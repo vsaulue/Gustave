@@ -1,0 +1,102 @@
+/* This file is part of Gustave, a structural integrity library for video games.
+ *
+ * Copyright (c) 2022,2023 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files(the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and /or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions :
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#pragma once
+
+#include <span>
+#include <vector>
+
+#include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/cfg/cUnitOf.hpp>
+#include <gustave/cfg/LibTraits.hpp>
+#include <gustave/model/Structure.hpp>
+
+namespace Gustave::Balancers::Force1 {
+    template<Cfg::cLibConfig auto cfg>
+    class SolutionBasis {
+    private:
+        static constexpr auto u = Cfg::units(cfg);
+
+        template<Cfg::cUnitOf<cfg> auto unit>
+        using Real = Cfg::Real<cfg, unit>;
+
+        template<Cfg::cUnitOf<cfg> auto unit>
+        using Vector3 = Cfg::Vector3<cfg, unit>;
+    public:
+        using Structure = Model::Structure<cfg>;
+
+        [[nodiscard]]
+        SolutionBasis(Structure const& structure, Vector3<u.acceleration> const& g, std::vector<Real<u.potential>> potentials)
+            : structure_(structure)
+            , g_(g)
+            , potentials_(std::move(potentials))
+        {
+            checkPotentials();
+        }
+
+        [[nodiscard]]
+        SolutionBasis(Structure const& structure, Vector3<u.acceleration> const& g)
+            : structure_(structure)
+            , g_(g)
+            , potentials_(structure_.nodes().size(), Real<u.potential>::zero())
+        {
+
+        }
+
+        [[nodiscard]]
+        const Structure& structure() const {
+            return structure_;
+        }
+
+        [[nodiscard]]
+        std::vector<Real<u.potential>> const& potentials() const {
+            return potentials_;
+        }
+
+        [[nodiscard]]
+        std::span<Real<u.potential>> spanPotentials() {
+            return potentials_;
+        }
+
+        void swapPotentials(std::vector<Real<u.potential>>& newPotentials) {
+            potentials_.swap(newPotentials);
+            checkPotentials();
+        }
+
+        [[nodiscard]]
+        Vector3<u.acceleration> const& g() const {
+            return g_;
+        }
+    private:
+        Structure const& structure_;
+        Vector3<u.acceleration> g_;
+        std::vector<Real<u.potential>> potentials_;
+
+        void checkPotentials() const {
+            assert(potentials_.size() == structure_.nodes().size());
+        }
+    };
+
+}
