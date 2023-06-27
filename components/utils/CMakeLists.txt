@@ -29,9 +29,9 @@ target_link_libraries(Comp-Utils
 )
 
 add_executable(Test-Comp-Utils
-    "tests/NumberHyperscript.cpp"
-    "tests/SizedString.cpp"
-    "tests/SizedStringView.cpp"
+    "tests/text/NumberHyperscript.cpp"
+    "tests/text/SizedString.cpp"
+    "tests/text/SizedStringView.cpp"
 )
 target_link_libraries(Test-Comp-Utils
     PRIVATE Catch2::Catch2WithMain
