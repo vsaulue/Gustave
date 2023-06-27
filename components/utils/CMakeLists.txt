@@ -22,19 +22,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_library(Comp-Text INTERFACE)
-target_include_directories(Comp-Text INTERFACE "include")
-target_link_libraries(Comp-Text
+add_library(Comp-Utils INTERFACE)
+target_include_directories(Comp-Utils INTERFACE "include")
+target_link_libraries(Comp-Utils
     INTERFACE Comp-Config
 )
 
-add_executable(Test-Comp-Text
+add_executable(Test-Comp-Utils
     "tests/NumberHyperscript.cpp"
     "tests/SizedString.cpp"
     "tests/SizedStringView.cpp"
 )
-target_link_libraries(Test-Comp-Text
+target_link_libraries(Test-Comp-Utils
     PRIVATE Catch2::Catch2WithMain
-    PRIVATE Comp-Text
+    PRIVATE Comp-Utils
 )
-declare_unit_test(Test-Comp-Text)
+declare_unit_test(Test-Comp-Utils)

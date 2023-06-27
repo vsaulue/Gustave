@@ -27,7 +27,7 @@ target_include_directories(Comp-Units-Vanilla-Lib INTERFACE
     "include"
 )
 target_link_libraries(Comp-Units-Vanilla-Lib
-    INTERFACE Comp-Text
+    INTERFACE Comp-Utils
 )
 
 add_executable(Test-Comp-Units-Vanilla-Lib
