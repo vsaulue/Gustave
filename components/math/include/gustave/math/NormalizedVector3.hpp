@@ -29,6 +29,7 @@
 
 #include <gustave/cfg/cRealOf.hpp>
 #include <gustave/cfg/cRealTraits.hpp>
+#include <gustave/math/BasicDirection.hpp>
 #include <gustave/math/Vector3.hpp>
 
 namespace Gustave::Math {
@@ -44,6 +45,32 @@ namespace Gustave::Math {
         [[nodiscard]]
         static constexpr RealTraits realTraits() {
             return {};
+        }
+
+        [[nodiscard]]
+        static NormalizedVector3 basisVector(BasicDirection direction) {
+            NormalizedVector3 result{ UncheckedInit{}, 1.f, 0.f, 0.f };
+            switch (direction) {
+            case BasicDirection::plusX:
+                result = { UncheckedInit{}, 1.f, 0.f, 0.f };
+                break;
+            case BasicDirection::minusX:
+                result = { UncheckedInit{}, -1.f, 0.f, 0.f };
+                break;
+            case BasicDirection::plusY:
+                result = { UncheckedInit{}, 0.f, 1.f, 0.f };
+                break;
+            case BasicDirection::minusY:
+                result = { UncheckedInit{}, 0.f, -1.f, 0.f };
+                break;
+            case BasicDirection::plusZ:
+                result = { UncheckedInit{}, 0.f, 0.f, 1.f };
+                break;
+            case BasicDirection::minusZ:
+                result = { UncheckedInit{}, 0.f, 0.f, -1.f };
+                break;
+            }
+            return result;
         }
 
         [[nodiscard]]
