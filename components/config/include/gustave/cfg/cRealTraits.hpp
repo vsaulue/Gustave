@@ -47,6 +47,7 @@ namespace Gustave::Cfg {
             { Meta::value(u.acceleration) } -> cUnit;
             { Meta::value(u.area) } -> cUnit;
             { Meta::value(u.conductivity) } -> cUnit;
+            { Meta::value(u.density) } -> cUnit;
             { Meta::value(u.force) } -> cUnit;
             { Meta::value(u.length) } -> cUnit;
             { Meta::value(u.mass) } -> cUnit;
@@ -55,6 +56,7 @@ namespace Gustave::Cfg {
             { Meta::value(u.pressure) } -> cUnit;
             { Meta::value(u.resistance) } -> cUnit;
             { Meta::value(u.time) } -> cUnit;
+            { Meta::value(u.volume) } -> cUnit;
 
             // one is identity
             { u.one * u.area } -> cUnitAssignableFrom<T::area>;
@@ -69,6 +71,8 @@ namespace Gustave::Cfg {
             { Meta::value(u.potential) } -> cUnitAssignableFrom<T::length>;
             { u.potential / u.resistance } -> cUnitAssignableFrom<T::force>;
             { u.potential * u.conductivity } -> cUnitAssignableFrom<T::force>;
+            { u.length * u.length * u.length } -> cUnitAssignableFrom<T::volume>;
+            { u.density * u.volume } -> cUnitAssignableFrom<T::mass>;
         };
 
         template<typename RealTraits, auto unit>
@@ -89,6 +93,7 @@ namespace Gustave::Cfg {
         requires requires (
             detail::Real<T, T::units().acceleration> acceleration,
             detail::Real<T, T::units().area> area,
+            detail::Real<T, T::units().density> density,
             detail::Real<T, T::units().force> force,
             detail::Real<T, T::units().length> length,
             detail::Real<T, T::units().mass> mass,
@@ -96,10 +101,12 @@ namespace Gustave::Cfg {
             detail::Real<T, T::units().potential> potential,
             detail::Real<T, T::units().pressure> pressure,
             detail::Real<T, T::units().resistance> resistance,
-            detail::Real<T, T::units().time> time
+            detail::Real<T, T::units().time> time,
+            detail::Real<T, T::units().volume> volume
         ) {
             { Meta::value(acceleration) } -> cReal;
             { Meta::value(area) } -> cReal;
+            { Meta::value(density) } -> cReal;
             { Meta::value(force) } -> cReal;
             { Meta::value(length) } -> cReal;
             { Meta::value(mass) } -> cReal;
@@ -108,13 +115,16 @@ namespace Gustave::Cfg {
             { Meta::value(pressure) } -> cReal;
             { Meta::value(resistance) } -> cReal;
             { Meta::value(time) } -> cReal;
+            { Meta::value(volume) } -> cReal;
 
             acceleration = length / time / time;
             area = length * length;
+            density = mass / length / length / length;
             force = mass * acceleration;
             potential = one;
             pressure = force / area;
             resistance = potential / force;
+            volume = length * length * length;
 
             area = area * one;
             area = one * area;

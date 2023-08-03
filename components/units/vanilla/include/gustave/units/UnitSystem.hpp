@@ -50,8 +50,10 @@ namespace Gustave::Units {
         // derived natural units
         static constexpr auto acceleration = Lib::Unit{ m / s / s };
         static constexpr auto area = Lib::Unit{ m * m };
+        static constexpr auto density = Lib::Unit{ kg / m / m / m };
         static constexpr auto force = Lib::Unit<"N", kg * m / s / s>{};
         static constexpr auto pressure = Lib::Unit<"Pa", kg / m / s / s>{};
+        static constexpr auto volume = Lib::Unit{ m * m * m };
         // custom
         static constexpr auto potential = Lib::Unit<"lP", m>{};
         static constexpr auto resistance = Lib::Unit<"lR", length.unitId() / force.unitId()>{};
