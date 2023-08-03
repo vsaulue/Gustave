@@ -121,6 +121,9 @@ namespace Gustave::Math {
         Coord z() const {
             return value_.z();
         }
+
+        [[nodiscard]]
+        bool operator==(NormalizedVector3 const&) const = default;
     private:
         Vector value_;
 
