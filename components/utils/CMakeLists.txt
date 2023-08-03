@@ -29,9 +29,16 @@ target_link_libraries(Comp-Utils
 )
 
 add_executable(Test-Comp-Utils
+    "tests/hash/HashEquals.cpp"
+    "tests/hash/Hasher.cpp"
+    "tests/hash/PointerHash.cpp"
     "tests/text/NumberHyperscript.cpp"
     "tests/text/SizedString.cpp"
     "tests/text/SizedStringView.cpp"
+    "tests/utils/getter.cpp"
+)
+target_include_directories(Test-Comp-Utils
+    PRIVATE "tests/include"
 )
 target_link_libraries(Test-Comp-Utils
     PRIVATE Catch2::Catch2WithMain
