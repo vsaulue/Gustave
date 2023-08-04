@@ -66,6 +66,9 @@ namespace Gustave::Model {
         Real<u.pressure> maxTensileStress() const {
             return maxTensileStress_;
         }
+
+        [[nodiscard]]
+        bool operator==(Material const&) const = default;
     private:
         Real<u.pressure> maxCompressionStress_;
         Real<u.pressure> maxShearStress_;
