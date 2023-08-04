@@ -122,6 +122,6 @@ namespace Gustave::Model {
         NormalizedVector3 normal_; // normal at the surface of localNode.
         Real<u.area> area_;
         Real<u.length> thickness_;
-        Material<cfg> const& maxConstraints_;
+        Material<cfg> maxConstraints_;
     };
 }
