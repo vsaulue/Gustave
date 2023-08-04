@@ -37,6 +37,7 @@ namespace Gustave::Model {
     struct Material {
     private:
         static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto rt = cfg.realTraits;
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
@@ -50,6 +51,15 @@ namespace Gustave::Model {
             assert(maxCompression > 0.f * u.pressure);
             assert(maxShear > 0.f * u.pressure);
             assert(maxTensile > 0.f * u.pressure);
+        }
+
+        [[nodiscard]]
+        static Material minResistance(Material const& m1, Material const& m2) {
+            return {
+                rt.min(m1.maxCompressionStress_, m2.maxCompressionStress_),
+                rt.min(m1.maxShearStress_, m2.maxShearStress_),
+                rt.min(m1.maxTensileStress_, m2.maxTensileStress_)
+            };
         }
 
         [[nodiscard]]

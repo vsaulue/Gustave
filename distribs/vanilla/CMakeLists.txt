@@ -34,6 +34,7 @@ target_link_libraries(Gustave-Vanilla
 add_executable(Test-Gustave-Vanilla
     "tests/force1/Solution.cpp"
     "tests/force1/Solver.cpp"
+    "tests/model/Material.cpp"
 )
 target_link_libraries(Test-Gustave-Vanilla
     PRIVATE Catch2::Catch2WithMain
