@@ -26,4 +26,5 @@ add_library(Comp-Core INTERFACE)
 target_include_directories(Comp-Core INTERFACE "include")
 target_link_libraries(Comp-Core
     INTERFACE Comp-Config
+    INTERFACE Comp-Utils
 )
