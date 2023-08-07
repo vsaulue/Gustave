@@ -35,6 +35,15 @@ add_executable(Test-Gustave-Vanilla
     "tests/force1/Solution.cpp"
     "tests/force1/Solver.cpp"
     "tests/model/Material.cpp"
+    "tests/scenes/cuboidGrid/BlockConstructionInfo.cpp"
+    "tests/scenes/cuboidGrid/BlockPosition.cpp"
+    "tests/scenes/cuboidGrid/detail/BlockMappedData.cpp"
+    "tests/scenes/cuboidGrid/detail/BlockReference.cpp"
+    "tests/scenes/cuboidGrid/detail/PositionNeighbours.cpp"
+    "tests/scenes/cuboidGrid/detail/SceneBlocks.cpp"
+    "tests/scenes/cuboidGrid/detail/SceneNeighbours.cpp"
+    "tests/scenes/cuboidGrid/Scene.cpp"
+    "tests/scenes/cuboidGrid/Transaction.cpp"
 )
 target_link_libraries(Test-Gustave-Vanilla
     PRIVATE Catch2::Catch2WithMain

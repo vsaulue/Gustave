@@ -33,6 +33,11 @@
 #include <gustave/balancers/force1/Solution.hpp>
 #include <gustave/balancers/force1/SolutionBasis.hpp>
 #include <gustave/balancers/force1/Solver.hpp>
+#include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
+#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/Scene.hpp>
+#include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
+#include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/units/lib/Unit.hpp>
 
 #include "LibConfig.hpp"
@@ -49,6 +54,14 @@ namespace Gustave::Vanilla {
         using Solution = Balancers::Force1::Solution<libConfig>;
         using SolutionBasis = Balancers::Force1::SolutionBasis<libConfig>;
         using Solver = Balancers::Force1::Solver<libConfig>;
+    }
+
+    namespace CuboidGrid {
+        using BlockConstructionInfo = Scenes::CuboidGrid::BlockConstructionInfo<libConfig>;
+        using BlockPosition = Scenes::CuboidGrid::BlockPosition;
+        using Scene = Scenes::CuboidGrid::Scene<libConfig>;
+        using SceneStructure = Scenes::CuboidGrid::Scene<libConfig>;
+        using Transaction = Scenes::CuboidGrid::Transaction<libConfig>;
     }
 
     using NormalizedVector3 = LibConfig::NormalizedVector3;
