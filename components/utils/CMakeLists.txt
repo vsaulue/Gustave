@@ -24,9 +24,6 @@
 
 add_library(Comp-Utils INTERFACE)
 target_include_directories(Comp-Utils INTERFACE "include")
-target_link_libraries(Comp-Utils
-    INTERFACE Comp-Config
-)
 
 add_executable(Test-Comp-Utils
     "tests/hash/HashEquals.cpp"
