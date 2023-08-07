@@ -41,7 +41,7 @@ namespace Gustave::Scenes::CuboidGrid {
     private:
         using ConstructionHashEquals = Hash::HashEquals<BlockConstructionInfo<cfg>, Utils::getter(&BlockConstructionInfo<cfg>::position)>;
     public:
-        using ConstructionSet = ConstructionHashEquals::Set;
+        using ConstructionSet = typename ConstructionHashEquals::Set;
         using DeletedSet = std::unordered_set<BlockPosition>;
 
         [[nodiscard]]

@@ -37,8 +37,8 @@ namespace Gustave::Testing::Matchers {
     template<Cfg::cVector3 TargetVector>
     class Vector3WithinRelMatcher : public Catch::Matchers::MatcherGenericBase {
     public:
-        using Coord = TargetVector::Coord;
-        using RealRep = TargetVector::RealRep;
+        using Coord = typename TargetVector::Coord;
+        using RealRep = typename TargetVector::RealRep;
 
         [[nodiscard]]
         constexpr Vector3WithinRelMatcher(TargetVector const& target, RealRep epsilon)

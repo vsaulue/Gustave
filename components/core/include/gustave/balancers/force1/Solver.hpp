@@ -51,19 +51,19 @@ namespace Gustave::Balancers::Force1 {
         static constexpr auto rt = cfg.realTraits;
 
         template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        using Real = typename Cfg::Real<cfg, unit>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        using Vector3 = typename Cfg::Vector3<cfg, unit>;
 
-        using ContactIndex = Cfg::ContactIndex<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
+        using ContactIndex = typename Cfg::ContactIndex<cfg>;
+        using NodeIndex = typename Cfg::NodeIndex<cfg>;
+        using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
 
-        using Node = Model::Node<cfg>;
-        using Structure = Model::Structure<cfg>;
-        using NodeInfo = Solution<cfg>::NodeInfo;
-        using ContactInfo = Solution<cfg>::ContactInfo;
+        using Node = typename Model::Node<cfg>;
+        using Structure = typename Model::Structure<cfg>;
+        using NodeInfo = typename Solution<cfg>::NodeInfo;
+        using ContactInfo = typename Solution<cfg>::ContactInfo;
     public:
         using IterationIndex = std::uint64_t;
 

@@ -30,17 +30,19 @@
 struct Coord {
     int value;
 
+    [[nodiscard]]
+    Coord(int v) : value{v} {}
+
     bool operator==(Coord const&) const = default;
 };
 
 struct Point {
+    [[nodiscard]]
     Point(int x, int y, int z)
         : x(x)
         , y(y)
         , z(z)
-    {
-
-    }
+    {}
 
     Coord x;
     Coord y;
