@@ -27,12 +27,12 @@
 
 #include <unordered_set>
 
-#include <gustave/hash/cHashableMemberOf.hpp>
-#include <gustave/hash/getMember.hpp>
-#include <gustave/hash/Hasher.hpp>
 #include <gustave/meta/Meta.hpp>
+#include <gustave/utils/cHashableMemberOf.hpp>
+#include <gustave/utils/getMember.hpp>
+#include <gustave/utils/Hasher.hpp>
 
-namespace Gustave::Hash {
+namespace Gustave::Utils {
     template<typename T, typename Object>
     concept cEqualsMemberOf = requires (Object const& object, T const& getter) {
         { getMember(object, getter) } -> std::equality_comparable;

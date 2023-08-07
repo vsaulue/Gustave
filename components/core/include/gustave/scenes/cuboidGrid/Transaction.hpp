@@ -31,15 +31,15 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/hash/HashEquals.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/utils/getter.hpp>
+#include <gustave/utils/HashEquals.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
     class Transaction {
     private:
-        using ConstructionHashEquals = Hash::HashEquals<BlockConstructionInfo<cfg>, Utils::getter(&BlockConstructionInfo<cfg>::position)>;
+        using ConstructionHashEquals = Utils::HashEquals<BlockConstructionInfo<cfg>, Utils::getter(&BlockConstructionInfo<cfg>::position)>;
     public:
         using ConstructionSet = typename ConstructionHashEquals::Set;
         using DeletedSet = std::unordered_set<BlockPosition>;

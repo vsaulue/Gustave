@@ -34,7 +34,7 @@
 #include <gustave/meta/MutableIf.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
-#include <gustave/hash/HashEquals.hpp>
+#include <gustave/utils/HashEquals.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
@@ -53,7 +53,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         QualifiedBlockData* data_;
     public:
-        using Hasher = Hash::Hasher<BlockReference, &BlockReference::data_>;
+        using Hasher = Utils::Hasher<BlockReference, &BlockReference::data_>;
 
         [[nodiscard]]
         static constexpr bool isMutable() {

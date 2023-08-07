@@ -25,11 +25,11 @@
 
 #pragma once
 
-#include <gustave/hash/cHashable.hpp>
-#include <gustave/hash/getMember.hpp>
 #include <gustave/meta/Meta.hpp>
+#include <gustave/utils/cHashable.hpp>
+#include <gustave/utils/getMember.hpp>
 
-namespace Gustave::Hash {
+namespace Gustave::Utils {
     template<typename T, typename Object>
     concept cHashableMemberOf = requires (Object const& obj, T const& getter) {
         { Meta::value(getMember(obj, getter)) } -> cHashable;

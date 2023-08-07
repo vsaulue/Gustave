@@ -29,7 +29,7 @@
 #include <functional>
 #include <ostream>
 
-#include <gustave/hash/Hasher.hpp>
+#include <gustave/utils/Hasher.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
@@ -65,7 +65,7 @@ namespace Gustave::Scenes::CuboidGrid {
         Coord y;
         Coord z;
 
-        using Hasher = Hash::Hasher<BlockPosition, &BlockPosition::x, &BlockPosition::y, &BlockPosition::z>;
+        using Hasher = Utils::Hasher<BlockPosition, &BlockPosition::x, &BlockPosition::y, &BlockPosition::z>;
     };
 }
 

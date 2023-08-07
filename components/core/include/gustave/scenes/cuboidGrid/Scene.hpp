@@ -35,7 +35,6 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/hash/PointerHash.hpp>
 #include <gustave/math/BasicDirection.hpp>
 #include <gustave/model/Material.hpp>
 #include <gustave/model/Structure.hpp>
@@ -48,6 +47,7 @@
 #include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/PointerHash.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
@@ -73,7 +73,7 @@ namespace Gustave::Scenes::CuboidGrid {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
-        using StructureSet = Hash::PointerHash::Set<std::shared_ptr<SceneStructure<cfg> const>>;
+        using StructureSet = Utils::PointerHash::Set<std::shared_ptr<SceneStructure<cfg> const>>;
 
         [[nodiscard]]
         Scene(Vector3<u.length> const& blockSize)

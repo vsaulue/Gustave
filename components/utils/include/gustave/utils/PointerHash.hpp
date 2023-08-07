@@ -27,39 +27,59 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
-#include <gustave/hash/cHashable.hpp>
-#include <gustave/hash/cHashableMemberOf.hpp>
-#include <gustave/hash/getMember.hpp>
+namespace Gustave::Utils {
+    struct PointerHash {
+    public:
+        struct Hash {
+        public:
+            using is_transparent = void;
 
-namespace Gustave::Hash {
-    namespace detail {
+            [[nodiscard]]
+            constexpr Hash() = default;
+
+            [[nodiscard]]
+            std::size_t operator()(auto const& value) const {
+                return std::hash<void const*>{}(getKey(value));
+            }
+        };
+
+        struct Equals {
+            using is_transparent = void;
+
+            [[nodiscard]]
+            constexpr Equals() = default;
+
+            [[nodiscard]]
+            bool operator()(auto const& lhs, auto const& rhs) const {
+                return getKey(lhs) == getKey(rhs);
+            }
+        };
+
+        template<typename Key, typename Value>
+        using Map = std::unordered_map<Key, Value, Hash, Equals>;
+
+        template<typename Key>
+        using Set = std::unordered_set<Key, Hash, Equals>;
+    private:
         [[nodiscard]]
-        inline std::size_t composeHash(std::size_t const h1, std::size_t const h2) {
-            static_assert(sizeof(std::size_t) == 8, "This implementation only works for 64bits hashing.");
-            return h1 ^ (h2 + 0x517cc1b727220a95 + (h1 << 6) + (h1 >> 2));
+        static void const* getKey(void const* value) {
+            return value;
         }
 
-        template<cHashable Arg>
+        template<typename T, typename Deleter>
         [[nodiscard]]
-        std::size_t doHash(Arg const& arg) {
-            return std::hash<Arg>{}(arg);
+        static T* getKey(std::unique_ptr<T, Deleter> const& value) {
+            return value.get();
         }
-    }
 
-    template<typename T, auto... members>
-        // constraint moved into requires clause because of MSVC bug:
-        // https://developercommunity.visualstudio.com/t/Template-parameters:-constraints-dependi/10312655#T-ND10364982
-        requires (cHashableMemberOf<decltype(members),T> && ...)
-    struct Hasher {
+        template<typename T>
         [[nodiscard]]
-        constexpr Hasher() = default;
-
-        [[nodiscard]]
-        std::size_t operator()(T const& obj) const {
-            std::size_t result = 0;
-            ((result = detail::composeHash(result, detail::doHash(getMember(obj, members)))), ...);
-            return result;
+        static T* getKey(std::shared_ptr<T> const& value) {
+            return value.get();
         }
     };
 }

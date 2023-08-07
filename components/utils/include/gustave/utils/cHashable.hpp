@@ -23,38 +23,14 @@
  * SOFTWARE.
  */
 
-#include <memory>
+#pragma once
 
-#include <catch2/catch_test_macros.hpp>
+#include <concepts>
+#include <functional>
 
-#include <gustave/utils/PointerHash.hpp>
-
-namespace Utils = Gustave::Utils;
-
-TEST_CASE("PointerHash") {
-    SECTION("::Set<unique_ptr<*>>") {
-        Utils::PointerHash::Set<std::unique_ptr<int>> set;
-        auto unique = std::make_unique<int>(8);
-        int* const raw = unique.get();
-        set.emplace(std::move(unique));
-
-        CHECK(set.contains(raw));
-        CHECK_FALSE(set.contains(nullptr));
-
-        auto otherUnique = std::make_unique<int>(8);
-        CHECK_FALSE(set.contains(otherUnique));
-    }
-
-    SECTION("::Set<shared_ptr<*>>") {
-        Utils::PointerHash::Set<std::shared_ptr<int>> set;
-        auto shared = std::make_shared<int>(5);
-        set.insert(shared);
-
-        CHECK(set.contains(shared));
-        CHECK(set.contains(shared.get()));
-        CHECK_FALSE(set.contains(nullptr));
-
-        auto unique = std::make_unique<int>(5);
-        CHECK_FALSE(set.contains(unique));
-    }
+namespace Gustave::Utils {
+    template<typename T>
+    concept cHashable = requires (T const& val) {
+        { std::hash<T>{}(val) } -> std::convertible_to<std::size_t>;
+    };
 }

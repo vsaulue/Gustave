@@ -27,14 +27,14 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/hash/HashEquals.hpp>
+#include <gustave/utils/HashEquals.hpp>
 #include <Point.hpp>
 
-namespace H = Gustave::Hash;
+namespace Utils = Gustave::Utils;
 
 TEST_CASE("HashEquals") {
     SECTION("// full HashEquals") {
-        using HE = H::HashEquals<Point, &Point::x, &Point::y, &Point::z>;
+        using HE = Utils::HashEquals<Point, &Point::x, &Point::y, &Point::z>;
         HE::Set set;
         set.insert({ 0,0,0 });
         set.insert({ 1,0,0 });
@@ -47,7 +47,7 @@ TEST_CASE("HashEquals") {
     }
 
     SECTION("// partial HashEquals") {
-        using xyHE = H::HashEquals<Point, &Point::x, &Point::y>;
+        using xyHE = Utils::HashEquals<Point, &Point::x, &Point::y>;
         xyHE::Set set;
         set.insert({ 0,0,0 });
         set.insert({ 1,0,0 });

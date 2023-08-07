@@ -25,15 +25,15 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/hash/Hasher.hpp>
+#include <gustave/utils/Hasher.hpp>
 #include <Point.hpp>
 
-namespace H = Gustave::Hash;
+namespace Utils = Gustave::Utils;
 
 TEST_CASE("Hash") {
     SECTION("::operator()()") {
         SECTION("// all fields") {
-            constexpr auto fullHasher = H::Hasher<Point, &Point::x, &Point::y, &Point::z>{};
+            constexpr auto fullHasher = Utils::Hasher<Point, &Point::x, &Point::y, &Point::z>{};
             CHECK(fullHasher({ 2,4,7 }) == 0x6b0e1ecbcccca9f);
             CHECK(fullHasher({ 2,4,7 }) != fullHasher({ 3,4,7 }));
             CHECK(fullHasher({ 2,4,7 }) != fullHasher({ 2,5,7 }));
@@ -41,7 +41,7 @@ TEST_CASE("Hash") {
         }
 
         SECTION("// partial fields") {
-            constexpr auto yzHasher = H::Hasher<Point, &Point::y, &Point::z>{};
+            constexpr auto yzHasher = Utils::Hasher<Point, &Point::y, &Point::z>{};
             CHECK(yzHasher({ 2,4,7 }) == 0x94709e599e4f391b);
             CHECK(yzHasher({ 2,4,7 }) == yzHasher({ 3,4,7 }));
             CHECK(yzHasher({ 2,4,7 }) != yzHasher({ 2,5,7 }));

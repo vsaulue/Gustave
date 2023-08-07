@@ -25,12 +25,41 @@
 
 #pragma once
 
-#include <concepts>
+#include <cstddef>
 #include <functional>
 
-namespace Gustave::Hash {
-    template<typename T>
-    concept cHashable = requires (T const& val) {
-        { std::hash<T>{}(val) } -> std::convertible_to<std::size_t>;
+#include <gustave/utils/cHashable.hpp>
+#include <gustave/utils/cHashableMemberOf.hpp>
+#include <gustave/utils/getMember.hpp>
+
+namespace Gustave::Utils {
+    namespace detail {
+        [[nodiscard]]
+        inline std::size_t composeHash(std::size_t const h1, std::size_t const h2) {
+            static_assert(sizeof(std::size_t) == 8, "This implementation only works for 64bits hashing.");
+            return h1 ^ (h2 + 0x517cc1b727220a95 + (h1 << 6) + (h1 >> 2));
+        }
+
+        template<cHashable Arg>
+        [[nodiscard]]
+        std::size_t doHash(Arg const& arg) {
+            return std::hash<Arg>{}(arg);
+        }
+    }
+
+    template<typename T, auto... members>
+        // constraint moved into requires clause because of MSVC bug:
+        // https://developercommunity.visualstudio.com/t/Template-parameters:-constraints-dependi/10312655#T-ND10364982
+        requires (cHashableMemberOf<decltype(members),T> && ...)
+    struct Hasher {
+        [[nodiscard]]
+        constexpr Hasher() = default;
+
+        [[nodiscard]]
+        std::size_t operator()(T const& obj) const {
+            std::size_t result = 0;
+            ((result = detail::composeHash(result, detail::doHash(getMember(obj, members)))), ...);
+            return result;
+        }
     };
 }
