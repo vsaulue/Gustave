@@ -26,11 +26,11 @@ add_library(Comp-Utils INTERFACE)
 target_include_directories(Comp-Utils INTERFACE "include")
 
 add_executable(Test-Comp-Utils
-    "tests/hash/HashEquals.cpp"
-    "tests/hash/Hasher.cpp"
-    "tests/hash/PointerHash.cpp"
     "tests/utils/getter.cpp"
+    "tests/utils/HashEquals.cpp"
+    "tests/utils/Hasher.cpp"
     "tests/utils/NumberHyperscript.cpp"
+    "tests/utils/PointerHash.cpp"
     "tests/utils/SizedString.cpp"
     "tests/utils/SizedStringView.cpp"
 )
