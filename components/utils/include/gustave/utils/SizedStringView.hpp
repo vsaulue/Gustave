@@ -25,9 +25,49 @@
 
 #pragma once
 
-namespace Gustave::Text {
-    template<typename T>
-    concept cChar = requires(const T * ptr, std::size_t len) {
-        std::basic_string_view<T>(ptr, len);
+#include <cstddef>
+
+#include <gustave/utils/cChar.hpp>
+
+namespace Gustave::Utils {
+    template<cChar Char_, std::size_t length>
+    class SizedStringView {
+    public:
+        using Char = Char_;
+        using Size = std::size_t;
+
+        using const_iterator = const Char*;
+
+        [[nodiscard]]
+        constexpr SizedStringView(const Char* val)
+            : data_(val)
+        {
+
+        }
+
+        [[nodiscard]]
+        constexpr const Char* data() const {
+            return data_;
+        }
+
+        [[nodiscard]]
+        static constexpr std::size_t size() {
+            return length;
+        }
+
+        [[nodiscard]]
+        constexpr const_iterator begin() const {
+            return data_;
+        }
+
+        [[nodiscard]]
+        constexpr const_iterator end() const {
+            return data_ + length;
+        }
+    private:
+        const Char* data_;
     };
+
+    template<cChar Char, std::size_t len>
+    SizedStringView(const Char(&)[len]) -> SizedStringView<Char, len - 1>;
 }

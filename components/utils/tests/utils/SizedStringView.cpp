@@ -23,51 +23,28 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include <algorithm>
+#include <string>
 
-#include <cstddef>
+#include <catch2/catch_test_macros.hpp>
 
-#include "cChar.hpp"
+#include <gustave/utils/SizedStringView.hpp>
 
-namespace Gustave::Text {
-    template<cChar Char_, std::size_t length>
-    class SizedStringView {
-    public:
-        using Char = Char_;
-        using Size = std::size_t;
+namespace Utils = Gustave::Utils;
 
-        using const_iterator = const Char*;
+TEST_CASE("SizedStringView") {
+    constexpr Utils::SizedStringView<char, 4> view = "abcd";
+    const std::string expected = "abcd";
 
-        [[nodiscard]]
-        constexpr SizedStringView(const Char* val)
-            : data_(val)
-        {
+    SECTION(".begin() // & .end()") {
+        CHECK(std::ranges::equal(view, expected));
+    }
 
-        }
+    SECTION(".size()") {
+        CHECK(view.size() == 4);
+    }
 
-        [[nodiscard]]
-        constexpr const Char* data() const {
-            return data_;
-        }
-
-        [[nodiscard]]
-        static constexpr std::size_t size() {
-            return length;
-        }
-
-        [[nodiscard]]
-        constexpr const_iterator begin() const {
-            return data_;
-        }
-
-        [[nodiscard]]
-        constexpr const_iterator end() const {
-            return data_ + length;
-        }
-    private:
-        const Char* data_;
-    };
-
-    template<cChar Char, std::size_t len>
-    SizedStringView(const Char(&)[len]) -> SizedStringView<Char, len - 1>;
+    SECTION(".data()") {
+        CHECK(view.data()[0] == 'a');
+    }
 }

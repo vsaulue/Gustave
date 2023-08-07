@@ -34,11 +34,10 @@
 #include <string_view>
 
 #include <gustave/meta/Meta.hpp>
+#include <gustave/utils/cChar.hpp>
+#include <gustave/utils/SizedStringView.hpp>
 
-#include "cChar.hpp"
-#include "SizedStringView.hpp"
-
-namespace Gustave::Text {
+namespace Gustave::Utils {
     template<cChar _Char, std::size_t length>
     struct SizedString {
     public:

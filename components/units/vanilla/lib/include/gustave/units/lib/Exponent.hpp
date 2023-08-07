@@ -31,8 +31,8 @@
 #include <numeric>
 #include <type_traits>
 
-#include <gustave/text/NumberHyperscript.hpp>
-#include <gustave/text/SizedString.hpp>
+#include <gustave/utils/NumberHyperscript.hpp>
+#include <gustave/utils/SizedString.hpp>
 
 namespace Gustave::Units::Lib {
     using ExpNum = std::int64_t;
@@ -61,7 +61,7 @@ namespace Gustave::Units::Lib {
         }
 
         struct ExponentText {
-            static constexpr Text::SizedStringView fractionText = "\u2044";
+            static constexpr Utils::SizedStringView fractionText = "\u2044";
         };
     }
 
@@ -95,15 +95,15 @@ namespace Gustave::Units::Lib {
         }
 
         [[nodiscard]]
-        static constexpr Text::cSizedString auto toString() {
-            constexpr Text::NumberHyperscript numDec{num()};
-            Text::SizedStringView<char, numDec.size()> numText{ numDec.begin() };
+        static constexpr Utils::cSizedString auto toString() {
+            constexpr Utils::NumberHyperscript numDec{num()};
+            Utils::SizedStringView<char, numDec.size()> numText{ numDec.begin() };
             if constexpr (den() == 1) {
-                return Text::SizedString{ numText };
+                return Utils::SizedString{ numText };
             } else {
-                constexpr Text::NumberHyperscript denDec{ den() };
-                Text::SizedStringView<char, denDec.size()> denText{ denDec.begin() };
-                return Text::SizedString{ numText, detail::ExponentText::fractionText ,denText };
+                constexpr Utils::NumberHyperscript denDec{ den() };
+                Utils::SizedStringView<char, denDec.size()> denText{ denDec.begin() };
+                return Utils::SizedString{ numText, detail::ExponentText::fractionText, denText };
             }
         }
     };

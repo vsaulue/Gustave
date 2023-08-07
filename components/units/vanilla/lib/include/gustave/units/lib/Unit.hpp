@@ -28,13 +28,13 @@
 #include <ostream>
 #include <type_traits>
 
-#include <gustave/text/SizedString.hpp>
+#include <gustave/utils/SizedString.hpp>
 
 #include "Exponent.hpp"
 #include "UnitIdentifier.hpp"
 
 namespace Gustave::Units::Lib {
-    template<Text::SizedString symbol_, cUnitIdentifier auto unitId_>
+    template<Utils::SizedString symbol_, cUnitIdentifier auto unitId_>
     class Unit;
     
     template<typename T>
@@ -42,7 +42,7 @@ namespace Gustave::Units::Lib {
 
     // `cUnitidentifier auto unitId_` instead of `UnitIdentifier unitId_`, because of MSVC bug.
     // see https://developercommunity.visualstudio.com/t/CTAD-rule-on-default-constructible-type/10279590?sort=newest.
-    template<Text::SizedString symbol_, cUnitIdentifier auto unitId_>
+    template<Utils::SizedString symbol_, cUnitIdentifier auto unitId_>
     class Unit {
     public:
         using UnitId = decltype(unitId_);
@@ -88,7 +88,7 @@ namespace Gustave::Units::Lib {
             return Unit<resId.toString(), resId>{};
         }
 
-        template<Text::SizedString argSymbol, UnitIdentifier argUnitId>
+        template<Utils::SizedString argSymbol, UnitIdentifier argUnitId>
         [[nodiscard]]
         static constexpr bool isAssignableFrom(Unit<argSymbol, argUnitId> other) {
             return other.unitId() == unitId();

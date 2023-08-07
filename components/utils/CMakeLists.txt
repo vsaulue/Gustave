@@ -29,10 +29,10 @@ add_executable(Test-Comp-Utils
     "tests/hash/HashEquals.cpp"
     "tests/hash/Hasher.cpp"
     "tests/hash/PointerHash.cpp"
-    "tests/text/NumberHyperscript.cpp"
-    "tests/text/SizedString.cpp"
-    "tests/text/SizedStringView.cpp"
     "tests/utils/getter.cpp"
+    "tests/utils/NumberHyperscript.cpp"
+    "tests/utils/SizedString.cpp"
+    "tests/utils/SizedStringView.cpp"
 )
 target_include_directories(Test-Comp-Utils
     PRIVATE "tests/include"

@@ -23,28 +23,11 @@
  * SOFTWARE.
  */
 
-#include <algorithm>
-#include <string>
+#pragma once
 
-#include <catch2/catch_test_macros.hpp>
-
-#include <gustave/text/SizedStringView.hpp>
-
-namespace T = Gustave::Text;
-
-TEST_CASE("SizedStringView") {
-    constexpr T::SizedStringView<char, 4> view = "abcd";
-    const std::string expected = "abcd";
-
-    SECTION(".begin() // & .end()") {
-        CHECK(std::ranges::equal(view, expected));
-    }
-
-    SECTION(".size()") {
-        CHECK(view.size() == 4);
-    }
-
-    SECTION(".data()") {
-        CHECK(view.data()[0] == 'a');
-    }
+namespace Gustave::Utils {
+    template<typename T>
+    concept cChar = requires(const T * ptr, std::size_t len) {
+        std::basic_string_view<T>(ptr, len);
+    };
 }

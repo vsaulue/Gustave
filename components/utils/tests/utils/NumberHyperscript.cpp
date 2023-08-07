@@ -29,35 +29,35 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "gustave/text/NumberHyperscript.hpp"
+#include "gustave/utils/NumberHyperscript.hpp"
 
-namespace T = Gustave::Text;
+namespace Utils = Gustave::Utils;
 
 TEST_CASE("NumberHyperscript") {
     SECTION("::NumberHyperscript(std::integral)") {
         SECTION("// int64: min") {
-            constexpr T::NumberHyperscript obj{ std::numeric_limits<std::int64_t>::min() };
+            constexpr Utils::NumberHyperscript obj{ std::numeric_limits<std::int64_t>::min() };
             REQUIRE(obj.view() == "⁻⁹²²³³⁷²⁰³⁶⁸⁵⁴⁷⁷⁵⁸⁰⁸");
         }
 
         SECTION("// int32: -1,111,111,111") {
-            constexpr T::NumberHyperscript obj{ std::int32_t{ -1111111111 } };
+            constexpr Utils::NumberHyperscript obj{ std::int32_t{ -1111111111 } };
             REQUIRE(obj.view() == "⁻¹¹¹¹¹¹¹¹¹¹");
         }
 
         SECTION("// int32_t: 0") {
-            constexpr T::NumberHyperscript<std::int32_t> obj{ 0 };
+            constexpr Utils::NumberHyperscript<std::int32_t> obj{ 0 };
             REQUIRE(obj.view() == "⁰");
         }
 
         SECTION("// uint64_t: max") {
-            constexpr T::NumberHyperscript obj{ std::numeric_limits<std::uint64_t>::max() };
+            constexpr Utils::NumberHyperscript obj{ std::numeric_limits<std::uint64_t>::max() };
             REQUIRE(obj.view() == "¹⁸⁴⁴⁶⁷⁴⁴⁰⁷³⁷⁰⁹⁵⁵¹⁶¹⁵");
         }
     }
 
     SECTION("") {
-        constexpr T::NumberHyperscript obj{ 12345 };
+        constexpr Utils::NumberHyperscript obj{ 12345 };
         const std::string expected = "¹²³⁴⁵";
 
         SECTION("::view()") {

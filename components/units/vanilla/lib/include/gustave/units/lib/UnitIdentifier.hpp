@@ -27,6 +27,8 @@
 
 #include <type_traits>
 
+#include <gustave/utils/SizedString.hpp>
+
 #include "Exponent.hpp"
 #include "UnitTerm.hpp"
 
@@ -75,11 +77,11 @@ namespace Gustave::Units::Lib {
         static constexpr auto pow(cExponent auto exp);
 
         [[nodiscard]]
-        static constexpr Text::cSizedString auto toString() {
+        static constexpr Utils::cSizedString auto toString() {
             if constexpr (tailUnit().isOne()) {
                 return headText();
             } else {
-                return Text::SizedString{ headText().sizedView(), Text::SizedStringView{"."}, tailUnit().toString().sizedView()};
+                return Utils::SizedString{ headText().sizedView(), Utils::SizedStringView{"."}, tailUnit().toString().sizedView()};
             }
         }
     private:
@@ -93,14 +95,14 @@ namespace Gustave::Units::Lib {
         }
 
         [[nodiscard]]
-        static constexpr Text::cSizedString auto headText() {
-            constexpr Text::cSizedString auto const& headSymbol = headTerm().basicUnit().symbol();
+        static constexpr Utils::cSizedString auto headText() {
+            constexpr Utils::cSizedString auto const& headSymbol = headTerm().basicUnit().symbol();
             constexpr cExponent auto headExp = headTerm().exponent();
             if constexpr (headExp == Exponent<1, 1>{}) {
                 return headSymbol;
             }
             else {
-                return Text::SizedString{ headSymbol.sizedView(), headExp.toString().sizedView()};
+                return Utils::SizedString{ headSymbol.sizedView(), headExp.toString().sizedView()};
             }
         }
 
@@ -135,7 +137,7 @@ namespace Gustave::Units::Lib {
         }
 
         [[nodiscard]]
-        static constexpr Text::SizedString<char, 0> toString() {
+        static constexpr Utils::SizedString<char, 0> toString() {
             return {};
         }
     };
