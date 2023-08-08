@@ -29,13 +29,13 @@
 #include <memory>
 #include <vector>
 
-#include <gustave/balancers/force1/SolutionBasis.hpp>
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/SolverStructure.hpp>
+#include <gustave/solvers/force1/SolutionBasis.hpp>
 
-namespace Gustave::Balancers::Force1 {
+namespace Gustave::Solvers::Force1 {
     template<Cfg::cLibConfig auto cfg>
     class Solution {
     private:

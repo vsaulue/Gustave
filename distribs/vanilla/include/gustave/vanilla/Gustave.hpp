@@ -30,14 +30,14 @@
 #include <gustave/model/SolverContact.hpp>
 #include <gustave/model/SolverNode.hpp>
 #include <gustave/model/SolverStructure.hpp>
-#include <gustave/balancers/force1/Solution.hpp>
-#include <gustave/balancers/force1/SolutionBasis.hpp>
-#include <gustave/balancers/force1/Solver.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/Scene.hpp>
 #include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
+#include <gustave/solvers/force1/Solution.hpp>
+#include <gustave/solvers/force1/SolutionBasis.hpp>
+#include <gustave/solvers/force1/Solver.hpp>
 #include <gustave/units/lib/Unit.hpp>
 
 #include "LibConfig.hpp"
@@ -51,9 +51,9 @@ namespace Gustave::Vanilla {
     using SolverStructure = Model::SolverStructure<libConfig>;
 
     namespace Force1 {
-        using Solution = Balancers::Force1::Solution<libConfig>;
-        using SolutionBasis = Balancers::Force1::SolutionBasis<libConfig>;
-        using Solver = Balancers::Force1::Solver<libConfig>;
+        using Solution = Solvers::Force1::Solution<libConfig>;
+        using SolutionBasis = Solvers::Force1::SolutionBasis<libConfig>;
+        using Solver = Solvers::Force1::Solver<libConfig>;
     }
 
     namespace CuboidGrid {

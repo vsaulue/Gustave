@@ -33,7 +33,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/SolverStructure.hpp>
 
-namespace Gustave::Balancers::Force1 {
+namespace Gustave::Solvers::Force1 {
     template<Cfg::cLibConfig auto cfg>
     class SolutionBasis {
     private:
