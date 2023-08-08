@@ -31,7 +31,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/Structure.hpp>
+#include <gustave/model/SolverStructure.hpp>
 
 namespace Gustave::Balancers::Force1 {
     template<Cfg::cLibConfig auto cfg>
@@ -45,10 +45,10 @@ namespace Gustave::Balancers::Force1 {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
-        using Structure = Model::Structure<cfg>;
+        using SolverStructure = Model::SolverStructure<cfg>;
 
         [[nodiscard]]
-        SolutionBasis(Structure const& structure, Vector3<u.acceleration> const& g, std::vector<Real<u.potential>> potentials)
+        SolutionBasis(SolverStructure const& structure, Vector3<u.acceleration> const& g, std::vector<Real<u.potential>> potentials)
             : structure_(structure)
             , g_(g)
             , potentials_(std::move(potentials))
@@ -57,7 +57,7 @@ namespace Gustave::Balancers::Force1 {
         }
 
         [[nodiscard]]
-        SolutionBasis(Structure const& structure, Vector3<u.acceleration> const& g)
+        SolutionBasis(SolverStructure const& structure, Vector3<u.acceleration> const& g)
             : structure_(structure)
             , g_(g)
             , potentials_(structure_.nodes().size(), Real<u.potential>::zero())
@@ -66,7 +66,7 @@ namespace Gustave::Balancers::Force1 {
         }
 
         [[nodiscard]]
-        const Structure& structure() const {
+        const SolverStructure& structure() const {
             return structure_;
         }
 
@@ -90,7 +90,7 @@ namespace Gustave::Balancers::Force1 {
             return g_;
         }
     private:
-        Structure const& structure_;
+        SolverStructure const& structure_;
         Vector3<u.acceleration> g_;
         std::vector<Real<u.potential>> potentials_;
 

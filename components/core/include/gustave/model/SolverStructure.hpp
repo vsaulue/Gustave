@@ -33,7 +33,7 @@
 
 namespace Gustave::Model {
     template<Cfg::cLibConfig auto cfg>
-    struct Structure {
+    struct SolverStructure {
         [[nodiscard]]
         std::vector<Node<cfg>>& nodes() {
             return nodes_;

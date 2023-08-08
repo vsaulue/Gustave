@@ -37,7 +37,6 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/math/BasicDirection.hpp>
 #include <gustave/model/Material.hpp>
-#include <gustave/model/Structure.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>

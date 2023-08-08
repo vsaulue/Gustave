@@ -33,6 +33,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/model/SolverStructure.hpp>
 
 namespace Gustave::Balancers::Force1 {
     template<Cfg::cLibConfig auto cfg>
@@ -54,7 +55,7 @@ namespace Gustave::Balancers::Force1 {
 
         using ContactArea = Model::ContactArea<cfg>;
         using Node = Model::Node<cfg>;
-        using Structure = Model::Structure<cfg>;
+        using SolverStructure = Model::SolverStructure<cfg>;
 
         class ContactInfo {
         public:
@@ -146,7 +147,7 @@ namespace Gustave::Balancers::Force1 {
         }
 
         [[nodiscard]]
-        Structure const& structure() const {
+        SolverStructure const& structure() const {
             return basis_->structure();
         }
 

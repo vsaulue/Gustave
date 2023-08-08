@@ -35,7 +35,7 @@ TEST_CASE("Force1::Solver") {
     SECTION("// pillar") {
         constexpr G::Real<u.mass> blockMass = 4000.f * u.mass;
         auto makePillar = [blockMass](unsigned blockCount) {
-            G::Structure structure;
+            G::SolverStructure structure;
             for (unsigned i = 0; i < blockCount; ++i) {
                 structure.nodes().emplace_back(blockMass, i == 0);
             }
@@ -46,7 +46,7 @@ TEST_CASE("Force1::Solver") {
         };
         constexpr unsigned blockCount = 10;
         constexpr float precision = 0.001f;
-        G::Structure const structure = makePillar(blockCount);
+        G::SolverStructure const structure = makePillar(blockCount);
         G::Force1::Solver const solver{structure, g, G::Force1::Solver::Config{1000, precision}};
         G::Force1::Solution const& solution = solver.solution();
         CHECK_THAT(solution.forceVector(0, 1), M::WithinRel(float(blockCount - 1) * blockMass * g, precision));

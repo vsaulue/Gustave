@@ -35,7 +35,7 @@
 #include <TestConfig.hpp>
 
 TEST_CASE("Force1::Solution") {
-    G::Structure structure;
+    G::SolverStructure structure;
     for (unsigned i = 1; i <= 7; ++i) {
         structure.nodes().emplace_back(double(i * 1'000) * u.mass, i == 1);
     }

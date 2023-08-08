@@ -40,7 +40,7 @@
 #include <gustave/model/ContactArea.hpp>
 #include <gustave/model/Material.hpp>
 #include <gustave/model/Node.hpp>
-#include <gustave/model/Structure.hpp>
+#include <gustave/model/SolverStructure.hpp>
 
 namespace Gustave::Balancers::Force1 {
 
@@ -61,7 +61,7 @@ namespace Gustave::Balancers::Force1 {
         using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
 
         using Node = typename Model::Node<cfg>;
-        using Structure = typename Model::Structure<cfg>;
+        using SolverStructure = typename Model::SolverStructure<cfg>;
         using NodeInfo = typename Solution<cfg>::NodeInfo;
         using ContactInfo = typename Solution<cfg>::ContactInfo;
     public:
@@ -92,7 +92,7 @@ namespace Gustave::Balancers::Force1 {
         };
 
         [[nodiscard]]
-        Solver(Structure const& structure, Vector3<u.acceleration> const& g, Config const& config)
+        Solver(SolverStructure const& structure, Vector3<u.acceleration> const& g, Config const& config)
             : Solver(std::make_shared<SolutionBasis<cfg>>(structure, g), config)
         {
             
@@ -133,7 +133,7 @@ namespace Gustave::Balancers::Force1 {
             return *solution_;
         }
     private:
-        Structure const& structure_;
+        SolverStructure const& structure_;
         SolutionBasis<cfg>* basis_;
         std::unique_ptr<Solution<cfg> const> solution_;
     };
