@@ -33,7 +33,7 @@
 
 namespace Gustave::Model {
     template<Cfg::cLibConfig auto cfg>
-    struct Node {
+    struct SolverNode {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
@@ -43,7 +43,7 @@ namespace Gustave::Model {
         bool isFoundation;
 
         [[nodiscard]]
-        Node(Real<u.mass> mass, bool isFoundation)
+        SolverNode(Real<u.mass> mass, bool isFoundation)
             : isFoundation(isFoundation)
             , mass_(mass)
         {

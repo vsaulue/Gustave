@@ -27,20 +27,20 @@
 
 #include <vector>
 
-#include "gustave/cfg/cLibConfig.hpp"
-#include "ContactArea.hpp"
-#include "Node.hpp"
+#include <gustave/cfg/cLibConfig.hpp>
+#include "gustave/model/ContactArea.hpp"
+#include <gustave/model/SolverNode.hpp>
 
 namespace Gustave::Model {
     template<Cfg::cLibConfig auto cfg>
     struct SolverStructure {
         [[nodiscard]]
-        std::vector<Node<cfg>>& nodes() {
+        std::vector<SolverNode<cfg>>& nodes() {
             return nodes_;
         }
 
         [[nodiscard]]
-        std::vector<Node<cfg>> const& nodes() const {
+        std::vector<SolverNode<cfg>> const& nodes() const {
             return nodes_;
         }
 
@@ -55,7 +55,7 @@ namespace Gustave::Model {
             links_.push_back(newLink);
         }
     private:
-        std::vector<Node<cfg>> nodes_;
+        std::vector<SolverNode<cfg>> nodes_;
         std::vector<ContactArea<cfg>> links_;
     };
 }

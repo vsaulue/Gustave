@@ -124,7 +124,7 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             CHECK(scene.blocks().size() == 1);
             SceneStructure const& structure = structureOf({ 1,0,0 });
             G::NodeIndex blockIndex = getBlockIndex(structure, { 1,0,0 });
-            G::Node const& solverNode = structure.solverStructure().nodes()[blockIndex];
+            G::SolverNode const& solverNode = structure.solverStructure().nodes()[blockIndex];
             CHECK_FALSE(solverNode.isFoundation);
             CHECK(solverNode.mass() == blockMass);
         }

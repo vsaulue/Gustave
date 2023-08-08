@@ -115,7 +115,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
     private:
         [[nodiscard]]
-        std::vector<Model::Node<cfg>>& solverNodes() {
+        std::vector<Model::SolverNode<cfg>>& solverNodes() {
             return solverStructure_.nodes();
         }
 

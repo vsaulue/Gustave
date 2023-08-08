@@ -28,7 +28,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/ContactArea.hpp>
 #include <gustave/model/Material.hpp>
-#include <gustave/model/Node.hpp>
+#include <gustave/model/SolverNode.hpp>
 #include <gustave/model/SolverStructure.hpp>
 #include <gustave/balancers/force1/Solution.hpp>
 #include <gustave/balancers/force1/SolutionBasis.hpp>
@@ -47,7 +47,7 @@ namespace Gustave::Vanilla {
 
     using ContactArea = Model::ContactArea<libConfig>;
     using Material = Model::Material<libConfig>;
-    using Node = Model::Node<libConfig>;
+    using SolverNode = Model::SolverNode<libConfig>;
     using SolverStructure = Model::SolverStructure<libConfig>;
 
     namespace Force1 {

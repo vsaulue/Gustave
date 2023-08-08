@@ -54,7 +54,7 @@ namespace Gustave::Balancers::Force1 {
         using Basis = SolutionBasis<cfg>;
 
         using ContactArea = Model::ContactArea<cfg>;
-        using Node = Model::Node<cfg>;
+        using SolverNode = Model::SolverNode<cfg>;
         using SolverStructure = Model::SolverStructure<cfg>;
 
         class ContactInfo {
@@ -113,7 +113,7 @@ namespace Gustave::Balancers::Force1 {
         {
             const Real<u.acceleration> gNorm = g().norm();
             nodeInfos_.reserve(nodes().size());
-            for (const Node& node : nodes()) {
+            for (const SolverNode& node : nodes()) {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
             for (const ContactArea& link : structure().links()) {
@@ -256,7 +256,7 @@ namespace Gustave::Balancers::Force1 {
         NormalizedVector3 normalizedG_;
 
         [[nodiscard]]
-        std::vector<Node> const& nodes() const {
+        std::vector<SolverNode> const& nodes() const {
             return basis_->structure().nodes();
         }
 

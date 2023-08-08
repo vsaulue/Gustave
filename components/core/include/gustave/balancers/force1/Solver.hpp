@@ -39,7 +39,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/ContactArea.hpp>
 #include <gustave/model/Material.hpp>
-#include <gustave/model/Node.hpp>
+#include <gustave/model/SolverNode.hpp>
 #include <gustave/model/SolverStructure.hpp>
 
 namespace Gustave::Balancers::Force1 {
@@ -60,7 +60,7 @@ namespace Gustave::Balancers::Force1 {
         using NodeIndex = typename Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
 
-        using Node = typename Model::Node<cfg>;
+        using SolverNode = typename Model::SolverNode<cfg>;
         using SolverStructure = typename Model::SolverStructure<cfg>;
         using NodeInfo = typename Solution<cfg>::NodeInfo;
         using ContactInfo = typename Solution<cfg>::ContactInfo;
@@ -104,7 +104,7 @@ namespace Gustave::Balancers::Force1 {
             , basis_{ basis.get() }
             , solution_{ std::make_unique<Solution<cfg>>(std::move(basis)) }
         {
-            std::vector<Node> const& nodes = structure_.nodes();
+            std::vector<SolverNode> const& nodes = structure_.nodes();
             std::vector<Real<u.potential>> const& potentials = basis_->potentials();
             std::vector<Real<u.potential>> nextPotentials = potentials;
             constexpr Real<u.one> convergenceFactor = 0.5f;
@@ -112,7 +112,7 @@ namespace Gustave::Balancers::Force1 {
             do {
                 Real<u.one> currentMaxError = 0.f;
                 for (NodeIndex id = 0; id < nodes.size(); ++id) {
-                    Node const& node = nodes[id];
+                    SolverNode const& node = nodes[id];
                     if (!node.isFoundation) {
                         auto const nodeStats = solution_->statsOf(id);
                         nextPotentials[id] = potentials[id] - nodeStats.force / nodeStats.derivative * convergenceFactor;
