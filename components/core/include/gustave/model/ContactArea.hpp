@@ -45,16 +45,17 @@ namespace Gustave::Model {
     public:
         [[nodiscard]]
         ContactArea(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, Material<cfg> const& maxConstraints)
-            : localNodeId_(id1)
-            , otherNodeId_(id2)
-            , normal_(normal)
-            , area_(area)
-            , thickness_(thickness)
-            , maxConstraints_(maxConstraints)
+            : localNodeId_{ id1 }
+            , otherNodeId_{ id2 }
+            , normal_{ normal }
+            , compressionConductivity_{ maxConstraints.maxCompressionStress() * area / thickness }
+            , shearConductivity_{ maxConstraints.maxShearStress() * area / thickness }
+            , tensileConductivity_{ maxConstraints.maxTensileStress() * area / thickness }
         {
             assert(id1 != id2);
-            assert(area > 0.0f * u.area);
-            assert(thickness > 0.0f * u.length);
+            assert(compressionConductivity_ > 0.f * u.conductivity);
+            assert(shearConductivity_ > 0.f * u.conductivity);
+            assert(tensileConductivity_ > 0.f * u.conductivity);
         }
 
         [[nodiscard]]
@@ -73,55 +74,25 @@ namespace Gustave::Model {
         }
 
         [[nodiscard]]
-        Real<u.area> area() const {
-            return area_;
-        }
-
-        [[nodiscard]]
-        Real<u.length> thickness() const {
-            return thickness_;
-        }
-
-        [[nodiscard]]
-        const Material<cfg>& maxConstraints() const {
-            return maxConstraints_;
-        }
-
-        [[nodiscard]]
-        Real<u.force> maxCompressionForce() const {
-            return area_ * maxConstraints_.maxCompressionStress();
-        }
-
-        [[nodiscard]]
-        Real<u.force> maxShearForce() const {
-            return area_ * maxConstraints_.maxShearStress();
-        }
-
-        [[nodiscard]]
-        Real<u.force> maxTensileForce() const {
-            return area_ * maxConstraints_.maxTensileStress();
-        }
-
-        [[nodiscard]]
         Real<u.conductivity> compressionConductivity() const {
-            return maxCompressionForce() / thickness_;
+            return compressionConductivity_;
         }
 
         [[nodiscard]]
         Real<u.conductivity> shearConductivity() const {
-            return maxShearForce() / thickness_;
+            return shearConductivity_;
         }
 
         [[nodiscard]]
         Real<u.conductivity> tensileConductivity() const {
-            return maxTensileForce() / thickness_;
+            return tensileConductivity_;
         }
     private:
         NodeIndex localNodeId_;
         NodeIndex otherNodeId_;
         NormalizedVector3 normal_; // normal at the surface of localNode.
-        Real<u.area> area_;
-        Real<u.length> thickness_;
-        Material<cfg> maxConstraints_;
+        Real<u.conductivity> compressionConductivity_;
+        Real<u.conductivity> shearConductivity_;
+        Real<u.conductivity> tensileConductivity_;
     };
 }

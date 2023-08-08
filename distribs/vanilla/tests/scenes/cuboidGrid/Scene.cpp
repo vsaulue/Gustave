@@ -85,7 +85,7 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             return *optBlock;
         };
 
-        auto checkContact = [](SceneStructure const& structure, G::NodeIndex source, G::NodeIndex dest, Direction sourceNormal, G::Material const& material) {
+        auto checkContact = [&scene](SceneStructure const& structure, G::NodeIndex source, G::NodeIndex dest, Direction sourceNormal, G::Material const& material) {
             G::NormalizedVector3 const normal = G::NormalizedVector3::basisVector(sourceNormal);
             bool found = false;
             for (G::ContactArea const& link : structure.solverStructure().links()) {
@@ -98,7 +98,10 @@ TEST_CASE("Scene::CubeGrid::Scene") {
                     found = true;
                 }
                 if (found) {
-                    CHECK(link.maxConstraints() == material);
+                    G::Real<u.length> const conductivityFactor = scene.contactAreaAlong(sourceNormal) / scene.thicknessAlong(sourceNormal);
+                    CHECK_THAT(link.compressionConductivity(), M::WithinRel(conductivityFactor * material.maxCompressionStress(), epsilon));
+                    CHECK_THAT(link.shearConductivity(), M::WithinRel(conductivityFactor * material.maxShearStress(), epsilon));
+                    CHECK_THAT(link.tensileConductivity(), M::WithinRel(conductivityFactor * material.maxTensileStress(), epsilon));
                     break;
                 }
             }
