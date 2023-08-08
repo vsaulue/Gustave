@@ -53,7 +53,7 @@ namespace Gustave::Balancers::Force1 {
     public:
         using Basis = SolutionBasis<cfg>;
 
-        using ContactArea = Model::ContactArea<cfg>;
+        using SolverContact = Model::SolverContact<cfg>;
         using SolverNode = Model::SolverNode<cfg>;
         using SolverStructure = Model::SolverStructure<cfg>;
 
@@ -116,7 +116,7 @@ namespace Gustave::Balancers::Force1 {
             for (const SolverNode& node : nodes()) {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
-            for (const ContactArea& link : structure().links()) {
+            for (SolverContact const& link : structure().links()) {
                 const NodeIndex id1 = link.localNodeId();
                 const NodeIndex id2 = link.otherNodeId();
 

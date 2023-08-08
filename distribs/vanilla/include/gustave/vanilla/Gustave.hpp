@@ -26,8 +26,8 @@
 #pragma once
 
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/ContactArea.hpp>
 #include <gustave/model/Material.hpp>
+#include <gustave/model/SolverContact.hpp>
 #include <gustave/model/SolverNode.hpp>
 #include <gustave/model/SolverStructure.hpp>
 #include <gustave/balancers/force1/Solution.hpp>
@@ -45,8 +45,8 @@
 namespace Gustave::Vanilla {
     inline constexpr LibConfig libConfig{};
 
-    using ContactArea = Model::ContactArea<libConfig>;
     using Material = Model::Material<libConfig>;
+    using SolverContact = Model::SolverContact<libConfig>;
     using SolverNode = Model::SolverNode<libConfig>;
     using SolverStructure = Model::SolverStructure<libConfig>;
 

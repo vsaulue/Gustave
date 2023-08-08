@@ -37,7 +37,6 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/ContactArea.hpp>
 #include <gustave/model/Material.hpp>
 #include <gustave/model/SolverNode.hpp>
 #include <gustave/model/SolverStructure.hpp>

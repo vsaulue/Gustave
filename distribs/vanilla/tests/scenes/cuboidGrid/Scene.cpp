@@ -87,8 +87,8 @@ TEST_CASE("Scene::CubeGrid::Scene") {
 
         auto checkContact = [&scene](SceneStructure const& structure, G::NodeIndex source, G::NodeIndex dest, Direction sourceNormal, G::Material const& material) {
             G::NormalizedVector3 const normal = G::NormalizedVector3::basisVector(sourceNormal);
-            G::ContactArea const* selectedLink = nullptr;
-            for (G::ContactArea const& link : structure.solverStructure().links()) {
+            G::SolverContact const* selectedLink = nullptr;
+            for (G::SolverContact const& link : structure.solverStructure().links()) {
                 if (link.localNodeId() == source && link.otherNodeId() == dest) {
                     CHECK(link.normal() == normal);
                     selectedLink = &link;

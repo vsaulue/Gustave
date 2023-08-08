@@ -28,7 +28,7 @@
 #include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include "gustave/model/ContactArea.hpp"
+#include <gustave/model/SolverContact.hpp>
 #include <gustave/model/SolverNode.hpp>
 
 namespace Gustave::Model {
@@ -45,17 +45,17 @@ namespace Gustave::Model {
         }
 
         [[nodiscard]]
-        std::vector<ContactArea<cfg>> const& links() const {
+        std::vector<SolverContact<cfg>> const& links() const {
             return links_;
         }
 
-        void addLink(ContactArea<cfg> const& newLink) {
+        void addLink(SolverContact<cfg> const& newLink) {
             assert(newLink.localNodeId() < nodes_.size());
             assert(newLink.otherNodeId() < nodes_.size());
             links_.push_back(newLink);
         }
     private:
         std::vector<SolverNode<cfg>> nodes_;
-        std::vector<ContactArea<cfg>> links_;
+        std::vector<SolverContact<cfg>> links_;
     };
 }
