@@ -35,11 +35,10 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/Material.hpp>
-#include <gustave/model/SolverNode.hpp>
-#include <gustave/model/SolverStructure.hpp>
 #include <gustave/solvers/force1/Solution.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
+#include <gustave/solvers/SolverNode.hpp>
+#include <gustave/solvers/SolverStructure.hpp>
 
 namespace Gustave::Solvers::Force1 {
     template<Cfg::cLibConfig auto cfg>
@@ -58,8 +57,6 @@ namespace Gustave::Solvers::Force1 {
         using NodeIndex = typename Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
 
-        using SolverNode = typename Model::SolverNode<cfg>;
-        using SolverStructure = typename Model::SolverStructure<cfg>;
         using NodeInfo = typename Solution<cfg>::NodeInfo;
         using ContactInfo = typename Solution<cfg>::ContactInfo;
     public:
@@ -90,7 +87,7 @@ namespace Gustave::Solvers::Force1 {
         };
 
         [[nodiscard]]
-        Solver(SolverStructure const& structure, Vector3<u.acceleration> const& g, Config const& config)
+        Solver(SolverStructure<cfg> const& structure, Vector3<u.acceleration> const& g, Config const& config)
             : Solver(std::make_shared<SolutionBasis<cfg>>(structure, g), config)
         {
             
@@ -102,7 +99,7 @@ namespace Gustave::Solvers::Force1 {
             , basis_{ basis.get() }
             , solution_{ std::make_unique<Solution<cfg>>(std::move(basis)) }
         {
-            std::vector<SolverNode> const& nodes = structure_.nodes();
+            std::vector<SolverNode<cfg>> const& nodes = structure_.nodes();
             std::vector<Real<u.potential>> const& potentials = basis_->potentials();
             std::vector<Real<u.potential>> nextPotentials = potentials;
             constexpr Real<u.one> convergenceFactor = 0.5f;
@@ -110,7 +107,7 @@ namespace Gustave::Solvers::Force1 {
             do {
                 Real<u.one> currentMaxError = 0.f;
                 for (NodeIndex id = 0; id < nodes.size(); ++id) {
-                    SolverNode const& node = nodes[id];
+                    SolverNode<cfg> const& node = nodes[id];
                     if (!node.isFoundation) {
                         auto const nodeStats = solution_->statsOf(id);
                         nextPotentials[id] = potentials[id] - nodeStats.force / nodeStats.derivative * convergenceFactor;
@@ -131,7 +128,7 @@ namespace Gustave::Solvers::Force1 {
             return *solution_;
         }
     private:
-        SolverStructure const& structure_;
+        SolverStructure<cfg> const& structure_;
         SolutionBasis<cfg>* basis_;
         std::unique_ptr<Solution<cfg> const> solution_;
     };

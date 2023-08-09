@@ -25,37 +25,36 @@
 
 #pragma once
 
-#include <vector>
+#include <cassert>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/model/SolverContact.hpp>
-#include <gustave/model/SolverNode.hpp>
+#include <gustave/cfg/cUnitOf.hpp>
+#include <gustave/cfg/LibTraits.hpp>
 
-namespace Gustave::Model {
+namespace Gustave::Solvers {
     template<Cfg::cLibConfig auto cfg>
-    struct SolverStructure {
+    struct SolverNode {
+    private:
+        static constexpr auto u = Cfg::units(cfg);
+
+        template<Cfg::cUnitOf<cfg> auto unit>
+        using Real = Cfg::Real<cfg, unit>;
+    public:
+        bool isFoundation;
+
         [[nodiscard]]
-        std::vector<SolverNode<cfg>>& nodes() {
-            return nodes_;
+        SolverNode(Real<u.mass> mass, bool isFoundation)
+            : isFoundation(isFoundation)
+            , mass_(mass)
+        {
+            assert(mass > 0.f * u.mass);
         }
 
         [[nodiscard]]
-        std::vector<SolverNode<cfg>> const& nodes() const {
-            return nodes_;
-        }
-
-        [[nodiscard]]
-        std::vector<SolverContact<cfg>> const& links() const {
-            return links_;
-        }
-
-        void addLink(SolverContact<cfg> const& newLink) {
-            assert(newLink.localNodeId() < nodes_.size());
-            assert(newLink.otherNodeId() < nodes_.size());
-            links_.push_back(newLink);
+        Real<u.mass> mass() const {
+            return mass_;
         }
     private:
-        std::vector<SolverNode<cfg>> nodes_;
-        std::vector<SolverContact<cfg>> links_;
+        Real<u.mass> mass_;
     };
 }

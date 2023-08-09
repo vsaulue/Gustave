@@ -32,8 +32,8 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/SolverStructure.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
+#include <gustave/solvers/SolverStructure.hpp>
 
 namespace Gustave::Solvers::Force1 {
     template<Cfg::cLibConfig auto cfg>
@@ -52,10 +52,6 @@ namespace Gustave::Solvers::Force1 {
         static constexpr auto rt = cfg.realTraits;
     public:
         using Basis = SolutionBasis<cfg>;
-
-        using SolverContact = Model::SolverContact<cfg>;
-        using SolverNode = Model::SolverNode<cfg>;
-        using SolverStructure = Model::SolverStructure<cfg>;
 
         class ContactInfo {
         public:
@@ -113,10 +109,10 @@ namespace Gustave::Solvers::Force1 {
         {
             const Real<u.acceleration> gNorm = g().norm();
             nodeInfos_.reserve(nodes().size());
-            for (const SolverNode& node : nodes()) {
+            for (SolverNode<cfg> const& node : nodes()) {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
-            for (SolverContact const& link : structure().links()) {
+            for (SolverContact<cfg> const& link : structure().links()) {
                 const NodeIndex id1 = link.localNodeId();
                 const NodeIndex id2 = link.otherNodeId();
 
@@ -147,7 +143,7 @@ namespace Gustave::Solvers::Force1 {
         }
 
         [[nodiscard]]
-        SolverStructure const& structure() const {
+        SolverStructure<cfg> const& structure() const {
             return basis_->structure();
         }
 
@@ -256,7 +252,7 @@ namespace Gustave::Solvers::Force1 {
         NormalizedVector3 normalizedG_;
 
         [[nodiscard]]
-        std::vector<SolverNode> const& nodes() const {
+        std::vector<SolverNode<cfg>> const& nodes() const {
             return basis_->structure().nodes();
         }
 

@@ -27,9 +27,6 @@
 
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/Material.hpp>
-#include <gustave/model/SolverContact.hpp>
-#include <gustave/model/SolverNode.hpp>
-#include <gustave/model/SolverStructure.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/Scene.hpp>
@@ -38,6 +35,9 @@
 #include <gustave/solvers/force1/Solution.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/solvers/force1/Solver.hpp>
+#include <gustave/solvers/SolverContact.hpp>
+#include <gustave/solvers/SolverNode.hpp>
+#include <gustave/solvers/SolverStructure.hpp>
 #include <gustave/units/lib/Unit.hpp>
 
 #include "LibConfig.hpp"
@@ -46,9 +46,10 @@ namespace Gustave::Vanilla {
     inline constexpr LibConfig libConfig{};
 
     using Material = Model::Material<libConfig>;
-    using SolverContact = Model::SolverContact<libConfig>;
-    using SolverNode = Model::SolverNode<libConfig>;
-    using SolverStructure = Model::SolverStructure<libConfig>;
+
+    using SolverContact = Solvers::SolverContact<libConfig>;
+    using SolverNode = Solvers::SolverNode<libConfig>;
+    using SolverStructure = Solvers::SolverStructure<libConfig>;
 
     namespace Force1 {
         using Solution = Solvers::Force1::Solution<libConfig>;

@@ -32,9 +32,10 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/SolverStructure.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
+#include <gustave/solvers/SolverNode.hpp>
+#include <gustave/solvers/SolverStructure.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
@@ -47,7 +48,8 @@ namespace Gustave::Scenes::CuboidGrid {
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using SceneBlocks = detail::SceneBlocks<cfg>;
-        using SolverStructure = Model::SolverStructure<cfg>;
+        using SolverNode = Solvers::SolverNode<cfg>;
+        using SolverStructure = Solvers::SolverStructure<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
@@ -115,7 +117,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
     private:
         [[nodiscard]]
-        std::vector<Model::SolverNode<cfg>>& solverNodes() {
+        std::vector<SolverNode>& solverNodes() {
             return solverStructure_.nodes();
         }
 

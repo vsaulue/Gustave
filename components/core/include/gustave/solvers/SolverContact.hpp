@@ -31,7 +31,7 @@
 #include <gustave/meta/Meta.hpp>
 #include <gustave/model/Material.hpp>
 
-namespace Gustave::Model {
+namespace Gustave::Solvers {
     template<Cfg::cLibConfig auto cfg>
     struct SolverContact {
     private:
@@ -40,11 +40,12 @@ namespace Gustave::Model {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
 
+        using Material = Model::Material<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
     public:
         [[nodiscard]]
-        SolverContact(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, Material<cfg> const& maxConstraints)
+        SolverContact(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, Material const& maxConstraints)
             : localNodeId_{ id1 }
             , otherNodeId_{ id2 }
             , normal_{ normal }
