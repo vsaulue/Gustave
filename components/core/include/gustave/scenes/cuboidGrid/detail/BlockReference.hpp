@@ -45,7 +45,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         using QualifiedBlockData = Meta::MutableIf<isMutable_, BlockData<cfg>>;
 
-        using Material = Model::Material<cfg>;
+        using MaxStress = Model::MaxStress<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
@@ -119,8 +119,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        Material const& material() const {
-            return data_->second.material();
+        MaxStress const& maxStress() const {
+            return data_->second.maxStress();
         }
 
         [[nodiscard]]

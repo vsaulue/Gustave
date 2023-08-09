@@ -29,7 +29,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/meta/Meta.hpp>
-#include <gustave/model/Material.hpp>
+#include <gustave/model/MaxStress.hpp>
 
 namespace Gustave::Solvers {
     template<Cfg::cLibConfig auto cfg>
@@ -40,18 +40,18 @@ namespace Gustave::Solvers {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
 
-        using Material = Model::Material<cfg>;
+        using MaxStress = Model::MaxStress<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
     public:
         [[nodiscard]]
-        SolverContact(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, Material const& maxConstraints)
+        SolverContact(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, MaxStress const& maxStress)
             : localNodeId_{ id1 }
             , otherNodeId_{ id2 }
             , normal_{ normal }
-            , compressionConductivity_{ maxConstraints.maxCompressionStress() * area / thickness }
-            , shearConductivity_{ maxConstraints.maxShearStress() * area / thickness }
-            , tensileConductivity_{ maxConstraints.maxTensileStress() * area / thickness }
+            , compressionConductivity_{ maxStress.maxCompressionStress() * area / thickness }
+            , shearConductivity_{ maxStress.maxShearStress() * area / thickness }
+            , tensileConductivity_{ maxStress.maxTensileStress() * area / thickness }
         {
             assert(id1 != id2);
             assert(compressionConductivity_ > 0.f * u.conductivity);

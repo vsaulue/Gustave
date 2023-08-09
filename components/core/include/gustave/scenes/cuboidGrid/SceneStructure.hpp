@@ -44,7 +44,7 @@ namespace Gustave::Scenes::CuboidGrid {
         static constexpr auto u = Cfg::units(cfg);
 
         using ConstBlockReference = detail::BlockReference<cfg, false>;
-        using Material = Model::Material<cfg>;
+        using MaxStress = Model::MaxStress<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using SceneBlocks = detail::SceneBlocks<cfg>;
@@ -71,7 +71,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         void addContact(ConstBlockReference b1, ConstBlockReference b2, NormalizedVector3 const& normalOnB1,
-                        Real<u.area> area, Real<u.length> thickness, Material const& maxConstraints)
+                        Real<u.area> area, Real<u.length> thickness, MaxStress const& maxConstraints)
         {
             solverStructure_.addLink({ indexOf(b1), indexOf(b2), normalOnB1, area, thickness, maxConstraints });
         }

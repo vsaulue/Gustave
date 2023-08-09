@@ -36,7 +36,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/math/BasicDirection.hpp>
-#include <gustave/model/Material.hpp>
+#include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>
@@ -59,7 +59,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using ConstSceneNeighbour = detail::SceneNeighbour<cfg, false>;
         using ConstSceneNeighbours = detail::SceneNeighbours<cfg, false>;
         using Direction = Math::BasicDirection;
-        using Material = Model::Material<cfg>;
+        using MaxStress = Model::MaxStress<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using SceneBlocks = detail::SceneBlocks<cfg>;
@@ -250,8 +250,8 @@ namespace Gustave::Scenes::CuboidGrid {
             NormalizedVector3 const normal = NormalizedVector3::basisVector(direction);
             Real<u.area> const area = contactAreaAlong(direction);
             Real<u.length> const thickness = thicknessAlong(direction);
-            Material const material = Material::minResistance(source.material(), neighbour.block.material());
-            structure.addContact(source, neighbour.block, normal, area, thickness, material);
+            MaxStress const maxStress = MaxStress::minResistance(source.maxStress(), neighbour.block.maxStress());
+            structure.addContact(source, neighbour.block, normal, area, thickness, maxStress);
         }
 
         [[nodiscard]]

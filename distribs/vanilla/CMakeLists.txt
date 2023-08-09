@@ -34,7 +34,7 @@ target_link_libraries(Gustave-Vanilla
 add_executable(Test-Gustave-Vanilla
     "tests/force1/Solution.cpp"
     "tests/force1/Solver.cpp"
-    "tests/model/Material.cpp"
+    "tests/model/MaxStress.cpp"
     "tests/scenes/cuboidGrid/BlockConstructionInfo.cpp"
     "tests/scenes/cuboidGrid/BlockPosition.cpp"
     "tests/scenes/cuboidGrid/detail/BlockMappedData.cpp"

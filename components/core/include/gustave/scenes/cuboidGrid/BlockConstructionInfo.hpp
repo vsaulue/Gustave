@@ -31,7 +31,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/Material.hpp>
+#include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
@@ -43,12 +43,12 @@ namespace Gustave::Scenes::CuboidGrid {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
 
-        using Material = Model::Material<cfg>;
+        using MaxStress = Model::MaxStress<cfg>;
     public:
         [[nodiscard]]
-        BlockConstructionInfo(BlockPosition const& position, Material const& material, Real<u.mass> mass, bool isFoundation)
+        BlockConstructionInfo(BlockPosition const& position, MaxStress const& maxStress, Real<u.mass> mass, bool isFoundation)
             : position_{ position }
-            , material_{ material }
+            , maxStress_{ maxStress }
             , mass_{ mass }
             , isFoundation_{ isFoundation }
         {
@@ -66,13 +66,13 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        Material& material() {
-            return material_;
+        MaxStress& maxStress() {
+            return maxStress_;
         }
 
         [[nodiscard]]
-        Material const& material() const {
-            return material_;
+        MaxStress const& maxStress() const {
+            return maxStress_;
         }
 
         [[nodiscard]]
@@ -99,7 +99,7 @@ namespace Gustave::Scenes::CuboidGrid {
         bool operator==(BlockConstructionInfo const&) const = default;
     private:
         BlockPosition position_;
-        Material material_;
+        MaxStress maxStress_;
         Real<u.mass> mass_;
         bool isFoundation_;
 

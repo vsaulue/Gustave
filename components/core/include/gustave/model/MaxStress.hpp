@@ -34,7 +34,7 @@
 
 namespace Gustave::Model {
     template<Cfg::cLibConfig auto cfg>
-    struct Material {
+    struct MaxStress {
     private:
         static constexpr auto u = Cfg::units(cfg);
         static constexpr auto rt = cfg.realTraits;
@@ -43,7 +43,7 @@ namespace Gustave::Model {
         using Real = Cfg::Real<cfg, unit>;
     public:
         [[nodiscard]]
-        Material(Real<u.pressure> maxCompression, Real<u.pressure> maxShear, Real<u.pressure> maxTensile)
+        MaxStress(Real<u.pressure> maxCompression, Real<u.pressure> maxShear, Real<u.pressure> maxTensile)
             : maxCompressionStress_{maxCompression}
             , maxShearStress_{maxShear}
             , maxTensileStress_{maxTensile}
@@ -54,7 +54,7 @@ namespace Gustave::Model {
         }
 
         [[nodiscard]]
-        static Material minResistance(Material const& m1, Material const& m2) {
+        static MaxStress minResistance(MaxStress const& m1, MaxStress const& m2) {
             return {
                 rt.min(m1.maxCompressionStress_, m2.maxCompressionStress_),
                 rt.min(m1.maxShearStress_, m2.maxShearStress_),
@@ -78,7 +78,7 @@ namespace Gustave::Model {
         }
 
         [[nodiscard]]
-        bool operator==(Material const&) const = default;
+        bool operator==(MaxStress const&) const = default;
     private:
         Real<u.pressure> maxCompressionStress_;
         Real<u.pressure> maxShearStress_;

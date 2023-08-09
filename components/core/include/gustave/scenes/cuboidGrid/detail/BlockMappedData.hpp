@@ -30,6 +30,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
@@ -46,11 +47,11 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
 
-        using Material = Model::Material<cfg>;
+        using MaxStress = Model::MaxStress<cfg>;
     public:
         [[nodiscard]]
         BlockMappedData(BlockConstructionInfo<cfg> const& info)
-            : material_{ info.material() }
+            : maxStress_{ info.maxStress() }
             , mass_{ info.mass() }
             , isFoundation_{ info.isFoundation() }
             , structure_{ nullptr }
@@ -64,8 +65,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        Material const& material() const {
-            return material_;
+        MaxStress const& maxStress() const {
+            return maxStress_;
         }
 
         [[nodiscard]]
@@ -83,7 +84,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             return structure_;
         }
     private:
-        Material material_;
+        MaxStress maxStress_;
         Real<u.mass> mass_;
         bool isFoundation_;
         SceneStructure<cfg>* structure_;

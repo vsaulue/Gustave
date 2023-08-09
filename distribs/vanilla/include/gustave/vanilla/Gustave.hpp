@@ -26,7 +26,7 @@
 #pragma once
 
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/Material.hpp>
+#include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/Scene.hpp>
@@ -45,7 +45,7 @@
 namespace Gustave::Vanilla {
     inline constexpr LibConfig libConfig{};
 
-    using Material = Model::Material<libConfig>;
+    using MaxStress = Model::MaxStress<libConfig>;
 
     using SolverContact = Solvers::SolverContact<libConfig>;
     using SolverNode = Solvers::SolverNode<libConfig>;

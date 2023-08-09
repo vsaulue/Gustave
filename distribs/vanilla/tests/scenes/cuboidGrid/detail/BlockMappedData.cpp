@@ -38,7 +38,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockMappedData") {
         const BlockConstructionInfo info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
         BlockMappedData data{ info };
 
-        CHECK(data.material().maxTensileStress() == concrete_20m.maxTensileStress());
+        CHECK(data.maxStress().maxTensileStress() == concrete_20m.maxTensileStress());
         CHECK(data.mass() == 5.f * u.mass);
         CHECK(data.isFoundation() == true);
         CHECK(data.structure() == nullptr);

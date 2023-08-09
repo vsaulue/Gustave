@@ -49,7 +49,7 @@ struct Normals {
 };
 
 inline G::Vector3<u.acceleration> const g{ 0.f, -10.f, 0.f, u.acceleration };
-inline G::Material const concrete_20m{
+inline G::MaxStress const concrete_20m{
     20'000'000.f * u.pressure, // compressive
     14'000'000.f * u.pressure, // shear
     2'000'000.f * u.pressure, // tensile

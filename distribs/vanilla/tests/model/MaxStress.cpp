@@ -25,30 +25,30 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/model/Material.hpp>
+#include <gustave/model/MaxStress.hpp>
 
 #include <TestConfig.hpp>
 
-using Material = Gustave::Model::Material<G::libConfig>;
+using MaxStress = Gustave::Model::MaxStress<G::libConfig>;
 
-TEST_CASE("Model::Material") {
-    SECTION("::minResistance(Material const&, Material const&)") {
-        Material const m1{
+TEST_CASE("Model::MaxStress") {
+    SECTION("::minResistance(MaxStress const&, MaxStress const&)") {
+        MaxStress const m1{
             4.f * u.pressure, // compressive
             1.f * u.pressure, // shear
             7.f * u.pressure, // tensile
         };
-        Material const m2{
+        MaxStress const m2{
             3.f * u.pressure,
             5.f * u.pressure,
             6.f * u.pressure,
         };
-        Material const expected{
+        MaxStress const expected{
             3.f * u.pressure,
             1.f * u.pressure,
             6.f * u.pressure,
         };
-        CHECK(Material::minResistance(m1, m2) == expected);
-        CHECK(Material::minResistance(m2, m1) == expected);
+        CHECK(MaxStress::minResistance(m1, m2) == expected);
+        CHECK(MaxStress::minResistance(m2, m1) == expected);
     }
 }
