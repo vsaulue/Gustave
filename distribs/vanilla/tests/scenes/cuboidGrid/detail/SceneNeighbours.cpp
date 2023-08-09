@@ -27,7 +27,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/math/BasicDirection.hpp>
+#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
@@ -40,7 +40,7 @@ namespace Cuboid = Gustave::Scenes::CuboidGrid;
 
 using BlockPosition = Cuboid::BlockPosition;
 using BlockReference = Cuboid::detail::BlockReference<G::libConfig,true>;
-using Direction = Gustave::Math::BasicDirection;
+using Direction = Gustave::Math3d::BasicDirection;
 using SceneBlocks = Cuboid::detail::SceneBlocks<G::libConfig>;
 using SceneNeighbour = Cuboid::detail::SceneNeighbour<G::libConfig,true>;
 using SceneNeighbours = Cuboid::detail::SceneNeighbours<G::libConfig,true>;

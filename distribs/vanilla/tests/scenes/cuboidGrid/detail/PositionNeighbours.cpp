@@ -28,7 +28,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/math/BasicDirection.hpp>
+#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
@@ -37,7 +37,7 @@
 
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using Coord = BlockPosition::Coord;
-using Direction = Gustave::Math::BasicDirection;
+using Direction = Gustave::Math3d::BasicDirection;
 using Limits = std::numeric_limits<Coord>;
 using Neighbours = Gustave::Scenes::CuboidGrid::detail::PositionNeighbours;
 using PositionNeighbour = Gustave::Scenes::CuboidGrid::detail::PositionNeighbour;

@@ -29,10 +29,10 @@
 
 #include <gustave/cfg/cRealOf.hpp>
 #include <gustave/cfg/cRealTraits.hpp>
-#include <gustave/math/BasicDirection.hpp>
-#include <gustave/math/Vector3.hpp>
+#include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/math3d/Vector3.hpp>
 
-namespace Gustave::Math {
+namespace Gustave::Math3d {
     template<Cfg::cRealTraits auto rt>
     class NormalizedVector3 {
     public:

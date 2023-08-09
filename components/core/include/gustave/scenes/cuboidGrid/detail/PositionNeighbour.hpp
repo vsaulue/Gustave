@@ -25,13 +25,13 @@
 
 #pragma once
 
-#include <gustave/math/BasicDirection.hpp>
+#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     struct PositionNeighbour {
     public:
-        using Direction = Math::BasicDirection;
+        using Direction = Math3d::BasicDirection;
 
         [[nodiscard]]
         PositionNeighbour(Utils::NoInit) :

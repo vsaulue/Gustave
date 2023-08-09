@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include <gustave/math/NormalizedVector3.hpp>
-#include <gustave/math/Vector3.hpp>
+#include <gustave/math3d/NormalizedVector3.hpp>
+#include <gustave/math3d/Vector3.hpp>
 #include <gustave/units/lib/Unit.hpp>
 #include <gustave/units/RealTraits.hpp>
 
@@ -35,9 +35,9 @@ namespace Gustave::Vanilla {
         static constexpr Units::RealTraits<double> realTraits{};
 
         template<Units::Lib::cUnit auto unit>
-        using Vector3 = ::Gustave::Math::Vector3<realTraits, unit>;
+        using Vector3 = ::Gustave::Math3d::Vector3<realTraits, unit>;
 
-        using NormalizedVector3 = ::Gustave::Math::NormalizedVector3<realTraits>;
+        using NormalizedVector3 = ::Gustave::Math3d::NormalizedVector3<realTraits>;
 
         using ContactIndex = std::size_t;
         using NodeIndex = std::size_t;

@@ -26,14 +26,14 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/math/BasicDirection.hpp>
+#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg, bool isMutable_>
     struct SceneNeighbour {
     public:
-        using Direction = Math::BasicDirection;
+        using Direction = Math3d::BasicDirection;
 
         [[nodiscard]]
         SceneNeighbour(Utils::NoInit NO_INIT)

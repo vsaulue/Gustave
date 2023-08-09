@@ -25,6 +25,6 @@
 
 #pragma once
 
-namespace Gustave::Math {
+namespace Gustave::Math3d {
     enum class BasicDirection { plusX, minusX, plusY, minusY, plusZ, minusZ };
 }

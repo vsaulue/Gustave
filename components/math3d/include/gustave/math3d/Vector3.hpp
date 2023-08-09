@@ -35,7 +35,7 @@
 #include <gustave/cfg/cRealTraits.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 
-namespace Gustave::Math {
+namespace Gustave::Math3d {
     // concept moved to `requires` for MSVC (https://developercommunity.visualstudio.com/t/Template-parameters:-constraints-dependi/10312655).
     template<Cfg::cRealTraits auto rt, auto unit_>
         requires Cfg::cUnitOf<decltype(unit_), rt>

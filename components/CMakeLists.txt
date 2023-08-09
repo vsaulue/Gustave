@@ -24,7 +24,7 @@
 
 add_subdirectory("core")
 add_subdirectory("config")
-add_subdirectory("math")
+add_subdirectory("math3d")
 add_subdirectory("units")
 add_subdirectory("testing")
 add_subdirectory("utils")

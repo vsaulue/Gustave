@@ -27,7 +27,7 @@
 
 #include <array>
 
-#include <gustave/math/BasicDirection.hpp>
+#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
 #include <gustave/utils/NoInit.hpp>
@@ -36,7 +36,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
     class PositionNeighbours {
     public:
         using Coord = BlockPosition::Coord;
-        using Direction = Math::BasicDirection;
+        using Direction = Math3d::BasicDirection;
 
         static constexpr Utils::NoInit NO_INIT{};
         using Values = std::array<PositionNeighbour,6>;

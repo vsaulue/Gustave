@@ -27,7 +27,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/math/BasicDirection.hpp>
+#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/Scene.hpp>
 #include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
@@ -37,7 +37,7 @@
 #include <TestConfig.hpp>
 
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
-using Direction = Gustave::Math::BasicDirection;
+using Direction = Gustave::Math3d::BasicDirection;
 using Scene = Gustave::Scenes::CuboidGrid::Scene<G::libConfig>;
 using SceneStructure = Gustave::Scenes::CuboidGrid::SceneStructure<G::libConfig>;
 using Transaction = Gustave::Scenes::CuboidGrid::Transaction<G::libConfig>;

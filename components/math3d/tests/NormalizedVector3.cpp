@@ -28,12 +28,13 @@
 
 #include "TestConfig.hpp"
 
-#include <gustave/math/NormalizedVector3.hpp>
+#include <gustave/math3d/NormalizedVector3.hpp>
+#include <gustave/math3d/Vector3.hpp>
 
 template<G::Cfg::cUnitOf<rt> auto unit>
-using Vector3 = G::Math::Vector3<rt, unit>;
+using Vector3 = G::Math3d::Vector3<rt, unit>;
 
-using NormalizedVector3 = G::Math::NormalizedVector3<rt>;
+using NormalizedVector3 = G::Math3d::NormalizedVector3<rt>;
 
 TEST_CASE("NormalizedVector3") {
     SECTION("::NormalizedVector3(Real<one>, Real<one>, Real<one>)") {

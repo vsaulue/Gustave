@@ -35,7 +35,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/math/BasicDirection.hpp>
+#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
@@ -58,7 +58,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using ConstBlockReference = detail::BlockReference<cfg, false>;
         using ConstSceneNeighbour = detail::SceneNeighbour<cfg, false>;
         using ConstSceneNeighbours = detail::SceneNeighbours<cfg, false>;
-        using Direction = Math::BasicDirection;
+        using Direction = Math3d::BasicDirection;
         using MaxStress = Model::MaxStress<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;

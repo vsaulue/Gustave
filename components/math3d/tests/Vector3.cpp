@@ -28,12 +28,12 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include <gustave/math/Vector3.hpp>
+#include <gustave/math3d/Vector3.hpp>
 
 #include "TestConfig.hpp"
 
 template<G::Cfg::cUnitOf<rt> auto unit>
-using Vector3 = G::Math::Vector3<rt, unit>;
+using Vector3 = G::Math3d::Vector3<rt, unit>;
 
 TEST_CASE("Vector3") {
     constexpr auto acc = u.acceleration;
@@ -156,22 +156,22 @@ TEST_CASE("Vector3") {
         constexpr Vector3<kg> vec{ 2.0, -4.0, 3.0, kg };
 
         SECTION("operator*(std::floating_point auto, cVector3 auto const&)") {
-            constexpr G::Math::cVector3 auto res = 2.0 * vec;
+            constexpr G::Math3d::cVector3 auto res = 2.0 * vec;
             CHECK(res == Vector3<kg>{ 4.0, -8.0, 6.0, kg });
         }
 
         SECTION("operator*(cReal auto, cVector3 auto const&)") {
-            constexpr G::Math::cVector3 auto res = (0.5 * kg) * vec;
+            constexpr G::Math3d::cVector3 auto res = (0.5 * kg) * vec;
             CHECK(res == Vector3<kg*kg>{ 1.0, -2.0, 1.5, kg*kg });
         }
 
         SECTION("operator/(cVector3 auto const&, cReal auto)") {
-            constexpr G::Math::cVector3 auto res = vec / -2.0;
+            constexpr G::Math3d::cVector3 auto res = vec / -2.0;
             CHECK(res == Vector3<kg>{ -1.0, 2.0, -1.5, kg });
         }
 
         SECTION("operator/(cVector3 auto const&, std::floating_point auto)") {
-            constexpr G::Math::cVector3 auto res = vec / (0.5 * kg);
+            constexpr G::Math3d::cVector3 auto res = vec / (0.5 * kg);
             CHECK(res == Vector3<u.one>{ 4.0, -8.0, 6.0, u.one });
         }
     }
