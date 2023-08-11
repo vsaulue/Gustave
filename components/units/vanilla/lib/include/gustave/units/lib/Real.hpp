@@ -30,7 +30,8 @@
 #include <ostream>
 #include <type_traits>
 
-#include "Unit.hpp"
+#include <gustave/units/lib/Unit.hpp>
+#include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Units::Lib {
     template<typename T>
@@ -59,7 +60,7 @@ namespace Gustave::Units::Lib {
         };
 
         [[nodiscard]]
-        constexpr Real() = default;
+        explicit constexpr Real(Utils::NoInit) {}
 
         [[nodiscard]]
         constexpr Real(Rep value)

@@ -34,6 +34,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/solvers/SolverStructure.hpp>
+#include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Solvers::Force1 {
     template<Cfg::cLibConfig auto cfg>
@@ -119,8 +120,8 @@ namespace Gustave::Solvers::Force1 {
                 const NormalizedVector3& normal = link.normal();
                 const Real<u.one> nComp = normal.dot(normalizedG_);
                 Real<u.resistance> tangentResist = rt.sqrt(1.f - nComp * nComp) / link.shearConductivity();
-                Real<u.resistance> pNormalResist;
-                Real<u.resistance> nNormalResist;
+                Real<u.resistance> pNormalResist{ Utils::NO_INIT };
+                Real<u.resistance> nNormalResist{ Utils::NO_INIT };
                 if (nComp <= 0.f) {
                     pNormalResist = -nComp / link.compressionConductivity();
                     nNormalResist = -nComp / link.tensileConductivity();
