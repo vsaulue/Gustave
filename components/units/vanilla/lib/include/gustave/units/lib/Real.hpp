@@ -72,14 +72,14 @@ namespace Gustave::Units::Lib {
             : value_(other.value())
         {
             using Other = decltype(other);
-            static_assert(Detail::template isNotNarrowingFrom<Other>(), "Invalid conversion: narrowing representation");
-            static_assert(isCompatible(other.unit()), "Invalid conversion: incompatible units");
+            static_assert(Detail::template isNotNarrowingFrom<Other>(), "Invalid conversion: narrowing representation.");
+            static_assert(isCompatible(other.unit()), "Invalid conversion: incompatible units.");
         }
 
         constexpr Real& operator=(cReal auto other) {
             using Other = decltype(other);
-            static_assert(Detail::template isNotNarrowingFrom<Other>(), "Invalid conversion: narrowing representation");
-            static_assert(isCompatible(other.unit()), "Invalid conversion: incompatible units");
+            static_assert(Detail::template isNotNarrowingFrom<Other>(), "Invalid conversion: narrowing representation.");
+            static_assert(isCompatible(other.unit()), "Invalid conversion: incompatible units.");
             value() = other.value();
             return *this;
         }
@@ -228,13 +228,13 @@ namespace Gustave::Units::Lib {
 
     [[nodiscard]]
     constexpr cReal auto operator+(cReal auto lhs, std::floating_point auto rhs) {
-        static_assert(lhs.unit().isOne(), "Invalid addition: (Real with non-one dimension) + (raw float)");
+        static_assert(lhs.unit().isOne(), "Invalid addition: (Real with non-one dimension) + (raw float).");
         return (lhs.value() + rhs) * lhs.unit();
     }
 
     [[nodiscard]]
     constexpr cReal auto operator+(std::floating_point auto lhs, cReal auto rhs) {
-        static_assert(rhs.unit().isOne(), "Invalid addition: (raw float) + (Real with non-one dimension)");
+        static_assert(rhs.unit().isOne(), "Invalid addition: (raw float) + (Real with non-one dimension).");
         return (lhs + rhs.value()) * rhs.unit();
     }
 
@@ -248,13 +248,13 @@ namespace Gustave::Units::Lib {
 
     [[nodiscard]]
     constexpr cReal auto operator-(cReal auto lhs, std::floating_point auto rhs) {
-        static_assert(lhs.unit().isOne(), "Invalid substraction: (Real with non-one dimension) + (raw float)");
+        static_assert(lhs.unit().isOne(), "Invalid substraction: (Real with non-one dimension) + (raw float).");
         return (lhs.value() - rhs) * lhs.unit();
     }
 
     [[nodiscard]]
     constexpr cReal auto operator-(std::floating_point auto lhs, cReal auto rhs) {
-        static_assert(rhs.unit().isOne(), "Invalid substraction: (raw float) + (Real with non-one dimension)");
+        static_assert(rhs.unit().isOne(), "Invalid substraction: (raw float) + (Real with non-one dimension).");
         return (lhs - rhs.value()) * rhs.unit();
     }
 
