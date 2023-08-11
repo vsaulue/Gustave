@@ -48,17 +48,6 @@ namespace Gustave::Units::Lib {
     public:
         using Rep = Rep_;
 
-        struct InitValue {
-            [[nodiscard]]
-            explicit constexpr InitValue(Rep val)
-                : value(val)
-            {
-
-            }
-
-            Rep value;
-        };
-
         [[nodiscard]]
         explicit constexpr Real(Utils::NoInit) {}
 
@@ -72,10 +61,10 @@ namespace Gustave::Units::Lib {
         }
 
         [[nodiscard]]
-        constexpr explicit Real(InitValue initVal)
-            : value_(initVal.value)
+        explicit constexpr Real(Rep value, cUnit auto u)
+            : value_{ value }
         {
-
+            static_assert(isCompatible(u), "Invalid conversion: incompatible units.");
         }
 
         [[nodiscard]]
@@ -102,7 +91,7 @@ namespace Gustave::Units::Lib {
 
         [[nodiscard]]
         static constexpr Real zero() {
-            return Real{InitValue{0.0f}};
+            return Real{ 0.f, unit_ };
         }
 
         [[nodiscard]]
@@ -117,7 +106,7 @@ namespace Gustave::Units::Lib {
 
         [[nodiscard]]
         constexpr Real operator-() const {
-            return Real{ InitValue{-value_}};
+            return Real{ -value_, unit_ };
         }
 
         constexpr Real& operator+=(cReal auto rhs) {
@@ -211,8 +200,7 @@ namespace Gustave::Units::Lib {
         using Rep = decltype(value);
         using ArgUnit = decltype(unit);
         using Res = Real<ArgUnit{}, Rep>;
-        using InitValue = typename Res::InitValue;
-        return Res(InitValue(value));
+        return Res{ value, unit };
     }
 
     [[nodiscard]]

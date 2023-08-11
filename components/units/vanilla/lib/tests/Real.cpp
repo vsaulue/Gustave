@@ -57,10 +57,10 @@ TEST_CASE("Real") {
 
     // constructors
 
-    SECTION("::Real(InitValue)") {
-        using R = U::Real<kg, double>;
-        const R val{R::InitValue{5.0}};
-        CHECK(val.unit().isAssignableFrom(kg));
+    SECTION("::Real(Rep, cUnit auto)") {
+        using R = U::Real<newton, double>;
+        const R val{ 5.f, newton };
+        CHECK(val.unit().isAssignableFrom(newton));
         testValue(val, 5.0);
     }
 
