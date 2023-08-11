@@ -70,9 +70,6 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        constexpr Vector3() = default;
-
-        [[nodiscard]]
         constexpr Vector3(Coord x, Coord y, Coord z) :
             values{x, y, z}
         {

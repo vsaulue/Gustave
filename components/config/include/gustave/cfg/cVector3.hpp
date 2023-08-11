@@ -44,7 +44,6 @@ namespace Gustave::Cfg {
         requires cRealOf<typename T::Coord, T::realTraits()>;
         requires std::is_same_v<typename T::RealRep, typename T::Coord::Rep>;
 
-        T{};
         requires requires (typename T::Coord c) { T{ c,c,c }; };
         requires requires (typename T::RealRep rep) { T{ rep, rep, rep, T::unit() }; };
         { T::zero() } -> std::same_as<T>;
