@@ -98,13 +98,13 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        operator const Vector&() const {
-            return value_;
+        Coord dot(const Vector& other) const {
+            return value_.dot(other);
         }
 
         [[nodiscard]]
-        Coord dot(const Vector& other) const {
-            return value_.dot(other);
+        Coord dot(const NormalizedVector3& other) const {
+            return value_.dot(other.value());
         }
 
         [[nodiscard]]
