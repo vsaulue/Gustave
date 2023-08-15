@@ -30,6 +30,7 @@
 #include <gustave/cfg/cRealOf.hpp>
 #include <gustave/cfg/cRealTraits.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/math3d/cRealConstArg.hpp>
 #include <gustave/math3d/Vector3.hpp>
 
 namespace Gustave::Math3d {
@@ -119,6 +120,21 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
+        constexpr cVector3 auto operator*(cRealConstArg<rt> auto const rhs) const {
+            return value_ * rhs;
+        }
+
+        [[nodiscard]]
+        friend constexpr cVector3 auto operator*(cRealConstArg<rt> auto const lhs, NormalizedVector3 const& rhs) {
+            return lhs * rhs.value_;
+        }
+
+        [[nodiscard]]
+        constexpr cVector3 auto operator/(cRealConstArg<rt> auto const rhs) const {
+            return value_ / rhs;
+        }
+
+        [[nodiscard]]
         Coord x() const {
             return value_.x();
         }
@@ -156,11 +172,4 @@ namespace Gustave::Math3d {
 
         }
     };
-
-    [[nodiscard]]
-    constexpr cVector3 auto operator*(auto const& lhs, cNormalizedVector3 auto const& rhs)
-        requires requires { lhs * rhs.value(); }
-    {
-        return lhs * rhs.value();
-    }
 }

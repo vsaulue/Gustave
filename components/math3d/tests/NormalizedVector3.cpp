@@ -93,18 +93,26 @@ TEST_CASE("NormalizedVector3") {
             CHECK_THAT(opposed.z().value(), Catch::Matchers::WithinRel( 2.0 / 3.0, epsilon));
         }
 
-        SECTION("operator*(Real, cNormalizedVector3 auto const&)") {
-            const Vector3<u.force> res = (-3.0 * u.force) * v;
-            CHECK_THAT(res.x().value(), Catch::Matchers::WithinRel(-2.0, epsilon));
-            CHECK_THAT(res.y().value(), Catch::Matchers::WithinRel( 1.0, epsilon));
-            CHECK_THAT(res.z().value(), Catch::Matchers::WithinRel( 2.0, epsilon));
+        SECTION("// Multiplication: Real & NormalizedVector3 (both ways).") {
+            Real<u.force> r = (-3.f * u.force);
+            auto const matcher = M::WithinRel(vector3(-2.f, 1.f, 2.f, u.force), epsilon);
+            CHECK_THAT(r * v, matcher);
+            CHECK_THAT(v * r, matcher);
         }
 
-        SECTION("operator*(std::floating_point, cNormalizedVector3 auto const&)") {
-            const Vector3<u.one> res = 3.0 * v;
-            CHECK_THAT(res.x().value(), Catch::Matchers::WithinRel( 2.0, epsilon));
-            CHECK_THAT(res.y().value(), Catch::Matchers::WithinRel(-1.0, epsilon));
-            CHECK_THAT(res.z().value(), Catch::Matchers::WithinRel(-2.0, epsilon));
+        SECTION("// Multiplication: float & NormalizedVector3 (both ways).") {
+            auto const matcher = M::WithinRel(vector3(2.f, -1.f, -2.f, u.one), epsilon);
+            CHECK_THAT(v * 3.f, matcher);
+            CHECK_THAT(3.f * v, matcher);
+        }
+
+        SECTION("// Division: NormalizedVector3 & float") {
+            CHECK_THAT(v / (1.f / 6.f), M::WithinRel(vector3(4.f, -2.f, -4.f, u.one), epsilon));
+        }
+
+        SECTION("// Division: NormalizedVector3 & float") {
+            Real<u.one / u.area> const r = -1.f / (12.f * u.area);
+            CHECK_THAT(v / r, M::WithinRel(vector3(-8.f, 4.f, 8.f, u.area), epsilon));
         }
     }
 }
