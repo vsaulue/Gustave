@@ -53,6 +53,8 @@ namespace Gustave::Testing::Matchers {
         template<Cfg::cVector3 TestedVector>
         [[nodiscard]]
         constexpr bool match(TestedVector tested) const {
+            static_assert(TestedVector::realTraits() == TargetVector::realTraits(), "Invalid comparison: incompatible traits.");
+            static_assert(TestedVector::unit().isAssignableFrom(TargetVector::unit()), "Invalid comparison: incompatible units.");
             const Coord testedNorm = tested.norm();
             const Coord targetNorm = target_.norm();
             const Coord deltaNorm = (target_ - tested).norm();
