@@ -29,8 +29,11 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <gustave/math3d/Vector3.hpp>
+#include <gustave/testing/Matchers.hpp>
 
 #include "TestConfig.hpp"
+
+namespace M = Gustave::Testing::Matchers;
 
 TEST_CASE("Vector3") {
     constexpr auto acc = u.acceleration;
@@ -92,40 +95,36 @@ TEST_CASE("Vector3") {
     }
 
     SECTION("") {
-        Vector3<kg> lhs{ 1.0, 2.0, 3.0, kg };
-        const Vector3<kg> rhs{ 2.0, 0.0, 5.0, kg };
+        auto lhs = vector3(1.f, 2.f, 3.f, kg);
+        auto const rhs = vector3(2.f, 0.f, 5.f, kg);
 
-        SECTION("::operator+=(Vector3<*,*> const&)") {
+        SECTION("::operator+=(cVector3ConstArg auto const&)") {
             Vector3<kg>& res = (lhs += rhs);
-            CHECK(lhs == Vector3<kg>{ 3.0, 2.0, 8.0, kg });
+            CHECK(lhs == vector3(3.f, 2.f, 8.f, kg));
             CHECK(&lhs == &res);
         }
 
-        SECTION("::operator-=(Vector3<*,*> const&)") {
+        SECTION("::operator-=(cVector3ConstArg auto const&)") {
             Vector3<kg>& res = (lhs -= rhs);
-            CHECK(lhs == Vector3<kg>{-1.0, 2.0, -2.0, kg });
+            CHECK(lhs == vector3(-1.f, 2.f, -2.f, kg));
             CHECK(&lhs == &res);
         }
     }
 
     SECTION("") {
-        const Vector3<pa> lhs{ 1.0, 2.0, 3.0, pa };
-        const Vector3<newton / m2> rhs{ 5.0, 7.0, -2.0, pa };
+        auto const lhs = vector3(1.f, 2.f, 3.f, pa);
+        auto const rhs = vector3(5.f, 7.f, -2.f, pa);
 
-        SECTION("::operator+(Vector3<*,*> const&)") {
+        SECTION("::operator+(cVector3ConstArg auto const&)") {
             const auto res = lhs + rhs;
             CHECK(res.unit() == lhs.unit());
-            CHECK(res.x() == 6.0 * pa);
-            CHECK(res.y() == 9.0 * pa);
-            CHECK(res.z() == 1.0 * pa);
+            CHECK(res == vector3(6.f, 9.f, 1.f, pa));
         }
 
-        SECTION("::operator-(Vector3<*,*> const&") {
+        SECTION("::operator-(cVector3ConstArg auto const&") {
             const auto res = lhs - rhs;
             CHECK(res.unit() == lhs.unit());
-            CHECK(res.x() == -4.0 * pa);
-            CHECK(res.y() == -5.0 * pa);
-            CHECK(res.z() == 5.0 * pa);
+            CHECK(res == vector3(-4.f, -5.f, 5.f, pa));
         }
     }
 

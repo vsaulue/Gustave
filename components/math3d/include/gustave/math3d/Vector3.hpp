@@ -149,45 +149,51 @@ namespace Gustave::Math3d {
             return { -x(), -y(), -z() };
         }
 
-        template<auto rhsUnit> // gcc bug 109160: concept moved into `requires`.
-            requires (RealTraits::isUnit(rhsUnit))
-        constexpr Vector3& operator+=(Vector3<rt, rhsUnit> const& rhs) {
-            using Rhs = decltype(Meta::value(rhs));
-            static_assert(isCompatible(Rhs::unit()), "Invalid addition: incompatible units.");
+        constexpr Vector3& operator+=(cVector3ConstArg auto const& rhs) {
+            cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
+            using RhsV3 = decltype(Meta::value(rhsV3));
+            static_assert(rt == RhsV3::realTraits(), "Invalid addition: incompatible traits.");
+            static_assert(isCompatible(RhsV3::unit()), "Invalid addition: incompatible units.");
             for (std::size_t i = 0; i < coords_.size(); ++i) {
-                coords_[i] += rhs.coords()[i];
+                coords_[i] += rhsV3.coords()[i];
             }
             return *this;
         }
 
-        template<auto rhsUnit> // gcc bug 109160: concept moved into `requires`.
-            requires (RealTraits::isUnit(rhsUnit))
-        constexpr Vector3 operator+(Vector3<rt, rhsUnit> const& rhs) const {
-            using Rhs = decltype(Meta::value(rhs));
-            static_assert(isCompatible(Rhs::unit()), "Invalid addition: incompatible units.");
+        [[nodiscard]]
+        constexpr Vector3 operator+(cVector3ConstArg auto const& rhs) const {
+            cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
+            using RhsV3 = decltype(Meta::value(rhsV3));
+            static_assert(rt == RhsV3::realTraits(), "Invalid addition: incompatible traits.");
+            static_assert(isCompatible(RhsV3::unit()), "Invalid addition: incompatible units.");
             Vector3 result = *this;
-            result += rhs;
+            for (std::size_t i = 0; i < coords_.size(); ++i) {
+                result.coords()[i] += rhsV3.coords()[i];
+            }
             return result;
         }
 
-        template<auto rhsUnit> // gcc bug 109160: concept moved into `requires`.
-            requires (RealTraits::isUnit(rhsUnit))
-        constexpr Vector3& operator-=(Vector3<rt, rhsUnit> const& rhs) {
-            using Rhs = decltype(Meta::value(rhs));
-            static_assert(isCompatible(Rhs::unit()), "Invalid substraction: incompatible units.");
+        constexpr Vector3& operator-=(cVector3ConstArg auto const& rhs) {
+            cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
+            using RhsV3 = decltype(Meta::value(rhsV3));
+            static_assert(rt == RhsV3::realTraits(), "Invalid substraction: incompatible traits.");
+            static_assert(isCompatible(RhsV3::unit()), "Invalid substraction: incompatible units.");
             for (std::size_t i = 0; i < coords_.size(); ++i) {
-                coords_[i] -= rhs.coords()[i];
+                coords_[i] -= rhsV3.coords()[i];
             }
             return *this;
         }
 
-        template<auto rhsUnit> // gcc bug 109160: concept moved into `requires`.
-            requires (RealTraits::isUnit(rhsUnit))
-        constexpr Vector3 operator-(Vector3<rt, rhsUnit> const& rhs) const {
-            using Rhs = decltype(Meta::value(rhs));
-            static_assert(isCompatible(Rhs::unit()), "Invalid addition: incompatible units.");
+        [[nodiscard]]
+        constexpr Vector3 operator-(cVector3ConstArg auto const& rhs) const {
+            cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
+            using RhsV3 = decltype(Meta::value(rhsV3));
+            static_assert(rt == RhsV3::realTraits(), "Invalid substraction: incompatible traits.");
+            static_assert(isCompatible(RhsV3::unit()), "Invalid substraction: incompatible units.");
             Vector3 result = *this;
-            result -= rhs;
+            for (std::size_t i = 0; i < coords_.size(); ++i) {
+                result.coords()[i] -= rhsV3.coords()[i];
+            }
             return result;
         }
 
