@@ -282,15 +282,15 @@ namespace Gustave::Math3d {
             return stream << '{' << vector.x().value() << ", " << vector.y().value() << ", " << vector.z().value() << "}" << vector.unit();
         }
 
+        [[nodiscard]]
+        constexpr bool operator==(cVector3ConstArg auto const& rhs) const {
+            cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
+            using RhsV3 = decltype(Meta::value(rhsV3));
+            static_assert(rt == RhsV3::realTraits(), "Invalid comparison: different realTraits.");
+            static_assert(isCompatible(RhsV3::unit()), "Invalid comparison: incompatible units.");
+            return std::ranges::equal(values, rhsV3.values);
+        }
+
         std::array<Coord, 3> values;
     };
-
-    [[nodiscard]]
-    constexpr bool operator==(cVector3 auto const& lhs, cVector3 auto const& rhs) {
-        using Lhs = decltype(Meta::value(lhs));
-        using Rhs = decltype(Meta::value(rhs));
-        static_assert(Lhs::realTraits() == Rhs::realTraits(), "Invalid comparison: different realTraits.");
-        static_assert(Lhs::isCompatible(Rhs::unit()), "Invalid comparison: incompatible units.");
-        return std::ranges::equal(lhs.values, rhs.values);
-    }
 }
