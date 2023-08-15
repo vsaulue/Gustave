@@ -93,6 +93,14 @@ TEST_CASE("NormalizedVector3") {
             CHECK_THAT(opposed.z().value(), Catch::Matchers::WithinRel( 2.0 / 3.0, epsilon));
         }
 
+        SECTION("::operator==(cVector3ConstArg auto const&)") {
+            NormalizedVector3 opposed = -v;
+            CHECK(v == v);
+            CHECK(v != opposed);
+            CHECK(v == v.value());
+            CHECK(v != opposed.value());
+        }
+
         SECTION("// Multiplication: Real & NormalizedVector3 (both ways).") {
             Real<u.force> r = (-3.f * u.force);
             auto const matcher = M::WithinRel(vector3(-2.f, 1.f, 2.f, u.force), epsilon);

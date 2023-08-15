@@ -150,7 +150,9 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        bool operator==(NormalizedVector3 const&) const = default;
+        bool operator==(cVector3ConstArg auto const& rhs) const {
+            return value_ == rhs;
+        }
     private:
         Vector value_;
 
