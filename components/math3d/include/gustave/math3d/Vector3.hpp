@@ -278,6 +278,10 @@ namespace Gustave::Math3d {
             return unit().isAssignableFrom(otherUnit);
         }
 
+        friend std::ostream& operator<<(std::ostream& stream, Vector3 const& vector) {
+            return stream << '{' << vector.x().value() << ", " << vector.y().value() << ", " << vector.z().value() << "}" << vector.unit();
+        }
+
         std::array<Coord, 3> values;
     };
 
@@ -288,9 +292,5 @@ namespace Gustave::Math3d {
         static_assert(Lhs::realTraits() == Rhs::realTraits(), "Invalid comparison: different realTraits.");
         static_assert(Lhs::isCompatible(Rhs::unit()), "Invalid comparison: incompatible units.");
         return std::ranges::equal(lhs.values, rhs.values);
-    }
-
-    std::ostream& operator<<(std::ostream& stream, cVector3 auto const& vector) {
-        return stream << '{' << vector.x().value() << ", " << vector.y().value() << ", " << vector.z().value() << "}" << vector.unit();
     }
 }

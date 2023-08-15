@@ -187,7 +187,7 @@ TEST_CASE("Vector3") {
         }
     }
 
-    SECTION("operator<<(std::ostream&, cVector3 auto const&)") {
+    SECTION("operator<<(std::ostream&, Vector3 const&)") {
         Vector3<u.pressure> vec{1.0, -2.0, 3.0, pa};
         std::stringstream stream;
         stream << vec;
