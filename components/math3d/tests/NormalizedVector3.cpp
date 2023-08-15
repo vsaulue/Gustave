@@ -28,6 +28,7 @@
 
 #include "TestConfig.hpp"
 
+#include <gustave/testing/Matchers.hpp>
 #include <gustave/math3d/NormalizedVector3.hpp>
 #include <gustave/math3d/Vector3.hpp>
 
@@ -35,6 +36,8 @@ template<G::Cfg::cUnitOf<rt> auto unit>
 using Vector3 = G::Math3d::Vector3<rt, unit>;
 
 using NormalizedVector3 = G::Math3d::NormalizedVector3<rt>;
+
+namespace M = Gustave::Testing::Matchers;
 
 TEST_CASE("NormalizedVector3") {
     SECTION("::NormalizedVector3(Real<one>, Real<one>, Real<one>)") {
@@ -68,6 +71,22 @@ TEST_CASE("NormalizedVector3") {
 
         SECTION("::z()") {
             CHECK_THAT(v.z().value(), Catch::Matchers::WithinRel(-2.0 / 3.0, epsilon));
+        }
+
+        SECTION(".dot()") {
+            SECTION("// with Vector3") {
+                Vector3<u.length> const v2{ 3.f, 0.f, 6.f, u.length };
+                auto const matcher = M::WithinRel(-2.f * u.length, epsilon);
+                CHECK_THAT(v.dot(v2), matcher);
+                CHECK_THAT(v2.dot(v), matcher);
+            }
+
+            SECTION("// with NormalizedVector3") {
+                NormalizedVector3 const v2{ 0.f,-1.f,0.f };
+                auto const matcher = M::WithinRel(1.f / 3.f * u.one, epsilon);
+                CHECK_THAT(v.dot(v2), matcher);
+                CHECK_THAT(v2.dot(v), matcher);
+            }
         }
 
         SECTION("::operator-()") {

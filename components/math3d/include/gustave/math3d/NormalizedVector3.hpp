@@ -34,6 +34,22 @@
 
 namespace Gustave::Math3d {
     template<Cfg::cRealTraits auto rt>
+    class NormalizedVector3;
+
+    template<typename T>
+    concept cNormalizedVector3 = std::is_same_v<T, NormalizedVector3<T::realTraits()>>;
+
+    namespace detail {
+        template<cNormalizedVector3 T>
+        struct AsVector3ConstArg<T> {
+            [[nodiscard]]
+            static constexpr auto const& convert(T const& normal) {
+                return normal.value();
+            }
+        };
+    }
+
+    template<Cfg::cRealTraits auto rt>
     class NormalizedVector3 {
     public:
         static constexpr auto one = rt.units().one;
@@ -98,13 +114,8 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        Coord dot(const Vector& other) const {
+        Cfg::cRealOf<rt> auto dot(cVector3ConstArg auto const& other) const {
             return value_.dot(other);
-        }
-
-        [[nodiscard]]
-        Coord dot(const NormalizedVector3& other) const {
-            return value_.dot(other.value());
         }
 
         [[nodiscard]]
@@ -145,9 +156,6 @@ namespace Gustave::Math3d {
 
         }
     };
-
-    template<typename T>
-    concept cNormalizedVector3 = std::is_same_v<T, NormalizedVector3<T::realTraits()>>;
 
     [[nodiscard]]
     constexpr cVector3 auto operator*(auto const& lhs, cNormalizedVector3 auto const& rhs)

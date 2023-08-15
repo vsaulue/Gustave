@@ -44,6 +44,32 @@ namespace Gustave::Math3d {
     template<typename T>
     concept cVector3 = std::same_as<T, Vector3<T::realTraits(), T::unit()>>;
 
+    namespace detail {
+        template<typename T>
+        struct AsVector3ConstArg;
+
+        template<cVector3 T>
+        struct AsVector3ConstArg<T> {
+            [[nodiscard]]
+            static constexpr T const& convert(T const& vector) {
+                return vector;
+            }
+        };
+    }
+
+    template<typename T>
+    concept cVector3ConstArg = requires (T const& cv) {
+        requires requires (detail::AsVector3ConstArg<std::remove_cvref_t<T>> const& converter) {
+            { Meta::value(converter.convert(cv)) } -> cVector3;
+        };
+    };
+
+    [[nodiscard]]
+    constexpr auto const& asVector3ConstArg(cVector3ConstArg auto const& vector) {
+        using Converter = detail::AsVector3ConstArg<decltype(Meta::value(vector))>;
+        return Converter::convert(vector);
+    }
+
     template<Cfg::cRealTraits auto rt, auto unit_>
         requires Cfg::cUnitOf<decltype(unit_),rt>
     struct Vector3 {
@@ -210,14 +236,14 @@ namespace Gustave::Math3d {
             return RealTraits::sqrt(result);
         }
 
-        template<auto otherUnit> // gcc bug 109160: concept moved into `requires`.
-            requires (RealTraits::isUnit(otherUnit))
         [[nodiscard]]
-        constexpr auto dot(Vector3<rt, otherUnit> const& other) const {
-            using Other = decltype(Meta::value(other));
-            auto result = Real<unit() * Other::unit()>::zero();
+        constexpr auto dot(cVector3ConstArg auto const& other) const {
+            cVector3 auto const& otherV3 = asVector3ConstArg(other);
+            using OtherV3 = decltype(Meta::value(otherV3));
+            static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
+            auto result = Real<unit() * OtherV3::unit()>::zero();
             for (unsigned i = 0; i < values.size(); ++i) {
-                result += values[i] * other.values[i];
+                result += values[i] * otherV3.values[i];
             }
             return result;
         }

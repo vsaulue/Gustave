@@ -38,5 +38,6 @@ target_link_libraries(Test-Comp-Math
     PRIVATE Catch2::Catch2WithMain
     PRIVATE Comp-Math
     PRIVATE Comp-Units-Vanilla
+    PRIVATE Comp-Testing
 )
 declare_unit_test(Test-Comp-Math)
