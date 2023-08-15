@@ -41,18 +41,18 @@ TEST_CASE("Vector3") {
 
     SECTION("::Vector3(Real, Real, Real)") {
         constexpr Vector3<kg> v{ 1.0 * kg, 2.0 * kg, 3.0 * kg};
-        CHECK(v.values[2] == 3.0 * kg);
+        CHECK(v.coords()[2] == 3.0 * kg);
     }
 
     SECTION("::Vector3(double, double, double, unit)") {
         constexpr Vector3<kg> v{ 1.0, 2.0, 3.0, kg };
-        CHECK(v.values[2] == 3.0 * kg);
+        CHECK(v.coords()[2] == 3.0 * kg);
     }
 
     SECTION("::Vector3(cVector3 auto const& other)") {
         constexpr Vector3<newton / m2> src{ 3.0, 2.0, 1.0, newton / m2 };
         constexpr Vector3<pa> dst{ src };
-        CHECK(dst.values[2] == 1.0 * pa);
+        CHECK(dst.coords()[2] == 1.0 * pa);
     }
     
     SECTION("::zero()") {
@@ -66,9 +66,9 @@ TEST_CASE("Vector3") {
         Vector3<pa> dst{ 0.0, 0.0, 0.0, pa };
         const auto& res = (dst = src);
         CHECK(&res == &dst);
-        CHECK(dst.values[0] == 3.0 * pa);
-        CHECK(dst.values[1] == 2.0 * pa);
-        CHECK(dst.values[2] == 1.0 * pa);
+        CHECK(dst.coords()[0] == 3.0 * pa);
+        CHECK(dst.coords()[1] == 2.0 * pa);
+        CHECK(dst.coords()[2] == 1.0 * pa);
     }
 
     SECTION(".norm()") {

@@ -40,7 +40,7 @@ namespace Gustave::Math3d {
     // concept moved to `requires` for MSVC (https://developercommunity.visualstudio.com/t/Template-parameters:-constraints-dependi/10312655).
     template<Cfg::cRealTraits auto rt, auto unit_>
         requires Cfg::cUnitOf<decltype(unit_), rt>
-    struct Vector3;
+    class Vector3;
 
     template<typename T>
     concept cVector3 = std::same_as<T, Vector3<T::realTraits(), T::unit()>>;
@@ -81,7 +81,7 @@ namespace Gustave::Math3d {
 
     template<Cfg::cRealTraits auto rt, auto unit_>
         requires Cfg::cUnitOf<decltype(unit_),rt>
-    struct Vector3 {
+    class Vector3 {
     private:
         using Unit = decltype(unit_);
         using RealTraits = decltype(rt);
@@ -106,14 +106,14 @@ namespace Gustave::Math3d {
 
         [[nodiscard]]
         constexpr Vector3(Coord x, Coord y, Coord z) :
-            values{x, y, z}
+            values_{x, y, z}
         {
 
         }
 
         [[nodiscard]]
         constexpr Vector3(RealRep x, RealRep y, RealRep z, Cfg::cUnitOf<rt> auto argUnit) :
-            values{x * argUnit, y * argUnit, z * argUnit}
+            values_{x * argUnit, y * argUnit, z * argUnit}
         {
 
         }
@@ -121,7 +121,7 @@ namespace Gustave::Math3d {
         [[nodiscard]]
         constexpr Vector3(cVector3 auto const& other)
             requires (!std::is_same_v<Vector3, decltype(Meta::value(other))>)
-            : values{other.x(), other.y(), other.z()}
+            : values_{other.x(), other.y(), other.z()}
         {
             using Other = decltype(Meta::value(other));
             static_assert(rt == Other::realTraits(), "Invalid conversion: incompatible traits.");
@@ -134,7 +134,7 @@ namespace Gustave::Math3d {
             using Other = decltype(Meta::value(other));
             static_assert(rt == Other::realTraits(), "Invalid conversion: incompatible traits.");
             static_assert(isCompatible(Other::unit()), "Invalid conversion: incompatible units.");
-            std::ranges::copy(other.values, values.begin());
+            std::ranges::copy(other.coords(), values_.begin());
             return *this;
         }
 
@@ -154,8 +154,8 @@ namespace Gustave::Math3d {
         constexpr Vector3& operator+=(Vector3<rt, rhsUnit> const& rhs) {
             using Rhs = decltype(Meta::value(rhs));
             static_assert(isCompatible(Rhs::unit()), "Invalid addition: incompatible units.");
-            for (std::size_t i = 0; i < values.size(); ++i) {
-                values[i] += rhs.values[i];
+            for (std::size_t i = 0; i < values_.size(); ++i) {
+                values_[i] += rhs.coords()[i];
             }
             return *this;
         }
@@ -175,8 +175,8 @@ namespace Gustave::Math3d {
         constexpr Vector3& operator-=(Vector3<rt, rhsUnit> const& rhs) {
             using Rhs = decltype(Meta::value(rhs));
             static_assert(isCompatible(Rhs::unit()), "Invalid substraction: incompatible units.");
-            for (std::size_t i = 0; i < values.size(); ++i) {
-                values[i] -= rhs.values[i];
+            for (std::size_t i = 0; i < values_.size(); ++i) {
+                values_[i] -= rhs.coords()[i];
             }
             return *this;
         }
@@ -192,71 +192,81 @@ namespace Gustave::Math3d {
         }
 
         constexpr Vector3& operator*=(Real<one> rhs) {
-            for (auto& value : values) {
-                value *= rhs;
+            for (auto& coord : values_) {
+                coord *= rhs;
             }
             return *this;
         }
 
         [[nodiscard]]
         constexpr cVector3 auto operator*(cRealConstArg<rt> auto const rhs) const {
-            return detail::vector3(rt, values[0] * rhs, values[1] * rhs, values[2] * rhs);
+            return detail::vector3(rt, values_[0] * rhs, values_[1] * rhs, values_[2] * rhs);
         }
 
         [[nodiscard]]
         friend constexpr cVector3 auto operator*(cRealConstArg<rt> auto const lhs, Vector3 const& rhs) {
-            auto const& values = rhs.values;
-            return detail::vector3(rt, lhs * values[0], lhs * values[1], lhs * values[2]);
+            auto const& coords = rhs.coords();
+            return detail::vector3(rt, lhs * coords[0], lhs * coords[1], lhs * coords[2]);
         }
 
         constexpr Vector3& operator/=(Real<one> rhs) {
-            for (auto& value : values) {
-                value /= rhs;
+            for (auto& coord : values_) {
+                coord /= rhs;
             }
             return *this;
         }
 
         [[nodiscard]]
         constexpr cVector3 auto operator/(cRealConstArg<rt> auto const rhs) const {
-            return detail::vector3(rt, values[0] / rhs, values[1] / rhs, values[2] / rhs);
+            return detail::vector3(rt, values_[0] / rhs, values_[1] / rhs, values_[2] / rhs);
+        }
+
+        [[nodiscard]]
+        constexpr std::array<Coord, 3>& coords() {
+            return values_;
+        }
+
+        [[nodiscard]]
+        constexpr std::array<Coord, 3> const& coords() const {
+            return values_;
         }
 
         [[nodiscard]]
         constexpr Coord& x() {
-            return values[0];
+            return values_[0];
         }
 
         [[nodiscard]]
         constexpr Coord& y() {
-            return values[1];
+            return values_[1];
         }
 
         [[nodiscard]]
         constexpr Coord& z() {
-            return values[2];
+            return values_[2];
         }
 
         [[nodiscard]]
         constexpr Coord x() const {
-            return values[0];
+            return values_[0];
         }
 
         [[nodiscard]]
         constexpr Coord y() const {
-            return values[1];
+            return values_[1];
         }
 
         [[nodiscard]]
         constexpr Coord z() const {
-            return values[2];
+            return values_[2];
         }
 
         [[nodiscard]]
         Coord norm() const {
             using T2 = Real<unit()* unit()>;
             auto result = T2::zero();
-            for (const auto& value : values) {
-                result = result + value * value;
+            for (auto const coord : values_) {
+                result = result + coord * coord;
             }
             return RealTraits::sqrt(result);
         }
@@ -267,8 +277,8 @@ namespace Gustave::Math3d {
             using OtherV3 = decltype(Meta::value(otherV3));
             static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
             auto result = Real<unit() * OtherV3::unit()>::zero();
-            for (unsigned i = 0; i < values.size(); ++i) {
-                result += values[i] * otherV3.values[i];
+            for (unsigned i = 0; i < values_.size(); ++i) {
+                result += values_[i] * otherV3.coords()[i];
             }
             return result;
         }
@@ -288,9 +298,9 @@ namespace Gustave::Math3d {
             using RhsV3 = decltype(Meta::value(rhsV3));
             static_assert(rt == RhsV3::realTraits(), "Invalid comparison: different realTraits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid comparison: incompatible units.");
-            return std::ranges::equal(values, rhsV3.values);
+            return std::ranges::equal(values_, rhsV3.coords());
         }
-
-        std::array<Coord, 3> values;
+    private:
+        std::array<Coord, 3> values_;
     };
 }
