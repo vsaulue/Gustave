@@ -120,6 +120,16 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
+        constexpr Vector operator+(cVector3ConstArg auto const& rhs) const {
+            return value_ + rhs;
+        }
+
+        [[nodiscard]]
+        constexpr Vector operator-(cVector3ConstArg auto const& rhs) const {
+            return value_ - rhs;
+        }
+
+        [[nodiscard]]
         constexpr cVector3 auto operator*(cRealConstArg<rt> auto const rhs) const {
             return value_ * rhs;
         }

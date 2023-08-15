@@ -101,6 +101,22 @@ TEST_CASE("NormalizedVector3") {
             CHECK(v != opposed.value());
         }
 
+        SECTION("::operator+(cVector3ConstArg auto const&)") {
+            NormalizedVector3 const v2{ -1.f, 0.f, 0.f };
+            auto const matcher = M::WithinRel(vector3(-1.f, -1.f, -2.f, u.one) / 3.f, epsilon);
+            CHECK_THAT(v + v2, matcher);
+            CHECK_THAT(v + v2.value(), matcher);
+            CHECK_THAT(v.value() + v2, matcher);
+        }
+
+        SECTION("::operator-(cVector3ConstArg auto const&)") {
+            NormalizedVector3 const v2{ 0.f, -1.f, 0.f };
+            auto const matcher = M::WithinRel(vector3(2.f, 2.f, -2.f, u.one) / 3.f, epsilon);
+            CHECK_THAT(v - v2, matcher);
+            CHECK_THAT(v - v2.value(), matcher);
+            CHECK_THAT(v.value() - v2, matcher);
+        }
+
         SECTION("// Multiplication: Real & NormalizedVector3 (both ways).") {
             Real<u.force> r = (-3.f * u.force);
             auto const matcher = M::WithinRel(vector3(-2.f, 1.f, 2.f, u.force), epsilon);
