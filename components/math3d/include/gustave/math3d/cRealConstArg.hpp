@@ -25,27 +25,31 @@
 
 #pragma once
 
-#include <gustave/cfg/cUnitOf.hpp>
-#include <gustave/math3d/Vector3.hpp>
-#include <gustave/units/RealTraits.hpp>
+#include <concepts>
 
-namespace G = ::Gustave;
+#include <gustave/cfg/cRealOf.hpp>
+#include <gustave/cfg/cRealTraits.hpp>
 
-using RealTraits = G::Units::RealTraits<double>;
-inline constexpr RealTraits rt{};
+namespace Gustave::Math3d {
+    namespace detail {
+        template<Cfg::cRealTraits Traits>
+        [[nodiscard]]
+        constexpr Cfg::cRealOf<Traits{}> auto asRealConstArg(Traits, std::floating_point auto const value) {
+            constexpr auto one = Traits::units().one;
+            using Real = typename Traits::template Type<one>;
+            return Real{ value };
+        }
 
-inline constexpr auto u = rt.units();
+        template<Cfg::cRealTraits Traits, Cfg::cRealOf<Traits{}> Real>
+        [[nodiscard]]
+        constexpr Real asRealConstArg(Traits, Real const value) {
+            return value;
+        }
+    }
 
-template<G::Cfg::cUnitOf<rt> auto unit>
-using Real = RealTraits::template Type<unit>;
-
-template<G::Cfg::cUnitOf<rt> auto unit>
-using Vector3 = G::Math3d::Vector3<rt, unit>;
-
-template<G::Cfg::cUnitOf<rt> Unit, std::floating_point Float>
-[[nodiscard]]
-constexpr auto vector3(Float x, Float y, Float z, Unit unit) -> Vector3<Unit{}> {
-    return { x,y,z,unit };
+    template<typename T, auto traits>
+    concept cRealConstArg = requires (T value) {
+        requires Cfg::cRealTraits<decltype(traits)>;
+        { detail::asRealConstArg(traits, value) } -> Cfg::cRealOf<traits>;
+    };
 }
-
-inline constexpr double epsilon = 0.0001;

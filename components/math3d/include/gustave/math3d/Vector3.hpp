@@ -34,6 +34,7 @@
 #include <gustave/cfg/cRealOf.hpp>
 #include <gustave/cfg/cRealTraits.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
+#include <gustave/math3d/cRealConstArg.hpp>
 
 namespace Gustave::Math3d {
     // concept moved to `requires` for MSVC (https://developercommunity.visualstudio.com/t/Template-parameters:-constraints-dependi/10312655).
@@ -68,6 +69,14 @@ namespace Gustave::Math3d {
     constexpr auto const& asVector3ConstArg(cVector3ConstArg auto const& vector) {
         using Converter = detail::AsVector3ConstArg<decltype(Meta::value(vector))>;
         return Converter::convert(vector);
+    }
+
+    namespace detail {
+        template<Cfg::cRealTraits Traits, Cfg::cRealOf<Traits{}> Real>
+        [[nodiscard]]
+        constexpr cVector3 auto vector3(Traits, Real x, Real y, Real z) {
+            return Vector3<Traits{}, Real::unit()>{x, y, z};
+        }
     }
 
     template<Cfg::cRealTraits auto rt, auto unit_>
@@ -189,11 +198,27 @@ namespace Gustave::Math3d {
             return *this;
         }
 
+        [[nodiscard]]
+        constexpr cVector3 auto operator*(cRealConstArg<rt> auto const rhs) const {
+            return detail::vector3(rt, values[0] * rhs, values[1] * rhs, values[2] * rhs);
+        }
+
+        [[nodiscard]]
+        friend constexpr cVector3 auto operator*(cRealConstArg<rt> auto const lhs, Vector3 const& rhs) {
+            auto const& values = rhs.values;
+            return detail::vector3(rt, lhs * values[0], lhs * values[1], lhs * values[2]);
+        }
+
         constexpr Vector3& operator/=(Real<one> rhs) {
             for (auto& value : values) {
                 value /= rhs;
             }
             return *this;
+        }
+
+        [[nodiscard]]
+        constexpr cVector3 auto operator/(cRealConstArg<rt> auto const rhs) const {
+            return detail::vector3(rt, values[0] / rhs, values[1] / rhs, values[2] / rhs);
         }
 
         [[nodiscard]]
@@ -255,46 +280,6 @@ namespace Gustave::Math3d {
 
         std::array<Coord, 3> values;
     };
-
-    namespace detail {
-        template<Cfg::cRealTraits Traits>
-        [[nodiscard]]
-        constexpr auto asReal(Traits, std::floating_point auto value) {
-            constexpr auto one = Traits::units().one;
-            using Real = typename Traits::template Type<one>;
-            return Real(value);
-        }
-
-        template<Cfg::cRealTraits Traits>
-        [[nodiscard]]
-        constexpr auto asReal(Traits, Cfg::cRealOf<Traits{}> auto value) {
-            return value;
-        }
-    }
-
-    [[nodiscard]]
-    constexpr cVector3 auto operator*(auto lhs, cVector3 auto const& rhs)
-        requires requires { detail::asReal(rhs.realTraits(), lhs); }
-    {
-        using Rhs = decltype(Meta::value(rhs));
-        constexpr auto traits = Rhs::realTraits();
-        const auto l = detail::asReal(traits, lhs);
-        using L = decltype(l);
-        constexpr auto unit = L::unit() * Rhs::unit();
-        return Vector3<traits, unit>{l * rhs.x(), l * rhs.y(), l * rhs.z() };
-    }
-
-    [[nodiscard]]
-    constexpr cVector3 auto operator/(cVector3 auto const& lhs, auto rhs)
-        requires requires { detail::asReal(lhs.realTraits(), rhs); }
-    {
-        using Lhs = decltype(Meta::value(lhs));
-        constexpr auto traits = Lhs::realTraits();
-        const auto r = detail::asReal(traits, rhs);
-        using R = decltype(r);
-        constexpr auto unit = Lhs::unit() / R::unit();
-        return Vector3<traits, unit>{ lhs.x() / r, lhs.y() / r, lhs.z() / r};
-    }
 
     [[nodiscard]]
     constexpr bool operator==(cVector3 auto const& lhs, cVector3 auto const& rhs) {

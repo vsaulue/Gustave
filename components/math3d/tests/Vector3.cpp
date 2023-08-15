@@ -32,9 +32,6 @@
 
 #include "TestConfig.hpp"
 
-template<G::Cfg::cUnitOf<rt> auto unit>
-using Vector3 = G::Math3d::Vector3<rt, unit>;
-
 TEST_CASE("Vector3") {
     constexpr auto acc = u.acceleration;
     constexpr auto kg = u.mass;
@@ -153,26 +150,28 @@ TEST_CASE("Vector3") {
     }
 
     SECTION("") {
-        constexpr Vector3<kg> vec{ 2.0, -4.0, 3.0, kg };
+        constexpr auto vec = vector3(2.f, -4.f, 3.f, kg);
 
-        SECTION("operator*(std::floating_point auto, cVector3 auto const&)") {
-            constexpr G::Math3d::cVector3 auto res = 2.0 * vec;
-            CHECK(res == Vector3<kg>{ 4.0, -8.0, 6.0, kg });
+        SECTION("// Multiplication float * Vector3 (& reverse)") {
+            constexpr auto expected = vector3(4.f, -8.f, 6.f, kg);
+            CHECK(2.f * vec == expected);
+            CHECK(vec * 2.f == expected);
         }
 
-        SECTION("operator*(cReal auto, cVector3 auto const&)") {
-            constexpr G::Math3d::cVector3 auto res = (0.5 * kg) * vec;
-            CHECK(res == Vector3<kg*kg>{ 1.0, -2.0, 1.5, kg*kg });
+        SECTION("// Multiplication Real * Vector3 (& reverse)") {
+            constexpr Real<kg> r = 0.5f * kg;
+            constexpr auto expected = vector3(1.f, -2.f, 1.5f, kg * kg);
+            CHECK(r * vec == expected);
+            CHECK(vec * r == expected);
         }
 
-        SECTION("operator/(cVector3 auto const&, cReal auto)") {
-            constexpr G::Math3d::cVector3 auto res = vec / -2.0;
-            CHECK(res == Vector3<kg>{ -1.0, 2.0, -1.5, kg });
+        SECTION("// Division Vector3 / Real") {
+            constexpr Real<kg> r = -2.f * kg;
+            CHECK(vec / r == vector3(-1.f, 2.f, -1.5f, u.one));
         }
 
-        SECTION("operator/(cVector3 auto const&, std::floating_point auto)") {
-            constexpr G::Math3d::cVector3 auto res = vec / (0.5 * kg);
-            CHECK(res == Vector3<u.one>{ 4.0, -8.0, 6.0, u.one });
+        SECTION("// Division Vector3 / float") {
+            CHECK(vec / -1.f == vector3(-2.f, 4.f, -3.f, kg));
         }
     }
 
