@@ -55,6 +55,7 @@ namespace Gustave::Testing::Matchers {
         template<Cfg::cReal TestedReal>
         [[nodiscard]]
         constexpr bool match(TestedReal tested) const {
+            static_assert(TestedReal::unit().isAssignableFrom(TargetReal::unit()), "Invalid addition: incompatible units.");
             using RealType = decltype(Meta::value(target_ + tested));
             auto const testedValue = RealType{ tested }.value();
             auto const targetValue = RealType{ target_ }.value();
@@ -74,9 +75,11 @@ namespace Gustave::Testing::Matchers {
     };
 
     template<Cfg::cReal Target>
-    RealWithinRelMatcher(Target, std::floating_point auto) -> RealWithinRelMatcher<Target>;
+    RealWithinRelMatcher(Target, typename Target::Rep) -> RealWithinRelMatcher<Target>;
 
+    [[nodiscard]]
     auto WithinRel(Cfg::cReal auto target, std::floating_point auto epsilon) {
-        return RealWithinRelMatcher{ target, epsilon };
+        using Rep = decltype(target.value() + epsilon);
+        return RealWithinRelMatcher{ Rep{target.value()} * target.unit(), Rep{epsilon} };
     }
 }
