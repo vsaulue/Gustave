@@ -138,5 +138,16 @@ TEST_CASE("NormalizedVector3") {
             Real<u.one / u.area> const r = -1.f / (12.f * u.area);
             CHECK_THAT(v / r, M::WithinRel(vector3(-8.f, 4.f, 8.f, u.area), epsilon));
         }
+
+        SECTION("// convertible to Vector3") {
+            Vector3<u.one> vec{ v };
+            CHECK(vec == v);
+        }
+
+        SECTION("// assignable to Vector3") {
+            auto vec = Vector3<u.one>::zero();
+            vec = v;
+            CHECK(vec == v);
+        }
     }
 }

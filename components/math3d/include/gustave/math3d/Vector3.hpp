@@ -105,6 +105,11 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
+        explicit constexpr Vector3(Utils::NoInit NO_INIT)
+            : coords_{ Coord{NO_INIT}, Coord{NO_INIT}, Coord{NO_INIT} }
+        {}
+
+        [[nodiscard]]
         constexpr Vector3(Coord x, Coord y, Coord z) :
             coords_{x, y, z}
         {
@@ -119,22 +124,25 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        constexpr Vector3(cVector3 auto const& other)
+        constexpr Vector3(cVector3ConstArg auto const& other)
             requires (!std::is_same_v<Vector3, decltype(Meta::value(other))>)
-            : coords_{other.x(), other.y(), other.z()}
+            : Vector3{ Utils::NO_INIT }
         {
-            using Other = decltype(Meta::value(other));
-            static_assert(rt == Other::realTraits(), "Invalid conversion: incompatible traits.");
-            static_assert(isCompatible(Other::unit()), "Invalid conversion: incompatible units.");
+            auto const& otherV3 = asVector3ConstArg(other);
+            using OtherV3 = decltype(Meta::value(otherV3));
+            static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
+            static_assert(isCompatible(OtherV3::unit()), "Invalid conversion: incompatible units.");
+            std::ranges::copy(otherV3.coords(), coords_.begin());
         }
 
-        constexpr Vector3& operator=(cVector3 auto const& other)
+        constexpr Vector3& operator=(cVector3ConstArg auto const& other)
             requires (!std::is_same_v<Vector3,decltype(Meta::value(other))>)
         {
-            using Other = decltype(Meta::value(other));
-            static_assert(rt == Other::realTraits(), "Invalid conversion: incompatible traits.");
-            static_assert(isCompatible(Other::unit()), "Invalid conversion: incompatible units.");
-            std::ranges::copy(other.coords(), coords_.begin());
+            auto const& otherV3 = asVector3ConstArg(other);
+            using OtherV3 = decltype(Meta::value(otherV3));
+            static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
+            static_assert(isCompatible(OtherV3::unit()), "Invalid conversion: incompatible units.");
+            std::ranges::copy(otherV3.coords(), coords_.begin());
             return *this;
         }
 
