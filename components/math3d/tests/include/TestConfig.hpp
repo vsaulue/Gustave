@@ -48,4 +48,4 @@ constexpr auto vector3(Float x, Float y, Float z, Unit unit) -> Vector3<Unit{}> 
     return { x,y,z,unit };
 }
 
-inline constexpr double epsilon = 0.0001;
+inline constexpr float epsilon = 0.0001f;

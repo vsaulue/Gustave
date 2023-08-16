@@ -38,41 +38,37 @@ namespace M = Gustave::Testing::Matchers;
 
 TEST_CASE("NormalizedVector3") {
     SECTION("::NormalizedVector3(Real<one>, Real<one>, Real<one>)") {
-        NormalizedVector3 v{ 2.0, -1.0, -2.0 };
-        CHECK_THAT(v.x().value(), Catch::Matchers::WithinRel(2.0 / 3.0, epsilon));
-        CHECK_THAT(v.y().value(), Catch::Matchers::WithinRel(-1.0 / 3.0, epsilon));
-        CHECK_THAT(v.z().value(), Catch::Matchers::WithinRel(-2.0 / 3.0, epsilon));
+        NormalizedVector3 const v{ 2.f, -1.f, -2.f };
+        CHECK_THAT(v.value(), M::WithinRel(vector3(2.f, -1.f, -2.f, u.one) / 3.f, epsilon));
     }
 
     SECTION("::NormalizedVector3(Vector3<*> const&)") {
-        NormalizedVector3 v{ Vector3<u.mass>{ 4.0, -2.0, 4.0, u.mass} };
-        CHECK_THAT(v.x().value(), Catch::Matchers::WithinRel(4.0 / 6.0, epsilon));
-        CHECK_THAT(v.y().value(), Catch::Matchers::WithinRel(-2.0 / 6.0, epsilon));
-        CHECK_THAT(v.z().value(), Catch::Matchers::WithinRel(4.0 / 6.0, epsilon));
+        NormalizedVector3 const v{ vector3(4.f, -2.f, 4.f, u.mass) };
+        CHECK_THAT(v.value(), M::WithinRel(vector3(2.f, -1.f, 2.f, u.one) / 3.f, epsilon));
     }
 
     SECTION("") {
-        const NormalizedVector3 v{ 2.0, -1.0, -2.0 };
+        NormalizedVector3 const v{ 2.f, -1.f, -2.f };
 
         SECTION("::value()") {
-            CHECK_THAT(v.value().x().value(), Catch::Matchers::WithinRel(2.0 / 3.0, epsilon));
+            CHECK_THAT(v.value().x(), M::WithinRel((2.f / 3.f) * u.one, epsilon));
         }
 
         SECTION("::x()") {
-            CHECK_THAT(v.x().value(), Catch::Matchers::WithinRel(2.0 / 3.0, epsilon));
+            CHECK_THAT(v.x(), M::WithinRel((2.f / 3.f) * u.one, epsilon));
         }
 
         SECTION("::y()") {
-            CHECK_THAT(v.y().value(), Catch::Matchers::WithinRel(-1.0 / 3.0, epsilon));
+            CHECK_THAT(v.y(), M::WithinRel((-1.f / 3.f) * u.one, epsilon));
         }
 
         SECTION("::z()") {
-            CHECK_THAT(v.z().value(), Catch::Matchers::WithinRel(-2.0 / 3.0, epsilon));
+            CHECK_THAT(v.z(), M::WithinRel((- 2.f / 3.f) * u.one, epsilon));
         }
 
         SECTION(".dot()") {
             SECTION("// with Vector3") {
-                Vector3<u.length> const v2{ 3.f, 0.f, 6.f, u.length };
+                auto const v2 = vector3(3.f, 0.f, 6.f, u.length);
                 auto const matcher = M::WithinRel(-2.f * u.length, epsilon);
                 CHECK_THAT(v.dot(v2), matcher);
                 CHECK_THAT(v2.dot(v), matcher);
@@ -87,14 +83,12 @@ TEST_CASE("NormalizedVector3") {
         }
 
         SECTION("::operator-()") {
-            NormalizedVector3 opposed = -v;
-            CHECK_THAT(opposed.x().value(), Catch::Matchers::WithinRel(-2.0 / 3.0, epsilon));
-            CHECK_THAT(opposed.y().value(), Catch::Matchers::WithinRel( 1.0 / 3.0, epsilon));
-            CHECK_THAT(opposed.z().value(), Catch::Matchers::WithinRel( 2.0 / 3.0, epsilon));
+            NormalizedVector3 const opposed = -v;
+            CHECK_THAT(opposed.value(), M::WithinRel(vector3(-2.f, 1.f, 2.f, u.one) / 3.f, epsilon));
         }
 
         SECTION("::operator==(cVector3ConstArg auto const&)") {
-            NormalizedVector3 opposed = -v;
+            NormalizedVector3 const opposed = -v;
             CHECK(v == v);
             CHECK(v != opposed);
             CHECK(v == v.value());
