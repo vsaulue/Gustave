@@ -58,13 +58,13 @@ namespace Gustave::Cfg {
         v /= 2.0f;
 
         { v.x() } -> std::same_as<typename T::Coord&>;
-        { cv.x() } -> std::same_as<typename T::Coord>;
+        { cv.x() } -> std::convertible_to<typename T::Coord>;
 
         { v.y() } -> std::same_as<typename T::Coord&>;
-        { cv.y() } -> std::same_as<typename T::Coord>;
+        { cv.y() } -> std::convertible_to<typename T::Coord>;
 
         { v.z() } -> std::same_as<typename T::Coord&>;
-        { cv.z() } -> std::same_as<typename T::Coord>;
+        { cv.z() } -> std::convertible_to<typename T::Coord>;
 
         { cv.norm() } -> std::same_as<typename T::Coord>;
         { cv.isCompatible(T::realTraits().units().one) } -> std::same_as<bool>;

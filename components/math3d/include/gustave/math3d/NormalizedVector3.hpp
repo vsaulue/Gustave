@@ -145,17 +145,17 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        Coord x() const {
+        Coord const x() const {
             return value_.x();
         }
 
         [[nodiscard]]
-        Coord y() const {
+        Coord const y() const {
             return value_.y();
         }
 
         [[nodiscard]]
-        Coord z() const {
+        Coord const z() const {
             return value_.z();
         }
 

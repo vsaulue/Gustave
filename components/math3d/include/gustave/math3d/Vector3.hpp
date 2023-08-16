@@ -261,17 +261,17 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        constexpr Coord x() const {
+        constexpr Coord const x() const {
             return coords_[0];
         }
 
         [[nodiscard]]
-        constexpr Coord y() const {
+        constexpr Coord const y() const {
             return coords_[1];
         }
 
         [[nodiscard]]
-        constexpr Coord z() const {
+        constexpr Coord const z() const {
             return coords_[2];
         }
 
