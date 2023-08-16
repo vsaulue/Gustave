@@ -26,11 +26,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "TestConfig.hpp"
-
 #include <gustave/testing/Matchers.hpp>
 #include <gustave/math3d/NormalizedVector3.hpp>
 #include <gustave/math3d/Vector3.hpp>
+#include <TestHelpers.hpp>
 
 using NormalizedVector3 = G::Math3d::NormalizedVector3<rt>;
 

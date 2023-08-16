@@ -30,8 +30,7 @@
 
 #include <gustave/math3d/Vector3.hpp>
 #include <gustave/testing/Matchers.hpp>
-
-#include "TestConfig.hpp"
+#include <TestHelpers.hpp>
 
 namespace M = Gustave::Testing::Matchers;
 

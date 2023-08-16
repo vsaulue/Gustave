@@ -25,6 +25,25 @@
 
 #pragma once
 
-#include <gustave/units/RealTraits.hpp>
+#include <gustave/cfg/cUnitOf.hpp>
+#include <gustave/math3d/Vector3.hpp>
+#include <TestConfig.hpp>
 
-using RealTraits = Gustave::Units::RealTraits<double>;
+namespace G = ::Gustave;
+inline constexpr RealTraits rt{};
+
+inline constexpr auto u = rt.units();
+
+template<G::Cfg::cUnitOf<rt> auto unit>
+using Real = RealTraits::template Type<unit>;
+
+template<G::Cfg::cUnitOf<rt> auto unit>
+using Vector3 = G::Math3d::Vector3<rt, unit>;
+
+template<G::Cfg::cUnitOf<rt> Unit, std::floating_point Float>
+[[nodiscard]]
+constexpr auto vector3(Float x, Float y, Float z, Unit unit) -> Vector3 < Unit{} > {
+    return { x,y,z,unit };
+}
+
+inline constexpr float epsilon = 0.0001f;
