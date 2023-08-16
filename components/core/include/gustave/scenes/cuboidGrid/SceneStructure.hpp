@@ -63,10 +63,10 @@ namespace Gustave::Scenes::CuboidGrid {
 
         void addBlock(ConstBlockReference block) {
             assert(block);
-            NodeIndex const newIndex = solverNodes().size();
+            NodeIndex const newIndex = solverStructure_.nextNodeIndex();
             auto insertResult = solverIndices_.insert({ block, newIndex });
             if (insertResult.second) {
-                solverNodes().emplace_back(block.mass(), block.isFoundation());
+                solverStructure_.addNode({ block.mass(), block.isFoundation() });
             }
         }
 
@@ -116,11 +116,6 @@ namespace Gustave::Scenes::CuboidGrid {
             return solverStructure_;
         }
     private:
-        [[nodiscard]]
-        std::vector<SolverNode>& solverNodes() {
-            return solverStructure_.nodes();
-        }
-
         [[nodiscard]]
         NodeIndex indexOf(ConstBlockReference block) const {
             return solverIndices_.at(block);

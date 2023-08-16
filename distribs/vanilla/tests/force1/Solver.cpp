@@ -37,7 +37,7 @@ TEST_CASE("Force1::Solver") {
         auto makePillar = [blockMass](unsigned blockCount) {
             G::SolverStructure structure;
             for (unsigned i = 0; i < blockCount; ++i) {
-                structure.nodes().emplace_back(blockMass, i == 0);
+                structure.addNode({ blockMass, i == 0 });
             }
             for (unsigned i = 0; i < blockCount - 1; ++i) {
                 structure.addLink({ i, i + 1,  Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });

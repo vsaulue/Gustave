@@ -37,7 +37,7 @@
 TEST_CASE("Force1::Solution") {
     G::SolverStructure structure;
     for (unsigned i = 1; i <= 7; ++i) {
-        structure.nodes().emplace_back(double(i * 1'000) * u.mass, i == 1);
+        structure.addNode({ double(i * 1'000) * u.mass, i == 1 });
     }
     structure.addLink({ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
     structure.addLink({ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });

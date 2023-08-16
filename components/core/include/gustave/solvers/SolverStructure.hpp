@@ -33,12 +33,10 @@
 
 namespace Gustave::Solvers {
     template<Cfg::cLibConfig auto cfg>
-    struct SolverStructure {
-        [[nodiscard]]
-        std::vector<SolverNode<cfg>>& nodes() {
-            return nodes_;
-        }
-
+    class SolverStructure {
+    private:
+        using NodeIndex = Cfg::NodeIndex<cfg>;
+    public:
         [[nodiscard]]
         std::vector<SolverNode<cfg>> const& nodes() const {
             return nodes_;
@@ -49,10 +47,19 @@ namespace Gustave::Solvers {
             return links_;
         }
 
+        void addNode(SolverNode<cfg> const& newNode) {
+            nodes_.push_back(newNode);
+        }
+
         void addLink(SolverContact<cfg> const& newLink) {
             assert(newLink.localNodeId() < nodes_.size());
             assert(newLink.otherNodeId() < nodes_.size());
             links_.push_back(newLink);
+        }
+
+        [[nodiscard]]
+        NodeIndex nextNodeIndex() const {
+            return nodes_.size();
         }
     private:
         std::vector<SolverNode<cfg>> nodes_;
