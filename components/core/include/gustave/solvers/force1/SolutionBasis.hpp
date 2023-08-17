@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <cassert>
+#include <memory>
 #include <span>
 #include <vector>
 
@@ -46,26 +48,27 @@ namespace Gustave::Solvers::Force1 {
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
         [[nodiscard]]
-        SolutionBasis(SolverStructure<cfg> const& structure, Vector3<u.acceleration> const& g, std::vector<Real<u.potential>> potentials)
-            : structure_(structure)
-            , g_(g)
-            , potentials_(std::move(potentials))
+        SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g, std::vector<Real<u.potential>> potentials)
+            : structure_{ std::move(structure) }
+            , g_{ g }
+            , potentials_{ std::move(potentials) }
         {
+            assert(structure_);
             checkPotentials();
         }
 
         [[nodiscard]]
-        SolutionBasis(SolverStructure<cfg> const& structure, Vector3<u.acceleration> const& g)
-            : structure_(structure)
-            , g_(g)
-            , potentials_(structure_.nodes().size(), Real<u.potential>::zero())
+        SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g)
+            : structure_{ std::move(structure) }
+            , g_{ g }
+            , potentials_{ structure_->nodes().size(), 0.f * u.potential }
         {
-
+            assert(structure_);
         }
 
         [[nodiscard]]
-        const SolverStructure<cfg>& structure() const {
-            return structure_;
+        SolverStructure<cfg> const& structure() const {
+            return *structure_;
         }
 
         [[nodiscard]]
@@ -88,12 +91,12 @@ namespace Gustave::Solvers::Force1 {
             return g_;
         }
     private:
-        SolverStructure<cfg> const& structure_;
+        std::shared_ptr<SolverStructure<cfg> const> structure_;
         Vector3<u.acceleration> g_;
         std::vector<Real<u.potential>> potentials_;
 
         void checkPotentials() const {
-            assert(potentials_.size() == structure_.nodes().size());
+            assert(potentials_.size() == structure_->nodes().size());
         }
     };
 

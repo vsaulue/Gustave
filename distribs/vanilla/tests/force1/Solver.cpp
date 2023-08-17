@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <memory>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
@@ -46,7 +48,7 @@ TEST_CASE("Force1::Solver") {
         };
         constexpr unsigned blockCount = 10;
         constexpr float precision = 0.001f;
-        G::SolverStructure const structure = makePillar(blockCount);
+        auto structure = std::make_shared<G::SolverStructure const>(makePillar(blockCount));
         G::Force1::Solver const solver{structure, g, G::Force1::Solver::Config{1000, precision}};
         G::Force1::Solution const& solution = solver.solution();
         CHECK_THAT(solution.forceVector(0, 1), M::WithinRel(float(blockCount - 1) * blockMass * g, precision));

@@ -87,8 +87,8 @@ namespace Gustave::Solvers::Force1 {
         };
 
         [[nodiscard]]
-        Solver(SolverStructure<cfg> const& structure, Vector3<u.acceleration> const& g, Config const& config)
-            : Solver(std::make_shared<SolutionBasis<cfg>>(structure, g), config)
+        Solver(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g, Config const& config)
+            : Solver(std::make_shared<SolutionBasis<cfg>>(std::move(structure), g), config)
         {
             
         }

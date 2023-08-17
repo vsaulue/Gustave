@@ -35,16 +35,16 @@
 #include <TestConfig.hpp>
 
 TEST_CASE("Force1::Solution") {
-    G::SolverStructure structure;
+    auto structure = std::make_shared<G::SolverStructure>();
     for (unsigned i = 1; i <= 7; ++i) {
-        structure.addNode({ double(i * 1'000) * u.mass, i == 1 });
+        structure->addNode({ double(i * 1'000) * u.mass, i == 1 });
     }
-    structure.addLink({ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
-    structure.addLink({ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
-    structure.addLink({ 3, 0,  Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
-    structure.addLink({ 4, 0, -Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
-    structure.addLink({ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
-    structure.addLink({ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
+    structure->addLink({ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink({ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink({ 3, 0,  Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink({ 4, 0, -Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink({ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
+    structure->addLink({ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
 
     auto basis = std::make_shared<G::Force1::SolutionBasis>(structure, g);
     G::Force1::Solution solution{ basis };
