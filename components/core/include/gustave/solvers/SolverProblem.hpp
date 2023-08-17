@@ -27,18 +27,16 @@
 
 #include <cassert>
 #include <memory>
-#include <span>
-#include <vector>
+#include <utility>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/SolverProblem.hpp>
 #include <gustave/solvers/SolverStructure.hpp>
 
-namespace Gustave::Solvers::Force1 {
+namespace Gustave::Solvers {
     template<Cfg::cLibConfig auto cfg>
-    class SolutionBasis {
+    class SolverProblem {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
@@ -49,50 +47,25 @@ namespace Gustave::Solvers::Force1 {
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
         [[nodiscard]]
-        SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g, std::vector<Real<u.potential>> potentials)
-            : problem_{ g, std::move(structure) }
-            , potentials_{ std::move(potentials) }
+        SolverProblem(Vector3<u.acceleration> const& g, std::shared_ptr<SolverStructure<cfg> const> structure)
+            : g_{ g }
+            , structure_{ std::move(structure) }
         {
-            checkPotentials();
-        }
-
-        [[nodiscard]]
-        SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g)
-            : problem_{ g, std::move(structure) }
-            , potentials_{ problem_.structure().nodes().size(), 0.f * u.potential }
-        {}
-
-        [[nodiscard]]
-        SolverStructure<cfg> const& structure() const {
-            return problem_.structure();
-        }
-
-        [[nodiscard]]
-        std::vector<Real<u.potential>> const& potentials() const {
-            return potentials_;
-        }
-
-        [[nodiscard]]
-        std::span<Real<u.potential>> spanPotentials() {
-            return potentials_;
-        }
-
-        void swapPotentials(std::vector<Real<u.potential>>& newPotentials) {
-            potentials_.swap(newPotentials);
-            checkPotentials();
+            assert(structure_);
         }
 
         [[nodiscard]]
         Vector3<u.acceleration> const& g() const {
-            return problem_.g();
+            return g_;
+        }
+
+        [[nodiscard]]
+        SolverStructure<cfg> const& structure() const {
+            return *structure_;
         }
     private:
-        SolverProblem<cfg> problem_;
-        std::vector<Real<u.potential>> potentials_;
+        Vector3<u.acceleration> g_;
+        std::shared_ptr<SolverStructure<cfg> const> structure_;
 
-        void checkPotentials() const {
-            assert(potentials_.size() == problem_.structure().nodes().size());
-        }
     };
-
 }
