@@ -49,14 +49,6 @@ namespace Gustave::Solvers::Force1 {
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
         [[nodiscard]]
-        SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g, std::vector<Real<u.potential>> potentials)
-            : problem_{ g, std::move(structure) }
-            , potentials_{ std::move(potentials) }
-        {
-            checkPotentials();
-        }
-
-        [[nodiscard]]
         SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g)
             : problem_{ g, std::move(structure) }
             , potentials_{ problem_.structure().nodes().size(), 0.f * u.potential }
