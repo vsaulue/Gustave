@@ -26,69 +26,49 @@
 #pragma once
 
 #include <cassert>
-#include <memory>
-#include <span>
-#include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/SolverProblem.hpp>
-#include <gustave/solvers/SolverStructure.hpp>
 
-namespace Gustave::Solvers::Force1 {
+namespace Gustave::Solvers::Force1::detail {
     template<Cfg::cLibConfig auto cfg>
-    class SolutionBasis {
+    class ContactInfo {
     private:
-        static constexpr auto u = Cfg::units(cfg);
-
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        using NodeIndex = Cfg::NodeIndex<cfg>;
+
+        static constexpr auto u = Cfg::units(cfg);
     public:
         [[nodiscard]]
-        SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g)
-            : problem_{ g, std::move(structure) }
-            , potentials_{ problem_.structure().nodes().size(), 0.f * u.potential }
-        {}
-
-        [[nodiscard]]
-        SolverStructure<cfg> const& structure() const {
-            return problem_.structure();
-        }
-
-        SolverProblem<cfg> const& problem() const {
-            return problem_;
+        ContactInfo(NodeIndex otherIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) :
+            otherIndex_(otherIndex),
+            rMinus_(rMinus),
+            rPlus_(rPlus)
+        {
+            assert(rMinus > 0.f * u.resistance);
+            assert(rPlus > 0.f * u.resistance);
         }
 
         [[nodiscard]]
-        std::vector<Real<u.potential>> const& potentials() const {
-            return potentials_;
+        NodeIndex otherIndex() const {
+            return otherIndex_;
         }
 
         [[nodiscard]]
-        std::span<Real<u.potential>> spanPotentials() {
-            return potentials_;
-        }
-
-        void swapPotentials(std::vector<Real<u.potential>>& newPotentials) {
-            potentials_.swap(newPotentials);
-            checkPotentials();
+        Real<u.resistance> rMinus() const {
+            return rMinus_;
         }
 
         [[nodiscard]]
-        Vector3<u.acceleration> const& g() const {
-            return problem_.g();
+        Real<u.resistance> rPlus() const {
+            return rPlus_;
         }
     private:
-        SolverProblem<cfg> problem_;
-        std::vector<Real<u.potential>> potentials_;
-
-        void checkPotentials() const {
-            assert(potentials_.size() == problem_.structure().nodes().size());
-        }
+        NodeIndex otherIndex_;
+        Real<u.resistance> rMinus_;
+        Real<u.resistance> rPlus_;
     };
-
 }

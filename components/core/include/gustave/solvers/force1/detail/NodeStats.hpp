@@ -25,70 +25,52 @@
 
 #pragma once
 
-#include <cassert>
-#include <memory>
-#include <span>
-#include <vector>
-
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/SolverProblem.hpp>
-#include <gustave/solvers/SolverStructure.hpp>
+#include <gustave/solvers/force1/detail/NodeInfo.hpp>
 
-namespace Gustave::Solvers::Force1 {
+namespace Gustave::Solvers::Force1::detail {
     template<Cfg::cLibConfig auto cfg>
-    class SolutionBasis {
+    class NodeStats {
     private:
-        static constexpr auto u = Cfg::units(cfg);
-
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto rt = cfg.realTraits;
     public:
+        using NodeInfo = detail::NodeInfo<cfg>;
+
         [[nodiscard]]
-        SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g)
-            : problem_{ g, std::move(structure) }
-            , potentials_{ problem_.structure().nodes().size(), 0.f * u.potential }
+        NodeStats(NodeInfo const& info, Real<u.force> force, Real<u.conductivity> derivative)
+            : info_{ info }
+            , force_{ force }
+            , derivative_{ derivative }
         {}
 
         [[nodiscard]]
-        SolverStructure<cfg> const& structure() const {
-            return problem_.structure();
-        }
-
-        SolverProblem<cfg> const& problem() const {
-            return problem_;
+        Real<u.one> relativeError() const {
+            return rt.abs(force_ / info_.weight);
         }
 
         [[nodiscard]]
-        std::vector<Real<u.potential>> const& potentials() const {
-            return potentials_;
+        NodeInfo const& info() const {
+            return info_;
         }
 
         [[nodiscard]]
-        std::span<Real<u.potential>> spanPotentials() {
-            return potentials_;
-        }
-
-        void swapPotentials(std::vector<Real<u.potential>>& newPotentials) {
-            potentials_.swap(newPotentials);
-            checkPotentials();
+        Real<u.force> force() const {
+            return force_;
         }
 
         [[nodiscard]]
-        Vector3<u.acceleration> const& g() const {
-            return problem_.g();
+        Real<u.conductivity> derivative() const {
+            return derivative_;
         }
     private:
-        SolverProblem<cfg> problem_;
-        std::vector<Real<u.potential>> potentials_;
-
-        void checkPotentials() const {
-            assert(potentials_.size() == problem_.structure().nodes().size());
-        }
+        NodeInfo const& info_;
+        Real<u.force> force_;
+        Real<u.conductivity> derivative_;
     };
-
 }

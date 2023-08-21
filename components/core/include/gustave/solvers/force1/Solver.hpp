@@ -56,9 +56,6 @@ namespace Gustave::Solvers::Force1 {
         using ContactIndex = typename Cfg::ContactIndex<cfg>;
         using NodeIndex = typename Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
-
-        using NodeInfo = typename Solution<cfg>::NodeInfo;
-        using ContactInfo = typename Solution<cfg>::ContactInfo;
     public:
         using IterationIndex = std::uint64_t;
 
@@ -110,7 +107,7 @@ namespace Gustave::Solvers::Force1 {
                     SolverNode<cfg> const& node = nodes[id];
                     if (!node.isFoundation) {
                         auto const nodeStats = solution_->statsOf(id);
-                        nextPotentials[id] = potentials[id] - nodeStats.force / nodeStats.derivative * convergenceFactor;
+                        nextPotentials[id] = potentials[id] - nodeStats.force() / nodeStats.derivative() * convergenceFactor;
                         currentMaxError = rt.max(currentMaxError, nodeStats.relativeError());
                     }
                 }
