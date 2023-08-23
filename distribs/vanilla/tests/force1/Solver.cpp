@@ -33,6 +33,8 @@
 
 #include <TestConfig.hpp>
 
+using Solver = G::Force1::Solver;
+
 TEST_CASE("Force1::Solver") {
     SECTION("// pillar") {
         constexpr G::Real<u.mass> blockMass = 4000.f * u.mass;
@@ -49,8 +51,9 @@ TEST_CASE("Force1::Solver") {
         constexpr unsigned blockCount = 10;
         constexpr float precision = 0.001f;
         auto structure = std::make_shared<G::SolverStructure const>(makePillar(blockCount));
-        G::Force1::Solver const solver{structure, g, G::Force1::Solver::Config{1000, precision}};
-        G::Force1::Solution const& solution = solver.solution();
+        auto config = std::make_shared<Solver::Config const>(1000, precision);
+        auto result = G::Force1::Solver::run({ g, structure }, config);
+        G::Force1::Solution const& solution = result.solution();
         CHECK_THAT(solution.forceVector(0, 1), M::WithinRel(float(blockCount - 1) * blockMass * g, precision));
         CHECK_THAT(solution.forceVector(1, 2), M::WithinRel(float(blockCount - 2) * blockMass * g, precision));
         CHECK_THAT(solution.forceVector(2, 3), M::WithinRel(float(blockCount - 3) * blockMass * g, precision));

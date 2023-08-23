@@ -55,6 +55,14 @@ namespace Gustave::Solvers::Force1 {
         {}
 
         [[nodiscard]]
+        SolutionBasis(SolverProblem<cfg> problem, std::vector<Real<u.potential>> potentials)
+            : problem_{ std::move(problem) }
+            , potentials_{ std::move(potentials) }
+        {
+            checkPotentials();
+        }
+
+        [[nodiscard]]
         SolverStructure<cfg> const& structure() const {
             return problem_.structure();
         }
@@ -71,11 +79,6 @@ namespace Gustave::Solvers::Force1 {
         [[nodiscard]]
         std::span<Real<u.potential>> spanPotentials() {
             return potentials_;
-        }
-
-        void swapPotentials(std::vector<Real<u.potential>>& newPotentials) {
-            potentials_.swap(newPotentials);
-            checkPotentials();
         }
 
         [[nodiscard]]

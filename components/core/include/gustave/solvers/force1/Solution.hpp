@@ -62,9 +62,15 @@ namespace Gustave::Solvers::Force1 {
         using NodeStats = typename ForceRepartition::NodeStats;
 
         [[nodiscard]]
-        Solution(std::shared_ptr<const Basis> basis)
+        explicit Solution(std::shared_ptr<const Basis> basis)
             : basis_{ std::move(basis) }
             , forceBalancer_{ basis_->problem() }
+        {}
+
+        [[nodiscard]]
+        Solution(ForceBalancer balancer, std::vector<Real<u.potential>> potentials)
+            : basis_{ std::make_shared<Basis>(balancer.problem(), std::move(potentials)) }
+            , forceBalancer_{ std::move(balancer) }
         {}
 
         [[nodiscard]]

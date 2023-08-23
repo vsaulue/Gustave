@@ -35,6 +35,8 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/solvers/force1/detail/ForceBalancer.hpp>
+#include <gustave/solvers/force1/detail/ForceRepartition.hpp>
 #include <gustave/solvers/force1/Solution.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/solvers/SolverNode.hpp>
@@ -57,6 +59,8 @@ namespace Gustave::Solvers::Force1 {
         using NodeIndex = typename Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
     public:
+        using ForceBalancer = detail::ForceBalancer<cfg>;
+        using ForceRepartition = detail::ForceRepartition<cfg>;
         using IterationIndex = std::uint64_t;
 
         class Config {
@@ -83,50 +87,79 @@ namespace Gustave::Solvers::Force1 {
             Real<u.one> targetMaxError_;
         };
 
+        class Result {
+        public:
+            [[nodiscard]]
+            Result(IterationIndex iterations, std::shared_ptr<Solution<cfg> const> solution)
+                : iterations_{ iterations }
+                , solution_{ solution }
+            {}
+
+            [[nodiscard]]
+            IterationIndex iterations() const {
+                return iterations_;
+            }
+
+            [[nodiscard]]
+            Solution<cfg> const& solution() const {
+                return *solution_;
+            }
+
+            [[nodiscard]]
+            std::shared_ptr<Solution<cfg> const> const& solutionPtr() const {
+                return solution_;
+            }
+        private:
+            IterationIndex iterations_;
+            std::shared_ptr<Solution<cfg> const> solution_;
+        };
+
         [[nodiscard]]
-        Solver(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g, Config const& config)
-            : Solver(std::make_shared<SolutionBasis<cfg>>(std::move(structure), g), config)
-        {
-            
+        static Result run(SolverProblem<cfg> problem, std::shared_ptr<Config const> config) {
+            return Solver{ std::move(problem), std::move(config) }.result();
         }
 
         [[nodiscard]]
-        Solver(std::shared_ptr<SolutionBasis<cfg>> basis, Config const& config)
-            : structure_{ basis->structure() }
-            , basis_{ basis.get() }
-            , solution_{ std::make_unique<Solution<cfg>>(std::move(basis)) }
+        Result result() && {
+            return { iteration_, std::make_shared<Solution<cfg> const>(std::move(balancer_), std::move(potentials_)) };
+        }
+    private:
+        std::shared_ptr<Config const> config_;
+        SolverProblem<cfg> problem_;
+        ForceBalancer balancer_;
+        IterationIndex iteration_;
+        std::vector<Real<u.potential>> potentials_;
+        std::vector<Real<u.potential>> nextPotentials_;
+
+        [[nodiscard]]
+        Solver(SolverProblem<cfg> problem, std::shared_ptr<Config const> config)
+            : config_{ std::move(config) }
+            , problem_{ std::move(problem) }
+            , balancer_{ problem_ }
+            , iteration_{ 0 }
+            , potentials_(problem_.structure().nodes().size(), 0.f * u.potential)
+            , nextPotentials_{ potentials_ }
         {
-            std::vector<SolverNode<cfg>> const& nodes = structure_.nodes();
-            std::vector<Real<u.potential>> const& potentials = basis_->potentials();
-            std::vector<Real<u.potential>> nextPotentials = potentials;
+            std::vector<SolverNode<cfg>> const& nodes = problem_.structure().nodes();
             constexpr Real<u.one> convergenceFactor = 0.5f;
-            IterationIndex iteration = 0;
             do {
+                ForceRepartition repartition{ balancer_, potentials_ };
                 Real<u.one> currentMaxError = 0.f;
                 for (NodeIndex id = 0; id < nodes.size(); ++id) {
                     SolverNode<cfg> const& node = nodes[id];
                     if (!node.isFoundation) {
-                        auto const nodeStats = solution_->statsOf(id);
-                        nextPotentials[id] = potentials[id] - nodeStats.force() / nodeStats.derivative() * convergenceFactor;
+                        auto const nodeStats = repartition.statsOf(id);
+                        nextPotentials_[id] = potentials_[id] - nodeStats.force() / nodeStats.derivative() * convergenceFactor;
                         currentMaxError = rt.max(currentMaxError, nodeStats.relativeError());
                     }
                 }
-                if (currentMaxError >= config.targetMaxError()) {
-                    basis_->swapPotentials(nextPotentials);
-                    ++iteration;
+                if (currentMaxError >= config_->targetMaxError()) {
+                    potentials_.swap(nextPotentials_);
+                    ++iteration_;
                 } else {
                     break;
                 }
-            } while (iteration < config.maxIterations());
+            } while (iteration_ < config_->maxIterations());
         }
-
-        [[nodiscard]]
-        Solution<cfg> const& solution() const {
-            return *solution_;
-        }
-    private:
-        SolverStructure<cfg> const& structure_;
-        SolutionBasis<cfg>* basis_;
-        std::unique_ptr<Solution<cfg> const> solution_;
     };
 }

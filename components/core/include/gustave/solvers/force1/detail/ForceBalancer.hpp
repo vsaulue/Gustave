@@ -98,6 +98,11 @@ namespace Gustave::Solvers::Force1::detail {
         }
 
         [[nodiscard]]
+        SolverProblem<cfg> const& problem() const {
+            return problem_;
+        }
+
+        [[nodiscard]]
         SolverStructure<cfg> const& structure() const {
             return problem_.structure();
         }
@@ -107,7 +112,7 @@ namespace Gustave::Solvers::Force1::detail {
             return nodeInfos_;
         }
     private:
-        SolverProblem<cfg> const& problem_;
+        SolverProblem<cfg> problem_;
         std::vector<NodeInfo> nodeInfos_;
         NormalizedVector3 normalizedG_;
 
