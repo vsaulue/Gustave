@@ -72,10 +72,36 @@ namespace Gustave::Scenes::CuboidGrid {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
-        using StructureSet = Utils::PointerHash::Set<std::shared_ptr<SceneStructure<cfg> const>>;
+        using SceneStructure = CuboidGrid::SceneStructure<cfg>;
+        using StructureSet = Utils::PointerHash::Set<std::shared_ptr<SceneStructure const>>;
+
+        class TransactionResult {
+        public:
+            using DeletedSet = std::vector<SceneStructure const*>;
+            using NewSet = std::vector<std::shared_ptr<SceneStructure const>>;
+
+            [[nodiscard]]
+            TransactionResult(NewSet newStructures, DeletedSet deletedStructures)
+                : newStructures_{ std::move(newStructures) }
+                , deletedStructures_{ std::move(deletedStructures) }
+            {}
+
+            [[nodiscard]]
+            NewSet const& newStructures() const {
+                return newStructures_;
+            }
+
+            [[nodiscard]]
+            DeletedSet const& deletedStructures() const {
+                return deletedStructures_;
+            }
+        private:
+            NewSet newStructures_;
+            DeletedSet deletedStructures_;
+        };
 
         [[nodiscard]]
-        Scene(Vector3<u.length> const& blockSize)
+        explicit Scene(Vector3<u.length> const& blockSize)
             : blockSize_{blockSize}
         {
             if (blockSize.x() <= 0.f * u.length) {
@@ -92,13 +118,12 @@ namespace Gustave::Scenes::CuboidGrid {
         Scene(Scene const&) = delete;
         Scene& operator=(Scene const&) = delete;
 
-        void modify(Transaction<cfg> const& transaction) {
-            TransactionRunner::run(*this, transaction);
-            // TODO: generate structure diff.
+        TransactionResult modify(Transaction<cfg> const& transaction) {
+            return TransactionRunner::run(*this, transaction);
         }
 
         [[nodiscard]]
-        SceneStructure<cfg> const* anyStructureContaining(BlockPosition const& position) const {
+        SceneStructure const* anyStructureContaining(BlockPosition const& position) const {
             ConstBlockReference block = blocks_.find(position);
             if (!block) {
                 std::stringstream stream;
@@ -175,8 +200,18 @@ namespace Gustave::Scenes::CuboidGrid {
     private:
         class TransactionRunner {
         public:
-            static void run(Scene& scene, Transaction<cfg> const& transaction) {
-                TransactionRunner{ scene, transaction };
+            static TransactionResult run(Scene& scene, Transaction<cfg> const& transaction) {
+                return TransactionRunner{ scene, transaction }.result();
+            }
+
+            [[nodiscard]]
+            TransactionResult result() && {
+                typename TransactionResult::DeletedSet deletedStructures;
+                deletedStructures.reserve(removedStructures.size());
+                for (auto const& structure : removedStructures) {
+                    deletedStructures.push_back(structure.get());
+                }
+                return { std::move(newStructures), deletedStructures };
             }
         private:
             TransactionRunner(Scene& scene, Transaction<cfg> const& transaction)
@@ -190,7 +225,10 @@ namespace Gustave::Scenes::CuboidGrid {
                     addBlock(newInfo);
                 }
                 for (BlockReference root : newRoots) {
-                    scene.generateStructure(root);
+                    std::shared_ptr<SceneStructure const> newStruct = scene.generateStructure(root);
+                    if (newStruct) {
+                        newStructures.emplace_back(std::move(newStruct));
+                    }
                 }
             }
 
@@ -231,21 +269,22 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             void removeStructureOf(ConstBlockReference block) {
-                SceneStructure<cfg> const* structure = block.structure();
+                SceneStructure const* structure = block.structure();
                 if (scene.isStructureValid(structure)) {
-                    std::shared_ptr<SceneStructure<cfg> const> oldStructure = scene.removeStructure(structure);
+                    std::shared_ptr<SceneStructure const> oldStructure = scene.removeStructure(structure);
                     if (oldStructure != nullptr) {
-                        removedStructures.push(std::move(oldStructure));
+                        removedStructures.push_back(std::move(oldStructure));
                     }
                 }
             }
 
             Scene& scene;
             std::unordered_set<BlockReference> newRoots;
-            std::stack<std::shared_ptr<SceneStructure<cfg> const>> removedStructures;
+            std::vector<std::shared_ptr<SceneStructure const>> newStructures;
+            std::vector<std::shared_ptr<SceneStructure const>> removedStructures; // holds shared_ptr to prevent ABA issues.
         };
 
-        void addContact(SceneStructure<cfg>& structure, ConstBlockReference source, SceneNeighbour const& neighbour) {
+        void addContact(SceneStructure& structure, ConstBlockReference source, SceneNeighbour const& neighbour) {
             Direction const direction = neighbour.direction;
             NormalizedVector3 const normal = NormalizedVector3::basisVector(direction);
             Real<u.area> const area = contactAreaAlong(direction);
@@ -290,10 +329,10 @@ namespace Gustave::Scenes::CuboidGrid {
             return { blocks_, source };
         }
 
-        void generateStructure(BlockReference root) {
+        std::shared_ptr<SceneStructure const> generateStructure(BlockReference root) {
             assert(!root.isFoundation());
             if (!isStructureValid(root.structure())) {
-                auto newStructure = std::make_shared<SceneStructure<cfg>>(blocks_);
+                auto newStructure = std::make_shared<SceneStructure>(blocks_);
                 std::stack<BlockReference> remainingBlocks;
                 remainingBlocks.push(root);
                 while (!remainingBlocks.empty()) {
@@ -318,12 +357,15 @@ namespace Gustave::Scenes::CuboidGrid {
                         }
                     }
                 }
-                structures_.emplace(std::move(newStructure));
+                structures_.emplace(newStructure);
+                return newStructure;
+            } else {
+                return { nullptr };
             }
         }
 
         [[nodiscard]]
-        bool isStructureValid(SceneStructure<cfg> const* structure) const {
+        bool isStructureValid(SceneStructure const* structure) const {
             return structure != nullptr && structures_.contains(structure);
         }
 
@@ -338,7 +380,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        std::shared_ptr<SceneStructure<cfg> const> removeStructure(SceneStructure<cfg> const* structure) {
+        std::shared_ptr<SceneStructure const> removeStructure(SceneStructure const* structure) {
             auto it = structures_.find(structure);
             if (it != structures_.end()) {
                 // unordered_set::extract() doesn't support Hash::is_transparent before c++23.

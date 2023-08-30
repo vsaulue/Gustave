@@ -44,6 +44,8 @@ using Transaction = Gustave::Scenes::CuboidGrid::Transaction<G::libConfig>;
 
 static constexpr G::Real<u.density> concreteDensity = 2'400.f * u.density;
 
+static constexpr Gustave::Utils::PointerHash::Equals ptrEquals;
+
 TEST_CASE("Scene::CubeGrid::Scene") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     G::Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
@@ -109,7 +111,9 @@ TEST_CASE("Scene::CubeGrid::Scene") {
         SECTION(" // Transaction{1+}: single foundation") {
             Transaction t;
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, true });
-            scene.modify(t);
+            auto const result = scene.modify(t);
+            CHECK(result.newStructures().size() == 0);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(scene.structures().size() == 0);
             CHECK(scene.anyStructureContaining({ 1,0,0 }) == nullptr);
@@ -118,11 +122,14 @@ TEST_CASE("Scene::CubeGrid::Scene") {
         SECTION("// Transaction{1+}: single non-foundation") {
             Transaction t;
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
-            scene.modify(t);
+            auto const result = scene.modify(t);
+            CHECK(result.newStructures().size() == 1);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(scene.structures().size() == 1);
             CHECK(scene.blocks().size() == 1);
             SceneStructure const& structure = structureOf({ 1,0,0 });
+            CHECK_THAT(result.newStructures(), M::C2::Contains(&structure, ptrEquals));
             G::NodeIndex blockIndex = getBlockIndex(structure, { 1,0,0 });
             G::SolverNode const& solverNode = structure.solverStructure().nodes()[blockIndex];
             CHECK_FALSE(solverNode.isFoundation);
@@ -132,11 +139,15 @@ TEST_CASE("Scene::CubeGrid::Scene") {
         SECTION("// Transaction{1+} -> Transaction{1-}") {
             Transaction t;
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, true });
-            scene.modify(t);
+            auto const r1 = scene.modify(t);
+            CHECK(r1.newStructures().size() == 0);
+            CHECK(r1.deletedStructures().size() == 0);
 
             t.clear();
             t.removeBlock({ 1,0,0 });
-            scene.modify(t);
+            auto const r2 = scene.modify(t);
+            CHECK(r2.newStructures().size() == 0);
+            CHECK(r2.deletedStructures().size() == 0);
 
             CHECK(scene.structures().size() == 0);
             CHECK(scene.blocks().size() == 0);
@@ -147,20 +158,24 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             t.addBlock({ {0,0,0}, concrete_20m, blockMass, true });
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
             t.addBlock({ {0,1,0}, concrete_20m, blockMass, false });
-            scene.modify(t);
+            auto const result = scene.modify(t);
+            CHECK(result.newStructures().size() == 2);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(scene.structures().size() == 2);
 
             {
                 SceneStructure const& structureX = structureOf({ 1,0,0 });
-                G::NodeIndex x1 = getBlockIndex(structureX, { 1,0,0 });
-                G::NodeIndex origin = getBlockIndex(structureX, { 0,0,0 });
+                CHECK_THAT(result.newStructures(), M::C2::Contains(&structureX, ptrEquals));
+                G::NodeIndex const x1 = getBlockIndex(structureX, { 1,0,0 });
+                G::NodeIndex const origin = getBlockIndex(structureX, { 0,0,0 });
                 CHECK_FALSE(structureX.contains({ 0,1,0 }));
                 checkContact(structureX, origin, x1, Direction::plusX, concrete_20m);
             }
 
             {
                 SceneStructure const& structureY = structureOf({ 0,1,0 });
+                CHECK_THAT(result.newStructures(), M::C2::Contains(&structureY, ptrEquals));
                 G::NodeIndex y1 = getBlockIndex(structureY, { 0,1,0 });
                 G::NodeIndex origin = getBlockIndex(structureY, { 0,0,0 });
                 CHECK_FALSE(structureY.contains({ 1,0,0 }));
@@ -173,7 +188,9 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             t.addBlock({ {0,0,0}, concrete_20m, blockMass, true });
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, true });
             t.addBlock({ {2,0,0}, concrete_20m, blockMass, false });
-            scene.modify(t);
+            auto const result = scene.modify(t);
+            CHECK(result.newStructures().size() == 1);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(scene.structures().size() == 1);
 
@@ -184,6 +201,7 @@ TEST_CASE("Scene::CubeGrid::Scene") {
 
             {
                 SceneStructure const& structure = structureOf({ 2,0,0 });
+                CHECK_THAT(result.newStructures(), M::C2::Contains(&structure, ptrEquals));
                 G::NodeIndex const x1 = getBlockIndex(structure, { 1,0,0 });
                 G::NodeIndex const x2 = getBlockIndex(structure, { 2,0,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
@@ -196,11 +214,14 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             for (int i = 0; i < 5; ++i) {
                 t.addBlock({ {0,i,0}, concrete_20m, blockMass, i == 0 });
             }
-            scene.modify(t);
+            auto const result = scene.modify(t);
+            CHECK(result.newStructures().size() == 1);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(scene.structures().size() == 1);
 
             SceneStructure const& structure = structureOf({ 0,0,0 });
+            CHECK_THAT(result.newStructures(), M::C2::Contains(&structure, ptrEquals));
             for (int i = 0; i < 4; ++i) {
                 G::NodeIndex const bottom = getBlockIndex(structure, { 0,i,0 });
                 G::NodeIndex const top = getBlockIndex(structure, { 0,i + 1,0 });
@@ -213,16 +234,21 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             for (int i = 0; i < 5; ++i) {
                 t.addBlock({ {0,i,0}, concrete_20m, blockMass, false });
             }
-            scene.modify(t);
+            auto const r1 = scene.modify(t);
+            CHECK(r1.newStructures().size() == 1);
+            CHECK(r1.deletedStructures().size() == 0);
 
             t.clear();
             t.removeBlock({ 0,2,0 });
-            scene.modify(t);
+            auto const r2 = scene.modify(t);
+            CHECK(r2.newStructures().size() == 2);
+            CHECK_THAT(r2.deletedStructures(), M::C2::UnorderedRangeEquals(r1.newStructures(), ptrEquals));
 
             CHECK(scene.structures().size() == 2);
 
             {
                 SceneStructure const& structure = structureOf({ 0,0,0 });
+                CHECK_THAT(r2.newStructures(), M::C2::Contains(&structure, ptrEquals));
                 G::NodeIndex const y0 = getBlockIndex(structure, { 0,0,0 });
                 G::NodeIndex const y1 = getBlockIndex(structure, { 0,1,0 });
                 CHECK_FALSE(structure.contains({ 0,3,0 }));
@@ -232,6 +258,7 @@ TEST_CASE("Scene::CubeGrid::Scene") {
 
             {
                 SceneStructure const& structure = structureOf({ 0,3,0 });
+                CHECK_THAT(r2.newStructures(), M::C2::Contains(&structure, ptrEquals));
                 G::NodeIndex const y3 = getBlockIndex(structure, { 0,3,0 });
                 G::NodeIndex const y4 = getBlockIndex(structure, { 0,4,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
@@ -246,14 +273,19 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             t.addBlock({ {0,0,1}, concrete_20m, blockMass, false });
             t.addBlock({ {0,0,3}, concrete_20m, blockMass, false });
             t.addBlock({ {0,0,4}, concrete_20m, blockMass, true });
-            scene.modify(t);
+            auto const r1 = scene.modify(t);
+            CHECK(r1.newStructures().size() == 2);
+            CHECK(r1.deletedStructures().size() == 0);
 
             t.clear();
             t.addBlock({ { 0,0,2 }, concrete_20m, blockMass, false });
-            scene.modify(t);
+            auto const r2 = scene.modify(t);
+            CHECK(r2.newStructures().size() == 1);
+            CHECK_THAT(r2.deletedStructures(), M::C2::UnorderedRangeEquals(r1.newStructures(), ptrEquals));
 
             CHECK(scene.structures().size() == 1);
             SceneStructure const& structure = structureOf({ 0,0,0 });
+            CHECK_THAT(r2.newStructures(), M::C2::Contains(&structure, ptrEquals));
             G::NodeIndex const z0 = getBlockIndex(structure, { 0,0,0 });
             G::NodeIndex const z1 = getBlockIndex(structure, { 0,0,1 });
             G::NodeIndex const z2 = getBlockIndex(structure, { 0,0,2 });
@@ -268,15 +300,21 @@ TEST_CASE("Scene::CubeGrid::Scene") {
         SECTION("// Transaction{3+} -> Transaction{1-}: unmodified structure is not invalidated or rebuilt.") {
             Transaction t;
             t.addBlock({ {0,0,0}, concrete_20m, blockMass, true });
-            t.addBlock({ {-1,0,0}, concrete_20m, blockMass, false });
+            t.addBlock({ {0,1,0}, concrete_20m, blockMass, false });
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
-            scene.modify(t);
+            auto const r1 = scene.modify(t);
+            CHECK(r1.newStructures().size() == 2);
+            CHECK(r1.deletedStructures().size() == 0);
 
             SceneStructure const& structureOfX1 = structureOf({ 1,0,0 });
+            SceneStructure const& structureOfY1 = structureOf({ 0,1,0 });
 
             t.clear();
-            t.removeBlock({ -1,0,0 });
-            scene.modify(t);
+            t.removeBlock({ 0,1,0 });
+            auto const r2 = scene.modify(t);
+            CHECK(r2.newStructures().size() == 0);
+            CHECK(r2.deletedStructures().size() == 1);
+            CHECK_THAT(r2.deletedStructures(), M::C2::Contains(&structureOfY1, ptrEquals));
 
             CHECK(scene.structures().size() == 1);
             CHECK(&structureOfX1 == &structureOf({ 1,0,0 }));
