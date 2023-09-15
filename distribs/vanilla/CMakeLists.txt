@@ -44,6 +44,7 @@ add_executable(Test-Gustave-Vanilla
     "tests/scenes/cuboidGrid/detail/SceneNeighbours.cpp"
     "tests/scenes/cuboidGrid/Scene.cpp"
     "tests/scenes/cuboidGrid/Transaction.cpp"
+    "tests/world/SyncWorld.cpp"
 )
 target_link_libraries(Test-Gustave-Vanilla
     PRIVATE Catch2::Catch2WithMain
