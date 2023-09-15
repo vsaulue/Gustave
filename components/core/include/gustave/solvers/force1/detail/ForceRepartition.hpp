@@ -26,6 +26,7 @@
 #pragma once
 
 #include <cassert>
+#include <span>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
