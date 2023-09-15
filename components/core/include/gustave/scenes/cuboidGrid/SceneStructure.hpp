@@ -26,6 +26,7 @@
 #pragma once
 
 #include <cassert>
+#include <memory>
 #include <optional>
 #include <vector>
 
@@ -55,25 +56,24 @@ namespace Gustave::Scenes::CuboidGrid {
         using Real = Cfg::Real<cfg, unit>;
     public:
         [[nodiscard]]
-        SceneStructure(SceneBlocks const& sceneBlocks)
+        explicit SceneStructure(SceneBlocks const& sceneBlocks)
             : sceneBlocks_{ sceneBlocks }
-        {
-
-        }
+            , solverStructure_{ std::make_shared<SolverStructure>() }
+        {}
 
         void addBlock(ConstBlockReference block) {
             assert(block);
-            NodeIndex const newIndex = solverStructure_.nextNodeIndex();
+            NodeIndex const newIndex = solverStructure_->nextNodeIndex();
             auto insertResult = solverIndices_.insert({ block, newIndex });
             if (insertResult.second) {
-                solverStructure_.addNode({ block.mass(), block.isFoundation() });
+                solverStructure_->addNode({ block.mass(), block.isFoundation() });
             }
         }
 
         void addContact(ConstBlockReference b1, ConstBlockReference b2, NormalizedVector3 const& normalOnB1,
                         Real<u.area> area, Real<u.length> thickness, MaxStress const& maxConstraints)
         {
-            solverStructure_.addLink({ indexOf(b1), indexOf(b2), normalOnB1, area, thickness, maxConstraints });
+            solverStructure_->addLink({ indexOf(b1), indexOf(b2), normalOnB1, area, thickness, maxConstraints });
         }
 
         [[nodiscard]]
@@ -113,6 +113,11 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         SolverStructure const& solverStructure() const {
+            return *solverStructure_;
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<SolverStructure const> solverStructurePtr() const {
             return solverStructure_;
         }
     private:
@@ -122,7 +127,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         SceneBlocks const& sceneBlocks_;
-        SolverStructure solverStructure_;
+        std::shared_ptr<SolverStructure> solverStructure_;
         std::unordered_map<ConstBlockReference, NodeIndex> solverIndices_;
     };
 }
