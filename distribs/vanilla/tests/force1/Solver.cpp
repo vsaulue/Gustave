@@ -51,8 +51,8 @@ TEST_CASE("Force1::Solver") {
         constexpr unsigned blockCount = 10;
         constexpr float precision = 0.001f;
         auto structure = std::make_shared<G::SolverStructure const>(makePillar(blockCount));
-        auto config = std::make_shared<Solver::Config const>(1000, precision);
-        auto result = G::Force1::Solver::run({ g, structure }, config);
+        auto const solver = Solver{ std::make_shared<Solver::Config const>(1000, precision) };
+        auto const result = solver.run({g, structure });
         G::Force1::Solution const& solution = result.solution();
         CHECK_THAT(solution.forceVector(0, 1), M::WithinRel(float(blockCount - 1) * blockMass * g, precision));
         CHECK_THAT(solution.forceVector(1, 2), M::WithinRel(float(blockCount - 2) * blockMass * g, precision));
