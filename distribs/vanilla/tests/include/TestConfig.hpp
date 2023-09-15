@@ -59,6 +59,6 @@ inline G::MaxStress const concrete_20m{
 
 template<C::cUnitOf<G::libConfig> Unit>
 [[nodiscard]]
-static inline G::Vector3<Unit{}> vector3(std::floating_point auto x, std::floating_point auto y, std::floating_point auto z, Unit unit) {
+inline constexpr G::Vector3<Unit{}> vector3(std::floating_point auto x, std::floating_point auto y, std::floating_point auto z, Unit unit) {
     return {x, y, z, unit};
 }
