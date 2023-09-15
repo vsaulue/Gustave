@@ -72,8 +72,10 @@ namespace Gustave::Scenes::CuboidGrid {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
+        using BlockIndex = BlockPosition;
         using SceneStructure = CuboidGrid::SceneStructure<cfg>;
         using StructureSet = Utils::PointerHash::Set<std::shared_ptr<SceneStructure const>>;
+        using Transaction = CuboidGrid::Transaction<cfg>;
 
         class TransactionResult {
         public:
@@ -118,7 +120,7 @@ namespace Gustave::Scenes::CuboidGrid {
         Scene(Scene const&) = delete;
         Scene& operator=(Scene const&) = delete;
 
-        TransactionResult modify(Transaction<cfg> const& transaction) {
+        TransactionResult modify(Transaction const& transaction) {
             return TransactionRunner::run(*this, transaction);
         }
 
@@ -200,7 +202,7 @@ namespace Gustave::Scenes::CuboidGrid {
     private:
         class TransactionRunner {
         public:
-            static TransactionResult run(Scene& scene, Transaction<cfg> const& transaction) {
+            static TransactionResult run(Scene& scene, Transaction const& transaction) {
                 return TransactionRunner{ scene, transaction }.result();
             }
 
@@ -214,7 +216,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 return { std::move(newStructures), deletedStructures };
             }
         private:
-            TransactionRunner(Scene& scene, Transaction<cfg> const& transaction)
+            TransactionRunner(Scene& scene, Transaction const& transaction)
                 : scene{ scene }
             {
                 scene.checkTransaction(transaction);
@@ -300,7 +302,7 @@ namespace Gustave::Scenes::CuboidGrid {
             return result.str();
         }
 
-        void checkTransaction(Transaction<cfg> const& transaction) const {
+        void checkTransaction(Transaction const& transaction) const {
             auto const& deletedBlocks = transaction.deletedBlocks();
             for (BlockPosition const& delPosition : deletedBlocks) {
                 if (!blocks_.contains(delPosition)) {
