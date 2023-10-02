@@ -64,7 +64,7 @@ namespace Gustave::Scenes::CuboidGrid {
         void addBlock(ConstBlockReference block) {
             assert(block);
             NodeIndex const newIndex = solverStructure_->nextNodeIndex();
-            auto insertResult = solverIndices_.insert({ block, newIndex });
+            auto insertResult = solverIndices_.insert({ block.position(), newIndex});
             if (insertResult.second) {
                 solverStructure_->addNode({ block.mass(), block.isFoundation() });
             }
@@ -78,7 +78,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         bool contains(ConstBlockReference block) const {
-            return solverIndices_.contains(block);
+            return solverIndices_.contains(block.position());
         }
 
         [[nodiscard]]
@@ -93,7 +93,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         std::optional<NodeIndex> solverIndexOf(ConstBlockReference block) const {
-            auto const findResult = solverIndices_.find(block);
+            auto const findResult = solverIndices_.find(block.position());
             if (findResult != solverIndices_.end()) {
                 return { findResult->second };
             } else {
@@ -123,11 +123,11 @@ namespace Gustave::Scenes::CuboidGrid {
     private:
         [[nodiscard]]
         NodeIndex indexOf(ConstBlockReference block) const {
-            return solverIndices_.at(block);
+            return solverIndices_.at(block.position());
         }
 
         SceneBlocks const& sceneBlocks_;
         std::shared_ptr<SolverStructure> solverStructure_;
-        std::unordered_map<ConstBlockReference, NodeIndex> solverIndices_;
+        std::unordered_map<BlockPosition, NodeIndex> solverIndices_;
     };
 }
