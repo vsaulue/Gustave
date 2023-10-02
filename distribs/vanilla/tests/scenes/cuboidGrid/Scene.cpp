@@ -56,24 +56,6 @@ TEST_CASE("Scene::CubeGrid::Scene") {
         CHECK(scene.blockSize() == blockSize);
     }
 
-    SECTION("::contactAreaAlong(BasicDirection)") {
-        CHECK(scene.contactAreaAlong(Direction::minusX) == 6.f * u.area);
-        CHECK(scene.contactAreaAlong(Direction::plusX) == 6.f * u.area);
-        CHECK(scene.contactAreaAlong(Direction::minusY) == 3.f * u.area);
-        CHECK(scene.contactAreaAlong(Direction::plusY) == 3.f * u.area);
-        CHECK(scene.contactAreaAlong(Direction::minusZ) == 2.f * u.area);
-        CHECK(scene.contactAreaAlong(Direction::plusZ) == 2.f * u.area);
-    }
-
-    SECTION("::thicknessAlong(BasicDirection)") {
-        CHECK(scene.thicknessAlong(Direction::minusX) == 1.f * u.length);
-        CHECK(scene.thicknessAlong(Direction::plusX) == 1.f * u.length);
-        CHECK(scene.thicknessAlong(Direction::minusY) == 2.f * u.length);
-        CHECK(scene.thicknessAlong(Direction::plusY) == 2.f * u.length);
-        CHECK(scene.thicknessAlong(Direction::minusZ) == 3.f * u.length);
-        CHECK(scene.thicknessAlong(Direction::plusZ) == 3.f * u.length);
-    }
-
     SECTION("::modify(Transaction const&)") {
         auto structureOf = [&scene](BlockPosition const& position) -> SceneStructure const& {
             SceneStructure const* result = scene.anyStructureContaining(position);

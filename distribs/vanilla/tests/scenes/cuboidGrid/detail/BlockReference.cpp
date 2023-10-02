@@ -44,7 +44,7 @@ using BlockReference = Gustave::Scenes::CuboidGrid::detail::BlockReference<G::li
 TEST_CASE("Scenes::CuboidGrid::detail::BlockReference") {
     BlockConstructionInfo const info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
     BlockData data{ info.position(), { info } };
-    SceneBlocks const sceneBlocks;
+    SceneBlocks const sceneBlocks{ vector3(1.f, 1.f, 1.f, u.length) };
 
     SECTION("<*,true>") {
         SECTION("// constructor & getters") {

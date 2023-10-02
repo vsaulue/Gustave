@@ -104,18 +104,8 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         explicit Scene(Vector3<u.length> const& blockSize)
-            : blockSize_{blockSize}
-        {
-            if (blockSize.x() <= 0.f * u.length) {
-                throw std::invalid_argument{ blockSizeError('x', blockSize.x()) };
-            }
-            if (blockSize.y() <= 0.f * u.length) {
-                throw std::invalid_argument{ blockSizeError('y', blockSize.y()) };
-            }
-            if (blockSize.z() <= 0.f * u.length) {
-                throw std::invalid_argument{ blockSizeError('z', blockSize.z()) };
-            }
-        }
+            : blocks_{ blockSize }
+        {}
 
         Scene(Scene const&) = delete;
         Scene& operator=(Scene const&) = delete;
@@ -151,28 +141,12 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
-            return blockSize_;
+            return blocks_.blockSize();
         }
 
         [[nodiscard]]
         Real<u.area> contactAreaAlong(Direction direction) const {
-            Vector3<u.length> const& dims = blockSize_;
-            Real<u.area> result = 0.f * u.area;
-            switch (direction) {
-            case Direction::plusX:
-            case Direction::minusX:
-                result = dims.y() * dims.z();
-                break;
-            case Direction::plusY:
-            case Direction::minusY:
-                result = dims.x() * dims.z();
-                break;
-            case Direction::plusZ:
-            case Direction::minusZ:
-                result = dims.x() * dims.y();
-                break;
-            }
-            return result;
+            return blocks_.contactAreaAlong(direction);
         }
 
         [[nodiscard]]
@@ -182,22 +156,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         Real<u.length> thicknessAlong(Direction direction) const {
-            Real<u.length> result = 0.f * u.length;
-            switch (direction) {
-            case Direction::plusX:
-            case Direction::minusX:
-                result = blockSize_.x();
-                break;
-            case Direction::plusY:
-            case Direction::minusY:
-                result = blockSize_.y();
-                break;
-            case Direction::plusZ:
-            case Direction::minusZ:
-                result = blockSize_.z();
-                break;
-            }
-            return result;
+            return blocks_.thicknessAlong(direction);
         }
     private:
         class TransactionRunner {
@@ -295,13 +254,6 @@ namespace Gustave::Scenes::CuboidGrid {
             structure.addContact(source, neighbour.block, normal, area, thickness, maxStress);
         }
 
-        [[nodiscard]]
-        static std::string blockSizeError(char coordSymbol, Real<u.length> value) {
-            std::stringstream result;
-            result << "blocksize." << coordSymbol << " must be strictly positive (passed: " << value << ").";
-            return result.str();
-        }
-
         void checkTransaction(Transaction const& transaction) const {
             auto const& deletedBlocks = transaction.deletedBlocks();
             for (BlockPosition const& delPosition : deletedBlocks) {
@@ -393,7 +345,6 @@ namespace Gustave::Scenes::CuboidGrid {
             }
         }
 
-        Vector3<u.length> blockSize_;
         SceneBlocks blocks_;
         StructureSet structures_;
     };

@@ -52,7 +52,7 @@ static constexpr Coord max{ Limits::max() };
 static constexpr Coord min{ Limits::min() };
 
 TEST_CASE("Scene::CuboidGrid::detail::SceneNeighbours") {
-    SceneBlocks sceneBlocks;
+    SceneBlocks sceneBlocks{ vector3(2.f, 3.f, 1.f, u.length) };
 
     auto addBlock = [&](BlockPosition const& position) -> BlockReference {
         return sceneBlocks.insert({ position, concrete_20m, 20.f * u.mass, false });
