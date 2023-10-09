@@ -87,6 +87,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         template<bool rhsMutable>
+        [[nodiscard]]
         bool operator==(BlockDataReference<cfg, rhsMutable> const& rhs) const {
             return data_ == rhs.data();
         }
