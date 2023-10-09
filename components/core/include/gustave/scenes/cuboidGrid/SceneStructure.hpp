@@ -33,7 +33,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>
+#include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
 #include <gustave/solvers/SolverNode.hpp>
 #include <gustave/solvers/SolverStructure.hpp>
@@ -44,7 +44,7 @@ namespace Gustave::Scenes::CuboidGrid {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
-        using ConstBlockReference = detail::BlockReference<cfg, false>;
+        using ConstBlockReference = detail::BlockDataReference<cfg, false>;
         using MaxStress = Model::MaxStress<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;

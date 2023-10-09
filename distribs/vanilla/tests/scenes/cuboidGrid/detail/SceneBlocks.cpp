@@ -26,20 +26,20 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
-#include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>
+#include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
 
 #include <TestConfig.hpp>
 
-using BlockReference = Gustave::Scenes::CuboidGrid::detail::BlockReference<G::libConfig,true>;
+using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<G::libConfig,true>;
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using Direction = Gustave::Math3d::BasicDirection;
 using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<G::libConfig>;
 
 TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
     SceneBlocks sceneBlocks{ vector3(1.f, 2.f, 3.f, u.length) };
-    BlockReference b1 = sceneBlocks.insert({ {2,3,4}, concrete_20m, 10.f * u.mass, true });
-    BlockReference b2 = sceneBlocks.insert({ {4,6,9}, concrete_20m, 25.f * u.mass, false });
+    BlockDataReference b1 = sceneBlocks.insert({ {2,3,4}, concrete_20m, 10.f * u.mass, true });
+    BlockDataReference b2 = sceneBlocks.insert({ {4,6,9}, concrete_20m, 25.f * u.mass, false });
 
     SECTION("::contactAreaAlong(BasicDirection)") {
         CHECK(sceneBlocks.contactAreaAlong(Direction::minusX) == 6.f * u.area);
@@ -76,10 +76,10 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
 
     SECTION("::find(BlockPosition const&)") {
         SECTION("// true") {
-            BlockReference f1 = sceneBlocks.find({ 2,3,4 });
+            BlockDataReference f1 = sceneBlocks.find({ 2,3,4 });
             CHECK(f1 == b1);
 
-            BlockReference f2 = sceneBlocks.find({ 4,6,9 });
+            BlockDataReference f2 = sceneBlocks.find({ 4,6,9 });
             CHECK(f2 == b2);
         }
 

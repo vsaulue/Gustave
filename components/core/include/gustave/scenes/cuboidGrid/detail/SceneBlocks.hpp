@@ -33,8 +33,8 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockMappedData.hpp>
-#include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg>
@@ -103,16 +103,16 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        BlockReference<cfg,true> find(BlockPosition const& position) {
+        BlockDataReference<cfg,true> find(BlockPosition const& position) {
             return doFind(*this, position);
         }
 
         [[nodiscard]]
-        BlockReference<cfg,false> find(BlockPosition const& position) const {
+        BlockDataReference<cfg,false> find(BlockPosition const& position) const {
             return doFind(*this, position);
         }
 
-        BlockReference<cfg, true> insert(BlockConstructionInfo<cfg> const& info) {
+        BlockDataReference<cfg, true> insert(BlockConstructionInfo<cfg> const& info) {
             auto it = blocks_.emplace(info.position(), BlockMappedData{ info }).first;
             return { &(*it) };
         }

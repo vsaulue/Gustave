@@ -27,7 +27,7 @@
 
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
-#include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>
+#include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
 #include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
 
@@ -39,16 +39,16 @@ using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<G::libConfi
 using SceneStructure = Gustave::Scenes::CuboidGrid::SceneStructure<G::libConfig>;
 
 template<bool isMutable>
-using BlockReference = Gustave::Scenes::CuboidGrid::detail::BlockReference<G::libConfig, isMutable>;
+using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<G::libConfig, isMutable>;
 
-TEST_CASE("Scenes::CuboidGrid::detail::BlockReference") {
+TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
     BlockConstructionInfo const info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
     BlockData data{ info.position(), { info } };
     SceneBlocks const sceneBlocks{ vector3(1.f, 1.f, 1.f, u.length) };
 
     SECTION("<*,true>") {
         SECTION("// constructor & getters") {
-            BlockReference<true> ref{ &data };
+            BlockDataReference<true> ref{ &data };
             CHECK(ref.position() == info.position());
             CHECK(ref.mass() == 5.f * u.mass);
             CHECK(ref.isFoundation() == true);
@@ -57,18 +57,18 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockReference") {
 
         SECTION("operator bool() const") {
             SECTION("// true") {
-                BlockReference<true> const ref{ &data };
+                BlockDataReference<true> const ref{ &data };
                 CHECK(ref);
             }
 
             SECTION("// false") {
-                BlockReference<true> const ref{ nullptr };
+                BlockDataReference<true> const ref{ nullptr };
                 CHECK_FALSE(ref);
             }
         }
 
         SECTION("::structure() // mutable") {
-            BlockReference<true> ref{ &data };
+            BlockDataReference<true> ref{ &data };
             SceneStructure structure{ sceneBlocks };
             ref.structure() = &structure;
             CHECK(data.second.structure() == &structure);
@@ -78,24 +78,24 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockReference") {
     SECTION("<*,false>") {
         BlockData const* const cData = &data;
 
-        SECTION("::BlockReference(BlockData const*) // + getters") {
-            BlockReference<false> cRef{ cData };
+        SECTION("::BlockDataReference(BlockData const*) // + getters") {
+            BlockDataReference<false> cRef{ cData };
             CHECK(cRef.position() == info.position());
             CHECK(cRef.mass() == 5.f * u.mass);
             CHECK(cRef.isFoundation() == true);
             CHECK(cRef.structure() == nullptr);
         }
 
-        SECTION("::BlockReference(BlockReference<*,true> const&)") {
-            BlockReference<true> ref{ &data };
-            BlockReference<false> cRef{ ref };
+        SECTION("::BlockDataReference(BlockDataReference<*,true> const&)") {
+            BlockDataReference<true> ref{ &data };
+            BlockDataReference<false> cRef{ ref };
             CHECK(ref.data() == cRef.data());
         }
 
-        SECTION("::operator==(BlockReference<*;true> const&)") {
-            BlockReference<true> validRef{ &data };
-            BlockReference<true> nullRef{ nullptr };
-            BlockReference<false> cRef{ cData };
+        SECTION("::operator==(BlockDataReference<*;true> const&)") {
+            BlockDataReference<true> validRef{ &data };
+            BlockDataReference<true> nullRef{ nullptr };
+            BlockDataReference<false> cRef{ cData };
 
             CHECK(cRef == validRef);
             CHECK(cRef != nullRef);

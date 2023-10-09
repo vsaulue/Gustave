@@ -86,7 +86,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             void next() {
                 while (pos_ != positions().end()) {
                     PositionNeighbour const& nPos = *pos_;
-                    if (BlockReference<cfg,isMutable_> neighbour = neighbours_->blocks_.find(nPos.position)) {
+                    if (BlockDataReference<cfg,isMutable_> neighbour = neighbours_->blocks_.find(nPos.position)) {
                         value_ = { nPos.direction, neighbour };
                         break;
                     }

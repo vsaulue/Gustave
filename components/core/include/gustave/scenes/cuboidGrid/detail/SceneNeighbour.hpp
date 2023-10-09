@@ -27,7 +27,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/detail/BlockReference.hpp>
+#include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg, bool isMutable_>
@@ -41,7 +41,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         {}
 
         [[nodiscard]]
-        SceneNeighbour(Direction direction, BlockReference<cfg,isMutable_> block)
+        SceneNeighbour(Direction direction, BlockDataReference<cfg,isMutable_> block)
             : direction{ direction }
             , block{ block }
         {}
@@ -50,6 +50,6 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         bool operator==(SceneNeighbour const&) const = default;
 
         Direction direction;
-        BlockReference<cfg,isMutable_> block;
+        BlockDataReference<cfg,isMutable_> block;
     };
 }

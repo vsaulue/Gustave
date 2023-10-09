@@ -39,7 +39,7 @@
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg, bool isMutable_>
-    class BlockReference {
+    class BlockDataReference {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
@@ -53,7 +53,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         QualifiedBlockData* data_;
     public:
-        using Hasher = Utils::Hasher<BlockReference, &BlockReference::data_>;
+        using Hasher = Utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
 
         [[nodiscard]]
         static constexpr bool isMutable() {
@@ -61,25 +61,25 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        BlockReference(QualifiedBlockData* data)
+        BlockDataReference(QualifiedBlockData* data)
             : data_{ data }
         {}
 
         [[nodiscard]]
-        explicit BlockReference(Utils::NoInit) {}
+        explicit BlockDataReference(Utils::NoInit) {}
 
         [[nodiscard]]
-        BlockReference(BlockReference const&) = default;
+        BlockDataReference(BlockDataReference const&) = default;
 
-        BlockReference& operator=(BlockReference const&) = default;
+        BlockDataReference& operator=(BlockDataReference const&) = default;
 
         [[nodiscard]]
-        BlockReference(BlockReference<cfg, true> const& otherBlock)
+        BlockDataReference(BlockDataReference<cfg, true> const& otherBlock)
             requires (!isMutable_)
             : data_{ otherBlock.data() }
         {}
 
-        BlockReference& operator=(BlockReference<cfg, true> const& rhs)
+        BlockDataReference& operator=(BlockDataReference<cfg, true> const& rhs)
             requires (!isMutable_)
         {
             data_ = rhs.data();
@@ -87,7 +87,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         template<bool rhsMutable>
-        bool operator==(BlockReference<cfg, rhsMutable> const& rhs) const {
+        bool operator==(BlockDataReference<cfg, rhsMutable> const& rhs) const {
             return data_ == rhs.data();
         }
 
@@ -136,4 +136,4 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 }
 
 template<Gustave::Cfg::cLibConfig auto cfg, bool isMutable>
-struct std::hash<Gustave::Scenes::CuboidGrid::detail::BlockReference<cfg,isMutable>> : Gustave::Scenes::CuboidGrid::detail::BlockReference<cfg,isMutable>::Hasher {};
+struct std::hash<Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg,isMutable>> : Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg,isMutable>::Hasher {};

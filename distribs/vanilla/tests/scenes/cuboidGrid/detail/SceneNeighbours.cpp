@@ -39,7 +39,7 @@
 namespace Cuboid = Gustave::Scenes::CuboidGrid;
 
 using BlockPosition = Cuboid::BlockPosition;
-using BlockReference = Cuboid::detail::BlockReference<G::libConfig,true>;
+using BlockDataReference = Cuboid::detail::BlockDataReference<G::libConfig,true>;
 using Direction = Gustave::Math3d::BasicDirection;
 using SceneBlocks = Cuboid::detail::SceneBlocks<G::libConfig>;
 using SceneNeighbour = Cuboid::detail::SceneNeighbour<G::libConfig,true>;
@@ -54,13 +54,13 @@ static constexpr Coord min{ Limits::min() };
 TEST_CASE("Scene::CuboidGrid::detail::SceneNeighbours") {
     SceneBlocks sceneBlocks{ vector3(2.f, 3.f, 1.f, u.length) };
 
-    auto addBlock = [&](BlockPosition const& position) -> BlockReference {
+    auto addBlock = [&](BlockPosition const& position) -> BlockDataReference {
         return sceneBlocks.insert({ position, concrete_20m, 20.f * u.mass, false });
     };
 
-    BlockReference source = addBlock({ min, 1, 2 });
-    BlockReference plusX = addBlock({ 1 + min, 1, 2 });
-    BlockReference minusZ = addBlock({ min, 1, 1 });
+    BlockDataReference source = addBlock({ min, 1, 2 });
+    BlockDataReference plusX = addBlock({ 1 + min, 1, 2 });
+    BlockDataReference minusZ = addBlock({ min, 1, 1 });
     addBlock({ max, 1, 2 });
     addBlock({ min, 2, 3 });
 
