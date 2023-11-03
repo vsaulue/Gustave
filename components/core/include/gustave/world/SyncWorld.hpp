@@ -136,9 +136,10 @@ namespace Gustave::World {
 
         [[nodiscard]]
         std::shared_ptr<WorldStructure const> anyStructureContaining(BlockIndex const& blockIndex) const {
-            SceneStructure const* sceneStructure = scene_.anyStructureContaining(blockIndex);
-            if (sceneStructure != nullptr) {
-                return structures_.at(sceneStructure);
+            auto const structures = scene_.blocks().at(blockIndex).structures();
+            auto const it = structures.begin();
+            if (it != structures.end()) {
+                return structures_.at(*it);
             } else {
                 return { nullptr };
             }

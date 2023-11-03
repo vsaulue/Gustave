@@ -51,6 +51,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using BlockMap = std::unordered_map<BlockPosition, BlockMappedData<cfg>>;
         using Direction = Math3d::BasicDirection;
 
+        using const_iterator = typename BlockMap::const_iterator;
+
         [[nodiscard]]
         explicit SceneBlocks(Vector3<u.length> const& blockSize)
             : blockSize_{ blockSize }
@@ -100,6 +102,16 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         bool erase(BlockPosition const& position) {
             auto res = blocks_.erase(position);
             return res != 0;
+        }
+
+        [[nodiscard]]
+        const_iterator begin() const {
+            return blocks_.begin();
+        }
+
+        [[nodiscard]]
+        const_iterator end() const {
+            return blocks_.end();
         }
 
         [[nodiscard]]

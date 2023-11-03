@@ -46,11 +46,40 @@ static constexpr G::Real<u.density> concreteDensity = 2'400.f * u.density;
 
 static constexpr Gustave::Utils::PointerHash::Equals ptrEquals;
 
-TEST_CASE("Scene::CubeGrid::Scene") {
+TEST_CASE("Scene::CuboidGrid::Scene") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     G::Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
 
     Scene scene{blockSize};
+
+    SECTION("::blocks() const") {
+        Scene::Blocks blocks = scene.blocks();
+
+        SECTION("// empty") {
+            CHECK(blocks.size() == 0);
+            CHECK(blocks.begin() == blocks.end());
+        }
+
+        SECTION("// not empty") {
+            Transaction t;
+            t.addBlock({ {1,0,0}, concrete_20m, blockMass, true });
+            t.addBlock({ {2,0,0}, concrete_20m, blockMass, false });
+            scene.modify(t);
+
+            CHECK(blocks.size() == 2);
+            CHECK(blocks.at({1,0,0}).isFoundation());
+            CHECK_FALSE(blocks.at({ 2,0,0 }).isFoundation());
+
+            {
+                std::vector<BlockPosition> positions;
+                for (auto const& block : blocks) {
+                    positions.push_back(block.position());
+                }
+                std::vector<BlockPosition> expected{ {1,0,0}, {2,0,0} };
+                CHECK_THAT(positions, M::C2::UnorderedEquals(expected));
+            }
+        }
+    }
 
     SECTION("::blockSize() const") {
         CHECK(scene.blockSize() == blockSize);
@@ -58,7 +87,9 @@ TEST_CASE("Scene::CubeGrid::Scene") {
 
     SECTION("::modify(Transaction const&)") {
         auto structureOf = [&scene](BlockPosition const& position) -> SceneStructure const& {
-            SceneStructure const* result = scene.anyStructureContaining(position);
+            auto const structures = scene.blocks().at(position).structures();
+            REQUIRE(structures.size() == 1);
+            SceneStructure const* result = structures[0];
             REQUIRE(result != nullptr);
             return *result;
         };
@@ -98,7 +129,7 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             CHECK(result.deletedStructures().size() == 0);
 
             CHECK(scene.structures().size() == 0);
-            CHECK(scene.anyStructureContaining({ 1,0,0 }) == nullptr);
+            CHECK(scene.blocks().at({ 1,0,0 }).structures().size() == 0);
         }
 
         SECTION("// Transaction{1+}: single non-foundation") {
@@ -177,8 +208,7 @@ TEST_CASE("Scene::CubeGrid::Scene") {
             CHECK(scene.structures().size() == 1);
 
             {
-                SceneStructure const* structure = scene.anyStructureContaining({ 0,0,0 });
-                REQUIRE(structure == nullptr);
+                REQUIRE(scene.blocks().at({ 0,0,0 }).structures().size() == 0);
             }
 
             {

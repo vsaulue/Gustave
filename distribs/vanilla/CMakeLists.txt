@@ -37,6 +37,8 @@ add_executable(Test-Gustave-Vanilla
     "tests/model/MaxStress.cpp"
     "tests/scenes/cuboidGrid/BlockConstructionInfo.cpp"
     "tests/scenes/cuboidGrid/BlockPosition.cpp"
+    "tests/scenes/cuboidGrid/BlockReference.cpp"
+    "tests/scenes/cuboidGrid/Blocks.cpp"
     "tests/scenes/cuboidGrid/detail/BlockMappedData.cpp"
     "tests/scenes/cuboidGrid/detail/BlockReference.cpp"
     "tests/scenes/cuboidGrid/detail/PositionNeighbours.cpp"

@@ -30,6 +30,7 @@
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneNeighbour.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg, bool isMutable_>
