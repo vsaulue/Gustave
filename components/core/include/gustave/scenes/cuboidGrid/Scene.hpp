@@ -42,13 +42,12 @@
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/Blocks.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/utils/NoInit.hpp>
-#include <gustave/utils/PointerHash.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
@@ -64,7 +63,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using MaxStress = Model::MaxStress<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using SceneBlocks = detail::SceneBlocks<cfg>;
+        using SceneData = detail::SceneData<cfg>;
         using SceneNeighbour = detail::SceneNeighbour<cfg, true>;
         using SceneNeighbours = detail::SceneNeighbours<cfg, true>;
 
@@ -108,7 +107,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         explicit Scene(Vector3<u.length> const& blockSize)
-            : sceneBlocks_{ blockSize }
+            : data_{ blockSize }
         {}
 
         Scene(Scene const&) = delete;
@@ -120,27 +119,27 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         Blocks blocks() const {
-            return Blocks{ sceneBlocks_ };
+            return Blocks{ data_.blocks };
         }
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
-            return sceneBlocks_.blockSize();
+            return data_.blocks.blockSize();
         }
 
         [[nodiscard]]
         Real<u.area> contactAreaAlong(Direction direction) const {
-            return sceneBlocks_.contactAreaAlong(direction);
+            return data_.blocks.contactAreaAlong(direction);
         }
 
         [[nodiscard]]
         StructureSet const& structures() const {
-            return structures_;
+            return data_.structures;
         }
 
         [[nodiscard]]
         Real<u.length> thicknessAlong(Direction direction) const {
-            return sceneBlocks_.thicknessAlong(direction);
+            return data_.blocks.thicknessAlong(direction);
         }
     private:
         class TransactionRunner {
@@ -178,7 +177,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             void addBlock(BlockConstructionInfo<cfg> const& newInfo) {
-                BlockDataReference ref = scene.sceneBlocks_.insert(newInfo);
+                BlockDataReference ref = scene.data_.blocks.insert(newInfo);
                 assert(ref);
                 if (ref.isFoundation()) {
                     for (SceneNeighbour const& neighbour : scene.neighbours(ref)) {
@@ -193,14 +192,14 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             void removeBlock(BlockPosition const& deletedPosition) {
-                BlockDataReference deletedBlock = scene.sceneBlocks_.find(deletedPosition);
+                BlockDataReference deletedBlock = scene.data_.blocks.find(deletedPosition);
                 assert(deletedBlock);
                 newRoots.erase(deletedBlock);
                 removeStructureOf(deletedBlock);
                 for (SceneNeighbour const& neighbour : scene.neighbours(deletedPosition)) {
                     declareRoot(neighbour.block);
                 }
-                bool isDeleted = scene.sceneBlocks_.erase(deletedPosition);
+                bool isDeleted = scene.data_.blocks.erase(deletedPosition);
                 assert(isDeleted);
             }
 
@@ -241,7 +240,7 @@ namespace Gustave::Scenes::CuboidGrid {
         void checkTransaction(Transaction const& transaction) const {
             auto const& deletedBlocks = transaction.deletedBlocks();
             for (BlockPosition const& delPosition : deletedBlocks) {
-                if (!sceneBlocks_.contains(delPosition)) {
+                if (!data_.blocks.contains(delPosition)) {
                     std::stringstream stream;
                     stream << "Invalid deletion at " << delPosition << ": block does not exist in the scene.";
                     throw std::invalid_argument(stream.str());
@@ -249,7 +248,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
             for (BlockConstructionInfo<cfg> const& newBlock : transaction.newBlocks()) {
                 BlockPosition const& position = newBlock.position();
-                if (sceneBlocks_.contains(position) && !deletedBlocks.contains(position)) {
+                if (data_.blocks.contains(position) && !deletedBlocks.contains(position)) {
                     std::stringstream stream;
                     stream << "Invalid insertion at " << position << ": block already exists in the scene.";
                     throw std::invalid_argument(stream.str());
@@ -259,18 +258,18 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         ConstSceneNeighbours constNeighbours(ConstBlockDataReference source) const {
-            return { sceneBlocks_, source.position() };
+            return { data_.blocks, source.position() };
         }
 
         [[nodiscard]]
         ConstSceneNeighbours constNeighbours(BlockPosition const& source) const {
-            return { sceneBlocks_, source };
+            return { data_.blocks, source };
         }
 
         std::shared_ptr<SceneStructure const> generateStructure(BlockDataReference root) {
             assert(!root.isFoundation());
             if (!isStructureValid(root.structure())) {
-                auto newStructure = std::make_shared<SceneStructure>(sceneBlocks_);
+                auto newStructure = std::make_shared<SceneStructure>(data_.blocks);
                 std::stack<BlockDataReference> remainingBlocks;
                 remainingBlocks.push(root);
                 while (!remainingBlocks.empty()) {
@@ -295,7 +294,7 @@ namespace Gustave::Scenes::CuboidGrid {
                         }
                     }
                 }
-                structures_.emplace(newStructure);
+                data_.structures.emplace(newStructure);
                 return newStructure;
             } else {
                 return { nullptr };
@@ -304,32 +303,31 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         bool isStructureValid(SceneStructure const* structure) const {
-            return structure != nullptr && structures_.contains(structure);
+            return structure != nullptr && data_.structures.contains(structure);
         }
 
         [[nodiscard]]
         SceneNeighbours neighbours(BlockDataReference source) {
-            return { sceneBlocks_, source.position() };
+            return { data_.blocks, source.position() };
         }
 
         [[nodiscard]]
         SceneNeighbours neighbours(BlockPosition const& source) {
-            return { sceneBlocks_, source };
+            return { data_.blocks, source };
         }
 
         [[nodiscard]]
         std::shared_ptr<SceneStructure const> removeStructure(SceneStructure const* structure) {
-            auto it = structures_.find(structure);
-            if (it != structures_.end()) {
+            auto it = data_.structures.find(structure);
+            if (it != data_.structures.end()) {
                 // unordered_set::extract() doesn't support Hash::is_transparent before c++23.
-                auto node = structures_.extract(it);
+                auto node = data_.structures.extract(it);
                 return std::move(node.value());
             } else {
                 return { nullptr };
             }
         }
 
-        SceneBlocks sceneBlocks_;
-        StructureSet structures_;
+        SceneData data_;
     };
 }
