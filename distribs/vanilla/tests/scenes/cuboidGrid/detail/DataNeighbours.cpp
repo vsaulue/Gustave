@@ -30,9 +30,9 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/detail/DataNeighbour.hpp>
+#include <gustave/scenes/cuboidGrid/detail/DataNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneNeighbour.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneNeighbours.hpp>
 
 #include <TestConfig.hpp>
 
@@ -40,10 +40,10 @@ namespace Cuboid = Gustave::Scenes::CuboidGrid;
 
 using BlockPosition = Cuboid::BlockPosition;
 using BlockDataReference = Cuboid::detail::BlockDataReference<G::libConfig,true>;
+using DataNeighbour = Cuboid::detail::DataNeighbour<G::libConfig, true>;
+using DataNeighbours = Cuboid::detail::DataNeighbours<G::libConfig, true>;
 using Direction = Gustave::Math3d::BasicDirection;
 using SceneBlocks = Cuboid::detail::SceneBlocks<G::libConfig>;
-using SceneNeighbour = Cuboid::detail::SceneNeighbour<G::libConfig,true>;
-using SceneNeighbours = Cuboid::detail::SceneNeighbours<G::libConfig,true>;
 
 using Coord = BlockPosition::Coord;
 using Limits = std::numeric_limits<Coord>;
@@ -51,7 +51,7 @@ using Limits = std::numeric_limits<Coord>;
 static constexpr Coord max{ Limits::max() };
 static constexpr Coord min{ Limits::min() };
 
-TEST_CASE("Scene::CuboidGrid::detail::SceneNeighbours") {
+TEST_CASE("Scene::CuboidGrid::detail::DataNeighbours") {
     SceneBlocks sceneBlocks{ vector3(2.f, 3.f, 1.f, u.length) };
 
     auto addBlock = [&](BlockPosition const& position) -> BlockDataReference {
@@ -64,9 +64,9 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneNeighbours") {
     addBlock({ max, 1, 2 });
     addBlock({ min, 2, 3 });
 
-    SceneNeighbours neighbours{ sceneBlocks, source.position() };
+    DataNeighbours neighbours{ sceneBlocks, source.position() };
 
-    std::vector<SceneNeighbour> const expected = {
+    std::vector<DataNeighbour> const expected = {
         {Direction::plusX, plusX},
         {Direction::minusZ, minusZ},
     };

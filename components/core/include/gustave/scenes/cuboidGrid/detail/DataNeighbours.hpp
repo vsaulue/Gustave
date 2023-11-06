@@ -27,14 +27,14 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/meta/MutableIf.hpp>
+#include <gustave/scenes/cuboidGrid/detail/DataNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneNeighbour.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg, bool isMutable_>
-    class SceneNeighbours {
+    class DataNeighbours {
     public:
         using QualifiedSceneBlocks = Meta::MutableIf<isMutable_, SceneBlocks<cfg>>;
 
@@ -49,7 +49,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             using PosIterator = PositionNeighbours::Iterator;
 
             [[nodiscard]]
-            Iterator(SceneNeighbours& neighbours)
+            Iterator(DataNeighbours& neighbours)
                 : neighbours_{ &neighbours }
                 , value_{ Utils::NO_INIT }
                 , pos_{ neighbours.positions_.begin() }
@@ -75,7 +75,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             }
 
             [[nodiscard]]
-            SceneNeighbour<cfg,isMutable_> const& operator*() const {
+            DataNeighbour<cfg,isMutable_> const& operator*() const {
                 return value_;
             }
         private:
@@ -95,13 +95,13 @@ namespace Gustave::Scenes::CuboidGrid::detail {
                 }
             }
 
-            SceneNeighbours* neighbours_;
-            SceneNeighbour<cfg,isMutable_> value_;
+            DataNeighbours* neighbours_;
+            DataNeighbour<cfg,isMutable_> value_;
             PosIterator pos_;
         };
 
         [[nodiscard]]
-        SceneNeighbours(QualifiedSceneBlocks& blocks, BlockPosition const& source)
+        DataNeighbours(QualifiedSceneBlocks& blocks, BlockPosition const& source)
             : blocks_{ blocks }
             , positions_{ source }
         {}

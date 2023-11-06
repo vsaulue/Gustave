@@ -33,10 +33,10 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/model/MaxStress.hpp>
+#include <gustave/scenes/cuboidGrid/detail/DataNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -47,9 +47,9 @@ namespace Gustave::Scenes::CuboidGrid {
         static constexpr auto u = Cfg::units(cfg);
 
         using BlockDataReference = detail::BlockDataReference<cfg, false>;
+        using DataNeighbours = detail::DataNeighbours<cfg, false>;
         using PositionNeighbour = detail::PositionNeighbour;
         using PositionNeighbours = detail::PositionNeighbours;
-        using SceneNeighbours = detail::SceneNeighbours<cfg, false>;
         using SceneStructure = CuboidGrid::SceneStructure<cfg>;
         using MaxStress = Model::MaxStress<cfg>;
         using SceneBlocks = detail::SceneBlocks<cfg>;
@@ -198,7 +198,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 : size_{ 0 }
             {
                 if (block.isFoundation()) {
-                    for (auto const& neighbour : SceneNeighbours{ *block.sceneBlocks_, block.position_ }) {
+                    for (auto const& neighbour : DataNeighbours{ *block.sceneBlocks_, block.position_ }) {
                         auto const nBlockData = neighbour.block;
                         if (!nBlockData.isFoundation()) {
                             pushBack(nBlockData.structure());

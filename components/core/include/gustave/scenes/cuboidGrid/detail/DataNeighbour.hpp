@@ -31,23 +31,23 @@
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg, bool isMutable_>
-    struct SceneNeighbour {
+    struct DataNeighbour {
     public:
         using Direction = Math3d::BasicDirection;
 
         [[nodiscard]]
-        SceneNeighbour(Utils::NoInit NO_INIT)
+        DataNeighbour(Utils::NoInit NO_INIT)
             : block{ NO_INIT }
         {}
 
         [[nodiscard]]
-        SceneNeighbour(Direction direction, BlockDataReference<cfg,isMutable_> block)
+        DataNeighbour(Direction direction, BlockDataReference<cfg,isMutable_> block)
             : direction{ direction }
             , block{ block }
         {}
 
         [[nodiscard]]
-        bool operator==(SceneNeighbour const&) const = default;
+        bool operator==(DataNeighbour const&) const = default;
 
         Direction direction;
         BlockDataReference<cfg,isMutable_> block;
