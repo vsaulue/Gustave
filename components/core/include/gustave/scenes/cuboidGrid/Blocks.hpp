@@ -27,16 +27,16 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
     class Blocks {
     private:
         using BlockReference = CuboidGrid::BlockReference<cfg>;
-        using SceneBlocks = detail::SceneBlocks<cfg>;
+        using SceneData = detail::SceneData<cfg>;
 
-        using DataIterator = typename SceneBlocks::BlockMap::const_iterator;
+        using DataIterator = typename SceneData::Blocks::BlockMap::const_iterator;
     public:
         class EndIterator {
         public:
@@ -51,15 +51,15 @@ namespace Gustave::Scenes::CuboidGrid {
 
             [[nodiscard]]
             Iterator()
-                : blocksData_{ nullptr }
+                : sceneData_{ nullptr }
                 , dataIterator_{}
                 , value_{ Utils::NO_INIT }
             {}
 
             [[nodiscard]]
-            explicit Iterator(SceneBlocks const& sceneBlocks)
-                : blocksData_{ &sceneBlocks }
-                , dataIterator_{ sceneBlocks.begin() }
+            explicit Iterator(SceneData const& sceneData)
+                : sceneData_{ &sceneData }
+                , dataIterator_{ sceneData.blocks.begin() }
                 , value_{ Utils::NO_INIT }
             {
                 updateValue();
@@ -97,28 +97,28 @@ namespace Gustave::Scenes::CuboidGrid {
         private:
             [[nodiscard]]
             bool isEnd() const {
-                return dataIterator_ == blocksData_->end();
+                return dataIterator_ == sceneData_->blocks.end();
             }
 
             void updateValue() {
                 if (!isEnd()) {
-                    value_ = BlockReference{ *blocksData_, dataIterator_->first };
+                    value_ = BlockReference{ *sceneData_, dataIterator_->first };
                 }
             }
 
-            SceneBlocks const* blocksData_;
+            SceneData const* sceneData_;
             DataIterator dataIterator_;
             BlockReference value_;
         };
 
         [[nodiscard]]
-        explicit Blocks(SceneBlocks const& sceneBlocks)
-            : blocksData_{ &sceneBlocks }
+        explicit Blocks(SceneData const& sceneData)
+            : sceneData_{ &sceneData }
         {}
 
         [[nodiscard]]
         BlockReference at(BlockPosition const& position) const {
-            BlockReference result{ *blocksData_, position };
+            BlockReference result{ *sceneData_, position };
             if (!result.isValid()) {
                 std::stringstream msg;
                 msg << "No block at position " << position << ".";
@@ -129,17 +129,17 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         BlockReference find(BlockPosition const& position) const {
-            return BlockReference{ *blocksData_, position };
+            return BlockReference{ *sceneData_, position };
         }
 
         [[nodiscard]]
         std::size_t size() const {
-            return blocksData_->size();
+            return sceneData_->blocks.size();
         }
 
         [[nodiscard]]
         Iterator begin() const {
-            return Iterator{ *blocksData_ };
+            return Iterator{ *sceneData_ };
         }
 
         [[nodiscard]]
@@ -147,6 +147,6 @@ namespace Gustave::Scenes::CuboidGrid {
             return {};
         }
     private:
-        SceneBlocks const* blocksData_;
+        SceneData const* sceneData_;
     };
 }

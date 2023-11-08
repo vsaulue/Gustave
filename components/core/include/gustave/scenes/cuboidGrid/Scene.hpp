@@ -119,7 +119,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         Blocks blocks() const {
-            return Blocks{ data_.blocks };
+            return Blocks{ data_ };
         }
 
         [[nodiscard]]

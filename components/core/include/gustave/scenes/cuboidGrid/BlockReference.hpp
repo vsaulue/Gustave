@@ -36,7 +36,7 @@
 #include <gustave/scenes/cuboidGrid/detail/DataNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -51,7 +51,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using MaxStress = Model::MaxStress<cfg>;
         using PositionNeighbour = detail::PositionNeighbour;
         using PositionNeighbours = detail::PositionNeighbours;
-        using SceneBlocks = detail::SceneBlocks<cfg>;
+        using SceneData = detail::SceneData<cfg>;
         using StructureData = detail::StructureData<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
@@ -156,8 +156,8 @@ namespace Gustave::Scenes::CuboidGrid {
                 void next() {
                     while (pos_ != positions().end()) {
                         PositionNeighbour const& nPos = *pos_;
-                        if (BlockDataReference neighbour = neighbours_->blocks_->find(nPos.position)) {
-                            value_ = Neighbour{ BlockReference{ *neighbours_->blocks_, nPos.position }, nPos.direction };
+                        if (BlockDataReference neighbour = neighbours_->data_->blocks.find(nPos.position)) {
+                            value_ = Neighbour{ BlockReference{ *neighbours_->data_, nPos.position }, nPos.direction };
                             break;
                         }
                         ++pos_;
@@ -170,8 +170,8 @@ namespace Gustave::Scenes::CuboidGrid {
             };
 
             [[nodiscard]]
-            explicit Neighbours(SceneBlocks const& blocks, BlockPosition const& source)
-                : blocks_{ &blocks }
+            explicit Neighbours(SceneData const& data, BlockPosition const& source)
+                : data_{ &data }
                 , positions_ { source }
             {}
 
@@ -183,7 +183,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 return {};
             }
         private:
-            SceneBlocks const* blocks_;
+            SceneData const* data_;
             PositionNeighbours positions_;
         };
 
@@ -198,7 +198,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 : size_{ 0 }
             {
                 if (block.isFoundation()) {
-                    for (auto const& neighbour : DataNeighbours{ *block.sceneBlocks_, block.position_ }) {
+                    for (auto const& neighbour : DataNeighbours{ block.sceneData_->blocks, block.position_ }) {
                         auto const nBlockData = neighbour.block;
                         if (!nBlockData.isFoundation()) {
                             pushBack(nBlockData.structure());
@@ -240,8 +240,8 @@ namespace Gustave::Scenes::CuboidGrid {
         };
 
         [[nodiscard]]
-        explicit BlockReference(SceneBlocks const& sceneBlocks, BlockPosition const& position)
-            : sceneBlocks_{ &sceneBlocks }
+        explicit BlockReference(SceneData const& sceneData, BlockPosition const& position)
+            : sceneData_{ &sceneData }
             , position_{ position }
         {}
 
@@ -252,7 +252,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
-            return sceneBlocks_->blockSize();
+            return sceneData_->blocks.blockSize();
         }
 
         [[nodiscard]]
@@ -267,7 +267,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         bool isValid() const {
-            return sceneBlocks_->contains(position_);
+            return sceneData_->blocks.contains(position_);
         }
 
         [[nodiscard]]
@@ -282,7 +282,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         Neighbours neighbours() const {
-            return Neighbours{ *sceneBlocks_, position_ };
+            return Neighbours{ *sceneData_, position_ };
         }
 
         [[nodiscard]]
@@ -298,12 +298,12 @@ namespace Gustave::Scenes::CuboidGrid {
         [[nodiscard]]
         bool operator==(BlockReference const&) const = default;
     private:
-        SceneBlocks const* sceneBlocks_;
+        SceneData const* sceneData_;
         BlockPosition position_;
 
         [[nodiscard]]
         BlockDataReference data() const {
-            BlockDataReference result = sceneBlocks_->find(position_);
+            BlockDataReference result = sceneData_->blocks.find(position_);
             if (!result) {
                 std::stringstream msg;
                 msg << "No block at position " << position_ << ".";

@@ -31,6 +31,7 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 
 #include <TestConfig.hpp>
@@ -39,7 +40,7 @@ using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<G::libConfig>;
 using Direction = Gustave::Math3d::BasicDirection;
 using Neighbour = BlockReference::Neighbour;
-using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<G::libConfig>;
+using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<G::libConfig>;
 using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<G::libConfig>;
 
 static_assert(std::ranges::forward_range<BlockReference::Neighbours>);
@@ -47,15 +48,15 @@ static_assert(std::ranges::forward_range<BlockReference::Structures>);
 
 TEST_CASE("Scene::CuboidGrid::BlockReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
-    SceneBlocks sceneBlocks{ blockSize };
+    SceneData sceneData{ blockSize };
     auto newBlock = [&](BlockPosition const& position, G::Real<u.mass> mass, bool isFoundation, StructureData* structure) -> BlockReference {
-        auto dataRef = sceneBlocks.insert({ position, concrete_20m, mass, isFoundation });
+        auto dataRef = sceneData.blocks.insert({ position, concrete_20m, mass, isFoundation });
         dataRef.structure() = structure;
-        return BlockReference{ sceneBlocks, position };
+        return BlockReference{ sceneData, position };
     };
 
-    StructureData s111{ sceneBlocks };
-    StructureData s122{ sceneBlocks };
+    StructureData s111{ sceneData.blocks };
+    StructureData s122{ sceneData.blocks };
 
     BlockReference b000 = newBlock({ 0,0,0 }, 1000.f * u.mass, true , nullptr);
     BlockReference b111 = newBlock({ 1,1,1 }, 3000.f * u.mass, false, &s111);
@@ -77,7 +78,7 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
             CHECK(b111.mass() == 3000.f * u.mass);
         }
         SECTION("// invalid") {
-            sceneBlocks.erase({ 1,1,1 });
+            sceneData.blocks.erase({ 1,1,1 });
             CHECK_THROWS_AS(b111.mass() == 0.f * u.mass, std::out_of_range);
         }
     }
@@ -88,7 +89,7 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         }
 
         SECTION("// invalid") {
-            sceneBlocks.erase({ 1,1,1 });
+            sceneData.blocks.erase({ 1,1,1 });
             CHECK_THROWS_AS(b111.maxStress() == concrete_20m, std::out_of_range);
         }
     }
@@ -99,14 +100,14 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         }
 
         SECTION("// invalid") {
-            sceneBlocks.erase({ 1,1,1 });
+            sceneData.blocks.erase({ 1,1,1 });
             CHECK_THROWS_AS(b111.isFoundation() == false, std::out_of_range);
         }
     }
 
     SECTION(".isValid()") {
         REQUIRE(b111.isValid());
-        sceneBlocks.erase(b111.position());
+        sceneData.blocks.erase(b111.position());
         REQUIRE_FALSE(b111.isValid());
     }
 

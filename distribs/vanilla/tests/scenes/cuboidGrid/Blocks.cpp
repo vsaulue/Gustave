@@ -31,23 +31,24 @@
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/Blocks.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 
 #include <TestConfig.hpp>
 
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<G::libConfig>;
 using Blocks = Gustave::Scenes::CuboidGrid::Blocks<G::libConfig>;
-using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<G::libConfig>;
+using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<G::libConfig>;
 
 static_assert(std::ranges::forward_range<Blocks>);
 
 TEST_CASE("Scenes::CuboidGrid::Blocks") {
     G::Vector3<u.length> const blockSize = vector3(1.f, 2.f, 3.f, u.length);
-    SceneBlocks blocksData{ blockSize };
-    Blocks const blocks{ blocksData };
+    SceneData sceneData{ blockSize };
+    Blocks const blocks{ sceneData };
 
     SECTION(".at()") {
-        blocksData.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
+        sceneData.blocks.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
 
         SECTION("// valid") {
             BlockReference ref = blocks.at({ 1,0,0 });
@@ -70,8 +71,8 @@ TEST_CASE("Scenes::CuboidGrid::Blocks") {
         }
 
         SECTION(": non-empty") {
-            blocksData.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
-            blocksData.insert({ {3,0,0}, concrete_20m, 1000.f * u.mass, false });
+            sceneData.blocks.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
+            sceneData.blocks.insert({ {3,0,0}, concrete_20m, 1000.f * u.mass, false });
 
             std::vector<BlockPosition> positions;
             for (auto const& block : blocks) {
@@ -83,7 +84,7 @@ TEST_CASE("Scenes::CuboidGrid::Blocks") {
     }
 
     SECTION(".size()") {
-        blocksData.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
+        sceneData.blocks.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
         CHECK(blocks.size() == 1);
     }
 }
