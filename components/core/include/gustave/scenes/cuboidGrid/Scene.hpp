@@ -45,7 +45,7 @@
 #include <gustave/scenes/cuboidGrid/detail/DataNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/DataNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
+#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -76,14 +76,14 @@ namespace Gustave::Scenes::CuboidGrid {
         using BlockIndex = BlockPosition;
         using BlockReference = CuboidGrid::BlockReference<cfg>;
         using Blocks = CuboidGrid::Blocks<cfg>;
-        using SceneStructure = CuboidGrid::SceneStructure<cfg>;
-        using StructureSet = Utils::PointerHash::Set<std::shared_ptr<SceneStructure const>>;
+        using StructureData = detail::StructureData<cfg>;
+        using StructureSet = Utils::PointerHash::Set<std::shared_ptr<StructureData const>>;
         using Transaction = CuboidGrid::Transaction<cfg>;
 
         class TransactionResult {
         public:
-            using DeletedSet = std::vector<SceneStructure const*>;
-            using NewSet = std::vector<std::shared_ptr<SceneStructure const>>;
+            using DeletedSet = std::vector<StructureData const*>;
+            using NewSet = std::vector<std::shared_ptr<StructureData const>>;
 
             [[nodiscard]]
             TransactionResult(NewSet newStructures, DeletedSet deletedStructures)
@@ -169,7 +169,7 @@ namespace Gustave::Scenes::CuboidGrid {
                     addBlock(newInfo);
                 }
                 for (BlockDataReference root : newRoots) {
-                    std::shared_ptr<SceneStructure const> newStruct = scene.generateStructure(root);
+                    std::shared_ptr<StructureData const> newStruct = scene.generateStructure(root);
                     if (newStruct) {
                         newStructures.emplace_back(std::move(newStruct));
                     }
@@ -213,9 +213,9 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             void removeStructureOf(ConstBlockDataReference block) {
-                SceneStructure const* structure = block.structure();
+                StructureData const* structure = block.structure();
                 if (scene.isStructureValid(structure)) {
-                    std::shared_ptr<SceneStructure const> oldStructure = scene.removeStructure(structure);
+                    std::shared_ptr<StructureData const> oldStructure = scene.removeStructure(structure);
                     if (oldStructure != nullptr) {
                         removedStructures.push_back(std::move(oldStructure));
                     }
@@ -224,11 +224,11 @@ namespace Gustave::Scenes::CuboidGrid {
 
             Scene& scene;
             std::unordered_set<BlockDataReference> newRoots;
-            std::vector<std::shared_ptr<SceneStructure const>> newStructures;
-            std::vector<std::shared_ptr<SceneStructure const>> removedStructures; // holds shared_ptr to prevent ABA issues.
+            std::vector<std::shared_ptr<StructureData const>> newStructures;
+            std::vector<std::shared_ptr<StructureData const>> removedStructures; // holds shared_ptr to prevent ABA issues.
         };
 
-        void addContact(SceneStructure& structure, ConstBlockDataReference source, DataNeighbour const& neighbour) {
+        void addContact(StructureData& structure, ConstBlockDataReference source, DataNeighbour const& neighbour) {
             Direction const direction = neighbour.direction;
             NormalizedVector3 const normal = NormalizedVector3::basisVector(direction);
             Real<u.area> const area = contactAreaAlong(direction);
@@ -266,10 +266,10 @@ namespace Gustave::Scenes::CuboidGrid {
             return { data_.blocks, source };
         }
 
-        std::shared_ptr<SceneStructure const> generateStructure(BlockDataReference root) {
+        std::shared_ptr<StructureData const> generateStructure(BlockDataReference root) {
             assert(!root.isFoundation());
             if (!isStructureValid(root.structure())) {
-                auto newStructure = std::make_shared<SceneStructure>(data_.blocks);
+                auto newStructure = std::make_shared<StructureData>(data_.blocks);
                 std::stack<BlockDataReference> remainingBlocks;
                 remainingBlocks.push(root);
                 while (!remainingBlocks.empty()) {
@@ -302,7 +302,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        bool isStructureValid(SceneStructure const* structure) const {
+        bool isStructureValid(StructureData const* structure) const {
             return structure != nullptr && data_.structures.contains(structure);
         }
 
@@ -317,7 +317,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        std::shared_ptr<SceneStructure const> removeStructure(SceneStructure const* structure) {
+        std::shared_ptr<StructureData const> removeStructure(StructureData const* structure) {
             auto it = data_.structures.find(structure);
             if (it != data_.structures.end()) {
                 // unordered_set::extract() doesn't support Hash::is_transparent before c++23.

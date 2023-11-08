@@ -38,9 +38,9 @@
 #include <gustave/solvers/SolverNode.hpp>
 #include <gustave/solvers/SolverStructure.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
+namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg>
-    class SceneStructure {
+    class StructureData {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
@@ -56,7 +56,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using Real = Cfg::Real<cfg, unit>;
     public:
         [[nodiscard]]
-        explicit SceneStructure(SceneBlocks const& sceneBlocks)
+        explicit StructureData(SceneBlocks const& sceneBlocks)
             : sceneBlocks_{ sceneBlocks }
             , solverStructure_{ std::make_shared<SolverStructure>() }
         {}

@@ -30,7 +30,7 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/Scene.hpp>
-#include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
+#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/testing/Matchers.hpp>
 
@@ -39,7 +39,7 @@
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using Direction = Gustave::Math3d::BasicDirection;
 using Scene = Gustave::Scenes::CuboidGrid::Scene<G::libConfig>;
-using SceneStructure = Gustave::Scenes::CuboidGrid::SceneStructure<G::libConfig>;
+using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<G::libConfig>;
 using Transaction = Gustave::Scenes::CuboidGrid::Transaction<G::libConfig>;
 
 static constexpr G::Real<u.density> concreteDensity = 2'400.f * u.density;
@@ -86,21 +86,21 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
     }
 
     SECTION("::modify(Transaction const&)") {
-        auto structureOf = [&scene](BlockPosition const& position) -> SceneStructure const& {
+        auto structureOf = [&scene](BlockPosition const& position) -> StructureData const& {
             auto const structures = scene.blocks().at(position).structures();
             REQUIRE(structures.size() == 1);
-            SceneStructure const* result = structures[0];
+            StructureData const* result = structures[0];
             REQUIRE(result != nullptr);
             return *result;
         };
 
-        auto getBlockIndex = [](SceneStructure const& structure, BlockPosition const& position) -> G::NodeIndex {
+        auto getBlockIndex = [](StructureData const& structure, BlockPosition const& position) -> G::NodeIndex {
             auto const optBlock = structure.solverIndexOf(position);
             REQUIRE(optBlock);
             return *optBlock;
         };
 
-        auto checkContact = [&scene](SceneStructure const& structure, G::NodeIndex source, G::NodeIndex dest, Direction sourceNormal, G::MaxStress const& maxStress) {
+        auto checkContact = [&scene](StructureData const& structure, G::NodeIndex source, G::NodeIndex dest, Direction sourceNormal, G::MaxStress const& maxStress) {
             G::NormalizedVector3 const normal = G::NormalizedVector3::basisVector(sourceNormal);
             G::SolverContact const* selectedLink = nullptr;
             for (G::SolverContact const& link : structure.solverStructure().links()) {
@@ -141,7 +141,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
 
             CHECK(scene.structures().size() == 1);
             CHECK(scene.blocks().size() == 1);
-            SceneStructure const& structure = structureOf({ 1,0,0 });
+            StructureData const& structure = structureOf({ 1,0,0 });
             CHECK_THAT(result.newStructures(), M::C2::Contains(&structure, ptrEquals));
             G::NodeIndex blockIndex = getBlockIndex(structure, { 1,0,0 });
             G::SolverNode const& solverNode = structure.solverStructure().nodes()[blockIndex];
@@ -178,7 +178,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             CHECK(scene.structures().size() == 2);
 
             {
-                SceneStructure const& structureX = structureOf({ 1,0,0 });
+                StructureData const& structureX = structureOf({ 1,0,0 });
                 CHECK_THAT(result.newStructures(), M::C2::Contains(&structureX, ptrEquals));
                 G::NodeIndex const x1 = getBlockIndex(structureX, { 1,0,0 });
                 G::NodeIndex const origin = getBlockIndex(structureX, { 0,0,0 });
@@ -187,7 +187,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             }
 
             {
-                SceneStructure const& structureY = structureOf({ 0,1,0 });
+                StructureData const& structureY = structureOf({ 0,1,0 });
                 CHECK_THAT(result.newStructures(), M::C2::Contains(&structureY, ptrEquals));
                 G::NodeIndex y1 = getBlockIndex(structureY, { 0,1,0 });
                 G::NodeIndex origin = getBlockIndex(structureY, { 0,0,0 });
@@ -212,7 +212,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             }
 
             {
-                SceneStructure const& structure = structureOf({ 2,0,0 });
+                StructureData const& structure = structureOf({ 2,0,0 });
                 CHECK_THAT(result.newStructures(), M::C2::Contains(&structure, ptrEquals));
                 G::NodeIndex const x1 = getBlockIndex(structure, { 1,0,0 });
                 G::NodeIndex const x2 = getBlockIndex(structure, { 2,0,0 });
@@ -232,7 +232,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
 
             CHECK(scene.structures().size() == 1);
 
-            SceneStructure const& structure = structureOf({ 0,0,0 });
+            StructureData const& structure = structureOf({ 0,0,0 });
             CHECK_THAT(result.newStructures(), M::C2::Contains(&structure, ptrEquals));
             for (int i = 0; i < 4; ++i) {
                 G::NodeIndex const bottom = getBlockIndex(structure, { 0,i,0 });
@@ -259,7 +259,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             CHECK(scene.structures().size() == 2);
 
             {
-                SceneStructure const& structure = structureOf({ 0,0,0 });
+                StructureData const& structure = structureOf({ 0,0,0 });
                 CHECK_THAT(r2.newStructures(), M::C2::Contains(&structure, ptrEquals));
                 G::NodeIndex const y0 = getBlockIndex(structure, { 0,0,0 });
                 G::NodeIndex const y1 = getBlockIndex(structure, { 0,1,0 });
@@ -269,7 +269,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             }
 
             {
-                SceneStructure const& structure = structureOf({ 0,3,0 });
+                StructureData const& structure = structureOf({ 0,3,0 });
                 CHECK_THAT(r2.newStructures(), M::C2::Contains(&structure, ptrEquals));
                 G::NodeIndex const y3 = getBlockIndex(structure, { 0,3,0 });
                 G::NodeIndex const y4 = getBlockIndex(structure, { 0,4,0 });
@@ -296,7 +296,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             CHECK_THAT(r2.deletedStructures(), M::C2::UnorderedRangeEquals(r1.newStructures(), ptrEquals));
 
             CHECK(scene.structures().size() == 1);
-            SceneStructure const& structure = structureOf({ 0,0,0 });
+            StructureData const& structure = structureOf({ 0,0,0 });
             CHECK_THAT(r2.newStructures(), M::C2::Contains(&structure, ptrEquals));
             G::NodeIndex const z0 = getBlockIndex(structure, { 0,0,0 });
             G::NodeIndex const z1 = getBlockIndex(structure, { 0,0,1 });
@@ -318,8 +318,8 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             CHECK(r1.newStructures().size() == 2);
             CHECK(r1.deletedStructures().size() == 0);
 
-            SceneStructure const& structureOfX1 = structureOf({ 1,0,0 });
-            SceneStructure const& structureOfY1 = structureOf({ 0,1,0 });
+            StructureData const& structureOfX1 = structureOf({ 1,0,0 });
+            StructureData const& structureOfY1 = structureOf({ 0,1,0 });
 
             t.clear();
             t.removeBlock({ 0,1,0 });

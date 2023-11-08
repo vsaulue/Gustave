@@ -31,7 +31,6 @@
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/Blocks.hpp>
-#include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
 
 #include <TestConfig.hpp>
 

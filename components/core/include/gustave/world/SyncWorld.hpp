@@ -54,7 +54,7 @@ namespace Gustave::World {
         class WorldStructure;
 
         using BlockIndex = typename Scene::BlockIndex;
-        using SceneStructure = typename Scene::SceneStructure;
+        using SceneStructure = typename Scene::StructureData;
         using SceneTransactionResult = typename Scene::TransactionResult;
         using Solution = typename Solver::Solution;
         using SolverStructure = typename Solver::Structure;

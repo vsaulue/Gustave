@@ -30,7 +30,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
-#include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
+#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/utils/PointerHash.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
@@ -43,7 +43,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
         using Blocks = SceneBlocks<cfg>;
-        using Structures = Utils::PointerHash::Set<std::shared_ptr<SceneStructure<cfg> const>>;
+        using Structures = Utils::PointerHash::Set<std::shared_ptr<StructureData<cfg> const>>;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)

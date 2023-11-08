@@ -48,11 +48,11 @@ namespace Gustave::Scenes::CuboidGrid {
 
         using BlockDataReference = detail::BlockDataReference<cfg, false>;
         using DataNeighbours = detail::DataNeighbours<cfg, false>;
+        using MaxStress = Model::MaxStress<cfg>;
         using PositionNeighbour = detail::PositionNeighbour;
         using PositionNeighbours = detail::PositionNeighbours;
-        using SceneStructure = CuboidGrid::SceneStructure<cfg>;
-        using MaxStress = Model::MaxStress<cfg>;
         using SceneBlocks = detail::SceneBlocks<cfg>;
+        using StructureData = detail::StructureData<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
@@ -189,7 +189,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         class Structures {
         private:
-            using Values = std::array<SceneStructure const*, 6>;
+            using Values = std::array<StructureData const*, 6>;
         public:
             using Iterator = typename Values::const_iterator;
 
@@ -210,7 +210,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            SceneStructure const* operator[](std::size_t index) const {
+            StructureData const* operator[](std::size_t index) const {
                 return sceneStructures_[index];
             }
 
@@ -229,7 +229,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 return size_;
             }
         private:
-            void pushBack(SceneStructure const* newValue) {
+            void pushBack(StructureData const* newValue) {
                 assert(newValue != nullptr);
                 sceneStructures_[size_] = newValue;
                 ++size_;

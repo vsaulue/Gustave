@@ -33,12 +33,10 @@
 #include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
-    class SceneStructure;
-}
-
 namespace Gustave::Scenes::CuboidGrid::detail {
+    template<Cfg::cLibConfig auto cfg>
+    class StructureData;
+
     template<Cfg::cLibConfig auto cfg>
     class BlockMappedData {
     private:
@@ -75,18 +73,18 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        SceneStructure<cfg>*& structure() {
+        StructureData<cfg>*& structure() {
             return structure_;
         }
 
         [[nodiscard]]
-        SceneStructure<cfg> const* structure() const {
+        StructureData<cfg> const* structure() const {
             return structure_;
         }
     private:
         MaxStress maxStress_;
         Real<u.mass> mass_;
         bool isFoundation_;
-        SceneStructure<cfg>* structure_;
+        StructureData<cfg>* structure_;
     };
 }

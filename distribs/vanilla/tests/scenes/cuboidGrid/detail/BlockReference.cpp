@@ -29,14 +29,14 @@
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
-#include <gustave/scenes/cuboidGrid/SceneStructure.hpp>
+#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 
 #include <TestConfig.hpp>
 
 using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<G::libConfig>;
 using BlockData = Gustave::Scenes::CuboidGrid::detail::BlockData<G::libConfig>;
 using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<G::libConfig>;
-using SceneStructure = Gustave::Scenes::CuboidGrid::SceneStructure<G::libConfig>;
+using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<G::libConfig>;
 
 template<bool isMutable>
 using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<G::libConfig, isMutable>;
@@ -69,7 +69,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
 
         SECTION("::structure() // mutable") {
             BlockDataReference<true> ref{ &data };
-            SceneStructure structure{ sceneBlocks };
+            StructureData structure{ sceneBlocks };
             ref.structure() = &structure;
             CHECK(data.second.structure() == &structure);
         }

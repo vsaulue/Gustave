@@ -98,14 +98,14 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        SceneStructure<cfg>*& structure()
+        StructureData<cfg>*& structure()
             requires (isMutable_)
         {
             return data_->second.structure();
         }
 
         [[nodiscard]]
-        SceneStructure<cfg> const* structure() const {
+        StructureData<cfg> const* structure() const {
             return data_->second.structure();
         }
 
