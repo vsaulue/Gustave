@@ -269,7 +269,7 @@ namespace Gustave::Scenes::CuboidGrid {
         std::shared_ptr<StructureData const> generateStructure(BlockDataReference root) {
             assert(!root.isFoundation());
             if (!isStructureValid(root.structure())) {
-                auto newStructure = std::make_shared<StructureData>(data_.blocks);
+                auto newStructure = std::make_shared<StructureData>(data_);
                 std::stack<BlockDataReference> remainingBlocks;
                 remainingBlocks.push(root);
                 while (!remainingBlocks.empty()) {

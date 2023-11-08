@@ -28,14 +28,14 @@
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 
 #include <TestConfig.hpp>
 
 using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<G::libConfig>;
 using BlockData = Gustave::Scenes::CuboidGrid::detail::BlockData<G::libConfig>;
-using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<G::libConfig>;
+using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<G::libConfig>;
 using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<G::libConfig>;
 
 template<bool isMutable>
@@ -44,7 +44,7 @@ using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReferen
 TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
     BlockConstructionInfo const info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
     BlockData data{ info.position(), { info } };
-    SceneBlocks const sceneBlocks{ vector3(1.f, 1.f, 1.f, u.length) };
+    SceneData const sceneData{ vector3(1.f, 1.f, 1.f, u.length) };
 
     SECTION("<*,true>") {
         SECTION("// constructor & getters") {
@@ -69,7 +69,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
 
         SECTION("::structure() // mutable") {
             BlockDataReference<true> ref{ &data };
-            StructureData structure{ sceneBlocks };
+            StructureData structure{ sceneData };
             ref.structure() = &structure;
             CHECK(data.second.structure() == &structure);
         }

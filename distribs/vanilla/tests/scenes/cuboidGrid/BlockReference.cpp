@@ -55,8 +55,8 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         return BlockReference{ sceneData, position };
     };
 
-    StructureData s111{ sceneData.blocks };
-    StructureData s122{ sceneData.blocks };
+    StructureData s111{ sceneData };
+    StructureData s122{ sceneData };
 
     BlockReference b000 = newBlock({ 0,0,0 }, 1000.f * u.mass, true , nullptr);
     BlockReference b111 = newBlock({ 1,1,1 }, 3000.f * u.mass, false, &s111);

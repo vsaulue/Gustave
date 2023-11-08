@@ -34,11 +34,14 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/solvers/SolverNode.hpp>
 #include <gustave/solvers/SolverStructure.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
+    template<Cfg::cLibConfig auto cfg>
+    struct SceneData;
+
     template<Cfg::cLibConfig auto cfg>
     class StructureData {
     private:
@@ -48,7 +51,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using MaxStress = Model::MaxStress<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using SceneBlocks = detail::SceneBlocks<cfg>;
+        using SceneData = detail::SceneData<cfg>;
         using SolverNode = Solvers::SolverNode<cfg>;
         using SolverStructure = Solvers::SolverStructure<cfg>;
 
@@ -56,8 +59,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using Real = Cfg::Real<cfg, unit>;
     public:
         [[nodiscard]]
-        explicit StructureData(SceneBlocks const& sceneBlocks)
-            : sceneBlocks_{ sceneBlocks }
+        explicit StructureData(SceneData const& sceneData)
+            : sceneData_{ sceneData }
             , solverStructure_{ std::make_shared<SolverStructure>() }
         {}
 
@@ -83,7 +86,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         [[nodiscard]]
         bool contains(BlockPosition const& position) const {
-            ConstBlockReference block = sceneBlocks_.find(position);
+            ConstBlockReference block = sceneData_.blocks.find(position);
             if (block) {
                 return contains(block);
             } else {
@@ -103,7 +106,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         [[nodiscard]]
         std::optional<NodeIndex> solverIndexOf(BlockPosition const& position) const {
-            ConstBlockReference const block = sceneBlocks_.find(position);
+            ConstBlockReference const block = sceneData_.blocks.find(position);
             if (block) {
                 return solverIndexOf(block);
             } else {
@@ -126,7 +129,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             return solverIndices_.at(block.position());
         }
 
-        SceneBlocks const& sceneBlocks_;
+        SceneData const& sceneData_;
         std::shared_ptr<SolverStructure> solverStructure_;
         std::unordered_map<BlockPosition, NodeIndex> solverIndices_;
     };
