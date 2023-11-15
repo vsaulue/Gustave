@@ -47,6 +47,7 @@
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
+#include <gustave/scenes/cuboidGrid/TransactionResult.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
@@ -79,31 +80,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using StructureData = detail::StructureData<cfg>;
         using StructureSet = Utils::PointerHash::Set<std::shared_ptr<StructureData const>>;
         using Transaction = CuboidGrid::Transaction<cfg>;
-
-        class TransactionResult {
-        public:
-            using DeletedSet = std::vector<StructureData const*>;
-            using NewSet = std::vector<std::shared_ptr<StructureData const>>;
-
-            [[nodiscard]]
-            TransactionResult(NewSet newStructures, DeletedSet deletedStructures)
-                : newStructures_{ std::move(newStructures) }
-                , deletedStructures_{ std::move(deletedStructures) }
-            {}
-
-            [[nodiscard]]
-            NewSet const& newStructures() const {
-                return newStructures_;
-            }
-
-            [[nodiscard]]
-            DeletedSet const& deletedStructures() const {
-                return deletedStructures_;
-            }
-        private:
-            NewSet newStructures_;
-            DeletedSet deletedStructures_;
-        };
+        using TransactionResult = CuboidGrid::TransactionResult<cfg>;
 
         [[nodiscard]]
         explicit Scene(Vector3<u.length> const& blockSize)
