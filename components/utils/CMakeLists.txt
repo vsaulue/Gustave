@@ -31,6 +31,7 @@ add_executable(Test-Comp-Utils
     "tests/utils/Hasher.cpp"
     "tests/utils/NumberHyperscript.cpp"
     "tests/utils/PointerHash.cpp"
+    "tests/utils/prop/Ptr.cpp"
     "tests/utils/SizedString.cpp"
     "tests/utils/SizedStringView.cpp"
 )
