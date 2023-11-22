@@ -35,7 +35,6 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
-#include <gustave/solvers/SolverNode.hpp>
 #include <gustave/solvers/SolverStructure.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
@@ -52,7 +51,6 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using SceneData = detail::SceneData<cfg>;
-        using SolverNode = Solvers::SolverNode<cfg>;
         using SolverStructure = Solvers::SolverStructure<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>

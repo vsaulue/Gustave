@@ -37,6 +37,7 @@
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneUpdater.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
+#include <gustave/scenes/cuboidGrid/Structures.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/scenes/cuboidGrid/TransactionResult.hpp>
 #include <gustave/utils/NoInit.hpp>
@@ -61,7 +62,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using Blocks = CuboidGrid::Blocks<cfg>;
         using Direction = Math3d::BasicDirection;
         using StructureData = detail::StructureData<cfg>;
-        using Structures = Utils::PointerHash::Set<std::shared_ptr<StructureData const>>;
+        using Structures = CuboidGrid::Structures<cfg>;
         using Transaction = CuboidGrid::Transaction<cfg>;
         using TransactionResult = CuboidGrid::TransactionResult<cfg>;
 
@@ -93,8 +94,8 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        Structures const& structures() const {
-            return data_.structures;
+        Structures structures() const {
+            return Structures{ data_ };
         }
 
         [[nodiscard]]

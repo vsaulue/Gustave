@@ -82,4 +82,29 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
     SECTION("::blockSize() const") {
         CHECK(scene.blockSize() == blockSize);
     }
+
+    SECTION("::structures() const") {
+        Scene::Structures structures = scene.structures();
+
+        SECTION("// empty") {
+            CHECK(structures.size() == 0);
+            CHECK(structures.begin() == structures.end());
+        }
+
+        SECTION("// not empty") {
+            Transaction t;
+            t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
+            t.addBlock({ {2,0,0}, concrete_20m, blockMass, true });
+            t.addBlock({ {3,0,0}, concrete_20m, blockMass, false });
+            scene.modify(t);
+
+            CHECK(structures.size() == 2);
+            int count = 0;
+            for (auto const& structure : structures) {
+                CHECK(structure.blocks().contains({ 2,0,0 }));
+                ++count;
+            }
+            CHECK(count == 2);
+        }
+    }
 }
