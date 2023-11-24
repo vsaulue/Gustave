@@ -37,6 +37,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/force1/detail/ForceBalancer.hpp>
 #include <gustave/solvers/force1/detail/ForceRepartition.hpp>
+#include <gustave/solvers/force1/Config.hpp>
 #include <gustave/solvers/force1/Solution.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/solvers/SolverNode.hpp>
@@ -59,36 +60,13 @@ namespace Gustave::Solvers::Force1 {
         using NodeIndex = typename Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
     public:
+        using Config = Force1::Config<cfg>;
         using ForceBalancer = detail::ForceBalancer<cfg>;
         using ForceRepartition = detail::ForceRepartition<cfg>;
         using IterationIndex = std::uint64_t;
         using Problem = SolverProblem<cfg>;
         using Solution = Force1::Solution<cfg>;
         using Structure = Solvers::SolverStructure<cfg>;
-
-        class Config {
-        public:
-            [[nodiscard]]
-            Config(std::uint64_t maxIterations, Real<u.one> targetMaxError)
-                : maxIterations_{maxIterations}
-                , targetMaxError_{targetMaxError}
-            {
-                assert(targetMaxError > 0.f);
-            }
-
-            [[nodiscard]]
-            IterationIndex maxIterations() const {
-                return maxIterations_;
-            }
-
-            [[nodiscard]]
-            Real<u.one> targetMaxError() const {
-                return targetMaxError_;
-            }
-        private:
-            IterationIndex maxIterations_;
-            Real<u.one> targetMaxError_;
-        };
 
         class Result {
         public:
