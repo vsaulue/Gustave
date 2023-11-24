@@ -67,7 +67,6 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using SceneData = detail::SceneData<cfg>;
         using StructureData = detail::StructureData<cfg>;
         using Transaction = CuboidGrid::Transaction<cfg>;
-        using TransactionResult = CuboidGrid::TransactionResult<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
@@ -78,12 +77,17 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             std::vector<std::shared_ptr<StructureData const>> removedStructures;
         };
     public:
+        struct Result {
+            std::vector<std::shared_ptr<StructureData const>> newStructures;
+            std::vector<std::shared_ptr<StructureData const>> removedStructures;
+        };
+
         [[nodiscard]]
         explicit SceneUpdater(SceneData& data)
             : data_{ &data }
         {}
 
-        TransactionResult runTransaction(Transaction const& transaction) {
+        Result runTransaction(Transaction const& transaction) {
             checkTransaction(transaction);
             TransactionContext ctx;
             for (BlockPosition const& delPosition : transaction.deletedBlocks()) {
@@ -204,13 +208,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        static TransactionResult generateResult(TransactionContext&& ctx) {
-            typename TransactionResult::DeletedSet deletedStructures;
-            deletedStructures.reserve(ctx.removedStructures.size());
-            for (auto const& structure : ctx.removedStructures) {
-                deletedStructures.push_back(structure.get());
-            }
-            return TransactionResult{ std::move(ctx.newStructures), deletedStructures };
+        static Result generateResult(TransactionContext&& ctx) {
+            return Result{ std::move(ctx.newStructures), std::move(ctx.removedStructures) };
         }
 
         [[nodiscard]]

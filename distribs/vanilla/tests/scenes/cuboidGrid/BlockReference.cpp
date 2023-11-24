@@ -31,17 +31,21 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
+#include <gustave/scenes/cuboidGrid/StructureReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 
 #include <TestConfig.hpp>
 
-using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
-using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<G::libConfig>;
+namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
+
+using BlockPosition = CuboidGrid::BlockPosition;
+using BlockReference = CuboidGrid::BlockReference<G::libConfig>;
 using Direction = Gustave::Math3d::BasicDirection;
 using Neighbour = BlockReference::Neighbour;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<G::libConfig>;
-using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<G::libConfig>;
+using SceneData = CuboidGrid::detail::SceneData<G::libConfig>;
+using SceneUpdater = CuboidGrid::detail::SceneUpdater<G::libConfig>;
+using StructureReference = CuboidGrid::StructureReference<G::libConfig>;
+using Transaction = CuboidGrid::Transaction<G::libConfig>;
 
 static_assert(std::ranges::forward_range<BlockReference::Neighbours>);
 static_assert(std::ranges::forward_range<BlockReference::Structures>);
@@ -49,25 +53,23 @@ static_assert(std::ranges::forward_range<BlockReference::Structures>);
 TEST_CASE("Scene::CuboidGrid::BlockReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
     SceneData sceneData{ blockSize };
-    auto newBlock = [&](BlockPosition const& position, G::Real<u.mass> mass, bool isFoundation, StructureData* structure) -> BlockReference {
-        auto dataRef = sceneData.blocks.insert({ position, concrete_20m, mass, isFoundation });
-        dataRef.structure() = structure;
+
+    Transaction t;
+    auto newBlock = [&](BlockPosition const& position, G::Real<u.mass> mass, bool isFoundation) -> BlockReference {
+        t.addBlock({ position, concrete_20m, mass, isFoundation });
         return BlockReference{ sceneData, position };
     };
-
-    StructureData s111{ sceneData };
-    StructureData s122{ sceneData };
-
-    BlockReference b000 = newBlock({ 0,0,0 }, 1000.f * u.mass, true , nullptr);
-    BlockReference b111 = newBlock({ 1,1,1 }, 3000.f * u.mass, false, &s111);
-    BlockReference b011 = newBlock({ 0,1,1 }, 4000.f * u.mass, false, &s111);
-    BlockReference b211 = newBlock({ 2,1,1 }, 5000.f * u.mass, false, &s111);
-    BlockReference b101 = newBlock({ 1,0,1 }, 6000.f * u.mass, false, &s111);
-    BlockReference b121 = newBlock({ 1,2,1 }, 7000.f * u.mass, true , nullptr);
-    BlockReference b110 = newBlock({ 1,1,0 }, 8000.f * u.mass, false, &s111);
-    BlockReference b112 = newBlock({ 1,1,2 }, 9000.f * u.mass, true , nullptr);
-    /* b112 */ newBlock({1,2,2}, 2000.f * u.mass, false, &s122);
-    /* b113 */ newBlock({1,1,3}, 1000.f * u.mass, true, nullptr);
+    BlockReference b000 = newBlock({ 0,0,0 }, 1000.f * u.mass, true);
+    BlockReference b111 = newBlock({ 1,1,1 }, 3000.f * u.mass, false);
+    BlockReference b011 = newBlock({ 0,1,1 }, 4000.f * u.mass, false);
+    BlockReference b211 = newBlock({ 2,1,1 }, 5000.f * u.mass, false);
+    BlockReference b101 = newBlock({ 1,0,1 }, 6000.f * u.mass, false);
+    BlockReference b121 = newBlock({ 1,2,1 }, 7000.f * u.mass, true);
+    BlockReference b110 = newBlock({ 1,1,0 }, 8000.f * u.mass, false);
+    BlockReference b112 = newBlock({ 1,1,2 }, 9000.f * u.mass, true);
+    /* b112 */ newBlock({1,2,2}, 2000.f * u.mass, false);
+    /* b113 */ newBlock({1,1,3}, 1000.f * u.mass, true);
+    SceneUpdater{ sceneData }.runTransaction(t);
 
     SECTION(".blockSize()") {
         CHECK(b101.blockSize() == blockSize);
@@ -152,24 +154,23 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
     }
 
     SECTION(".structures()") {
-        auto structuresAsVector = [](BlockReference const& block) {
-            std::vector<StructureData const*> result;
-            for (auto const& structure : block.structures()) {
-                result.push_back(structure);
-            }
-            return result;
-        };
-
         SECTION("// non-foundation") {
-            auto const structures = structuresAsVector(b111);
-            auto const expected = std::vector<StructureData const*>{ &s111 };
-            CHECK_THAT(structures, M::C2::UnorderedEquals(expected));
+            auto const structures = b111.structures();
+            REQUIRE(structures.size() == 1);
+            CHECK(structures[0].blocks().contains(b111.position()));
         }
 
         SECTION("// foundation") {
-            auto const structures = structuresAsVector(b112);
-            auto const expected = std::vector<StructureData const*>{ &s111, &s122 };
-            CHECK_THAT(structures, M::C2::UnorderedEquals(expected));
+            auto const structures = b112.structures();
+            REQUIRE(structures.size() == 2);
+            CHECK(structures[0] != structures[1]);
+            bool has111 = false;
+            bool has122 = false;
+            for (auto const& structure : structures) {
+                has111 = has111 || structure.blocks().contains({ 1,1,1 });
+                has122 = has122 || structure.blocks().contains({ 1,2,2 });
+            }
+            CHECK((has111 && has122));
         }
     }
 }

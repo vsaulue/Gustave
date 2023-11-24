@@ -28,7 +28,7 @@
 #include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
+#include <gustave/scenes/cuboidGrid/StructureReference.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
@@ -36,8 +36,10 @@ namespace Gustave::Scenes::CuboidGrid {
     private:
         using StructureData = detail::StructureData<cfg>;
     public:
-        using DeletedSet = std::vector<StructureData const*>;
-        using NewSet = std::vector<std::shared_ptr<StructureData const>>;
+        using StructureReference = CuboidGrid::StructureReference<cfg>;
+
+        using DeletedSet = std::vector<StructureReference>;
+        using NewSet = std::vector<StructureReference>;
 
         [[nodiscard]]
         TransactionResult(NewSet newStructures, DeletedSet deletedStructures)

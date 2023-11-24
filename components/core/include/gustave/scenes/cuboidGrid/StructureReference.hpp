@@ -231,6 +231,8 @@ namespace Gustave::Scenes::CuboidGrid {
         friend detail::StructureData<cfg_> const& detail::structureDataOf(StructureReference<cfg_> const&);
     private:
         std::shared_ptr<StructureData const> data_;
+    public:
+        using Hasher = Utils::Hasher<StructureReference, &StructureReference::data_>;
     };
 
     namespace detail {
@@ -240,3 +242,6 @@ namespace Gustave::Scenes::CuboidGrid {
         }
     }
 }
+
+template<Gustave::Cfg::cLibConfig auto cfg>
+struct std::hash<Gustave::Scenes::CuboidGrid::StructureReference<cfg>> : Gustave::Scenes::CuboidGrid::StructureReference<cfg>::Hasher {};

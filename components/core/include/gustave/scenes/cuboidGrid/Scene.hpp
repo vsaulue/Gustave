@@ -50,6 +50,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         using SceneData = detail::SceneData<cfg>;
         using SceneUpdater = detail::SceneUpdater<cfg>;
+        using StructureData = detail::StructureData<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
@@ -61,7 +62,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using BlockReference = CuboidGrid::BlockReference<cfg>;
         using Blocks = CuboidGrid::Blocks<cfg>;
         using Direction = Math3d::BasicDirection;
-        using StructureData = detail::StructureData<cfg>;
+        using StructureReference = CuboidGrid::StructureReference<cfg>;
         using Structures = CuboidGrid::Structures<cfg>;
         using Transaction = CuboidGrid::Transaction<cfg>;
         using TransactionResult = CuboidGrid::TransactionResult<cfg>;
@@ -75,7 +76,8 @@ namespace Gustave::Scenes::CuboidGrid {
         Scene& operator=(Scene const&) = delete;
 
         TransactionResult modify(Transaction const& transaction) {
-            return SceneUpdater{ data_ }.runTransaction(transaction);
+            auto upResult = SceneUpdater{ data_ }.runTransaction(transaction);
+            return TransactionResult{ asReferences(std::move(upResult.newStructures)), asReferences(std::move(upResult.removedStructures)) };
         }
 
         [[nodiscard]]
@@ -103,6 +105,16 @@ namespace Gustave::Scenes::CuboidGrid {
             return data_.blocks.thicknessAlong(direction);
         }
     private:
+        [[nodiscard]]
+        std::vector<StructureReference> asReferences(std::vector<std::shared_ptr<StructureData const>>&& structures) {
+            std::vector<StructureReference> result;
+            result.reserve(structures.size());
+            for (auto&& structurePtr : structures) {
+                result.emplace_back(std::move(structurePtr));
+            }
+            return result;
+        }
+
         SceneData data_;
     };
 }

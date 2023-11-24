@@ -42,6 +42,9 @@
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
+    class StructureReference;
+
+    template<Cfg::cLibConfig auto cfg>
     class BlockReference {
     private:
         static constexpr auto u = Cfg::units(cfg);
@@ -61,6 +64,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
         using Direction = Math3d::BasicDirection;
+        using StructureReference = CuboidGrid::StructureReference<cfg>;
 
         class Neighbour {
         public:
@@ -189,28 +193,36 @@ namespace Gustave::Scenes::CuboidGrid {
 
         class Structures {
         private:
-            using Values = std::array<StructureData const*, 6>;
+            using Values = std::array<StructureReference, 6>;
         public:
             using Iterator = typename Values::const_iterator;
 
             [[nodiscard]]
             explicit Structures(BlockReference const& block)
-                : size_{ 0 }
+                : sceneStructures_{ NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT() }
+                , size_{ 0 }
             {
+                auto const& structures = block.sceneData_->structures;
+                auto addValue = [this, &structures](StructureData const* data) {
+                    auto const sharedStructure = *structures.find(data);
+                    sceneStructures_[size_] = StructureReference{ std::move(sharedStructure) };
+                    ++size_;
+                };
+
                 if (block.isFoundation()) {
                     for (auto const& neighbour : DataNeighbours{ block.sceneData_->blocks, block.position_ }) {
                         auto const nBlockData = neighbour.block;
                         if (!nBlockData.isFoundation()) {
-                            pushBack(nBlockData.structure());
+                            addValue(nBlockData.structure());
                         }
                     }
                 } else {
-                    pushBack(block.data().structure());
+                    addValue(block.data().structure());
                 }
             }
 
             [[nodiscard]]
-            StructureData const* operator[](std::size_t index) const {
+            StructureReference const& operator[](std::size_t index) const {
                 return sceneStructures_[index];
             }
 
@@ -229,10 +241,9 @@ namespace Gustave::Scenes::CuboidGrid {
                 return size_;
             }
         private:
-            void pushBack(StructureData const* newValue) {
-                assert(newValue != nullptr);
-                sceneStructures_[size_] = newValue;
-                ++size_;
+            [[nodiscard]]
+            static StructureReference NO_INIT() {
+                return StructureReference{ Utils::NO_INIT };
             }
 
             Values sceneStructures_;

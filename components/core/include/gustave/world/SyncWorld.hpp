@@ -54,12 +54,12 @@ namespace Gustave::World {
         class WorldStructure;
 
         using BlockIndex = typename Scene::BlockIndex;
-        using SceneStructure = typename Scene::StructureData;
+        using SceneStructure = typename Scene::StructureReference;
         using SceneTransactionResult = typename Scene::TransactionResult;
         using Solution = typename Solver::Solution;
         using SolverStructure = typename Solver::Structure;
         using SolverProblem = typename Solver::Problem;
-        using Structures = Utils::PointerHash::Map<SceneStructure const*, std::shared_ptr<WorldStructure>>;
+        using Structures = std::unordered_map<SceneStructure, std::shared_ptr<WorldStructure>>;
         using Transaction = typename Scene::Transaction;
 
         class WorldStructure {
@@ -67,23 +67,21 @@ namespace Gustave::World {
             using State = WorldStructureState;
 
             [[nodiscard]]
-            explicit WorldStructure(std::shared_ptr<SceneStructure const> sceneStructure)
+            explicit WorldStructure(SceneStructure sceneStructure)
                 : sceneStructure_{ std::move(sceneStructure) }
                 , state_{ WorldStructureState::New }
-            {
-                assert(sceneStructure_);
-            }
+            {}
 
             [[nodiscard]]
             bool contains(BlockIndex const& blockIndex) const {
-                return sceneStructure_->contains(blockIndex);
+                return sceneStructure_.contains(blockIndex);
             }
 
             [[nodiscard]]
             std::optional<Vector3<u.force>> forceVector(BlockIndex const& to, BlockIndex const& from) const {
                 assert(state_ == State::Solved);
-                auto const toIndex = sceneStructure_->solverIndexOf(to);
-                auto const fromIndex = sceneStructure_->solverIndexOf(from);
+                auto const toIndex = sceneStructure_.solverIndexOf(to);
+                auto const fromIndex = sceneStructure_.solverIndexOf(from);
                 if (toIndex && fromIndex) {
                     return solution_->forceVector(*toIndex, *fromIndex);
                 } else {
@@ -97,7 +95,7 @@ namespace Gustave::World {
 
             [[nodiscard]]
             SceneStructure const& sceneStructure() const {
-                return *sceneStructure_.get();
+                return sceneStructure_;
             }
 
             [[nodiscard]]
@@ -107,7 +105,7 @@ namespace Gustave::World {
 
             [[nodiscard]]
             std::shared_ptr<SolverStructure const> solverStructurePtr() const {
-                return sceneStructure_->solverStructurePtr();
+                return sceneStructure_.solverStructurePtr();
             }
 
             void solve(std::shared_ptr<Solution const> solution) {
@@ -122,7 +120,7 @@ namespace Gustave::World {
                 return state_;
             }
         private:
-            std::shared_ptr<SceneStructure const> sceneStructure_;
+            SceneStructure sceneStructure_;
             std::shared_ptr<Solution const> solution_;
             State state_;
         };
@@ -147,15 +145,15 @@ namespace Gustave::World {
 
         void modify(Transaction const& transaction) {
             SceneTransactionResult const trResult = scene_.modify(transaction);
-            for (SceneStructure const* structure : trResult.deletedStructures()) {
-                auto const count = structures_.erase(structure);
+            for (SceneStructure const& sceneStructure : trResult.deletedStructures()) {
+                auto const count = structures_.erase(sceneStructure);
                 assert(count == 1);
             }
-            for (std::shared_ptr<SceneStructure const> const& sceneStructure : trResult.newStructures()) {
+            for (SceneStructure const& sceneStructure : trResult.newStructures()) {
                 std::shared_ptr<WorldStructure> worldStructure = std::make_shared<WorldStructure>(sceneStructure);
                 auto const result = solver_.run(SolverProblem{ g_, worldStructure->solverStructurePtr() });
                 worldStructure->solve(result.solutionPtr());
-                auto const insertResult = structures_.insert({ &worldStructure->sceneStructure(), std::move(worldStructure)});
+                auto const insertResult = structures_.insert({ worldStructure->sceneStructure(), std::move(worldStructure)});
                 assert(insertResult.second);
             }
         }
