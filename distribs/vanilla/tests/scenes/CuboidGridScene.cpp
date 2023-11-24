@@ -29,7 +29,7 @@
 
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
-#include <gustave/scenes/cuboidGrid/Scene.hpp>
+#include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/testing/Matchers.hpp>
@@ -38,7 +38,7 @@
 
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using Direction = Gustave::Math3d::BasicDirection;
-using Scene = Gustave::Scenes::CuboidGrid::Scene<G::libConfig>;
+using Scene = Gustave::Scenes::CuboidGridScene<G::libConfig>;
 using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<G::libConfig>;
 using Transaction = Gustave::Scenes::CuboidGrid::Transaction<G::libConfig>;
 

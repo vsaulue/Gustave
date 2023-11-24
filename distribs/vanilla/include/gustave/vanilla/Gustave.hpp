@@ -27,11 +27,7 @@
 
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/MaxStress.hpp>
-#include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
-#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
-#include <gustave/scenes/cuboidGrid/Scene.hpp>
-#include <gustave/scenes/cuboidGrid/Transaction.hpp>
+#include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/solvers/force1/Solution.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/solvers/force1/Solver.hpp>
@@ -57,11 +53,8 @@ namespace Gustave::Vanilla {
         using Solver = Solvers::Force1::Solver<libConfig>;
     }
 
-    namespace CuboidGrid {
-        using BlockConstructionInfo = Scenes::CuboidGrid::BlockConstructionInfo<libConfig>;
-        using BlockPosition = Scenes::CuboidGrid::BlockPosition;
-        using Scene = Scenes::CuboidGrid::Scene<libConfig>;
-        using Transaction = Scenes::CuboidGrid::Transaction<libConfig>;
+    namespace Scenes {
+        using CuboidGridScene = Gustave::Scenes::CuboidGridScene<libConfig>;
     }
 
     using NormalizedVector3 = LibConfig::NormalizedVector3;

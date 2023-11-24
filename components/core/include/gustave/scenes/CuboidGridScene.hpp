@@ -42,15 +42,15 @@
 #include <gustave/scenes/cuboidGrid/TransactionResult.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
+namespace Gustave::Scenes {
     template<Cfg::cLibConfig auto cfg>
-    class Scene {
+    class CuboidGridScene {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
-        using SceneData = detail::SceneData<cfg>;
-        using SceneUpdater = detail::SceneUpdater<cfg>;
-        using StructureData = detail::StructureData<cfg>;
+        using SceneData = CuboidGrid::detail::SceneData<cfg>;
+        using SceneUpdater = CuboidGrid::detail::SceneUpdater<cfg>;
+        using StructureData = CuboidGrid::detail::StructureData<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
@@ -58,7 +58,7 @@ namespace Gustave::Scenes::CuboidGrid {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
-        using BlockIndex = BlockPosition;
+        using BlockIndex = CuboidGrid::BlockPosition;
         using BlockReference = CuboidGrid::BlockReference<cfg>;
         using Blocks = CuboidGrid::Blocks<cfg>;
         using Direction = Math3d::BasicDirection;
@@ -68,12 +68,12 @@ namespace Gustave::Scenes::CuboidGrid {
         using TransactionResult = CuboidGrid::TransactionResult<cfg>;
 
         [[nodiscard]]
-        explicit Scene(Vector3<u.length> const& blockSize)
+        explicit CuboidGridScene(Vector3<u.length> const& blockSize)
             : data_{ blockSize }
         {}
 
-        Scene(Scene const&) = delete;
-        Scene& operator=(Scene const&) = delete;
+        CuboidGridScene(CuboidGridScene const&) = delete;
+        CuboidGridScene& operator=(CuboidGridScene const&) = delete;
 
         TransactionResult modify(Transaction const& transaction) {
             auto upResult = SceneUpdater{ data_ }.runTransaction(transaction);

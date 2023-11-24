@@ -32,7 +32,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/scenes/cuboidGrid/Scene.hpp>
+#include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/solvers/force1/Solver.hpp>
 #include <gustave/utils/PointerHash.hpp>
 #include <gustave/world/WorldStructureState.hpp>
@@ -49,7 +49,7 @@ namespace Gustave::World {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
-        using Scene = Scenes::CuboidGrid::Scene<cfg>;
+        using Scene = Scenes::CuboidGridScene<cfg>;
         using Solver = Solvers::Force1::Solver<cfg>;
         class WorldStructure;
 
