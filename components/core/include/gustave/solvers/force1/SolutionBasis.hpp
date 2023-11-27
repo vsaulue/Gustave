@@ -33,7 +33,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/SolverProblem.hpp>
+#include <gustave/solvers/force1/Config.hpp>
 #include <gustave/solvers/SolverStructure.hpp>
 
 namespace Gustave::Solvers::Force1 {
@@ -48,27 +48,38 @@ namespace Gustave::Solvers::Force1 {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
-        [[nodiscard]]
-        SolutionBasis(std::shared_ptr<SolverStructure<cfg> const> structure, Vector3<u.acceleration> const& g)
-            : problem_{ g, std::move(structure) }
-            , potentials_{ problem_.structure().nodes().size(), 0.f * u.potential }
-        {}
+        using Config = Force1::Config<cfg>;
+        using Structure = SolverStructure<cfg>;
 
         [[nodiscard]]
-        SolutionBasis(SolverProblem<cfg> problem, std::vector<Real<u.potential>> potentials)
-            : problem_{ std::move(problem) }
+        explicit SolutionBasis(std::shared_ptr<Structure const> structure, std::shared_ptr<Config const> config)
+            : config_{ std::move(config) }
+            , structure_{ std::move(structure) }
+            , potentials_{ structure_->nodes().size(), 0.f * u.potential }
+        {
+            assert(config_);
+            assert(structure_);
+        }
+
+        [[nodiscard]]
+        explicit SolutionBasis(std::shared_ptr<Structure const> structure, std::shared_ptr<Config const> config, std::vector<Real<u.potential>> potentials)
+            : config_{ std::move(config) }
+            , structure_{ std::move(structure) }
             , potentials_{ std::move(potentials) }
         {
+            assert(config_);
+            assert(structure_);
             checkPotentials();
         }
 
         [[nodiscard]]
-        SolverStructure<cfg> const& structure() const {
-            return problem_.structure();
+        Config const& config() const {
+            return *config_;
         }
 
-        SolverProblem<cfg> const& problem() const {
-            return problem_;
+        [[nodiscard]]
+        Structure const& structure() const {
+            return *structure_;
         }
 
         [[nodiscard]]
@@ -83,14 +94,15 @@ namespace Gustave::Solvers::Force1 {
 
         [[nodiscard]]
         Vector3<u.acceleration> const& g() const {
-            return problem_.g();
+            return config_->g();
         }
     private:
-        SolverProblem<cfg> problem_;
+        std::shared_ptr<Config const> config_;
+        std::shared_ptr<Structure const> structure_;
         std::vector<Real<u.potential>> potentials_;
 
         void checkPotentials() const {
-            assert(potentials_.size() == problem_.structure().nodes().size());
+            assert(potentials_.size() == structure_->nodes().size());
         }
     };
 

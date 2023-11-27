@@ -58,7 +58,6 @@ namespace Gustave::World {
         using SceneTransactionResult = typename Scene::TransactionResult;
         using Solution = typename Solver::Solution;
         using SolverStructure = typename Solver::Structure;
-        using SolverProblem = typename Solver::Problem;
         using Structures = std::unordered_map<SceneStructure, std::shared_ptr<WorldStructure>>;
         using Transaction = typename Scene::Transaction;
 
@@ -126,9 +125,8 @@ namespace Gustave::World {
         };
 
         [[nodiscard]]
-        explicit SyncWorld(Vector3<u.length> const& blockSize, Vector3<u.acceleration> const& g, Solver solver)
-            : g_{ g }
-            , scene_{ blockSize }
+        explicit SyncWorld(Vector3<u.length> const& blockSize, Solver solver)
+            : scene_{ blockSize }
             , solver_{ std::move(solver) }
         {}
 
@@ -151,14 +149,13 @@ namespace Gustave::World {
             }
             for (SceneStructure const& sceneStructure : trResult.newStructures()) {
                 std::shared_ptr<WorldStructure> worldStructure = std::make_shared<WorldStructure>(sceneStructure);
-                auto const result = solver_.run(SolverProblem{ g_, worldStructure->solverStructurePtr() });
+                auto const result = solver_.run(worldStructure->solverStructurePtr());
                 worldStructure->solve(result.solutionPtr());
                 auto const insertResult = structures_.insert({ worldStructure->sceneStructure(), std::move(worldStructure)});
                 assert(insertResult.second);
             }
         }
     private:
-        Vector3<u.acceleration> g_;
         Scene scene_;
         Solver solver_;
         Structures structures_;

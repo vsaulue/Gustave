@@ -29,15 +29,18 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include <gustave/testing/Matchers.hpp>
 #include <gustave/vanilla/Gustave.hpp>
+#include <gustave/solvers/force1/Config.hpp>
 
 #include <TestConfig.hpp>
+
+using Config = Gustave::Solvers::Force1::Config<G::libConfig>;
+using Solution = Gustave::Solvers::Force1::Solution<G::libConfig>;
 
 TEST_CASE("Force1::Solution") {
     auto structure = std::make_shared<G::SolverStructure>();
     for (unsigned i = 1; i <= 7; ++i) {
-        structure->addNode({ double(i * 1'000) * u.mass, i == 1 });
+        structure->addNode({ (i * 1'000.f) * u.mass, i == 1 });
     }
     structure->addLink({ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
     structure->addLink({ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
@@ -46,11 +49,13 @@ TEST_CASE("Force1::Solution") {
     structure->addLink({ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
     structure->addLink({ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
 
-    auto basis = std::make_shared<G::Force1::SolutionBasis>(structure, g);
-    G::Force1::Solution solution{ basis };
-    auto spanPotentials = basis->spanPotentials();
-    for (unsigned i = 0; i < spanPotentials.size(); ++i) {
-        spanPotentials[i] = double(i*i) / 1000. * u.potential;
+    constexpr float precision = 0.001f;
+    auto config = std::make_shared<Config const>(g, 1000, precision);
+    auto basis = std::make_shared<Solution::Basis>(structure, config);
+    Solution solution{ basis };
+    auto potentials = basis->spanPotentials();
+    for (unsigned i = 0; i < potentials.size(); ++i) {
+        potentials[i] = float(i*i) / 1000.f * u.potential;
     }
 
     SECTION("::force(NodeIndex, Nodeindex)") {

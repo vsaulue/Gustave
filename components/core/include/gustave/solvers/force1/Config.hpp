@@ -37,15 +37,24 @@ namespace Gustave::Solvers::Force1 {
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = typename Cfg::Real<cfg, unit>;
+
+        template<Cfg::cUnitOf<cfg> auto unit>
+        using Vector3 = typename Cfg::Vector3<cfg, unit>;
     public:
         using IterationIndex = std::uint64_t;
 
         [[nodiscard]]
-        explicit Config(IterationIndex maxIterations, Real<u.one> targetMaxError)
-            : maxIterations_{ maxIterations }
+        explicit Config(Vector3<u.acceleration> const& g, IterationIndex maxIterations, Real<u.one> targetMaxError)
+            : g_{ g }
+            , maxIterations_{ maxIterations }
             , targetMaxError_{ targetMaxError }
         {
             assert(targetMaxError > 0.f);
+        }
+
+        [[nodiscard]]
+        Vector3<u.acceleration> const& g() const {
+            return g_;
         }
 
         [[nodiscard]]
@@ -58,6 +67,7 @@ namespace Gustave::Solvers::Force1 {
             return targetMaxError_;
         }
     private:
+        Vector3<u.acceleration> g_;
         IterationIndex maxIterations_;
         Real<u.one> targetMaxError_;
     };

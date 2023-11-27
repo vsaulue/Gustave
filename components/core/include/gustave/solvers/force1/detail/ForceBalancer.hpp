@@ -25,14 +25,16 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/solvers/SolverStructure.hpp>
+#include <gustave/solvers/force1/Config.hpp>
 #include <gustave/solvers/force1/detail/ContactInfo.hpp>
 #include <gustave/solvers/force1/detail/NodeInfo.hpp>
-#include <gustave/solvers/SolverProblem.hpp>
 
 namespace Gustave::Solvers::Force1::detail {
     template<Cfg::cLibConfig auto cfg>
@@ -50,20 +52,23 @@ namespace Gustave::Solvers::Force1::detail {
         static constexpr auto u = Cfg::units(cfg);
         static constexpr auto rt = cfg.realTraits;
     public:
+        using Config = Force1::Config<cfg>;
         using ContactInfo = detail::ContactInfo<cfg>;
         using NodeInfo = detail::NodeInfo<cfg>;
+        using Structure = SolverStructure<cfg>;
 
         [[nodiscard]]
-        explicit ForceBalancer(SolverProblem<cfg> const& problem)
-            : problem_{ problem }
-            , normalizedG_{ problem.g() }
+        explicit ForceBalancer(Structure const& structure, Config const& config)
+            : config_{ &config }
+            , structure_{ &structure }
+            , normalizedG_{ config_->g() }
         {
             Real<u.acceleration> const gNorm = g().norm();
             nodeInfos_.reserve(nodes().size());
             for (SolverNode<cfg> const& node : nodes()) {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
-            for (SolverContact<cfg> const& link : structure().links()) {
+            for (SolverContact<cfg> const& link : structure.links()) {
                 NodeIndex const id1 = link.localNodeId();
                 NodeIndex const id2 = link.otherNodeId();
 
@@ -88,8 +93,13 @@ namespace Gustave::Solvers::Force1::detail {
         }
 
         [[nodiscard]]
+        Config const& config() const {
+            return *config_;
+        }
+
+        [[nodiscard]]
         Vector3<u.acceleration> const& g() const {
-            return problem_.g();
+            return config_->g();
         }
 
         [[nodiscard]]
@@ -98,13 +108,8 @@ namespace Gustave::Solvers::Force1::detail {
         }
 
         [[nodiscard]]
-        SolverProblem<cfg> const& problem() const {
-            return problem_;
-        }
-
-        [[nodiscard]]
-        SolverStructure<cfg> const& structure() const {
-            return problem_.structure();
+        Structure const& structure() const {
+            return *structure_;
         }
 
         [[nodiscard]]
@@ -112,13 +117,14 @@ namespace Gustave::Solvers::Force1::detail {
             return nodeInfos_;
         }
     private:
-        SolverProblem<cfg> problem_;
+        Config const* config_;
+        Structure const* structure_;
         std::vector<NodeInfo> nodeInfos_;
         NormalizedVector3 normalizedG_;
 
         [[nodiscard]]
         std::vector<SolverNode<cfg>> const& nodes() const {
-            return problem_.structure().nodes();
+            return structure_->nodes();
         }
     };
 }

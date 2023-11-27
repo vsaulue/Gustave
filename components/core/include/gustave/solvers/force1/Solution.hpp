@@ -64,14 +64,17 @@ namespace Gustave::Solvers::Force1 {
         [[nodiscard]]
         explicit Solution(std::shared_ptr<const Basis> basis)
             : basis_{ std::move(basis) }
-            , forceBalancer_{ basis_->problem() }
+            , forceBalancer_{ basis_->structure(), basis_->config() }
         {}
 
         [[nodiscard]]
-        Solution(ForceBalancer balancer, std::vector<Real<u.potential>> potentials)
-            : basis_{ std::make_shared<Basis>(balancer.problem(), std::move(potentials)) }
+        explicit Solution(std::shared_ptr<const Basis> basis, ForceBalancer balancer)
+            : basis_{ std::move(basis) }
             , forceBalancer_{ std::move(balancer) }
-        {}
+        {
+            assert(&basis_->structure() == &forceBalancer_.structure());
+            assert(&basis_->config() == &forceBalancer_.config());
+        }
 
         [[nodiscard]]
         std::shared_ptr<const Basis> const& basis() const {
