@@ -46,18 +46,18 @@ namespace Gustave::Solvers {
         }
 
         [[nodiscard]]
-        std::vector<Contact> const& links() const {
-            return links_;
+        std::vector<Contact> const& contacts() const {
+            return contacts_;
         }
 
         void addNode(Node const& newNode) {
             nodes_.push_back(newNode);
         }
 
-        void addLink(Contact const& newLink) {
+        void addContact(Contact const& newLink) {
             assert(newLink.localNodeId() < nodes_.size());
             assert(newLink.otherNodeId() < nodes_.size());
-            links_.push_back(newLink);
+            contacts_.push_back(newLink);
         }
 
         [[nodiscard]]
@@ -66,6 +66,6 @@ namespace Gustave::Solvers {
         }
     private:
         std::vector<Node> nodes_;
-        std::vector<Contact> links_;
+        std::vector<Contact> contacts_;
     };
 }

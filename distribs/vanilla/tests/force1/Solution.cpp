@@ -44,12 +44,12 @@ TEST_CASE("Force1::Solution") {
     for (unsigned i = 1; i <= 7; ++i) {
         structure->addNode(Node{ (i * 1'000.f) * u.mass, i == 1 });
     }
-    structure->addLink({ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addLink({ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addLink({ 3, 0,  Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addLink({ 4, 0, -Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addLink({ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
-    structure->addLink({ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
+    structure->addContact({ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addContact({ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addContact({ 3, 0,  Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addContact({ 4, 0, -Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addContact({ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
+    structure->addContact({ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
 
     constexpr float precision = 0.001f;
     auto config = std::make_shared<Config const>(g, 1000, precision);

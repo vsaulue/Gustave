@@ -78,7 +78,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         void addContact(ConstBlockReference b1, ConstBlockReference b2, NormalizedVector3 const& normalOnB1,
                         Real<u.area> area, Real<u.length> thickness, MaxStress const& maxConstraints)
         {
-            solverStructure_->addLink({ indexOf(b1), indexOf(b2), normalOnB1, area, thickness, maxConstraints });
+            solverStructure_->addContact({ indexOf(b1), indexOf(b2), normalOnB1, area, thickness, maxConstraints });
         }
 
         [[nodiscard]]

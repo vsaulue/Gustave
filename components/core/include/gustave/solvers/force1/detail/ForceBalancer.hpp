@@ -71,21 +71,21 @@ namespace Gustave::Solvers::Force1::detail {
             for (Node const& node : nodes()) {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
-            for (Contact const& link : structure.links()) {
-                NodeIndex const id1 = link.localNodeId();
-                NodeIndex const id2 = link.otherNodeId();
+            for (Contact const& contact : structure.contacts()) {
+                NodeIndex const id1 = contact.localNodeId();
+                NodeIndex const id2 = contact.otherNodeId();
 
-                NormalizedVector3 const& normal = link.normal();
+                NormalizedVector3 const& normal = contact.normal();
                 Real<u.one> const nComp = normal.dot(normalizedG_);
-                Real<u.resistance> const tangentResist = rt.sqrt(1.f - nComp * nComp) / link.shearConductivity();
+                Real<u.resistance> const tangentResist = rt.sqrt(1.f - nComp * nComp) / contact.shearConductivity();
                 Real<u.resistance> pNormalResist{ Utils::NO_INIT };
                 Real<u.resistance> nNormalResist{ Utils::NO_INIT };
                 if (nComp <= 0.f) {
-                    pNormalResist = -nComp / link.compressionConductivity();
-                    nNormalResist = -nComp / link.tensileConductivity();
+                    pNormalResist = -nComp / contact.compressionConductivity();
+                    nNormalResist = -nComp / contact.tensileConductivity();
                 } else {
-                    pNormalResist = nComp / link.tensileConductivity();
-                    nNormalResist = nComp / link.compressionConductivity();
+                    pNormalResist = nComp / contact.tensileConductivity();
+                    nNormalResist = nComp / contact.compressionConductivity();
                 }
                 Real<u.resistance> const pResist = std::max(pNormalResist, tangentResist);
                 Real<u.resistance> const nResist = std::max(nNormalResist, tangentResist);

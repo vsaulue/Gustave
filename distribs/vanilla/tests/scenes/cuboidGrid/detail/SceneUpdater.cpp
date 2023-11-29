@@ -118,24 +118,24 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
 
         auto checkContact = [&data](StructureData const& structure, G::NodeIndex source, G::NodeIndex dest, Direction sourceNormal, G::MaxStress const& maxStress) {
             G::NormalizedVector3 const normal = G::NormalizedVector3::basisVector(sourceNormal);
-            G::SolverContact const* selectedLink = nullptr;
-            for (G::SolverContact const& link : structure.solverStructure().links()) {
-                if (link.localNodeId() == source && link.otherNodeId() == dest) {
-                    CHECK(link.normal() == normal);
-                    selectedLink = &link;
+            G::SolverContact const* selectedContact = nullptr;
+            for (G::SolverContact const& contact : structure.solverStructure().contacts()) {
+                if (contact.localNodeId() == source && contact.otherNodeId() == dest) {
+                    CHECK(contact.normal() == normal);
+                    selectedContact = &contact;
                     break;
                 }
-                else if (link.localNodeId() == dest && link.otherNodeId() == source) {
-                    CHECK(link.normal() == -normal);
-                    selectedLink = &link;
+                else if (contact.localNodeId() == dest && contact.otherNodeId() == source) {
+                    CHECK(contact.normal() == -normal);
+                    selectedContact = &contact;
                     break;
                 }
             }
-            REQUIRE(selectedLink != nullptr);
+            REQUIRE(selectedContact != nullptr);
             G::Real<u.length> const conductivityFactor = data.blocks.contactAreaAlong(sourceNormal) / data.blocks.thicknessAlong(sourceNormal);
-            CHECK_THAT(selectedLink->compressionConductivity(), M::WithinRel(conductivityFactor * maxStress.maxCompressionStress(), epsilon));
-            CHECK_THAT(selectedLink->shearConductivity(), M::WithinRel(conductivityFactor * maxStress.maxShearStress(), epsilon));
-            CHECK_THAT(selectedLink->tensileConductivity(), M::WithinRel(conductivityFactor * maxStress.maxTensileStress(), epsilon));
+            CHECK_THAT(selectedContact->compressionConductivity(), M::WithinRel(conductivityFactor * maxStress.maxCompressionStress(), epsilon));
+            CHECK_THAT(selectedContact->shearConductivity(), M::WithinRel(conductivityFactor * maxStress.maxShearStress(), epsilon));
+            CHECK_THAT(selectedContact->tensileConductivity(), M::WithinRel(conductivityFactor * maxStress.maxTensileStress(), epsilon));
         };
 
         SECTION(" // Transaction{1+}: single foundation") {
