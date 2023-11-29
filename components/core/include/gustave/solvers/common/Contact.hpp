@@ -31,9 +31,9 @@
 #include <gustave/meta/Meta.hpp>
 #include <gustave/model/MaxStress.hpp>
 
-namespace Gustave::Solvers {
+namespace Gustave::Solvers::Common {
     template<Cfg::cLibConfig auto cfg>
-    struct SolverContact {
+    struct Contact {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
@@ -45,7 +45,7 @@ namespace Gustave::Solvers {
         using NodeIndex = Cfg::NodeIndex<cfg>;
     public:
         [[nodiscard]]
-        SolverContact(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, MaxStress const& maxStress)
+        Contact(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, MaxStress const& maxStress)
             : localNodeId_{ id1 }
             , otherNodeId_{ id2 }
             , normal_{ normal }

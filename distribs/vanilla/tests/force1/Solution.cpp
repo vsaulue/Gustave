@@ -37,10 +37,12 @@
 using Config = Gustave::Solvers::Force1::Config<G::libConfig>;
 using Solution = Gustave::Solvers::Force1::Solution<G::libConfig>;
 
+using Node = Solution::Structure::Node;
+
 TEST_CASE("Force1::Solution") {
     auto structure = std::make_shared<G::SolverStructure>();
     for (unsigned i = 1; i <= 7; ++i) {
-        structure->addNode({ (i * 1'000.f) * u.mass, i == 1 });
+        structure->addNode(Node{ (i * 1'000.f) * u.mass, i == 1 });
     }
     structure->addLink({ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
     structure->addLink({ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });

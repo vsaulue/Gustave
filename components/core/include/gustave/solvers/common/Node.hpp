@@ -25,44 +25,36 @@
 
 #pragma once
 
-#include <vector>
+#include <cassert>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/solvers/SolverContact.hpp>
-#include <gustave/solvers/SolverNode.hpp>
+#include <gustave/cfg/cUnitOf.hpp>
+#include <gustave/cfg/LibTraits.hpp>
 
-namespace Gustave::Solvers {
+namespace Gustave::Solvers::Common {
     template<Cfg::cLibConfig auto cfg>
-    class SolverStructure {
+    struct Node {
     private:
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        static constexpr auto u = Cfg::units(cfg);
+
+        template<Cfg::cUnitOf<cfg> auto unit>
+        using Real = Cfg::Real<cfg, unit>;
     public:
-        [[nodiscard]]
-        std::vector<SolverNode<cfg>> const& nodes() const {
-            return nodes_;
-        }
+        bool isFoundation;
 
         [[nodiscard]]
-        std::vector<SolverContact<cfg>> const& links() const {
-            return links_;
-        }
-
-        void addNode(SolverNode<cfg> const& newNode) {
-            nodes_.push_back(newNode);
-        }
-
-        void addLink(SolverContact<cfg> const& newLink) {
-            assert(newLink.localNodeId() < nodes_.size());
-            assert(newLink.otherNodeId() < nodes_.size());
-            links_.push_back(newLink);
+        explicit Node(Real<u.mass> mass, bool isFoundation)
+            : isFoundation(isFoundation)
+            , mass_(mass)
+        {
+            assert(mass > 0.f * u.mass);
         }
 
         [[nodiscard]]
-        NodeIndex nextNodeIndex() const {
-            return nodes_.size();
+        Real<u.mass> mass() const {
+            return mass_;
         }
     private:
-        std::vector<SolverNode<cfg>> nodes_;
-        std::vector<SolverContact<cfg>> links_;
+        Real<u.mass> mass_;
     };
 }

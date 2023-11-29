@@ -37,6 +37,7 @@
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
+#include <gustave/solvers/Structure.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
@@ -58,7 +59,7 @@ namespace Gustave::Scenes::CuboidGrid {
         using BlockData = detail::BlockData<cfg>;
         using StructureData = detail::StructureData<cfg>;
     public:
-        using SolverStructure = Solvers::SolverStructure<cfg>;
+        using SolverStructure = Solvers::Structure<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
 
         class Blocks {

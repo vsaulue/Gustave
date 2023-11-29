@@ -36,7 +36,6 @@
 #include <gustave/solvers/force1/detail/ForceBalancer.hpp>
 #include <gustave/solvers/force1/detail/ForceRepartition.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
-#include <gustave/solvers/SolverStructure.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Solvers::Force1 {
@@ -60,6 +59,7 @@ namespace Gustave::Solvers::Force1 {
         using ForceRepartition = detail::ForceRepartition<cfg>;
         using NodeInfo = typename ForceBalancer::NodeInfo;
         using NodeStats = typename ForceRepartition::NodeStats;
+        using Structure = typename Basis::Structure;
 
         [[nodiscard]]
         explicit Solution(std::shared_ptr<const Basis> basis)
@@ -82,7 +82,7 @@ namespace Gustave::Solvers::Force1 {
         }
 
         [[nodiscard]]
-        SolverStructure<cfg> const& structure() const {
+        Structure const& structure() const {
             return basis_->structure();
         }
 

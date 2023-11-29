@@ -49,8 +49,11 @@ namespace Gustave::Solvers::Force1::detail {
         static constexpr auto u = Cfg::units(cfg);
         static constexpr auto rt = cfg.realTraits;
     public:
+        using Structure = Solvers::Structure<cfg>;
+
         using ContactInfo = detail::ContactInfo<cfg>;
         using ForceBalancer = detail::ForceBalancer<cfg>;
+        using Node = typename Structure::Node;
         using NodeInfo = detail::NodeInfo<cfg>;
         using NodeStats = detail::NodeStats<cfg>;
 
@@ -142,7 +145,7 @@ namespace Gustave::Solvers::Force1::detail {
         };
 
         [[nodiscard]]
-        std::vector<SolverNode<cfg>> const& nodes() const {
+        std::vector<Node> const& nodes() const {
             return balancer_.structure().nodes();
         }
 

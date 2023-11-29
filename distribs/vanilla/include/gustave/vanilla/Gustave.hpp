@@ -31,9 +31,7 @@
 #include <gustave/solvers/force1/Solution.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/solvers/force1/Solver.hpp>
-#include <gustave/solvers/SolverContact.hpp>
-#include <gustave/solvers/SolverNode.hpp>
-#include <gustave/solvers/SolverStructure.hpp>
+#include <gustave/solvers/Structure.hpp>
 #include <gustave/units/lib/Unit.hpp>
 
 #include "LibConfig.hpp"
@@ -43,9 +41,9 @@ namespace Gustave::Vanilla {
 
     using MaxStress = Model::MaxStress<libConfig>;
 
-    using SolverContact = Solvers::SolverContact<libConfig>;
-    using SolverNode = Solvers::SolverNode<libConfig>;
-    using SolverStructure = Solvers::SolverStructure<libConfig>;
+    using SolverStructure = Solvers::Structure<libConfig>;
+    using SolverContact = SolverStructure::Contact;
+    using SolverNode = SolverStructure::Node;
 
     namespace Force1 {
         using Solution = Solvers::Force1::Solution<libConfig>;

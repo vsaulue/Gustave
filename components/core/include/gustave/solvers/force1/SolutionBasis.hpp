@@ -34,7 +34,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/force1/Config.hpp>
-#include <gustave/solvers/SolverStructure.hpp>
+#include <gustave/solvers/Structure.hpp>
 
 namespace Gustave::Solvers::Force1 {
     template<Cfg::cLibConfig auto cfg>
@@ -49,7 +49,7 @@ namespace Gustave::Solvers::Force1 {
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
         using Config = Force1::Config<cfg>;
-        using Structure = SolverStructure<cfg>;
+        using Structure = Solvers::Structure<cfg>;
 
         [[nodiscard]]
         explicit SolutionBasis(std::shared_ptr<Structure const> structure, std::shared_ptr<Config const> config)

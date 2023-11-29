@@ -35,13 +35,15 @@
 
 using Solver = G::Force1::Solver;
 
+using Node = Solver::Structure::Node;
+
 TEST_CASE("Force1::Solver") {
     SECTION("// pillar") {
         constexpr G::Real<u.mass> blockMass = 4000.f * u.mass;
         auto makePillar = [blockMass](unsigned blockCount) {
             G::SolverStructure structure;
             for (unsigned i = 0; i < blockCount; ++i) {
-                structure.addNode({ blockMass, i == 0 });
+                structure.addNode(Node{ blockMass, i == 0 });
             }
             for (unsigned i = 0; i < blockCount - 1; ++i) {
                 structure.addLink({ i, i + 1,  Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });

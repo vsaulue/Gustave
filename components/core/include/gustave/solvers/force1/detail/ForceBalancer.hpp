@@ -31,7 +31,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/SolverStructure.hpp>
+#include <gustave/solvers/Structure.hpp>
 #include <gustave/solvers/force1/Config.hpp>
 #include <gustave/solvers/force1/detail/ContactInfo.hpp>
 #include <gustave/solvers/force1/detail/NodeInfo.hpp>
@@ -52,10 +52,13 @@ namespace Gustave::Solvers::Force1::detail {
         static constexpr auto u = Cfg::units(cfg);
         static constexpr auto rt = cfg.realTraits;
     public:
+        using Structure = Solvers::Structure<cfg>;
+
         using Config = Force1::Config<cfg>;
+        using Contact = typename Structure::Contact;
         using ContactInfo = detail::ContactInfo<cfg>;
+        using Node = typename Structure::Node;
         using NodeInfo = detail::NodeInfo<cfg>;
-        using Structure = SolverStructure<cfg>;
 
         [[nodiscard]]
         explicit ForceBalancer(Structure const& structure, Config const& config)
@@ -65,10 +68,10 @@ namespace Gustave::Solvers::Force1::detail {
         {
             Real<u.acceleration> const gNorm = g().norm();
             nodeInfos_.reserve(nodes().size());
-            for (SolverNode<cfg> const& node : nodes()) {
+            for (Node const& node : nodes()) {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
-            for (SolverContact<cfg> const& link : structure.links()) {
+            for (Contact const& link : structure.links()) {
                 NodeIndex const id1 = link.localNodeId();
                 NodeIndex const id2 = link.otherNodeId();
 
@@ -123,7 +126,7 @@ namespace Gustave::Solvers::Force1::detail {
         NormalizedVector3 normalizedG_;
 
         [[nodiscard]]
-        std::vector<SolverNode<cfg>> const& nodes() const {
+        std::vector<Node> const& nodes() const {
             return structure_->nodes();
         }
     };

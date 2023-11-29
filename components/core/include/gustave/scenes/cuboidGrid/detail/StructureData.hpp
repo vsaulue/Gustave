@@ -35,7 +35,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
-#include <gustave/solvers/SolverStructure.hpp>
+#include <gustave/solvers/Structure.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg>
@@ -51,7 +51,9 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using SceneData = detail::SceneData<cfg>;
-        using SolverStructure = Solvers::SolverStructure<cfg>;
+        using SolverStructure = Solvers::Structure<cfg>;
+
+        using Node = typename SolverStructure::Node;
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
@@ -69,7 +71,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             NodeIndex const newIndex = solverStructure_->nextNodeIndex();
             auto insertResult = solverIndices_.insert({ block.position(), newIndex});
             if (insertResult.second) {
-                solverStructure_->addNode({ block.mass(), block.isFoundation() });
+                solverStructure_->addNode(Node{ block.mass(), block.isFoundation() });
             }
         }
 
