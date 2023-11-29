@@ -33,7 +33,7 @@
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using Coord = BlockPosition::Coord;

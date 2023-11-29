@@ -31,15 +31,15 @@
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
-using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<G::libConfig>;
-using BlockData = Gustave::Scenes::CuboidGrid::detail::BlockData<G::libConfig>;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<G::libConfig>;
-using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<G::libConfig>;
+using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<cfg>;
+using BlockData = Gustave::Scenes::CuboidGrid::detail::BlockData<cfg>;
+using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
+using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<cfg>;
 
 template<bool isMutable>
-using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<G::libConfig, isMutable>;
+using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg, isMutable>;
 
 TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
     BlockConstructionInfo const info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };

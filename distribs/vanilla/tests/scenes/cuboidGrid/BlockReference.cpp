@@ -33,19 +33,20 @@
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/StructureReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneUpdater.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
 namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
 
 using BlockPosition = CuboidGrid::BlockPosition;
-using BlockReference = CuboidGrid::BlockReference<G::libConfig>;
+using BlockReference = CuboidGrid::BlockReference<cfg>;
 using Direction = Gustave::Math3d::BasicDirection;
 using Neighbour = BlockReference::Neighbour;
-using SceneData = CuboidGrid::detail::SceneData<G::libConfig>;
-using SceneUpdater = CuboidGrid::detail::SceneUpdater<G::libConfig>;
-using StructureReference = CuboidGrid::StructureReference<G::libConfig>;
-using Transaction = CuboidGrid::Transaction<G::libConfig>;
+using SceneData = CuboidGrid::detail::SceneData<cfg>;
+using SceneUpdater = CuboidGrid::detail::SceneUpdater<cfg>;
+using StructureReference = CuboidGrid::StructureReference<cfg>;
+using Transaction = CuboidGrid::Transaction<cfg>;
 
 static_assert(std::ranges::forward_range<BlockReference::Neighbours>);
 static_assert(std::ranges::forward_range<BlockReference::Structures>);
@@ -55,7 +56,7 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
     SceneData sceneData{ blockSize };
 
     Transaction t;
-    auto newBlock = [&](BlockPosition const& position, G::Real<u.mass> mass, bool isFoundation) -> BlockReference {
+    auto newBlock = [&](BlockPosition const& position, Real<u.mass> mass, bool isFoundation) -> BlockReference {
         t.addBlock({ position, concrete_20m, mass, isFoundation });
         return BlockReference{ sceneData, position };
     };

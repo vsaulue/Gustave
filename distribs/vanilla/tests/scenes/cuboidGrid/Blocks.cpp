@@ -33,17 +33,17 @@
 #include <gustave/scenes/cuboidGrid/Blocks.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
-using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<G::libConfig>;
-using Blocks = Gustave::Scenes::CuboidGrid::Blocks<G::libConfig>;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<G::libConfig>;
+using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<cfg>;
+using Blocks = Gustave::Scenes::CuboidGrid::Blocks<cfg>;
+using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
 
 static_assert(std::ranges::forward_range<Blocks>);
 
 TEST_CASE("Scenes::CuboidGrid::Blocks") {
-    G::Vector3<u.length> const blockSize = vector3(1.f, 2.f, 3.f, u.length);
+    Vector3<u.length> const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     SceneData sceneData{ blockSize };
     Blocks const blocks{ sceneData };
 

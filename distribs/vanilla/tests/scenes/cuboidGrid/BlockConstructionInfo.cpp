@@ -30,9 +30,9 @@
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
-using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<G::libConfig>;
+using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<cfg>;
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 
 TEST_CASE("Scene::CuboidGrid::BlockConstructionInfo") {

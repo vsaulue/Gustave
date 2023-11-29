@@ -29,14 +29,14 @@
 
 #include <gustave/world/SyncWorld.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
-using SyncWorld = Gustave::World::SyncWorld<G::libConfig>;
+using SyncWorld = Gustave::World::SyncWorld<cfg>;
 using Solver = SyncWorld::Solver;
 
 static constexpr auto blockSize = vector3(1.f, 1.f, 1.f, u.length);
-static constexpr G::Real<u.density> concreteDensity = 2'400.f * u.density;
-static constexpr G::Real<u.mass> blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
+static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
+static constexpr Real<u.mass> blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
 static constexpr float solverPrecision = 0.001f;
 
 [[nodiscard]]

@@ -27,23 +27,24 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
-
 #include <gustave/testing/Matchers.hpp>
-#include <gustave/vanilla/Gustave.hpp>
 
-#include <TestConfig.hpp>
+#include <gustave/solvers/Force1Solver.hpp>
 
-using Solver = G::Force1Solver;
+#include <TestHelpers.hpp>
+
+using Solver = Gustave::Solvers::Force1Solver<cfg>;
 
 using Contact = Solver::Structure::Contact;
 using Node = Solver::Structure::Node;
 using Solution = Solver::Solution;
+using Structure = Solver::Structure;
 
 TEST_CASE("Force1::Solver") {
     SECTION("// pillar") {
-        constexpr G::Real<u.mass> blockMass = 4000.f * u.mass;
+        constexpr Real<u.mass> blockMass = 4000.f * u.mass;
         auto makePillar = [blockMass](unsigned blockCount) {
-            G::SolverStructure structure;
+            Structure structure;
             for (unsigned i = 0; i < blockCount; ++i) {
                 structure.addNode(Node{ blockMass, i == 0 });
             }
@@ -54,7 +55,7 @@ TEST_CASE("Force1::Solver") {
         };
         constexpr unsigned blockCount = 10;
         constexpr float precision = 0.001f;
-        auto structure = std::make_shared<G::SolverStructure const>(makePillar(blockCount));
+        auto structure = std::make_shared<Structure const>(makePillar(blockCount));
         auto const solver = Solver{ std::make_shared<Solver::Config const>(g, 1000, precision) };
         auto const result = solver.run(structure);
         Solution const& solution = result.solution();

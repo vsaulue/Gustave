@@ -27,9 +27,9 @@
 
 #include <gustave/model/MaxStress.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
-using MaxStress = Gustave::Model::MaxStress<G::libConfig>;
+using MaxStress = Gustave::Model::MaxStress<cfg>;
 
 TEST_CASE("Model::MaxStress") {
     SECTION("::minResistance(MaxStress const&, MaxStress const&)") {

@@ -29,12 +29,12 @@
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
-using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<G::libConfig,true>;
+using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg,true>;
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using Direction = Gustave::Math3d::BasicDirection;
-using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<G::libConfig>;
+using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<cfg>;
 
 TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
     SceneBlocks sceneBlocks{ vector3(1.f, 2.f, 3.f, u.length) };

@@ -35,14 +35,14 @@
 #include <gustave/scenes/cuboidGrid/StructureReference.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
-using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<G::libConfig>;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<G::libConfig>;
-using SceneUpdater = Gustave::Scenes::CuboidGrid::detail::SceneUpdater<G::libConfig>;
-using StructureReference = Gustave::Scenes::CuboidGrid::StructureReference<G::libConfig>;
-using Transaction = Gustave::Scenes::CuboidGrid::Transaction<G::libConfig>;
+using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<cfg>;
+using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
+using SceneUpdater = Gustave::Scenes::CuboidGrid::detail::SceneUpdater<cfg>;
+using StructureReference = Gustave::Scenes::CuboidGrid::StructureReference<cfg>;
+using Transaction = Gustave::Scenes::CuboidGrid::Transaction<cfg>;
 
 static_assert(std::ranges::forward_range<StructureReference::Blocks>);
 

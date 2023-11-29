@@ -25,40 +25,9 @@
 
 #pragma once
 
-#include <concepts>
+#include <gustave/vanilla/LibConfig.hpp>
 
-#include <gustave/cfg/cUnitOf.hpp>
-#include <gustave/testing/Matchers.hpp>
-#include <gustave/vanilla/Gustave.hpp>
+// Config
 
-// Aliases
-
-namespace G = ::Gustave::Vanilla;
-namespace C = ::Gustave::Cfg;
-namespace M = ::Gustave::Testing::Matchers;
-
-inline constexpr auto u = C::units(G::libConfig);
+inline constexpr Gustave::Vanilla::LibConfig cfg{};
 inline constexpr float epsilon{ 0.0001f };
-
-// Constants
-
-struct Normals {
-    static inline G::NormalizedVector3 const x{1.f, 0.f, 0.f};
-    static inline G::NormalizedVector3 const y{0.f, 1.f, 0.f};
-    static inline G::NormalizedVector3 const z{0.f, 0.f, 1.f};
-};
-
-inline G::Vector3<u.acceleration> const g{ 0.f, -10.f, 0.f, u.acceleration };
-inline G::MaxStress const concrete_20m{
-    20'000'000.f * u.pressure, // compressive
-    14'000'000.f * u.pressure, // shear
-    2'000'000.f * u.pressure, // tensile
-};
-
-// Utils
-
-template<C::cUnitOf<G::libConfig> Unit>
-[[nodiscard]]
-inline constexpr G::Vector3<Unit{}> vector3(std::floating_point auto x, std::floating_point auto y, std::floating_point auto z, Unit unit) {
-    return {x, y, z, unit};
-}

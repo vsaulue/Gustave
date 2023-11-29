@@ -34,19 +34,19 @@
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/testing/Matchers.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
 using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
 using Direction = Gustave::Math3d::BasicDirection;
-using Scene = Gustave::Scenes::CuboidGridScene<G::libConfig>;
-using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<G::libConfig>;
-using Transaction = Gustave::Scenes::CuboidGrid::Transaction<G::libConfig>;
+using Scene = Gustave::Scenes::CuboidGridScene<cfg>;
+using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<cfg>;
+using Transaction = Gustave::Scenes::CuboidGrid::Transaction<cfg>;
 
-static constexpr G::Real<u.density> concreteDensity = 2'400.f * u.density;
+static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
 
 TEST_CASE("Scene::CuboidGrid::Scene") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
-    G::Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
+    Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
 
     Scene scene{blockSize};
 

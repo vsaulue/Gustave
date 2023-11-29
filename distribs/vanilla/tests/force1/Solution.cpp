@@ -29,19 +29,20 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include <gustave/vanilla/Gustave.hpp>
 #include <gustave/solvers/force1/Config.hpp>
+#include <gustave/solvers/force1/Solution.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
-using Config = Gustave::Solvers::Force1::Config<G::libConfig>;
-using Solution = Gustave::Solvers::Force1::Solution<G::libConfig>;
+using Config = Gustave::Solvers::Force1::Config<cfg>;
+using Solution = Gustave::Solvers::Force1::Solution<cfg>;
 
 using Contact = Solution::Structure::Contact;
 using Node = Solution::Structure::Node;
+using Structure = Solution::Structure;
 
 TEST_CASE("Force1::Solution") {
-    auto structure = std::make_shared<G::SolverStructure>();
+    auto structure = std::make_shared<Structure>();
     for (unsigned i = 1; i <= 7; ++i) {
         structure->addNode(Node{ (i * 1'000.f) * u.mass, i == 1 });
     }
@@ -62,7 +63,7 @@ TEST_CASE("Force1::Solution") {
     }
 
     SECTION("::force(NodeIndex, Nodeindex)") {
-        auto runTest = [&solution](G::NodeIndex const to, G::NodeIndex const from, G::Vector3<u.force> const& expected) {
+        auto runTest = [&solution](NodeIndex const to, NodeIndex const from, Vector3<u.force> const& expected) {
             CHECK_THAT(solution.forceVector(to, from), M::WithinRel(expected, epsilon));
             CHECK_THAT(solution.forceVector(from, to), M::WithinRel(-expected, epsilon));
         };
@@ -92,7 +93,7 @@ TEST_CASE("Force1::Solution") {
         }
 
         SECTION("// 1-3") {
-            runTest(1, 3, G::Vector3<u.force>::zero());
+            runTest(1, 3, Vector3<u.force>::zero());
         }
     }
 

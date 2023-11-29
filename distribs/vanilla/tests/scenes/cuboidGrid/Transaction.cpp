@@ -29,13 +29,13 @@
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
 namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
 
-using BlockConstructionInfo = CuboidGrid::BlockConstructionInfo<G::libConfig>;
+using BlockConstructionInfo = CuboidGrid::BlockConstructionInfo<cfg>;
 using BlockPosition = CuboidGrid::BlockPosition;
-using Transaction = CuboidGrid::Transaction<G::libConfig>;
+using Transaction = CuboidGrid::Transaction<cfg>;
 
 TEST_CASE("Scene::CubeGrid::Transaction") {
     Transaction transaction;

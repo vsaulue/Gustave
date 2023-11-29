@@ -28,10 +28,10 @@
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockMappedData.hpp>
 
-#include <TestConfig.hpp>
+#include <TestHelpers.hpp>
 
-using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<G::libConfig>;
-using BlockMappedData = Gustave::Scenes::CuboidGrid::detail::BlockMappedData<G::libConfig>;
+using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<cfg>;
+using BlockMappedData = Gustave::Scenes::CuboidGrid::detail::BlockMappedData<cfg>;
 
 TEST_CASE("Scenes::CuboidGrid::detail::BlockMappedData") {
     SECTION("// constructor & getters") {
