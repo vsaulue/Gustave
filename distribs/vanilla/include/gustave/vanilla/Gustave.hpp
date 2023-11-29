@@ -28,9 +28,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/CuboidGridScene.hpp>
-#include <gustave/solvers/force1/Solution.hpp>
-#include <gustave/solvers/force1/SolutionBasis.hpp>
-#include <gustave/solvers/force1/Solver.hpp>
+#include <gustave/solvers/Force1Solver.hpp>
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/units/lib/Unit.hpp>
 
@@ -45,11 +43,7 @@ namespace Gustave::Vanilla {
     using SolverContact = SolverStructure::Contact;
     using SolverNode = SolverStructure::Node;
 
-    namespace Force1 {
-        using Solution = Solvers::Force1::Solution<libConfig>;
-        using SolutionBasis = Solvers::Force1::SolutionBasis<libConfig>;
-        using Solver = Solvers::Force1::Solver<libConfig>;
-    }
+    using Force1Solver = Solvers::Force1Solver<libConfig>;
 
     namespace Scenes {
         using CuboidGridScene = Gustave::Scenes::CuboidGridScene<libConfig>;

@@ -33,9 +33,10 @@
 
 #include <TestConfig.hpp>
 
-using Solver = G::Force1::Solver;
+using Solver = G::Force1Solver;
 
 using Node = Solver::Structure::Node;
+using Solution = Solver::Solution;
 
 TEST_CASE("Force1::Solver") {
     SECTION("// pillar") {
@@ -55,7 +56,7 @@ TEST_CASE("Force1::Solver") {
         auto structure = std::make_shared<G::SolverStructure const>(makePillar(blockCount));
         auto const solver = Solver{ std::make_shared<Solver::Config const>(g, 1000, precision) };
         auto const result = solver.run(structure);
-        G::Force1::Solution const& solution = result.solution();
+        Solution const& solution = result.solution();
         CHECK_THAT(solution.forceVector(0, 1), M::WithinRel(float(blockCount - 1) * blockMass * g, precision));
         CHECK_THAT(solution.forceVector(1, 2), M::WithinRel(float(blockCount - 2) * blockMass * g, precision));
         CHECK_THAT(solution.forceVector(2, 3), M::WithinRel(float(blockCount - 3) * blockMass * g, precision));

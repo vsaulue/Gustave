@@ -42,9 +42,9 @@
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/solvers/Structure.hpp>
 
-namespace Gustave::Solvers::Force1 {
+namespace Gustave::Solvers {
     template<Cfg::cLibConfig auto cfg>
-    class Solver {
+    class Force1Solver {
     private:
         static constexpr auto u = Cfg::units(cfg);
         static constexpr auto rt = cfg.realTraits;
@@ -63,8 +63,8 @@ namespace Gustave::Solvers::Force1 {
 
         using Basis = Force1::SolutionBasis<cfg>;
         using Config = Force1::Config<cfg>;
-        using ForceBalancer = detail::ForceBalancer<cfg>;
-        using ForceRepartition = detail::ForceRepartition<cfg>;
+        using ForceBalancer = Force1::detail::ForceBalancer<cfg>;
+        using ForceRepartition = Force1::detail::ForceRepartition<cfg>;
         using IterationIndex = std::uint64_t;
         using Node = typename Structure::Node;
         using Solution = Force1::Solution<cfg>;
@@ -97,7 +97,7 @@ namespace Gustave::Solvers::Force1 {
         };
 
         [[nodiscard]]
-        explicit Solver(std::shared_ptr<Config const> config)
+        explicit Force1Solver(std::shared_ptr<Config const> config)
             : config_{ std::move(config) }
         {
             assert(config_);

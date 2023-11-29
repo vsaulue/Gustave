@@ -33,7 +33,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/CuboidGridScene.hpp>
-#include <gustave/solvers/force1/Solver.hpp>
+#include <gustave/solvers/Force1Solver.hpp>
 #include <gustave/utils/PointerHash.hpp>
 #include <gustave/world/WorldStructureState.hpp>
 
@@ -50,7 +50,7 @@ namespace Gustave::World {
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
         using Scene = Scenes::CuboidGridScene<cfg>;
-        using Solver = Solvers::Force1::Solver<cfg>;
+        using Solver = Solvers::Force1Solver<cfg>;
         class WorldStructure;
 
         using BlockIndex = typename Scene::BlockIndex;
