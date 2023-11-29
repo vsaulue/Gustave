@@ -45,7 +45,7 @@ namespace Gustave::Solvers::Common {
         using NodeIndex = Cfg::NodeIndex<cfg>;
     public:
         [[nodiscard]]
-        Contact(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, MaxStress const& maxStress)
+        explicit Contact(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, MaxStress const& maxStress)
             : localNodeId_{ id1 }
             , otherNodeId_{ id2 }
             , normal_{ normal }

@@ -35,6 +35,7 @@
 
 using Solver = G::Force1Solver;
 
+using Contact = Solver::Structure::Contact;
 using Node = Solver::Structure::Node;
 using Solution = Solver::Solution;
 
@@ -47,7 +48,7 @@ TEST_CASE("Force1::Solver") {
                 structure.addNode(Node{ blockMass, i == 0 });
             }
             for (unsigned i = 0; i < blockCount - 1; ++i) {
-                structure.addContact({ i, i + 1,  Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });
+                structure.addContact(Contact{ i, i + 1,  Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });
             }
             return structure;
         };

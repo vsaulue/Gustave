@@ -37,6 +37,7 @@
 using Config = Gustave::Solvers::Force1::Config<G::libConfig>;
 using Solution = Gustave::Solvers::Force1::Solution<G::libConfig>;
 
+using Contact = Solution::Structure::Contact;
 using Node = Solution::Structure::Node;
 
 TEST_CASE("Force1::Solution") {
@@ -44,12 +45,12 @@ TEST_CASE("Force1::Solution") {
     for (unsigned i = 1; i <= 7; ++i) {
         structure->addNode(Node{ (i * 1'000.f) * u.mass, i == 1 });
     }
-    structure->addContact({ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addContact({ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addContact({ 3, 0,  Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addContact({ 4, 0, -Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addContact({ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
-    structure->addContact({ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
+    structure->addContact(Contact{ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addContact(Contact{ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addContact(Contact{ 3, 0,  Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addContact(Contact{ 4, 0, -Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addContact(Contact{ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
+    structure->addContact(Contact{ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
 
     constexpr float precision = 0.001f;
     auto config = std::make_shared<Config const>(g, 1000, precision);

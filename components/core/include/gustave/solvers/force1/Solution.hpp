@@ -125,8 +125,8 @@ namespace Gustave::Solvers::Force1 {
         ForceBalancer forceBalancer_;
 
         [[nodiscard]]
-        auto forceRepartition() const -> ForceRepartition {
-            return { forceBalancer_, basis_->potentials() };
+        ForceRepartition forceRepartition() const {
+            return ForceRepartition{ forceBalancer_, basis_->potentials() };
         }
     };
 }

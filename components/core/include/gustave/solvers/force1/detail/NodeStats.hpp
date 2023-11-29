@@ -43,7 +43,7 @@ namespace Gustave::Solvers::Force1::detail {
         using NodeInfo = detail::NodeInfo<cfg>;
 
         [[nodiscard]]
-        NodeStats(NodeInfo const& info, Real<u.force> force, Real<u.conductivity> derivative)
+        explicit NodeStats(NodeInfo const& info, Real<u.force> force, Real<u.conductivity> derivative)
             : info_{ info }
             , force_{ force }
             , derivative_{ derivative }

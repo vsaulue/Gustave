@@ -43,7 +43,7 @@ namespace Gustave::Solvers::Force1::detail {
         static constexpr auto u = Cfg::units(cfg);
     public:
         [[nodiscard]]
-        ContactInfo(NodeIndex otherIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) :
+        explicit ContactInfo(NodeIndex otherIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) :
             otherIndex_(otherIndex),
             rMinus_(rMinus),
             rPlus_(rPlus)

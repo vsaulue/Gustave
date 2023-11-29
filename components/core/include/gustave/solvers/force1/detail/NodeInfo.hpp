@@ -46,7 +46,7 @@ namespace Gustave::Solvers::Force1::detail {
         static constexpr auto rt = cfg.realTraits;
     public:
         [[nodiscard]]
-        NodeInfo(Real<u.force> weight)
+        explicit NodeInfo(Real<u.force> weight)
             : weight{ weight }
         {
             assert(weight > 0.f * u.force);

@@ -53,6 +53,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using SceneData = detail::SceneData<cfg>;
         using SolverStructure = Solvers::Structure<cfg>;
 
+        using Contact = typename SolverStructure::Contact;
         using Node = typename SolverStructure::Node;
 
         template<Cfg::cUnitOf<cfg> auto unit>
@@ -78,7 +79,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         void addContact(ConstBlockReference b1, ConstBlockReference b2, NormalizedVector3 const& normalOnB1,
                         Real<u.area> area, Real<u.length> thickness, MaxStress const& maxConstraints)
         {
-            solverStructure_->addContact({ indexOf(b1), indexOf(b2), normalOnB1, area, thickness, maxConstraints });
+            solverStructure_->addContact(Contact{ indexOf(b1), indexOf(b2), normalOnB1, area, thickness, maxConstraints });
         }
 
         [[nodiscard]]

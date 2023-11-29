@@ -58,7 +58,7 @@ namespace Gustave::Solvers::Force1::detail {
         using NodeStats = detail::NodeStats<cfg>;
 
         [[nodiscard]]
-        ForceRepartition(ForceBalancer const& balancer, std::span<Real<u.potential> const> potentials)
+        explicit ForceRepartition(ForceBalancer const& balancer, std::span<Real<u.potential> const> potentials)
             : balancer_{ balancer }
             , potentials_{ potentials }
         {
@@ -104,7 +104,7 @@ namespace Gustave::Solvers::Force1::detail {
                 derivative += contactStats.derivative();
                 force += contactStats.force();
             }
-            return { info, force, derivative };
+            return NodeStats{ info, force, derivative };
         }
 
         [[nodiscard]]
