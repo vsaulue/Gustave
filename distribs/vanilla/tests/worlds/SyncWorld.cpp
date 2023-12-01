@@ -27,11 +27,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/world/SyncWorld.hpp>
+#include <gustave/worlds/SyncWorld.hpp>
 
 #include <TestHelpers.hpp>
 
-using SyncWorld = Gustave::World::SyncWorld<cfg>;
+using SyncWorld = Gustave::Worlds::SyncWorld<cfg>;
 using Solver = SyncWorld::Solver;
 
 static constexpr auto blockSize = vector3(1.f, 1.f, 1.f, u.length);

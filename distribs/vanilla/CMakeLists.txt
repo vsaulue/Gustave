@@ -49,7 +49,7 @@ add_executable(Test-Gustave-Vanilla
     "tests/scenes/cuboidGrid/Structures.cpp"
     "tests/scenes/cuboidGrid/Transaction.cpp"
     "tests/scenes/CuboidGridScene.cpp"
-    "tests/world/SyncWorld.cpp"
+    "tests/worlds/SyncWorld.cpp"
 )
 target_link_libraries(Test-Gustave-Vanilla
     PRIVATE Catch2::Catch2WithMain

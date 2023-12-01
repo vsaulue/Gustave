@@ -35,9 +35,9 @@
 #include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/solvers/Force1Solver.hpp>
 #include <gustave/utils/PointerHash.hpp>
-#include <gustave/world/WorldStructureState.hpp>
+#include <gustave/worlds/WorldStructureState.hpp>
 
-namespace Gustave::World {
+namespace Gustave::Worlds {
     template<Cfg::cLibConfig auto cfg>
     class SyncWorld {
     private:
