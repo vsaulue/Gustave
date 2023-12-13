@@ -83,7 +83,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            BlockReference const& operator->() const {
+            BlockReference const* operator->() const {
                 return &value_;
             }
 
