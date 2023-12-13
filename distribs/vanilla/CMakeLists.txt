@@ -49,6 +49,11 @@ add_executable(Test-Gustave-Vanilla
     "tests/scenes/cuboidGrid/Structures.cpp"
     "tests/scenes/cuboidGrid/Transaction.cpp"
     "tests/scenes/CuboidGridScene.cpp"
+    "tests/worlds/sync/BlockReference.cpp"
+    "tests/worlds/sync/Blocks.cpp"
+    "tests/worlds/sync/detail/WorldUpdater.cpp"
+    "tests/worlds/sync/StructureReference.cpp"
+    "tests/worlds/sync/Structures.cpp"
     "tests/worlds/SyncWorld.cpp"
 )
 target_link_libraries(Test-Gustave-Vanilla

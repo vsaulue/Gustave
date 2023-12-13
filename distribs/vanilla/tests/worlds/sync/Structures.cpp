@@ -23,55 +23,61 @@
  * SOFTWARE.
  */
 
-#include <stdexcept>
-
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/worlds/SyncWorld.hpp>
+#include <gustave/worlds/sync/detail/WorldData.hpp>
+#include <gustave/worlds/sync/detail/WorldUpdater.hpp>
+#include <gustave/worlds/sync/StructureReference.hpp>
+#include <gustave/worlds/sync/Structures.hpp>
 
 #include <TestHelpers.hpp>
 
-using SyncWorld = Gustave::Worlds::SyncWorld<cfg>;
-using BlockIndex = SyncWorld::BlockIndex;
-using Solver = SyncWorld::Solver;
+namespace Sync = Gustave::Worlds::Sync;
 
-static constexpr auto blockSize = vector3(1.f, 1.f, 1.f, u.length);
+using WorldData = Sync::detail::WorldData<cfg>;
+using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
+using StructureReference = Sync::StructureReference<cfg>;
+using Structures = Sync::Structures<cfg>;
+
+using BlockIndex = WorldData::Scene::BlockIndex;
+using Solver = WorldData::Solver;
+using Transaction = WorldUpdater::Transaction;
+
+static constexpr auto blockSize = vector3(3.f, 2.f, 1.f, u.length);
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
 static constexpr Real<u.mass> blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
 static constexpr float solverPrecision = 0.001f;
 
 [[nodiscard]]
-static SyncWorld makeWorld() {
-    auto const g = vector3(0.f, -10.f, 0.f, u.acceleration);
+static WorldData makeWorld() {
     auto solver = Solver{ std::make_shared<Solver::Config>(g, 1000, solverPrecision) };
-    return SyncWorld{ blockSize, std::move(solver) };
+    return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("SyncWorld") {
-    SyncWorld world = makeWorld();
+TEST_CASE("Worlds::Sync::Structures") {
+    WorldData world = makeWorld();
+    Structures structures{ world };
+
     {
-        SyncWorld::Transaction transaction;
-        for (int i = 0; i < 10; ++i) {
-            transaction.addBlock({ {0,i,0}, concrete_20m, blockMass, i == 0 });
-        }
-        world.modify(transaction);
+        Transaction t;
+        t.addBlock({ {0,0,0}, concrete_20m, blockMass, false });
+        t.addBlock({ {0,1,0}, concrete_20m, blockMass, true });
+        t.addBlock({ {0,2,0}, concrete_20m, blockMass, false });
+        WorldUpdater{ world }.runTransaction(t);
     }
 
-    auto structureOf = [&](BlockIndex const& blockIndex) {
-        auto const structures = world.blocks().at(blockIndex).structures();
-        REQUIRE(structures.size() == 1);
-        return structures[0];
+    auto structureOf = [&](BlockIndex const& index) {
+        auto sceneStructures = world.scene.blocks().at(index).structures();
+        REQUIRE(sceneStructures.size() == 1);
+        return StructureReference{ world.structures.at(sceneStructures[0]) };
     };
 
-    auto const structure = structureOf({ 0,0,0 });
-    {
-        auto const force = structure.forceVector({ 0,0,0 }, { 0,1,0 });
-        REQUIRE(force);
-        CHECK_THAT(*force, M::WithinRel(9.f * blockMass * g, solverPrecision));
+    SECTION(".begin() // & .end()") {
+        std::vector<StructureReference> expected = { structureOf({0,0,0}), structureOf({0,2,0}) };
+        CHECK_THAT(structures, M::C2::UnorderedRangeEquals(expected));
     }
-    {
-        auto const force = structure.forceVector({ 0,0,0 }, { 0,2,0 });
-        REQUIRE(force);
-        CHECK(*force == vector3(0.f, 0.f, 0.f, u.force));
+
+    SECTION(".size()") {
+        CHECK(structures.size() == 2);
     }
 }

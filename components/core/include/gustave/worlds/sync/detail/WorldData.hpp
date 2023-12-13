@@ -25,67 +25,38 @@
 
 #pragma once
 
-#include <cassert>
-#include <optional>
-#include <utility>
+#include <memory>
+#include <unordered_map>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/cfg/cUnitOf.hpp>
-#include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/solvers/Force1Solver.hpp>
-#include <gustave/utils/PointerHash.hpp>
-#include <gustave/worlds/sync/BlockReference.hpp>
-#include <gustave/worlds/sync/Blocks.hpp>
-#include <gustave/worlds/sync/detail/WorldData.hpp>
-#include <gustave/worlds/sync/detail/WorldUpdater.hpp>
-#include <gustave/worlds/sync/StructureReference.hpp>
-#include <gustave/worlds/sync/Structures.hpp>
-#include <gustave/worlds/WorldStructureState.hpp>
+#include <gustave/worlds/sync/detail/StructureData.hpp>
 
-namespace Gustave::Worlds {
+namespace Gustave::Worlds::Sync::detail {
     template<Cfg::cLibConfig auto cfg>
-    class SyncWorld {
+    struct WorldData {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
         template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
-
-        template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
-
-        using WorldData = Sync::detail::WorldData<cfg>;
-        using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
     public:
+        using Scene = Scenes::CuboidGridScene<cfg>;
         using Solver = Solvers::Force1Solver<cfg>;
+        using StructureData = detail::StructureData<cfg>;
 
-        using BlockIndex = typename WorldData::Scene::BlockIndex;
-        using BlockReference = Sync::BlockReference<cfg>;
-        using Blocks = Sync::Blocks<cfg>;
-        using StructureReference = Sync::StructureReference<cfg>;
-        using Structures = Sync::Structures<cfg>;
-        using Transaction = typename WorldData::Scene::Transaction;
+        using SceneStructure = typename Scene::StructureReference;
+        using Structures = std::unordered_map<SceneStructure, std::shared_ptr<StructureData>>;
 
         [[nodiscard]]
-        explicit SyncWorld(Vector3<u.length> const& blockSize, Solver solver)
-            : data_{ blockSize, std::move(solver) }
+        explicit WorldData(Vector3<u.length> const& blockSize, Solver solver_)
+            : scene{ blockSize }
+            , solver{ std::move(solver_) }
         {}
 
-        [[nodiscard]]
-        Blocks blocks() const {
-            return Blocks{ data_ };
-        }
-
-        void modify(Transaction const& transaction) {
-            WorldUpdater{ data_ }.runTransaction(transaction);
-        }
-
-        [[nodiscard]]
-        Structures structures() const {
-            return Structures{ data_ };
-        }
-    private:
-        WorldData data_;
+        Scene scene;
+        Solver solver;
+        Structures structures;
     };
 }
