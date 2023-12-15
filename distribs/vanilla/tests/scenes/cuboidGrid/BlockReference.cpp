@@ -76,6 +76,27 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         CHECK(b101.blockSize() == blockSize);
     }
 
+    SECTION(".index()") {
+        CHECK(b121.index() == BlockIndex{ 1,2,1 });
+    }
+
+    SECTION(".isFoundation()") {
+        SECTION("// valid") {
+            CHECK_FALSE(b111.isFoundation());
+        }
+
+        SECTION("// invalid") {
+            sceneData.blocks.erase({ 1,1,1 });
+            CHECK_THROWS_AS(b111.isFoundation() == false, std::out_of_range);
+        }
+    }
+
+    SECTION(".isValid()") {
+        REQUIRE(b111.isValid());
+        sceneData.blocks.erase(b111.index());
+        REQUIRE_FALSE(b111.isValid());
+    }
+
     SECTION(".mass()") {
         SECTION("// valid") {
             CHECK(b111.mass() == 3000.f * u.mass);
@@ -95,23 +116,6 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
             sceneData.blocks.erase({ 1,1,1 });
             CHECK_THROWS_AS(b111.maxStress() == concrete_20m, std::out_of_range);
         }
-    }
-
-    SECTION(".isFoundation()") {
-        SECTION("// valid") {
-            CHECK_FALSE(b111.isFoundation());
-        }
-
-        SECTION("// invalid") {
-            sceneData.blocks.erase({ 1,1,1 });
-            CHECK_THROWS_AS(b111.isFoundation() == false, std::out_of_range);
-        }
-    }
-
-    SECTION(".isValid()") {
-        REQUIRE(b111.isValid());
-        sceneData.blocks.erase(b111.index());
-        REQUIRE_FALSE(b111.isValid());
     }
 
     SECTION(".neighbours()") {
@@ -150,8 +154,8 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         }
     }
 
-    SECTION(".index()") {
-        CHECK(b121.index() == BlockIndex{ 1,2,1 });
+    SECTION(".position()") {
+        CHECK(b211.position() == vector3(4.f, 3.f, 1.f, u.length));
     }
 
     SECTION(".structures()") {

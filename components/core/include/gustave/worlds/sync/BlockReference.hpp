@@ -284,6 +284,11 @@ namespace Gustave::Worlds::Sync {
         }
 
         [[nodiscard]]
+        decltype(auto) position() const {
+            return sceneBlock().position();
+        }
+
+        [[nodiscard]]
         Structures structures() const {
             return Structures{ *this };
         }

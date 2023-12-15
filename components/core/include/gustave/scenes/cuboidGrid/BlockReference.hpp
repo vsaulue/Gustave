@@ -289,6 +289,16 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
+        Vector3<u.length> position() const {
+            using Rep = typename Real<u.length>::Rep;
+            Vector3<u.length> const& bSize = blockSize();
+            Real<u.length> const x = Rep(index_.x) * bSize.x();
+            Real<u.length> const y = Rep(index_.y) * bSize.y();
+            Real<u.length> const z = Rep(index_.z) * bSize.z();
+            return Vector3<u.length>{ x, y, z };
+        }
+
+        [[nodiscard]]
         Structures structures() const {
             return Structures{ *this };
         }

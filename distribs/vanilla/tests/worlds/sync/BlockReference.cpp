@@ -147,6 +147,17 @@ TEST_CASE("Worlds::Sync::BlockReference") {
         }
     }
 
+    SECTION(".position()") {
+        SECTION("// valid") {
+            CHECK(b020.position() == vector3(0.f, 4.f, 0.f, u.length));
+        }
+
+        SECTION("// invalid") {
+            removeBlock({ 0,2,0 });
+            CHECK_THROWS_AS(b020.position(), std::out_of_range);
+        }
+    }
+
     SECTION(".structures()") {
         auto structureOf = [&](BlockIndex const& index) {
             auto const sceneStructure = world.scene.blocks().at(index).structures()[0];
