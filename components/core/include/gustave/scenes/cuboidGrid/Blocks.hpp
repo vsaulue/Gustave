@@ -98,19 +98,19 @@ namespace Gustave::Scenes::CuboidGrid {
         {}
 
         [[nodiscard]]
-        BlockReference at(BlockPosition const& position) const {
-            BlockReference result{ *sceneData_, position };
+        BlockReference at(BlockIndex const& index) const {
+            BlockReference result{ *sceneData_, index };
             if (!result.isValid()) {
                 std::stringstream msg;
-                msg << "No block at position " << position << ".";
+                msg << "No block at index " << index << ".";
                 throw std::out_of_range(msg.str());
             }
             return result;
         }
 
         [[nodiscard]]
-        BlockReference find(BlockPosition const& position) const {
-            return BlockReference{ *sceneData_, position };
+        BlockReference find(BlockIndex const& index) const {
+            return BlockReference{ *sceneData_, index };
         }
 
         [[nodiscard]]

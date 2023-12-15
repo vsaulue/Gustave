@@ -28,10 +28,10 @@
 #include <utility>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockMappedData.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg>
-    using BlockData = std::pair<const BlockPosition, BlockMappedData<cfg>>;
+    using BlockData = std::pair<const BlockIndex, BlockMappedData<cfg>>;
 }

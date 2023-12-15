@@ -31,7 +31,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/Blocks.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
@@ -58,7 +58,7 @@ namespace Gustave::Scenes {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
-        using BlockIndex = CuboidGrid::BlockPosition;
+        using BlockIndex = CuboidGrid::BlockIndex;
         using BlockReference = CuboidGrid::BlockReference<cfg>;
         using Blocks = CuboidGrid::Blocks<cfg>;
         using Direction = Math3d::BasicDirection;

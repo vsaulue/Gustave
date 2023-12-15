@@ -32,7 +32,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockMappedData.hpp>
 
@@ -48,7 +48,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
-        using BlockMap = std::unordered_map<BlockPosition, BlockMappedData<cfg>>;
+        using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<cfg>>;
         using Direction = Math3d::BasicDirection;
 
         using const_iterator = typename BlockMap::const_iterator;
@@ -95,12 +95,12 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        bool contains(BlockPosition const& position) const {
-            return blocks_.contains(position);
+        bool contains(BlockIndex const& index) const {
+            return blocks_.contains(index);
         }
 
-        bool erase(BlockPosition const& position) {
-            auto res = blocks_.erase(position);
+        bool erase(BlockIndex const& index) {
+            auto res = blocks_.erase(index);
             return res != 0;
         }
 
@@ -115,17 +115,17 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        BlockDataReference<cfg,true> find(BlockPosition const& position) {
-            return doFind(*this, position);
+        BlockDataReference<cfg,true> find(BlockIndex const& index) {
+            return doFind(*this, index);
         }
 
         [[nodiscard]]
-        BlockDataReference<cfg,false> find(BlockPosition const& position) const {
-            return doFind(*this, position);
+        BlockDataReference<cfg,false> find(BlockIndex const& index) const {
+            return doFind(*this, index);
         }
 
         BlockDataReference<cfg, true> insert(BlockConstructionInfo<cfg> const& info) {
-            auto it = blocks_.emplace(info.position(), BlockMappedData{ info }).first;
+            auto it = blocks_.emplace(info.index(), BlockMappedData{ info }).first;
             return { &(*it) };
         }
 
@@ -155,8 +155,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
     private:
         [[nodiscard]]
-        static auto doFind(auto&& self, BlockPosition const& position) -> decltype(self.find(position)) {
-            auto it = self.blocks_.find(position);
+        static auto doFind(auto&& self, BlockIndex const& index) -> decltype(self.find(index)) {
+            auto it = self.blocks_.find(index);
             if (it != self.blocks_.end()) {
                 return { &(*it) };
             } else {

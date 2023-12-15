@@ -28,7 +28,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneUpdater.hpp>
@@ -37,7 +37,7 @@
 
 #include <TestHelpers.hpp>
 
-using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
+using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
 using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<cfg>;
 using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
 using SceneUpdater = Gustave::Scenes::CuboidGrid::detail::SceneUpdater<cfg>;
@@ -59,8 +59,8 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
         SceneUpdater{ data }.runTransaction(t);
     }
 
-    auto structureOf = [&](BlockPosition const& position) -> StructureReference {
-        auto const blockDataRef = data.blocks.find(position);
+    auto structureOf = [&](BlockIndex const& index) -> StructureReference {
+        auto const blockDataRef = data.blocks.find(index);
         REQUIRE(blockDataRef);
         auto const rawStructure = blockDataRef.structure();
         REQUIRE(rawStructure);
@@ -86,11 +86,11 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
         }
 
         SECTION(".begin() // & end()") {
-            std::vector<BlockPosition> blocks;
+            std::vector<BlockIndex> blocks;
             for (auto const& block : s1.blocks()) {
-                blocks.push_back(block.position());
+                blocks.push_back(block.index());
             }
-            std::vector<BlockPosition> expected = { {1,0,0},{2,0,0} };
+            std::vector<BlockIndex> expected = { {1,0,0},{2,0,0} };
             CHECK_THAT(blocks, M::C2::UnorderedRangeEquals(expected));
         }
 

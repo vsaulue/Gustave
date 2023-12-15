@@ -30,7 +30,7 @@
 
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/detail/DataNeighbour.hpp>
 #include <gustave/scenes/cuboidGrid/detail/DataNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
@@ -39,14 +39,14 @@
 
 namespace Cuboid = Gustave::Scenes::CuboidGrid;
 
-using BlockPosition = Cuboid::BlockPosition;
+using BlockIndex = Cuboid::BlockIndex;
 using BlockDataReference = Cuboid::detail::BlockDataReference<cfg,true>;
 using DataNeighbour = Cuboid::detail::DataNeighbour<cfg, true>;
 using DataNeighbours = Cuboid::detail::DataNeighbours<cfg, true>;
 using Direction = Gustave::Math3d::BasicDirection;
 using SceneBlocks = Cuboid::detail::SceneBlocks<cfg>;
 
-using Coord = BlockPosition::Coord;
+using Coord = BlockIndex::Coord;
 using Limits = std::numeric_limits<Coord>;
 
 static constexpr Coord max{ Limits::max() };
@@ -57,8 +57,8 @@ static_assert(std::ranges::forward_range<DataNeighbours>);
 TEST_CASE("Scene::CuboidGrid::detail::DataNeighbours") {
     SceneBlocks sceneBlocks{ vector3(2.f, 3.f, 1.f, u.length) };
 
-    auto addBlock = [&](BlockPosition const& position) -> BlockDataReference {
-        return sceneBlocks.insert({ position, concrete_20m, 20.f * u.mass, false });
+    auto addBlock = [&](BlockIndex const& index) -> BlockDataReference {
+        return sceneBlocks.insert({ index, concrete_20m, 20.f * u.mass, false });
     };
 
     BlockDataReference source = addBlock({ min, 1, 2 });
@@ -67,7 +67,7 @@ TEST_CASE("Scene::CuboidGrid::detail::DataNeighbours") {
     addBlock({ max, 1, 2 });
     addBlock({ min, 2, 3 });
 
-    DataNeighbours neighbours{ sceneBlocks, source.position() };
+    DataNeighbours neighbours{ sceneBlocks, source.index() };
 
     std::vector<DataNeighbour> const expected = {
         {Direction::plusX, plusX},

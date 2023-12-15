@@ -38,7 +38,7 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 #include <gustave/scenes/cuboidGrid/TransactionResult.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
@@ -90,8 +90,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         Result runTransaction(Transaction const& transaction) {
             checkTransaction(transaction);
             TransactionContext ctx;
-            for (BlockPosition const& delPosition : transaction.deletedBlocks()) {
-                removeBlock(ctx, delPosition);
+            for (BlockIndex const& delIndex : transaction.deletedBlocks()) {
+                removeBlock(ctx, delIndex);
             }
             for (BlockConstructionInfo const& newInfo : transaction.newBlocks()) {
                 addBlock(ctx, newInfo);
@@ -132,18 +132,18 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         void checkTransaction(Transaction const& transaction) const {
             auto const& deletedBlocks = transaction.deletedBlocks();
-            for (BlockPosition const& delPosition : deletedBlocks) {
-                if (!data_->blocks.contains(delPosition)) {
+            for (BlockIndex const& delIndex : deletedBlocks) {
+                if (!data_->blocks.contains(delIndex)) {
                     std::stringstream stream;
-                    stream << "Invalid deletion at " << delPosition << ": block does not exist in the scene.";
+                    stream << "Invalid deletion at " << delIndex << ": block does not exist in the scene.";
                     throw std::invalid_argument(stream.str());
                 }
             }
             for (BlockConstructionInfo const& newBlock : transaction.newBlocks()) {
-                BlockPosition const& position = newBlock.position();
-                if (data_->blocks.contains(position) && !deletedBlocks.contains(position)) {
+                BlockIndex const& index = newBlock.index();
+                if (data_->blocks.contains(index) && !deletedBlocks.contains(index)) {
                     std::stringstream stream;
-                    stream << "Invalid insertion at " << position << ": block already exists in the scene.";
+                    stream << "Invalid insertion at " << index << ": block already exists in the scene.";
                     throw std::invalid_argument(stream.str());
                 }
             }
@@ -151,12 +151,12 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         [[nodiscard]]
         ConstDataNeighbours constNeighbours(ConstBlockDataReference source) const {
-            return { data_->blocks, source.position() };
+            return ConstDataNeighbours{ data_->blocks, source.index() };
         }
 
         [[nodiscard]]
-        ConstDataNeighbours constNeighbours(BlockPosition const& source) const {
-            return { data_->blocks, source };
+        ConstDataNeighbours constNeighbours(BlockIndex const& source) const {
+            return ConstDataNeighbours{ data_->blocks, source };
         }
 
         void declareRoot(TransactionContext& ctx, BlockDataReference possibleRoot) {
@@ -219,23 +219,23 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         [[nodiscard]]
         DataNeighbours neighbours(BlockDataReference source) {
-            return { data_->blocks, source.position() };
+            return DataNeighbours{ data_->blocks, source.index() };
         }
 
         [[nodiscard]]
-        DataNeighbours neighbours(BlockPosition const& source) {
-            return { data_->blocks, source };
+        DataNeighbours neighbours(BlockIndex const& source) {
+            return DataNeighbours{ data_->blocks, source };
         }
 
-        void removeBlock(TransactionContext& ctx, BlockPosition const& deletedPosition) {
-            BlockDataReference deletedBlock = data_->blocks.find(deletedPosition);
+        void removeBlock(TransactionContext& ctx, BlockIndex const& deletedIndex) {
+            BlockDataReference deletedBlock = data_->blocks.find(deletedIndex);
             assert(deletedBlock);
             ctx.newRoots.erase(deletedBlock);
             removeStructureOf(ctx, deletedBlock);
-            for (DataNeighbour const& neighbour : neighbours(deletedPosition)) {
+            for (DataNeighbour const& neighbour : neighbours(deletedIndex)) {
                 declareRoot(ctx, neighbour.block);
             }
-            bool isDeleted = data_->blocks.erase(deletedPosition);
+            bool isDeleted = data_->blocks.erase(deletedIndex);
             assert(isDeleted);
         }
 

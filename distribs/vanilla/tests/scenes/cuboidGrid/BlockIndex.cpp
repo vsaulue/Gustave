@@ -23,33 +23,19 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include <catch2/catch_test_macros.hpp>
 
-#include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    struct PositionNeighbour {
-    public:
-        using Direction = Math3d::BasicDirection;
+#include <TestConfig.hpp>
 
-        [[nodiscard]]
-        PositionNeighbour(Utils::NoInit) :
-            position{ Utils::NO_INIT }
-        {}
+using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
 
-        [[nodiscard]]
-        PositionNeighbour(Direction direction, BlockPosition const& position)
-            : direction{ direction }
-            , position{ position }
-        {
-
-        }
-
-        [[nodiscard]]
-        bool operator==(PositionNeighbour const&) const = default;
-
-        Direction direction;
-        BlockPosition position;
-    };
+TEST_CASE("Scene::CuboidGrid::BlockIndex") {
+    SECTION("::operator+(BlockIndex const&)") {
+        BlockIndex lhs = { -1, 4, 7 };
+        BlockIndex rhs = { 8, 2, -5 };
+        BlockIndex expected = { 7, 6, 2 };
+        CHECK(lhs + rhs == expected);
+    }
 }

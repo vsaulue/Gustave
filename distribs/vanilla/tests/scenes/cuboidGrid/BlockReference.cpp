@@ -29,7 +29,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/StructureReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
@@ -39,7 +39,7 @@
 
 namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
 
-using BlockPosition = CuboidGrid::BlockPosition;
+using BlockIndex = CuboidGrid::BlockIndex;
 using BlockReference = CuboidGrid::BlockReference<cfg>;
 using Direction = Gustave::Math3d::BasicDirection;
 using Neighbour = BlockReference::Neighbour;
@@ -56,9 +56,9 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
     SceneData sceneData{ blockSize };
 
     Transaction t;
-    auto newBlock = [&](BlockPosition const& position, Real<u.mass> mass, bool isFoundation) -> BlockReference {
-        t.addBlock({ position, concrete_20m, mass, isFoundation });
-        return BlockReference{ sceneData, position };
+    auto newBlock = [&](BlockIndex const& index, Real<u.mass> mass, bool isFoundation) -> BlockReference {
+        t.addBlock({ index, concrete_20m, mass, isFoundation });
+        return BlockReference{ sceneData, index };
     };
     BlockReference b000 = newBlock({ 0,0,0 }, 1000.f * u.mass, true);
     BlockReference b111 = newBlock({ 1,1,1 }, 3000.f * u.mass, false);
@@ -110,7 +110,7 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
 
     SECTION(".isValid()") {
         REQUIRE(b111.isValid());
-        sceneData.blocks.erase(b111.position());
+        sceneData.blocks.erase(b111.index());
         REQUIRE_FALSE(b111.isValid());
     }
 
@@ -150,15 +150,15 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         }
     }
 
-    SECTION(".position()") {
-        CHECK(b121.position() == BlockPosition{ 1,2,1 });
+    SECTION(".index()") {
+        CHECK(b121.index() == BlockIndex{ 1,2,1 });
     }
 
     SECTION(".structures()") {
         SECTION("// non-foundation") {
             auto const structures = b111.structures();
             REQUIRE(structures.size() == 1);
-            CHECK(structures[0].blocks().contains(b111.position()));
+            CHECK(structures[0].blocks().contains(b111.index()));
         }
 
         SECTION("// foundation") {

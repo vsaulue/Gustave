@@ -28,7 +28,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/DataNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
@@ -40,7 +40,7 @@
 
 namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
 
-using BlockPosition = CuboidGrid::BlockPosition;
+using BlockIndex = CuboidGrid::BlockIndex;
 using ConstBlockDataReference = CuboidGrid::detail::BlockDataReference<cfg, false>;
 using ConstDataNeighbours = CuboidGrid::detail::DataNeighbours<cfg, false>;
 using Direction = Gustave::Math3d::BasicDirection;
@@ -79,8 +79,8 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
         REQUIRE_FALSE(data.structures.contains(nullptr));
         for (auto const& structure : data.structures) {
             bool hasNonFoundation = false;
-            for (auto const& [position,solverIndex] : structure->solverIndices()) {
-                ConstBlockDataReference blockRef = data.blocks.find(position);
+            for (auto const& [index,solverIndex] : structure->solverIndices()) {
+                ConstBlockDataReference blockRef = data.blocks.find(index);
                 REQUIRE(blockRef);
                 if (!blockRef.isFoundation()) {
                     hasNonFoundation = true;
@@ -96,10 +96,10 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
                 REQUIRE(blockRef.structure() == nullptr);
             } else {
                 REQUIRE(data.structures.contains(blockRef.structure()));
-                for (auto const& neighbour : ConstDataNeighbours{ data.blocks, blockRef.position() }) {
+                for (auto const& neighbour : ConstDataNeighbours{ data.blocks, blockRef.index() }) {
                     auto const& structure = blockRef.structure();
                     REQUIRE(data.structures.contains(structure));
-                    REQUIRE(structure->solverIndices().contains(neighbour.block.position()));
+                    REQUIRE(structure->solverIndices().contains(neighbour.block.index()));
                 }
             }
         }
@@ -107,15 +107,15 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
     };
 
     SECTION("::runTransaction(Transaction const&)") {
-        auto structureOf = [&data](BlockPosition const& position) -> StructureData const& {
-            ConstBlockDataReference ref = data.blocks.find(position);
+        auto structureOf = [&data](BlockIndex const& index) -> StructureData const& {
+            ConstBlockDataReference ref = data.blocks.find(index);
             REQUIRE(ref);
             REQUIRE(ref.structure() != nullptr);
             return *ref.structure();
         };
 
-        auto getBlockIndex = [](StructureData const& structure, BlockPosition const& position) -> NodeIndex {
-            auto const optBlock = structure.solverIndexOf(position);
+        auto getSolverIndex = [](StructureData const& structure, BlockIndex const& index) -> NodeIndex {
+            auto const optBlock = structure.solverIndexOf(index);
             REQUIRE(optBlock);
             return *optBlock;
         };
@@ -165,7 +165,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             CHECK(data.structures.size() == 1);
             CHECK(data.blocks.size() == 1);
             StructureData const& structure = structureOf({ 1,0,0 });
-            NodeIndex blockIndex = getBlockIndex(structure, { 1,0,0 });
+            NodeIndex blockIndex = getSolverIndex(structure, { 1,0,0 });
             SolverNode const& solverNode = structure.solverStructure().nodes()[blockIndex];
             CHECK_FALSE(solverNode.isFoundation);
             CHECK(solverNode.mass() == blockMass);
@@ -201,16 +201,16 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
 
             {
                 StructureData const& structureX = structureOf({ 1,0,0 });
-                NodeIndex const x1 = getBlockIndex(structureX, { 1,0,0 });
-                NodeIndex const origin = getBlockIndex(structureX, { 0,0,0 });
+                NodeIndex const x1 = getSolverIndex(structureX, { 1,0,0 });
+                NodeIndex const origin = getSolverIndex(structureX, { 0,0,0 });
                 CHECK_FALSE(structureX.contains({ 0,1,0 }));
                 checkContact(structureX, origin, x1, Direction::plusX, concrete_20m);
             }
 
             {
                 StructureData const& structureY = structureOf({ 0,1,0 });
-                NodeIndex y1 = getBlockIndex(structureY, { 0,1,0 });
-                NodeIndex origin = getBlockIndex(structureY, { 0,0,0 });
+                NodeIndex y1 = getSolverIndex(structureY, { 0,1,0 });
+                NodeIndex origin = getSolverIndex(structureY, { 0,0,0 });
                 CHECK_FALSE(structureY.contains({ 1,0,0 }));
                 checkContact(structureY, origin, y1, Direction::plusY, concrete_20m);
             }
@@ -235,8 +235,8 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
 
             {
                 StructureData const& structure = structureOf({ 2,0,0 });
-                NodeIndex const x1 = getBlockIndex(structure, { 1,0,0 });
-                NodeIndex const x2 = getBlockIndex(structure, { 2,0,0 });
+                NodeIndex const x1 = getSolverIndex(structure, { 1,0,0 });
+                NodeIndex const x2 = getSolverIndex(structure, { 2,0,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
                 checkContact(structure, x1, x2, Direction::plusX, concrete_20m);
             }
@@ -255,8 +255,8 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
 
             StructureData const& structure = structureOf({ 0,1,0 });
             for (int i = 0; i < 4; ++i) {
-                NodeIndex const bottom = getBlockIndex(structure, { 0,i,0 });
-                NodeIndex const top = getBlockIndex(structure, { 0,i + 1,0 });
+                NodeIndex const bottom = getSolverIndex(structure, { 0,i,0 });
+                NodeIndex const top = getSolverIndex(structure, { 0,i + 1,0 });
                 checkContact(structure, bottom, top, Direction::plusY, concrete_20m);
             }
         }
@@ -281,8 +281,8 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             {
                 StructureData const& structure = structureOf({ 0,0,0 });
                 CHECK_THAT(r2.newStructures, M::C2::Contains(&structure, ptrEquals));
-                NodeIndex const y0 = getBlockIndex(structure, { 0,0,0 });
-                NodeIndex const y1 = getBlockIndex(structure, { 0,1,0 });
+                NodeIndex const y0 = getSolverIndex(structure, { 0,0,0 });
+                NodeIndex const y1 = getSolverIndex(structure, { 0,1,0 });
                 CHECK_FALSE(structure.contains({ 0,3,0 }));
                 CHECK_FALSE(structure.contains({ 0,4,0 }));
                 checkContact(structure, y0, y1, Direction::plusY, concrete_20m);
@@ -291,8 +291,8 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             {
                 StructureData const& structure = structureOf({ 0,3,0 });
                 CHECK_THAT(r2.newStructures, M::C2::Contains(&structure, ptrEquals));
-                NodeIndex const y3 = getBlockIndex(structure, { 0,3,0 });
-                NodeIndex const y4 = getBlockIndex(structure, { 0,4,0 });
+                NodeIndex const y3 = getSolverIndex(structure, { 0,3,0 });
+                NodeIndex const y4 = getSolverIndex(structure, { 0,4,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
                 CHECK_FALSE(structure.contains({ 0,1,0 }));
                 checkContact(structure, y3, y4, Direction::plusY, concrete_20m);
@@ -318,11 +318,11 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             CHECK(data.structures.size() == 1);
             StructureData const& structure = structureOf({ 0,0,1 });
             CHECK_THAT(r2.newStructures, M::C2::Contains(&structure, ptrEquals));
-            NodeIndex const z0 = getBlockIndex(structure, { 0,0,0 });
-            NodeIndex const z1 = getBlockIndex(structure, { 0,0,1 });
-            NodeIndex const z2 = getBlockIndex(structure, { 0,0,2 });
-            NodeIndex const z3 = getBlockIndex(structure, { 0,0,3 });
-            NodeIndex const z4 = getBlockIndex(structure, { 0,0,4 });
+            NodeIndex const z0 = getSolverIndex(structure, { 0,0,0 });
+            NodeIndex const z1 = getSolverIndex(structure, { 0,0,1 });
+            NodeIndex const z2 = getSolverIndex(structure, { 0,0,2 });
+            NodeIndex const z3 = getSolverIndex(structure, { 0,0,3 });
+            NodeIndex const z4 = getSolverIndex(structure, { 0,0,4 });
             checkContact(structure, z0, z1, Direction::plusZ, concrete_20m);
             checkContact(structure, z1, z2, Direction::plusZ, concrete_20m);
             checkContact(structure, z2, z3, Direction::plusZ, concrete_20m);

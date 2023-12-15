@@ -28,7 +28,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
@@ -36,7 +36,7 @@
 
 #include <TestHelpers.hpp>
 
-using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
+using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
 using Direction = Gustave::Math3d::BasicDirection;
 using Scene = Gustave::Scenes::CuboidGridScene<cfg>;
 using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<cfg>;
@@ -69,12 +69,12 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             CHECK_FALSE(blocks.at({ 2,0,0 }).isFoundation());
 
             {
-                std::vector<BlockPosition> positions;
+                std::vector<BlockIndex> indices;
                 for (auto const& block : blocks) {
-                    positions.push_back(block.position());
+                    indices.push_back(block.index());
                 }
-                std::vector<BlockPosition> expected{ {1,0,0}, {2,0,0} };
-                CHECK_THAT(positions, M::C2::UnorderedEquals(expected));
+                std::vector<BlockIndex> expected{ {1,0,0}, {2,0,0} };
+                CHECK_THAT(indices, M::C2::UnorderedEquals(expected));
             }
         }
     }

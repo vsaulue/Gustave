@@ -34,7 +34,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
@@ -126,14 +126,14 @@ namespace Gustave::Scenes::CuboidGrid {
             {}
 
             [[nodiscard]]
-            BlockReference at(BlockPosition const& position) const {
-                auto it = data_->solverIndices().find(position);
+            BlockReference at(BlockIndex const& index) const {
+                auto it = data_->solverIndices().find(index);
                 if (it == data_->solverIndices().end()) {
                     std::stringstream msg;
-                    msg << "Structure does not contain the block at " << position << '.';
+                    msg << "Structure does not contain the block at " << index << '.';
                     throw std::out_of_range(msg.str());
                 }
-                return BlockReference{ data_->sceneData(), position };
+                return BlockReference{ data_->sceneData(), index };
             }
 
             [[nodiscard]]
@@ -142,8 +142,8 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            bool contains(BlockPosition const& position) const {
-                return data_->solverIndices().contains(position);
+            bool contains(BlockIndex const& index) const {
+                return data_->solverIndices().contains(index);
             }
 
             [[nodiscard]]
@@ -152,12 +152,12 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            std::optional<BlockReference> find(BlockPosition const& position) const {
-                auto it = data_->solverIndices().find(position);
+            std::optional<BlockReference> find(BlockIndex const& index) const {
+                auto it = data_->solverIndices().find(index);
                 if (it == data_->solverIndices().end()) {
                     return {};
                 } else {
-                    return BlockReference{ data_->sceneData(), position };
+                    return BlockReference{ data_->sceneData(), index };
                 }
             }
 
@@ -192,8 +192,8 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        std::optional<NodeIndex> solverIndexOf(BlockPosition const& position) const {
-            return data_->solverIndexOf(position);
+        std::optional<NodeIndex> solverIndexOf(BlockIndex const& index) const {
+            return data_->solverIndexOf(index);
         }
 
         [[nodiscard]]

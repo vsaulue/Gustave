@@ -43,13 +43,13 @@ using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReferen
 
 TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
     BlockConstructionInfo const info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
-    BlockData data{ info.position(), { info } };
+    BlockData data{ info.index(), { info } };
     SceneData const sceneData{ vector3(1.f, 1.f, 1.f, u.length) };
 
     SECTION("<*,true>") {
         SECTION("// constructor & getters") {
             BlockDataReference<true> ref{ &data };
-            CHECK(ref.position() == info.position());
+            CHECK(ref.index() == info.index());
             CHECK(ref.mass() == 5.f * u.mass);
             CHECK(ref.isFoundation() == true);
             CHECK(ref.structure() == nullptr);
@@ -80,7 +80,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
 
         SECTION("::BlockDataReference(BlockData const*) // + getters") {
             BlockDataReference<false> cRef{ cData };
-            CHECK(cRef.position() == info.position());
+            CHECK(cRef.index() == info.index());
             CHECK(cRef.mass() == 5.f * u.mass);
             CHECK(cRef.isFoundation() == true);
             CHECK(cRef.structure() == nullptr);

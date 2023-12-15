@@ -28,8 +28,8 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/meta/MutableIf.hpp>
 #include <gustave/scenes/cuboidGrid/detail/DataNeighbour.hpp>
-#include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
-#include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
+#include <gustave/scenes/cuboidGrid/detail/IndexNeighbour.hpp>
+#include <gustave/scenes/cuboidGrid/detail/IndexNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
@@ -40,7 +40,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
     class DataNeighbours {
     private:
         using QualifiedSceneBlocks = Meta::MutableIf<isMutable_, SceneBlocks<cfg>>;
-        using PosIterator = PositionNeighbours::Iterator;
+        using IndexIterator = IndexNeighbours::Iterator;
 
         class Enumerator {
         public:
@@ -48,25 +48,25 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             Enumerator()
                 : neighbours_{ nullptr }
                 , value_{ Utils::NO_INIT }
-                , pos_{}
+                , indexIterator_{}
             {}
 
             [[nodiscard]]
             explicit Enumerator(DataNeighbours& neighbours)
                 : neighbours_{ &neighbours }
                 , value_{ Utils::NO_INIT }
-                , pos_{ neighbours.positions_.begin() }
+                , indexIterator_{ neighbours.indices_.begin() }
             {
                 next();
             }
 
             [[nodiscard]]
             bool isEnd() const {
-                return pos_ == positions().end();
+                return indexIterator_ == indices().end();
             }
 
             void operator++() {
-                ++pos_;
+                ++indexIterator_;
                 next();
             }
 
@@ -77,36 +77,35 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
             [[nodiscard]]
             bool operator==(Enumerator const& other) const {
-                return pos_ == other.pos_;
+                return indexIterator_ == other.indexIterator_;
             }
         private:
             [[nodiscard]]
-            PositionNeighbours const& positions() const {
-                return neighbours_->positions_;
+            IndexNeighbours const& indices() const {
+                return neighbours_->indices_;
             }
 
             void next() {
-                while (pos_ != positions().end()) {
-                    PositionNeighbour const& nPos = *pos_;
-                    if (BlockDataReference<cfg, isMutable_> neighbour = neighbours_->blocks_.find(nPos.position)) {
-                        value_ = { nPos.direction, neighbour };
+                while (indexIterator_ != indices().end()) {
+                    if (BlockDataReference<cfg, isMutable_> neighbour = neighbours_->blocks_.find(indexIterator_->index)) {
+                        value_ = { indexIterator_->direction, neighbour };
                         break;
                     }
-                    ++pos_;
+                    ++indexIterator_;
                 }
             }
 
             DataNeighbours* neighbours_;
             DataNeighbour<cfg, isMutable_> value_;
-            PosIterator pos_;
+            IndexIterator indexIterator_;
         };
     public:
         using Iterator = Utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
-        DataNeighbours(QualifiedSceneBlocks& blocks, BlockPosition const& source)
+        explicit DataNeighbours(QualifiedSceneBlocks& blocks, BlockIndex const& source)
             : blocks_{ blocks }
-            , positions_{ source }
+            , indices_{ source }
         {}
 
         [[nodiscard]]
@@ -120,6 +119,6 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
     private:
         QualifiedSceneBlocks& blocks_;
-        PositionNeighbours positions_;
+        IndexNeighbours indices_;
     };
 }

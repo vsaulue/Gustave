@@ -29,29 +29,29 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
-#include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
-#include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
+#include <gustave/scenes/cuboidGrid/detail/IndexNeighbour.hpp>
+#include <gustave/scenes/cuboidGrid/detail/IndexNeighbours.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
-using Coord = BlockPosition::Coord;
+using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
+using Coord = BlockIndex::Coord;
 using Direction = Gustave::Math3d::BasicDirection;
 using Limits = std::numeric_limits<Coord>;
-using Neighbours = Gustave::Scenes::CuboidGrid::detail::PositionNeighbours;
-using PositionNeighbour = Gustave::Scenes::CuboidGrid::detail::PositionNeighbour;
+using Neighbours = Gustave::Scenes::CuboidGrid::detail::IndexNeighbours;
+using IndexNeighbour = Gustave::Scenes::CuboidGrid::detail::IndexNeighbour;
 
 static constexpr Coord max = Limits::max();
 static constexpr Coord min = Limits::min();
 
-TEST_CASE("Scene::CuboidGrid::detail::PositionNeighbours") {
-    auto runTest = [](BlockPosition const& source, std::vector<PositionNeighbour> const& expected) {
+TEST_CASE("Scene::CuboidGrid::detail::IndexNeighbours") {
+    auto runTest = [](BlockIndex const& source, std::vector<IndexNeighbour> const& expected) {
         CHECK_THAT(Neighbours{ source }, M::C2::RangeEquals(expected));
     };
 
     SECTION("// (min,max,min)") {
-        BlockPosition const p = { min,max,min };
+        BlockIndex const p = { min,max,min };
         runTest(p, {
             {Direction::plusX,  {min + 1, max,     min}},
             {Direction::minusY, {min    , max - 1, min}},
@@ -60,7 +60,7 @@ TEST_CASE("Scene::CuboidGrid::detail::PositionNeighbours") {
     }
 
     SECTION("// (max,min,max)") {
-        BlockPosition const p = { max,min,max };
+        BlockIndex const p = { max,min,max };
         runTest(p, {
             {Direction::minusX, {max - 1, min    , max}},
             {Direction::plusY,  {max    , min + 1, max}},
@@ -69,7 +69,7 @@ TEST_CASE("Scene::CuboidGrid::detail::PositionNeighbours") {
     }
 
     SECTION("// (-1,5,8)") {
-        BlockPosition const p = {-3,5,8};
+        BlockIndex const p = {-3,5,8};
         runTest(p, {
             {Direction::plusX,  {-2,5,8}},
             {Direction::minusX, {-4,5,8}},

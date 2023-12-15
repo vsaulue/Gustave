@@ -34,10 +34,10 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/detail/DataNeighbours.hpp>
-#include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
-#include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
+#include <gustave/scenes/cuboidGrid/detail/IndexNeighbour.hpp>
+#include <gustave/scenes/cuboidGrid/detail/IndexNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
@@ -54,8 +54,8 @@ namespace Gustave::Scenes::CuboidGrid {
         using BlockDataReference = detail::BlockDataReference<cfg, false>;
         using DataNeighbours = detail::DataNeighbours<cfg, false>;
         using MaxStress = Model::MaxStress<cfg>;
-        using PositionNeighbour = detail::PositionNeighbour;
-        using PositionNeighbours = detail::PositionNeighbours;
+        using IndexNeighbour = detail::IndexNeighbour;
+        using IndexNeighbours = detail::IndexNeighbours;
         using SceneData = detail::SceneData<cfg>;
         using StructureData = detail::StructureData<cfg>;
 
@@ -100,21 +100,21 @@ namespace Gustave::Scenes::CuboidGrid {
 
         class Neighbours {
         private:
-            using PosIterator = typename PositionNeighbours::Iterator;
+            using IndexIterator = typename IndexNeighbours::Iterator;
 
             class Enumerator {
             public:
                 [[nodiscard]]
                 Enumerator()
                     : neighbours_{ nullptr }
-                    , pos_{ nullptr }
+                    , index_{ nullptr }
                     , value_{ Utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
                 explicit Enumerator(Neighbours const& neighbours)
                     : neighbours_{ &neighbours }
-                    , pos_{ neighbours.positions_.begin() }
+                    , index_{ neighbours.indices_.begin() }
                     , value_{ Utils::NO_INIT }
                 {
                     next();
@@ -122,11 +122,11 @@ namespace Gustave::Scenes::CuboidGrid {
 
                 [[nodiscard]]
                 bool isEnd() const {
-                    return pos_ == positions().end();
+                    return index_ == indices().end();
                 }
 
                 void operator++() {
-                    ++pos_;
+                    ++index_;
                     next();
                 }
 
@@ -137,36 +137,36 @@ namespace Gustave::Scenes::CuboidGrid {
 
                 [[nodiscard]]
                 bool operator==(Enumerator const& other) const {
-                    return pos_ == other.pos_;
+                    return index_ == other.index_;
                 }
             private:
                 [[nodiscard]]
-                PositionNeighbours const& positions() const {
-                    return neighbours_->positions_;
+                IndexNeighbours const& indices() const {
+                    return neighbours_->indices_;
                 }
 
                 void next() {
-                    while (pos_ != positions().end()) {
-                        PositionNeighbour const& nPos = *pos_;
-                        if (BlockDataReference neighbour = neighbours_->data_->blocks.find(nPos.position)) {
-                            value_ = Neighbour{ BlockReference{ *neighbours_->data_, nPos.position }, nPos.direction };
+                    while (index_ != indices().end()) {
+                        IndexNeighbour const& idNeighbour = *index_;
+                        if (BlockDataReference neighbour = neighbours_->data_->blocks.find(idNeighbour.index)) {
+                            value_ = Neighbour{ BlockReference{ *neighbours_->data_, idNeighbour.index }, idNeighbour.direction };
                             break;
                         }
-                        ++pos_;
+                        ++index_;
                     }
                 }
 
                 Neighbours const* neighbours_;
-                PosIterator pos_;
+                IndexIterator index_;
                 Neighbour value_;
             };
         public:
             using Iterator = Utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
-            explicit Neighbours(SceneData const& data, BlockPosition const& source)
+            explicit Neighbours(SceneData const& data, BlockIndex const& source)
                 : data_{ &data }
-                , positions_ { source }
+                , indices_ { source }
             {}
 
             [[nodiscard]]
@@ -180,7 +180,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
         private:
             SceneData const* data_;
-            PositionNeighbours positions_;
+            IndexNeighbours indices_;
         };
 
         class Structures {
@@ -202,7 +202,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 };
 
                 if (block.isFoundation()) {
-                    for (auto const& neighbour : DataNeighbours{ block.sceneData_->blocks, block.position_ }) {
+                    for (auto const& neighbour : DataNeighbours{ block.sceneData_->blocks, block.index_ }) {
                         auto const nBlockData = neighbour.block;
                         if (!nBlockData.isFoundation()) {
                             addValue(nBlockData.structure());
@@ -243,14 +243,14 @@ namespace Gustave::Scenes::CuboidGrid {
         };
 
         [[nodiscard]]
-        explicit BlockReference(SceneData const& sceneData, BlockPosition const& position)
+        explicit BlockReference(SceneData const& sceneData, BlockIndex const& index)
             : sceneData_{ &sceneData }
-            , position_{ position }
+            , index_{ index }
         {}
 
         [[nodiscard]]
         explicit BlockReference(Utils::NoInit NO_INIT)
-            : position_{ NO_INIT }
+            : index_{ NO_INIT }
         {}
 
         [[nodiscard]]
@@ -259,8 +259,8 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        BlockPosition const& index() const {
-            return position_;
+        BlockIndex const& index() const {
+            return index_;
         }
 
         [[nodiscard]]
@@ -270,7 +270,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         bool isValid() const {
-            return sceneData_->blocks.contains(position_);
+            return sceneData_->blocks.contains(index_);
         }
 
         [[nodiscard]]
@@ -285,12 +285,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
         [[nodiscard]]
         Neighbours neighbours() const {
-            return Neighbours{ *sceneData_, position_ };
-        }
-
-        [[nodiscard]]
-        BlockPosition const& position() const {
-            return position_;
+            return Neighbours{ *sceneData_, index_ };
         }
 
         [[nodiscard]]
@@ -302,14 +297,14 @@ namespace Gustave::Scenes::CuboidGrid {
         bool operator==(BlockReference const&) const = default;
     private:
         SceneData const* sceneData_;
-        BlockPosition position_;
+        BlockIndex index_;
 
         [[nodiscard]]
         BlockDataReference data() const {
-            BlockDataReference result = sceneData_->blocks.find(position_);
+            BlockDataReference result = sceneData_->blocks.find(index_);
             if (!result) {
                 std::stringstream msg;
-                msg << "No block at position " << position_ << ".";
+                msg << "No block at index " << index_ << ".";
                 throw std::out_of_range(msg.str());
             }
             return result;

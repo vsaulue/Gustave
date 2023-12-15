@@ -28,14 +28,14 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/Blocks.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
+using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
 using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<cfg>;
 using Blocks = Gustave::Scenes::CuboidGrid::Blocks<cfg>;
 using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
@@ -74,12 +74,12 @@ TEST_CASE("Scenes::CuboidGrid::Blocks") {
             sceneData.blocks.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
             sceneData.blocks.insert({ {3,0,0}, concrete_20m, 1000.f * u.mass, false });
 
-            std::vector<BlockPosition> positions;
+            std::vector<BlockIndex> indices;
             for (auto const& block : blocks) {
-                positions.push_back(block.position());
+                indices.push_back(block.index());
             }
-            std::vector<BlockPosition> const expected = { {1,0,0},{3,0,0} };
-            CHECK_THAT(positions, M::C2::UnorderedEquals(expected));
+            std::vector<BlockIndex> const expected = { {1,0,0},{3,0,0} };
+            CHECK_THAT(indices, M::C2::UnorderedEquals(expected));
         }
     }
 

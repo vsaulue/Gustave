@@ -39,10 +39,10 @@ namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
     class Transaction {
     private:
-        using ConstructionHashEquals = Utils::HashEquals<BlockConstructionInfo<cfg>, Utils::getter(&BlockConstructionInfo<cfg>::position)>;
+        using ConstructionHashEquals = Utils::HashEquals<BlockConstructionInfo<cfg>, Utils::getter(&BlockConstructionInfo<cfg>::index)>;
     public:
         using ConstructionSet = typename ConstructionHashEquals::Set;
-        using DeletedSet = std::unordered_set<BlockPosition>;
+        using DeletedSet = std::unordered_set<BlockIndex>;
 
         [[nodiscard]]
         Transaction() = default;
@@ -51,13 +51,13 @@ namespace Gustave::Scenes::CuboidGrid {
             auto opResult = newBlocks_.insert(newBlock);
             if (!opResult.second) {
                 std::stringstream stream;
-                stream << "Duplicate insertion at" << newBlock.position() << '.';
+                stream << "Duplicate insertion at" << newBlock.index() << '.';
                 throw std::invalid_argument(stream.str());
             }
         }
 
-        void removeBlock(BlockPosition const& position) {
-            deletedBlocks_.insert(position);
+        void removeBlock(BlockIndex const& index) {
+            deletedBlocks_.insert(index);
         }
 
         [[nodiscard]]

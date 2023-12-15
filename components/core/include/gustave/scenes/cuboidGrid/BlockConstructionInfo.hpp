@@ -32,7 +32,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/MaxStress.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
@@ -46,8 +46,8 @@ namespace Gustave::Scenes::CuboidGrid {
         using MaxStress = Model::MaxStress<cfg>;
     public:
         [[nodiscard]]
-        BlockConstructionInfo(BlockPosition const& position, MaxStress const& maxStress, Real<u.mass> mass, bool isFoundation)
-            : position_{ position }
+        BlockConstructionInfo(BlockIndex const& index, MaxStress const& maxStress, Real<u.mass> mass, bool isFoundation)
+            : index_{ index }
             , maxStress_{ maxStress }
             , mass_{ mass }
             , isFoundation_{ isFoundation }
@@ -56,13 +56,13 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        BlockPosition& position() {
-            return position_;
+        BlockIndex& index() {
+            return index_;
         }
 
         [[nodiscard]]
-        BlockPosition const& position() const {
-            return position_;
+        BlockIndex const& index() const {
+            return index_;
         }
 
         [[nodiscard]]
@@ -98,7 +98,7 @@ namespace Gustave::Scenes::CuboidGrid {
         [[nodiscard]]
         bool operator==(BlockConstructionInfo const&) const = default;
     private:
-        BlockPosition position_;
+        BlockIndex index_;
         MaxStress maxStress_;
         Real<u.mass> mass_;
         bool isFoundation_;

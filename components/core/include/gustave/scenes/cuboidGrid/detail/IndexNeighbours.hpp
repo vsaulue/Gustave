@@ -28,24 +28,23 @@
 #include <array>
 
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
-#include <gustave/scenes/cuboidGrid/detail/PositionNeighbour.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
+#include <gustave/scenes/cuboidGrid/detail/IndexNeighbour.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
-    class PositionNeighbours {
+    class IndexNeighbours {
     public:
-        using Coord = BlockPosition::Coord;
+        using Coord = BlockIndex::Coord;
         using Direction = Math3d::BasicDirection;
 
-        static constexpr Utils::NoInit NO_INIT{};
-        using Values = std::array<PositionNeighbour,6>;
+        using Values = std::array<IndexNeighbour,6>;
 
         using Iterator = Values::const_iterator;
 
         [[nodiscard]]
-        PositionNeighbours(BlockPosition const& source)
-            : values_{ NO_INIT, NO_INIT, NO_INIT, NO_INIT, NO_INIT, NO_INIT }
+        explicit IndexNeighbours(BlockIndex const& source)
+            : values_{ NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT() }
             , source_{ source }
             , count_{ 0 }
         {
@@ -68,7 +67,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        PositionNeighbour const& operator[](unsigned id) const {
+        IndexNeighbour const& operator[](unsigned id) const {
             return values_[id];
         }
 
@@ -80,6 +79,11 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using Limits = std::numeric_limits<Coord>;
 
         [[nodiscard]]
+        static IndexNeighbour NO_INIT() {
+            return IndexNeighbour{ Utils::NO_INIT };
+        }
+
+        [[nodiscard]]
         static bool isMin(Coord value) {
             return value == Limits::min();
         }
@@ -89,7 +93,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             return value == Limits::max();
         }
 
-        void addValue(bool condition, Direction direction, BlockPosition const& offset) {
+        void addValue(bool condition, Direction direction, BlockIndex const& offset) {
             if (condition) {
                 values_[count_] = { direction, source_ + offset };
                 ++count_;
@@ -97,7 +101,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         Values values_;
-        BlockPosition const& source_;
+        BlockIndex const& source_;
         unsigned count_;
     };
 }

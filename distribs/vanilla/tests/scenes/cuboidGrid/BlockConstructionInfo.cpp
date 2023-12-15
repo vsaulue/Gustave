@@ -28,17 +28,17 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 
 #include <TestHelpers.hpp>
 
 using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<cfg>;
-using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
+using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
 
 TEST_CASE("Scene::CuboidGrid::BlockConstructionInfo") {
     SECTION("// valid constructor & getters") {
         const BlockConstructionInfo obj{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
-        CHECK(obj.position() == BlockPosition{4, 5, 6});
+        CHECK(obj.index() == BlockIndex{4, 5, 6});
         CHECK(obj.maxStress().maxTensileStress() == concrete_20m.maxTensileStress());
         CHECK(obj.mass() == 5.f * u.mass);
         CHECK(obj.isFoundation() == true);

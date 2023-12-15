@@ -25,49 +25,31 @@
 
 #pragma once
 
-#include <cstdint>
-#include <functional>
-#include <ostream>
+#include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 
-#include <gustave/utils/Hasher.hpp>
-#include <gustave/utils/NoInit.hpp>
-
-namespace Gustave::Scenes::CuboidGrid {
-    struct BlockPosition {
+namespace Gustave::Scenes::CuboidGrid::detail {
+    struct IndexNeighbour {
     public:
-        using Coord = std::int64_t;
+        using Direction = Math3d::BasicDirection;
 
         [[nodiscard]]
-        BlockPosition(Utils::NoInit) {}
+        explicit IndexNeighbour(Utils::NoInit) :
+            index{ Utils::NO_INIT }
+        {}
 
         [[nodiscard]]
-        BlockPosition(Coord x, Coord y, Coord z)
-            : x(x)
-            , y(y)
-            , z(z)
+        IndexNeighbour(Direction direction, BlockIndex const& index)
+            : direction{ direction }
+            , index{ index }
         {
 
         }
 
         [[nodiscard]]
-        bool operator==(BlockPosition const&) const = default;
+        bool operator==(IndexNeighbour const&) const = default;
 
-        [[nodiscard]]
-        BlockPosition operator+(BlockPosition const& rhs) const {
-            return { x + rhs.x, y + rhs.y, z + rhs.z };
-        }
-
-        friend std::ostream& operator<<(std::ostream& stream, BlockPosition const& pos) {
-            return stream << '{' << pos.x << ", " << pos.y << ", " << pos.z << '}';
-        }
-
-        Coord x;
-        Coord y;
-        Coord z;
-
-        using Hasher = Utils::Hasher<BlockPosition, &BlockPosition::x, &BlockPosition::y, &BlockPosition::z>;
+        Direction direction;
+        BlockIndex index;
     };
 }
-
-template<>
-struct std::hash<Gustave::Scenes::CuboidGrid::BlockPosition> : Gustave::Scenes::CuboidGrid::BlockPosition::Hasher {};

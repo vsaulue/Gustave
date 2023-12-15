@@ -32,7 +32,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/meta/MutableIf.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
 #include <gustave/utils/HashEquals.hpp>
 #include <gustave/utils/NoInit.hpp>
@@ -110,7 +110,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        BlockPosition const& position() const {
+        BlockIndex const& index() const {
             return data_->first;
         }
 

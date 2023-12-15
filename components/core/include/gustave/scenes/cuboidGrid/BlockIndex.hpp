@@ -23,19 +23,49 @@
  * SOFTWARE.
  */
 
-#include <catch2/catch_test_macros.hpp>
+#pragma once
 
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <cstdint>
+#include <functional>
+#include <ostream>
 
-#include <TestConfig.hpp>
+#include <gustave/utils/Hasher.hpp>
+#include <gustave/utils/NoInit.hpp>
 
-using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
+namespace Gustave::Scenes::CuboidGrid {
+    struct BlockIndex {
+    public:
+        using Coord = std::int64_t;
 
-TEST_CASE("Scene::CuboidGrid::BlockPosition") {
-    SECTION("::operator+(BlockPosition const&)") {
-        BlockPosition lhs = { -1, 4, 7 };
-        BlockPosition rhs = { 8, 2, -5 };
-        BlockPosition expected = { 7, 6, 2 };
-        CHECK(lhs + rhs == expected);
-    }
+        [[nodiscard]]
+        explicit BlockIndex(Utils::NoInit) {}
+
+        [[nodiscard]]
+        BlockIndex(Coord x, Coord y, Coord z)
+            : x(x)
+            , y(y)
+            , z(z)
+        {}
+
+        [[nodiscard]]
+        bool operator==(BlockIndex const&) const = default;
+
+        [[nodiscard]]
+        BlockIndex operator+(BlockIndex const& rhs) const {
+            return { x + rhs.x, y + rhs.y, z + rhs.z };
+        }
+
+        friend std::ostream& operator<<(std::ostream& stream, BlockIndex const& index) {
+            return stream << '{' << index.x << ", " << index.y << ", " << index.z << '}';
+        }
+
+        Coord x;
+        Coord y;
+        Coord z;
+
+        using Hasher = Utils::Hasher<BlockIndex, &BlockIndex::x, &BlockIndex::y, &BlockIndex::z>;
+    };
 }
+
+template<>
+struct std::hash<Gustave::Scenes::CuboidGrid::BlockIndex> : Gustave::Scenes::CuboidGrid::BlockIndex::Hasher {};

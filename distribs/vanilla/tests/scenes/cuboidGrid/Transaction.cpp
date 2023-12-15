@@ -26,7 +26,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/Transaction.hpp>
 
 #include <TestHelpers.hpp>
@@ -34,7 +34,7 @@
 namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
 
 using BlockConstructionInfo = CuboidGrid::BlockConstructionInfo<cfg>;
-using BlockPosition = CuboidGrid::BlockPosition;
+using BlockIndex = CuboidGrid::BlockIndex;
 using Transaction = CuboidGrid::Transaction<cfg>;
 
 TEST_CASE("Scene::CubeGrid::Transaction") {
@@ -61,7 +61,7 @@ TEST_CASE("Scene::CubeGrid::Transaction") {
         }
     }
 
-    SECTION("::removeBlock(BlockPosition const&)") {
+    SECTION("::removeBlock(BlockIndex const&)") {
         transaction.removeBlock({ 1,1,5 });
         transaction.removeBlock({ 2,1,5 });
 

@@ -25,14 +25,14 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneBlocks.hpp>
 
 #include <TestHelpers.hpp>
 
 using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg,true>;
-using BlockPosition = Gustave::Scenes::CuboidGrid::BlockPosition;
+using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
 using Direction = Gustave::Math3d::BasicDirection;
 using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<cfg>;
 
@@ -50,7 +50,7 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
         CHECK(sceneBlocks.contactAreaAlong(Direction::plusZ) == 2.f * u.area);
     }
 
-    SECTION("::contains(BlockPosition const&)") {
+    SECTION("::contains(BlockIndex const&)") {
         SECTION("// true") {
             CHECK(sceneBlocks.contains({ 2,3,4 }));
             CHECK(sceneBlocks.contains({ 4,6,9 }));
@@ -62,7 +62,7 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
         }
     }
 
-    SECTION("::erase(BlockPosition const&)") {
+    SECTION("::erase(BlockIndex const&)") {
         SECTION("// true") {
             bool deleted = sceneBlocks.erase({ 2,3,4 });
             CHECK(deleted);
@@ -74,7 +74,7 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
         }
     }
 
-    SECTION("::find(BlockPosition const&)") {
+    SECTION("::find(BlockIndex const&)") {
         SECTION("// true") {
             BlockDataReference f1 = sceneBlocks.find({ 2,3,4 });
             CHECK(f1 == b1);
@@ -90,12 +90,12 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
 
     SECTION("::insert(BlockConstructionInfo const&)") {
         REQUIRE(b1);
-        CHECK(b1.position() == BlockPosition{2, 3, 4});
+        CHECK(b1.index() == BlockIndex{2, 3, 4});
         CHECK(b1.mass() == 10.f * u.mass);
         CHECK(b1.isFoundation() == true);
 
         REQUIRE(b2);
-        CHECK(b2.position() == BlockPosition{4, 6, 9});
+        CHECK(b2.index() == BlockIndex{4, 6, 9});
         CHECK(b2.mass() == 25.f * u.mass);
         CHECK(b2.isFoundation() == false);
     }
