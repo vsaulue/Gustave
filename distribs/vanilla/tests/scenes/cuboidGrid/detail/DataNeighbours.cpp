@@ -24,6 +24,7 @@
  */
 
 #include <limits>
+#include <ranges>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -50,6 +51,8 @@ using Limits = std::numeric_limits<Coord>;
 
 static constexpr Coord max{ Limits::max() };
 static constexpr Coord min{ Limits::min() };
+
+static_assert(std::ranges::forward_range<DataNeighbours>);
 
 TEST_CASE("Scene::CuboidGrid::detail::DataNeighbours") {
     SceneBlocks sceneBlocks{ vector3(2.f, 3.f, 1.f, u.length) };

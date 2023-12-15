@@ -28,6 +28,9 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
+#include <gustave/utils/EndIterator.hpp>
+#include <gustave/utils/ForwardIterator.hpp>
+#include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
@@ -37,27 +40,18 @@ namespace Gustave::Scenes::CuboidGrid {
         using SceneData = detail::SceneData<cfg>;
 
         using DataIterator = typename SceneData::Blocks::BlockMap::const_iterator;
-    public:
-        class EndIterator {
+
+        class Enumerator {
         public:
             [[nodiscard]]
-            constexpr EndIterator() = default;
-        };
-
-        class Iterator {
-        public:
-            using difference_type = std::ptrdiff_t;
-            using value_type = BlockReference;
-
-            [[nodiscard]]
-            Iterator()
+            Enumerator()
                 : sceneData_{ nullptr }
                 , dataIterator_{}
                 , value_{ Utils::NO_INIT }
             {}
 
             [[nodiscard]]
-            explicit Iterator(SceneData const& sceneData)
+            explicit Enumerator(SceneData const& sceneData)
                 : sceneData_{ &sceneData }
                 , dataIterator_{ sceneData.blocks.begin() }
                 , value_{ Utils::NO_INIT }
@@ -65,16 +59,14 @@ namespace Gustave::Scenes::CuboidGrid {
                 updateValue();
             }
 
-            Iterator& operator++() {
-                ++dataIterator_;
-                updateValue();
-                return *this;
+            [[nodiscard]]
+            bool isEnd() const {
+                return dataIterator_ == sceneData_->blocks.end();
             }
 
-            Iterator operator++(int) {
-                Iterator result = *this;
-                ++*this;
-                return result;
+            void operator++() {
+                ++dataIterator_;
+                updateValue();
             }
 
             [[nodiscard]]
@@ -83,23 +75,10 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            BlockReference const* operator->() const {
-                return &value_;
+            bool operator==(Enumerator const& other) const {
+                return dataIterator_ == other.dataIterator_;
             }
-
-            [[nodiscard]]
-            bool operator==(EndIterator const&) const {
-                return isEnd();
-            }
-
-            [[nodiscard]]
-            bool operator==(Iterator const&) const = default;
         private:
-            [[nodiscard]]
-            bool isEnd() const {
-                return dataIterator_ == sceneData_->blocks.end();
-            }
-
             void updateValue() {
                 if (!isEnd()) {
                     value_ = BlockReference{ *sceneData_, dataIterator_->first };
@@ -110,6 +89,8 @@ namespace Gustave::Scenes::CuboidGrid {
             DataIterator dataIterator_;
             BlockReference value_;
         };
+    public:
+        using Iterator = Utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Blocks(SceneData const& sceneData)
@@ -143,7 +124,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        EndIterator end() const {
+        constexpr Utils::EndIterator end() const {
             return {};
         }
     private:

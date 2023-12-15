@@ -35,9 +35,12 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/solvers/Structure.hpp>
+#include <gustave/utils/EndIterator.hpp>
+#include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
@@ -65,27 +68,18 @@ namespace Gustave::Scenes::CuboidGrid {
         class Blocks {
         private:
             using DataIterator = typename StructureData::SolverIndices::const_iterator;
-        public:
-            class EndIterator {
+
+            class Enumerator {
             public:
                 [[nodiscard]]
-                constexpr EndIterator() = default;
-            };
-
-            class Iterator {
-            public:
-                using difference_type = std::ptrdiff_t;
-                using value_type = BlockReference;
-
-                [[nodiscard]]
-                Iterator()
+                Enumerator()
                     : structureData_{ nullptr }
                     , dataIterator_{}
                     , value_{ Utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
-                explicit Iterator(StructureData const& structureData)
+                explicit Enumerator(StructureData const& structureData)
                     : structureData_{ &structureData }
                     , dataIterator_{ structureData.solverIndices().begin() }
                     , value_{ Utils::NO_INIT }
@@ -93,16 +87,14 @@ namespace Gustave::Scenes::CuboidGrid {
                     updateValue();
                 }
 
-                Iterator& operator++() {
-                    ++dataIterator_;
-                    updateValue();
-                    return *this;
+                [[nodiscard]]
+                bool isEnd() const {
+                    return dataIterator_ == structureData_->solverIndices().end();
                 }
 
-                Iterator operator++(int) {
-                    Iterator result = *this;
-                    ++*this;
-                    return result;
+                void operator++() {
+                    ++dataIterator_;
+                    updateValue();
                 }
 
                 [[nodiscard]]
@@ -111,26 +103,13 @@ namespace Gustave::Scenes::CuboidGrid {
                 }
 
                 [[nodiscard]]
-                BlockReference const* operator->() const {
-                    return &value_;
+                bool operator==(Enumerator const& other) const {
+                    return dataIterator_ == other.dataIterator_;
                 }
-
-                [[nodiscard]]
-                bool operator==(EndIterator const&) const {
-                    return isEnd();
-                }
-
-                [[nodiscard]]
-                bool operator==(Iterator const&) const = default;
             private:
-                [[nodiscard]]
-                bool isEnd() const {
-                    return dataIterator_ == structureData_->solverIndices().end();
-                }
-
                 void updateValue() {
                     if (!isEnd()) {
-                        value_ = BlockReference{ structureData_->sceneData(), dataIterator_->first};
+                        value_ = BlockReference{ structureData_->sceneData(), dataIterator_->first };
                     }
                 }
 
@@ -138,6 +117,8 @@ namespace Gustave::Scenes::CuboidGrid {
                 DataIterator dataIterator_;
                 BlockReference value_;
             };
+        public:
+            using Iterator = Utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
             explicit Blocks(StructureData const& data)
@@ -166,8 +147,8 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            EndIterator end() const {
-                return EndIterator{};
+            constexpr Utils::EndIterator end() const {
+                return {};
             }
 
             [[nodiscard]]

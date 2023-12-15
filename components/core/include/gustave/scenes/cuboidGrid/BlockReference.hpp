@@ -38,6 +38,8 @@
 #include <gustave/scenes/cuboidGrid/detail/PositionNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/BlockPosition.hpp>
+#include <gustave/utils/EndIterator.hpp>
+#include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
@@ -97,29 +99,20 @@ namespace Gustave::Scenes::CuboidGrid {
         };
 
         class Neighbours {
-        public:
-            class EndIterator {
+        private:
+            using PosIterator = typename PositionNeighbours::Iterator;
+
+            class Enumerator {
             public:
                 [[nodiscard]]
-                constexpr EndIterator() = default;
-            };
-
-            class Iterator {
-            private:
-                using PosIterator = typename PositionNeighbours::Iterator;
-            public:
-                using difference_type = std::ptrdiff_t;
-                using value_type = Neighbour;
-
-                [[nodiscard]]
-                Iterator()
+                Enumerator()
                     : neighbours_{ nullptr }
                     , pos_{ nullptr }
                     , value_{ Utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
-                explicit Iterator(Neighbours const& neighbours)
+                explicit Enumerator(Neighbours const& neighbours)
                     : neighbours_{ &neighbours }
                     , pos_{ neighbours.positions_.begin() }
                     , value_{ Utils::NO_INIT }
@@ -128,28 +121,23 @@ namespace Gustave::Scenes::CuboidGrid {
                 }
 
                 [[nodiscard]]
-                bool operator==(EndIterator const&) const {
+                bool isEnd() const {
                     return pos_ == positions().end();
                 }
 
-                [[nodiscard]]
-                bool operator==(Iterator const&) const = default;
-
-                Iterator& operator++() {
+                void operator++() {
                     ++pos_;
                     next();
-                    return *this;
-                }
-
-                Iterator operator++(int) {
-                    Iterator result = *this;
-                    ++*this;
-                    return result;
                 }
 
                 [[nodiscard]]
                 Neighbour const& operator*() const {
                     return value_;
+                }
+
+                [[nodiscard]]
+                bool operator==(Enumerator const& other) const {
+                    return pos_ == other.pos_;
                 }
             private:
                 [[nodiscard]]
@@ -172,6 +160,8 @@ namespace Gustave::Scenes::CuboidGrid {
                 PosIterator pos_;
                 Neighbour value_;
             };
+        public:
+            using Iterator = Utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
             explicit Neighbours(SceneData const& data, BlockPosition const& source)
@@ -179,11 +169,13 @@ namespace Gustave::Scenes::CuboidGrid {
                 , positions_ { source }
             {}
 
+            [[nodiscard]]
             Iterator begin() const {
                 return Iterator{ *this };
             }
 
-            EndIterator end() const {
+            [[nodiscard]]
+            constexpr Utils::EndIterator end() const {
                 return {};
             }
         private:
