@@ -57,9 +57,14 @@ namespace Gustave::Solvers::Force1 {
         using Basis = SolutionBasis<cfg>;
         using ForceBalancer = detail::ForceBalancer<cfg>;
         using ForceRepartition = detail::ForceRepartition<cfg>;
+        using Structure = typename Basis::Structure;
+
+        using ContactIndex = typename Structure::ContactIndex;
+        using Link = typename Structure::Link;
+        using LinkInfo = typename ForceBalancer::LinkInfo;
+        using LocalContactIndex = typename ForceBalancer::LocalContactIndex;
         using NodeInfo = typename ForceBalancer::NodeInfo;
         using NodeStats = typename ForceRepartition::NodeStats;
-        using Structure = typename Basis::Structure;
 
         [[nodiscard]]
         explicit Solution(std::shared_ptr<const Basis> basis)
@@ -97,6 +102,12 @@ namespace Gustave::Solvers::Force1 {
         }
 
         [[nodiscard]]
+        Vector3<u.force> forceVectorOnContact(ContactIndex const& contactId) const {
+            return forceRepartition().forceVectorOnContact(contactId);
+
+        }
+
+        [[nodiscard]]
         Vector3<u.force> forceVector(NodeIndex to, NodeIndex from) const {
             return forceRepartition().forceVector(to, from);
         }
@@ -109,11 +120,6 @@ namespace Gustave::Solvers::Force1 {
         [[nodiscard]]
         Real<u.one> relativeErrorOf(NodeIndex id) const {
             return forceRepartition().relativeErrorOf(id);
-        }
-
-        [[nodiscard]]
-        NodeStats statsOf(NodeIndex id) const {
-            return forceRepartition().statsOf(id);
         }
 
         [[nodiscard]]

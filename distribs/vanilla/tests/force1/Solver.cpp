@@ -35,7 +35,7 @@
 
 using Solver = Gustave::Solvers::Force1Solver<cfg>;
 
-using Contact = Solver::Structure::Contact;
+using Link = Solver::Structure::Link;
 using Node = Solver::Structure::Node;
 using Solution = Solver::Solution;
 using Structure = Solver::Structure;
@@ -49,7 +49,7 @@ TEST_CASE("Force1::Solver") {
                 structure.addNode(Node{ blockMass, i == 0 });
             }
             for (unsigned i = 0; i < blockCount - 1; ++i) {
-                structure.addContact(Contact{ i, i + 1,  Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });
+                structure.addLink(Link{ i, i + 1,  Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });
             }
             return structure;
         };

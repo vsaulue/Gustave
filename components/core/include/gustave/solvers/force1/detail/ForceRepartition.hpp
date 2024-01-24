@@ -49,12 +49,16 @@ namespace Gustave::Solvers::Force1::detail {
         static constexpr auto u = Cfg::units(cfg);
         static constexpr auto rt = cfg.realTraits;
     public:
-        using Structure = Solvers::Structure<cfg>;
-
-        using ContactInfo = detail::ContactInfo<cfg>;
         using ForceBalancer = detail::ForceBalancer<cfg>;
+        using Structure = typename ForceBalancer::Structure;
+
+        using ContactIndex = typename Structure::ContactIndex;
+        using ContactInfo = typename ForceBalancer::ContactInfo;
+        using Link = typename Structure::Link;
+        using LinkInfo = typename ForceBalancer::LinkInfo;
+        using LocalContactIndex = typename LinkInfo::LocalContactIndex;
         using Node = typename Structure::Node;
-        using NodeInfo = detail::NodeInfo<cfg>;
+        using NodeInfo = typename ForceBalancer::NodeInfo;
         using NodeStats = detail::NodeStats<cfg>;
 
         [[nodiscard]]
@@ -123,6 +127,17 @@ namespace Gustave::Solvers::Force1::detail {
         [[nodiscard]]
         Vector3<u.force> forceVector(NodeIndex to, NodeIndex from) const {
             return forceCoord(to, from) * balancer_.normalizedG();
+        }
+
+        [[nodiscard]]
+        Vector3<u.force> forceVectorOnContact(ContactIndex const& index) const {
+            Link const& link = balancer_.structure().links()[index.linkIndex];
+            LinkInfo const& linkInfo = balancer_.linkInfos()[index.linkIndex];
+            NodeIndex const nodeId = index.isOnLocalNode ? link.localNodeId() : link.otherNodeId();
+            LocalContactIndex const localContactId = index.isOnLocalNode ? linkInfo.localContactId : linkInfo.otherContactId;
+            ContactInfo const& contactInfo = balancer_.nodeInfos()[nodeId].contacts[localContactId];
+            ContactStats const stats = contactStatsOf(contactInfo, potentials_[nodeId]);
+            return stats.force() * balancer_.normalizedG();
         }
     private:
         ForceBalancer const& balancer_;

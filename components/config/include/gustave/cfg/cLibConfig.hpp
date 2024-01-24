@@ -36,7 +36,7 @@ namespace Gustave::Cfg {
         requires cRealTraits<decltype(Meta::value(T::realTraits))>;
         typename T::NormalizedVector3;
         typename T::template Vector3<T::realTraits.units().one>;
-        requires std::integral<typename T::ContactIndex>;
+        requires std::integral<typename T::LinkIndex>;
         requires std::integral<typename T::NodeIndex>;
     };
 }

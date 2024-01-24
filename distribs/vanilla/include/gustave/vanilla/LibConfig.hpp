@@ -39,7 +39,7 @@ namespace Gustave::Vanilla {
 
         using NormalizedVector3 = ::Gustave::Math3d::NormalizedVector3<realTraits>;
 
-        using ContactIndex = std::size_t;
+        using LinkIndex = std::size_t;
         using NodeIndex = std::size_t;
     };
 }

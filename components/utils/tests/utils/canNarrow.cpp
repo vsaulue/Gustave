@@ -23,45 +23,23 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include <cstdint>
 
-#include <cassert>
-#include <stdexcept>
-#include <vector>
+#include <catch2/catch_test_macros.hpp>
 
-#include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/cfg/cUnitOf.hpp>
-#include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/force1/detail/ContactInfo.hpp>
 #include <gustave/utils/canNarrow.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
-    template<Cfg::cLibConfig auto cfg>
-    class NodeInfo {
-    private:
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+namespace Utils = Gustave::Utils;
 
-        static constexpr auto u = Cfg::units(cfg);
-    public:
-        using LocalContactIndex = Cfg::LinkIndex<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+TEST_CASE("Utils::canNarrow") {
+    constexpr std::uint64_t max32 = std::numeric_limits<std::uint32_t>::max();
 
-        [[nodiscard]]
-        explicit NodeInfo(Real<u.force> weight)
-            : weight{ weight }
-        {
-            assert(weight > 0.f * u.force);
-        }
+    SECTION("// true") {
+        CHECK(Utils::canNarrow<std::uint8_t>(std::uint32_t{ 0 }));
+        CHECK(Utils::canNarrow<std::uint32_t>(max32));
+    }
 
-        LocalContactIndex addContact(NodeIndex otherIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) {
-            auto const result = contacts.size();
-            assert(Utils::canNarrow<LocalContactIndex>(result));
-            contacts.emplace_back(otherIndex, rPlus, rMinus);
-            return result;
-        }
-
-        std::vector<ContactInfo<cfg>> contacts;
-        Real<u.force> weight;
-    };
+    SECTION("// false") {
+        CHECK_FALSE(Utils::canNarrow<std::uint32_t>(1 + max32));
+    }
 }

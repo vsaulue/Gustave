@@ -37,7 +37,8 @@
 using Config = Gustave::Solvers::Force1::Config<cfg>;
 using Solution = Gustave::Solvers::Force1::Solution<cfg>;
 
-using Contact = Solution::Structure::Contact;
+using ContactIndex = Solution::ContactIndex;
+using Link = Solution::Structure::Link;
 using Node = Solution::Structure::Node;
 using Structure = Solution::Structure;
 
@@ -46,12 +47,12 @@ TEST_CASE("Force1::Solution") {
     for (unsigned i = 1; i <= 7; ++i) {
         structure->addNode(Node{ (i * 1'000.f) * u.mass, i == 1 });
     }
-    structure->addContact(Contact{ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addContact(Contact{ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addContact(Contact{ 3, 0,  Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addContact(Contact{ 4, 0, -Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
-    structure->addContact(Contact{ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
-    structure->addContact(Contact{ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
+    structure->addLink(Link{ 1, 0,  Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink(Link{ 2, 0, -Normals::x, 1.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink(Link{ 3, 0,  Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink(Link{ 4, 0, -Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink(Link{ 5, 0,  Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
+    structure->addLink(Link{ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
 
     constexpr float precision = 0.001f;
     auto config = std::make_shared<Config const>(g, 1000, precision);
@@ -62,6 +63,16 @@ TEST_CASE("Force1::Solution") {
         potentials[i] = float(i*i) / 1000.f * u.potential;
     }
 
+    auto yForce = [&](float y) {
+        return vector3(0.f, y, 0.f, u.force);
+    };
+    auto const force1 = yForce(-14'000.f);
+    auto const force2 = yForce(-56'000.f);
+    auto const force3 = yForce(-36'000.f);
+    auto const force4 = yForce(-640'000.f);
+    auto const force5 = yForce(-175'000.f);
+    auto const force6 = yForce(-252'000.f);
+
     SECTION("::force(NodeIndex, Nodeindex)") {
         auto runTest = [&solution](NodeIndex const to, NodeIndex const from, Vector3<u.force> const& expected) {
             CHECK_THAT(solution.forceVector(to, from), M::WithinRel(expected, epsilon));
@@ -69,31 +80,63 @@ TEST_CASE("Force1::Solution") {
         };
 
         SECTION("// 0-1") {
-            runTest(0, 1, { 0.f, -14'000.f, 0.f, u.force });
+            runTest(0, 1, force1);
         }
 
         SECTION("// 0-2") {
-            runTest(0, 2, { 0.f, -56'000.f, 0.f, u.force });
+            runTest(0, 2, force2);
         }
 
         SECTION("// 0-3") {
-            runTest(0, 3, { 0.f, -36'000.f, 0.f, u.force });
+            runTest(0, 3, force3);
         }
 
         SECTION("// 0-4") {
-            runTest(0, 4, { 0.f, -640'000.f, 0.f, u.force });
+            runTest(0, 4, force4);
         }
 
         SECTION("// 0-5") {
-            runTest(0, 5, { 0.f, -175'000.f, 0.f, u.force });
+            runTest(0, 5, force5);
         }
 
         SECTION("// 0-6") {
-            runTest(0, 6, { 0.f, -252'000.f, 0.f, u.force });
+            runTest(0, 6, force6);
         }
 
         SECTION("// 1-3") {
             runTest(1, 3, Vector3<u.force>::zero());
+        }
+    }
+
+    SECTION("::forceVectorOnContact(ContactIndex)") {
+        auto runTest = [&solution](LinkIndex const linkIndex, Vector3<u.force> const& expected) {
+            ContactIndex localCtx{ linkIndex, true };
+            CHECK_THAT(solution.forceVectorOnContact(localCtx), M::WithinRel(expected, epsilon));
+            CHECK_THAT(solution.forceVectorOnContact(localCtx.opposite()), M::WithinRel(-expected, epsilon));
+        };
+
+        SECTION("// 0-1") {
+            runTest(0, -force1);
+        }
+
+        SECTION("// 0-2") {
+            runTest(1, -force2);
+        }
+
+        SECTION("// 0-3") {
+            runTest(2, -force3);
+        }
+
+        SECTION("// 0-4") {
+            runTest(3, -force4);
+        }
+
+        SECTION("// 0-5") {
+            runTest(4, -force5);
+        }
+
+        SECTION("// 0-6") {
+            runTest(5, -force6);
         }
     }
 

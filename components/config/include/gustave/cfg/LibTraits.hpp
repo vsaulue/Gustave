@@ -37,7 +37,10 @@ namespace Gustave::Cfg {
     using NormalizedVector3 = typename decltype(cfg)::NormalizedVector3;
 
     template<cLibConfig auto cfg>
-    using ContactIndex = typename decltype(cfg)::ContactIndex;
+    using LinkIndex = typename decltype(cfg)::LinkIndex;
+
+    template<cLibConfig auto cfg>
+    using LocalContactIndex = typename decltype(cfg)::LinkIndex;
 
     template<cLibConfig auto cfg>
     using NodeIndex = typename decltype(cfg)::NodeIndex;

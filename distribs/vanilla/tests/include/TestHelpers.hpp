@@ -38,6 +38,7 @@
 namespace Cfg = ::Gustave::Cfg;
 namespace M = ::Gustave::Testing::Matchers;
 
+using LinkIndex = Cfg::LinkIndex<cfg>;
 using MaxStress = Gustave::Model::MaxStress<cfg>;
 using NodeIndex = Cfg::NodeIndex<cfg>;
 using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;

@@ -34,6 +34,7 @@
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/solvers/force1/Config.hpp>
 #include <gustave/solvers/force1/detail/ContactInfo.hpp>
+#include <gustave/solvers/force1/detail/LinkInfo.hpp>
 #include <gustave/solvers/force1/detail/NodeInfo.hpp>
 
 namespace Gustave::Solvers::Force1::detail {
@@ -55,8 +56,10 @@ namespace Gustave::Solvers::Force1::detail {
         using Structure = Solvers::Structure<cfg>;
 
         using Config = Force1::Config<cfg>;
-        using Contact = typename Structure::Contact;
         using ContactInfo = detail::ContactInfo<cfg>;
+        using Link = typename Structure::Link;
+        using LinkInfo = detail::LinkInfo<cfg>;
+        using LocalContactIndex = typename LinkInfo::LocalContactIndex;
         using Node = typename Structure::Node;
         using NodeInfo = detail::NodeInfo<cfg>;
 
@@ -71,27 +74,29 @@ namespace Gustave::Solvers::Force1::detail {
             for (Node const& node : nodes()) {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
-            for (Contact const& contact : structure.contacts()) {
-                NodeIndex const id1 = contact.localNodeId();
-                NodeIndex const id2 = contact.otherNodeId();
+            linkInfos_.reserve(structure.links().size());
+            for (Link const& link : structure.links()) {
+                NodeIndex const id1 = link.localNodeId();
+                NodeIndex const id2 = link.otherNodeId();
 
-                NormalizedVector3 const& normal = contact.normal();
+                NormalizedVector3 const& normal = link.normal();
                 Real<u.one> const nComp = normal.dot(normalizedG_);
-                Real<u.resistance> const tangentResist = rt.sqrt(1.f - nComp * nComp) / contact.shearConductivity();
+                Real<u.resistance> const tangentResist = rt.sqrt(1.f - nComp * nComp) / link.shearConductivity();
                 Real<u.resistance> pNormalResist{ Utils::NO_INIT };
                 Real<u.resistance> nNormalResist{ Utils::NO_INIT };
                 if (nComp <= 0.f) {
-                    pNormalResist = -nComp / contact.compressionConductivity();
-                    nNormalResist = -nComp / contact.tensileConductivity();
+                    pNormalResist = -nComp / link.compressionConductivity();
+                    nNormalResist = -nComp / link.tensileConductivity();
                 } else {
-                    pNormalResist = nComp / contact.tensileConductivity();
-                    nNormalResist = nComp / contact.compressionConductivity();
+                    pNormalResist = nComp / link.tensileConductivity();
+                    nNormalResist = nComp / link.compressionConductivity();
                 }
                 Real<u.resistance> const pResist = std::max(pNormalResist, tangentResist);
                 Real<u.resistance> const nResist = std::max(nNormalResist, tangentResist);
 
-                nodeInfos_[id1].addContact(id2, pResist, nResist);
-                nodeInfos_[id2].addContact(id1, nResist, pResist);
+                LocalContactIndex contact1 = nodeInfos_[id1].addContact(id2, pResist, nResist);
+                LocalContactIndex contact2 = nodeInfos_[id2].addContact(id1, nResist, pResist);
+                linkInfos_.push_back(LinkInfo{ contact1, contact2 });
             }
         }
 
@@ -103,6 +108,11 @@ namespace Gustave::Solvers::Force1::detail {
         [[nodiscard]]
         Vector3<u.acceleration> const& g() const {
             return config_->g();
+        }
+
+        [[nodiscard]]
+        std::vector<LinkInfo> const& linkInfos() const {
+            return linkInfos_;
         }
 
         [[nodiscard]]
@@ -122,6 +132,7 @@ namespace Gustave::Solvers::Force1::detail {
     private:
         Config const* config_;
         Structure const* structure_;
+        std::vector<LinkInfo> linkInfos_;
         std::vector<NodeInfo> nodeInfos_;
         NormalizedVector3 normalizedG_;
 

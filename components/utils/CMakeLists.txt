@@ -26,6 +26,7 @@ add_library(Comp-Utils INTERFACE)
 target_include_directories(Comp-Utils INTERFACE "include")
 
 add_executable(Test-Comp-Utils
+    "tests/utils/canNarrow.cpp"
     "tests/utils/ForwardIterator.cpp"
     "tests/utils/getter.cpp"
     "tests/utils/HashEquals.cpp"

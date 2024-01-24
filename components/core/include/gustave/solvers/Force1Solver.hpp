@@ -55,7 +55,6 @@ namespace Gustave::Solvers {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = typename Cfg::Vector3<cfg, unit>;
 
-        using ContactIndex = typename Cfg::ContactIndex<cfg>;
         using NodeIndex = typename Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
     public:

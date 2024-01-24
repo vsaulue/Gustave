@@ -25,43 +25,22 @@
 
 #pragma once
 
-#include <cassert>
-#include <stdexcept>
-#include <vector>
-
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/force1/detail/ContactInfo.hpp>
-#include <gustave/utils/canNarrow.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
+namespace Gustave::Solvers::Common {
     template<Cfg::cLibConfig auto cfg>
-    class NodeInfo {
-    private:
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
-
-        static constexpr auto u = Cfg::units(cfg);
+    struct ContactIndex {
     public:
-        using LocalContactIndex = Cfg::LinkIndex<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using LinkIndex = Cfg::LinkIndex<cfg>;
 
         [[nodiscard]]
-        explicit NodeInfo(Real<u.force> weight)
-            : weight{ weight }
-        {
-            assert(weight > 0.f * u.force);
+        ContactIndex opposite() const {
+            return ContactIndex{ linkIndex, !isOnLocalNode };
         }
 
-        LocalContactIndex addContact(NodeIndex otherIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) {
-            auto const result = contacts.size();
-            assert(Utils::canNarrow<LocalContactIndex>(result));
-            contacts.emplace_back(otherIndex, rPlus, rMinus);
-            return result;
-        }
-
-        std::vector<ContactInfo<cfg>> contacts;
-        Real<u.force> weight;
+        LinkIndex linkIndex;
+        bool isOnLocalNode;
     };
 }
