@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  * 
- * Copyright (c) 2022,2023 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2024 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  * 
  * MIT License
  * 
