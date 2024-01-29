@@ -25,16 +25,13 @@
 
 #pragma once
 
-#include <cassert>
-#include <memory>
-#include <span>
-#include <vector>
+#include <utility>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/force1/detail/ForceBalancer.hpp>
-#include <gustave/solvers/force1/detail/ForceRepartition.hpp>
+#include <gustave/solvers/force1/detail/SolutionData.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -51,88 +48,53 @@ namespace Gustave::Solvers::Force1 {
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
 
+        using ForceBalancer = detail::ForceBalancer<cfg>;
+        using SolutionData = detail::SolutionData<cfg>;
+
         static constexpr auto u = Cfg::units(cfg);
         static constexpr auto rt = cfg.realTraits;
     public:
         using Basis = SolutionBasis<cfg>;
-        using ForceBalancer = detail::ForceBalancer<cfg>;
-        using ForceRepartition = detail::ForceRepartition<cfg>;
         using Structure = typename Basis::Structure;
 
         using ContactIndex = typename Structure::ContactIndex;
         using Link = typename Structure::Link;
-        using LinkInfo = typename ForceBalancer::LinkInfo;
-        using LocalContactIndex = typename ForceBalancer::LocalContactIndex;
-        using NodeInfo = typename ForceBalancer::NodeInfo;
-        using NodeStats = typename ForceRepartition::NodeStats;
 
         [[nodiscard]]
         explicit Solution(std::shared_ptr<const Basis> basis)
-            : basis_{ std::move(basis) }
-            , forceBalancer_{ basis_->structure(), basis_->config() }
+            : data_{ std::move(basis) }
         {}
 
         [[nodiscard]]
         explicit Solution(std::shared_ptr<const Basis> basis, ForceBalancer balancer)
-            : basis_{ std::move(basis) }
-            , forceBalancer_{ std::move(balancer) }
-        {
-            assert(&basis_->structure() == &forceBalancer_.structure());
-            assert(&basis_->config() == &forceBalancer_.config());
-        }
-
-        [[nodiscard]]
-        std::shared_ptr<const Basis> const& basis() const {
-            return basis_;
-        }
-
-        [[nodiscard]]
-        Structure const& structure() const {
-            return basis_->structure();
-        }
-
-        [[nodiscard]]
-        std::vector<Real<u.potential>> const& potentials() const {
-            return basis_->potentials();
-        }
-
-        [[nodiscard]]
-        Vector3<u.acceleration> const& g() const {
-            return basis_->g();
-        }
+            : data_{ std::move(basis), std::move(balancer) }
+        {}
 
         [[nodiscard]]
         Vector3<u.force> forceVectorOnContact(ContactIndex const& contactId) const {
-            return forceRepartition().forceVectorOnContact(contactId);
-
+            return data_.forceRepartition().forceVectorOnContact(contactId);
         }
 
         [[nodiscard]]
         Vector3<u.force> forceVector(NodeIndex to, NodeIndex from) const {
-            return forceRepartition().forceVector(to, from);
+            return data_.forceRepartition().forceVector(to, from);
         }
 
         [[nodiscard]]
         Real<u.one> maxRelativeError() const {
-            return forceRepartition().maxRelativeError();
+            return data_.forceRepartition().maxRelativeError();
         }
 
         [[nodiscard]]
         Real<u.one> relativeErrorOf(NodeIndex id) const {
-            return forceRepartition().relativeErrorOf(id);
+            return data_.forceRepartition().relativeErrorOf(id);
         }
 
         [[nodiscard]]
         Real<u.one> sumRelativeError() const {
-            return forceRepartition().sumRelativeError();
+            return data_.forceRepartition().sumRelativeError();
         }
     private:
-        std::shared_ptr<Basis const> basis_;
-        ForceBalancer forceBalancer_;
-
-        [[nodiscard]]
-        ForceRepartition forceRepartition() const {
-            return ForceRepartition{ forceBalancer_, basis_->potentials() };
-        }
+        SolutionData data_;
     };
 }
