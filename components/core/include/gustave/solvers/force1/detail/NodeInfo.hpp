@@ -44,7 +44,9 @@ namespace Gustave::Solvers::Force1::detail {
 
         static constexpr auto u = Cfg::units(cfg);
     public:
-        using LocalContactIndex = Cfg::LinkIndex<cfg>;
+        using Contacts = std::vector<ContactInfo<cfg>>;
+        using LinkIndex = Cfg::LinkIndex<cfg>;
+        using LocalContactIndex = LinkIndex;
         using NodeIndex = Cfg::NodeIndex<cfg>;
 
         [[nodiscard]]
@@ -54,14 +56,14 @@ namespace Gustave::Solvers::Force1::detail {
             assert(weight > 0.f * u.force);
         }
 
-        LocalContactIndex addContact(NodeIndex otherIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) {
+        LocalContactIndex addContact(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) {
             auto const result = contacts.size();
             assert(Utils::canNarrow<LocalContactIndex>(result));
-            contacts.emplace_back(otherIndex, rPlus, rMinus);
+            contacts.emplace_back(otherIndex, linkIndex, rPlus, rMinus);
             return result;
         }
 
-        std::vector<ContactInfo<cfg>> contacts;
+        Contacts contacts;
         Real<u.force> weight;
     };
 }

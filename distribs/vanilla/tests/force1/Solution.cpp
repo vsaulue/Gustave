@@ -73,46 +73,75 @@ TEST_CASE("Force1::Solution") {
     auto const force5 = yForce(-175'000.f);
     auto const force6 = yForce(-252'000.f);
 
-    SECTION("::force(NodeIndex, Nodeindex)") {
-        auto runTest = [&solution](NodeIndex const to, NodeIndex const from, Vector3<u.force> const& expected) {
-            CHECK_THAT(solution.forceVector(to, from), M::WithinRel(expected, epsilon));
-            CHECK_THAT(solution.forceVector(from, to), M::WithinRel(-expected, epsilon));
-        };
+    SECTION(".nodes()") {
+        auto const nodes = solution.nodes();
 
-        SECTION("// 0-1") {
-            runTest(0, 1, force1);
+        SECTION(".forceVectorFrom()") {
+            auto runTest = [&nodes](NodeIndex const to, NodeIndex const from, Vector3<u.force> const& expected) {
+                CHECK_THAT(nodes.at(to).forceVectorFrom(from), M::WithinRel(expected, epsilon));
+                CHECK_THAT(nodes.at(from).forceVectorFrom(to), M::WithinRel(-expected, epsilon));
+                };
+
+            SECTION("// 0-1") {
+                runTest(0, 1, force1);
+            }
+
+            SECTION("// 0-2") {
+                runTest(0, 2, force2);
+            }
+
+            SECTION("// 0-3") {
+                runTest(0, 3, force3);
+            }
+
+            SECTION("// 0-4") {
+                runTest(0, 4, force4);
+            }
+
+            SECTION("// 0-5") {
+                runTest(0, 5, force5);
+            }
+
+            SECTION("// 0-6") {
+                runTest(0, 6, force6);
+            }
+
+            SECTION("// 1-3") {
+                runTest(1, 3, Vector3<u.force>::zero());
+            }
         }
 
-        SECTION("// 0-2") {
-            runTest(0, 2, force2);
-        }
-
-        SECTION("// 0-3") {
-            runTest(0, 3, force3);
-        }
-
-        SECTION("// 0-4") {
-            runTest(0, 4, force4);
-        }
-
-        SECTION("// 0-5") {
-            runTest(0, 5, force5);
-        }
-
-        SECTION("// 0-6") {
-            runTest(0, 6, force6);
-        }
-
-        SECTION("// 1-3") {
-            runTest(1, 3, Vector3<u.force>::zero());
+        SECTION(".relativeError()") {
+            SECTION("// 0") {
+                CHECK_THAT(nodes.at(0).relativeError(), M::WithinRel(118.3f * u.one, epsilon));
+            }
+            SECTION("// 1") {
+                CHECK_THAT(nodes.at(1).relativeError(), M::WithinRel(0.3f * u.one, epsilon));
+            }
+            SECTION("// 2") {
+                CHECK_THAT(nodes.at(2).relativeError(), M::WithinRel((26.f / 30.f) * u.one, epsilon));
+            }
+            SECTION("// 3") {
+                CHECK_THAT(nodes.at(3).relativeError(), M::WithinRel(0.1f * u.one, epsilon));
+            }
+            SECTION("// 4") {
+                CHECK_THAT(nodes.at(4).relativeError(), M::WithinRel(11.8f * u.one, epsilon));
+            }
+            SECTION("// 5") {
+                CHECK_THAT(nodes.at(5).relativeError(), M::WithinRel((115.f / 60.f) * u.one, epsilon));
+            }
+            SECTION("// 6") {
+                CHECK_THAT(nodes.at(6).relativeError(), M::WithinRel((182.f / 70.f) * u.one, epsilon));
+            }
         }
     }
 
-    SECTION("::forceVectorOnContact(ContactIndex)") {
-        auto runTest = [&solution](LinkIndex const linkIndex, Vector3<u.force> const& expected) {
-            ContactIndex localCtx{ linkIndex, true };
-            CHECK_THAT(solution.forceVectorOnContact(localCtx), M::WithinRel(expected, epsilon));
-            CHECK_THAT(solution.forceVectorOnContact(localCtx.opposite()), M::WithinRel(-expected, epsilon));
+    SECTION(".contacts().forceVector()") {
+        auto const contacts = solution.contacts();
+        auto runTest = [&contacts](LinkIndex const linkIndex, Vector3<u.force> const& expected) {
+            ContactIndex localContactId{ linkIndex, true };
+            CHECK_THAT(contacts.at(localContactId).forceVector(), M::WithinRel(expected, epsilon));
+            CHECK_THAT(contacts.at(localContactId.opposite()).forceVector(), M::WithinRel(-expected, epsilon));
         };
 
         SECTION("// 0-1") {
@@ -140,35 +169,7 @@ TEST_CASE("Force1::Solution") {
         }
     }
 
-    SECTION("::relativeErrorOf(NodeIndex)") {
-        SECTION("// 0") {
-            CHECK_THAT(solution.relativeErrorOf(0), M::WithinRel(118.3f * u.one, epsilon));
-        }
-        SECTION("// 1") {
-            CHECK_THAT(solution.relativeErrorOf(1), M::WithinRel(0.3f * u.one, epsilon));
-        }
-        SECTION("// 2") {
-            CHECK_THAT(solution.relativeErrorOf(2), M::WithinRel((26.f / 30.f) * u.one, epsilon));
-        }
-        SECTION("// 3") {
-            CHECK_THAT(solution.relativeErrorOf(3), M::WithinRel(0.1f * u.one, epsilon));
-        }
-        SECTION("// 4") {
-            CHECK_THAT(solution.relativeErrorOf(4), M::WithinRel(11.8f * u.one, epsilon));
-        }
-        SECTION("// 5") {
-            CHECK_THAT(solution.relativeErrorOf(5), M::WithinRel((115.f / 60.f) * u.one, epsilon));
-        }
-        SECTION("// 6") {
-            CHECK_THAT(solution.relativeErrorOf(6), M::WithinRel((182.f / 70.f) * u.one, epsilon));
-        }
-    }
-
-    SECTION("::maxRelativeError()") {
+    SECTION(".maxRelativeError()") {
         CHECK_THAT(solution.maxRelativeError(), M::WithinRel(11.8f * u.one, epsilon));
-    }
-
-    SECTION("::sumRelativeError()") {
-        CHECK_THAT(solution.sumRelativeError(), M::WithinRel(17.583333f * u.one, epsilon));
     }
 }

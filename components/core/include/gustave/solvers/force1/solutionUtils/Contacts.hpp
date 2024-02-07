@@ -25,37 +25,48 @@
 
 #pragma once
 
-#include <ostream>
+#include <sstream>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/solvers/force1/detail/NodeInfo.hpp>
+#include <gustave/solvers/force1/detail/NodeStats.hpp>
+#include <gustave/solvers/force1/detail/SolutionData.hpp>
+#include <gustave/solvers/force1/solutionUtils/ContactReference.hpp>
+#include <gustave/solvers/Structure.hpp>
+#include <gustave/utils/EndIterator.hpp>
+#include <gustave/utils/ForwardIterator.hpp>
 
-namespace Gustave::Solvers::Common {
+namespace Gustave::Solvers::Force1::SolutionUtils {
     template<Cfg::cLibConfig auto cfg>
-    struct ContactIndex {
+    class Contacts {
+    private:
+        using SolutionData = detail::SolutionData<cfg>;
+        using Structure = Solvers::Structure<cfg>;
+
+        using LinkIndex = typename Structure::LinkIndex;
     public:
-        using LinkIndex = Cfg::LinkIndex<cfg>;
+        using ContactIndex = typename Structure::ContactIndex;
+        using ContactReference = SolutionUtils::ContactReference<cfg>;
 
         [[nodiscard]]
-        ContactIndex opposite() const {
-            return ContactIndex{ linkIndex, !isOnLocalNode };
-        }
+        explicit Contacts(SolutionData const& solution)
+            : solution_{ &solution }
+        {}
 
         [[nodiscard]]
-        bool operator==(ContactIndex const&) const = default;
-
-        friend std::ostream& operator<<(std::ostream& str, ContactIndex const& index) {
-            str << "{ linkIndex: " << index.linkIndex << ", isOnLocalNode: ";
-            if (index.isOnLocalNode) {
-                str << "true";
-            } else {
-                str << "false";
+        ContactReference at(ContactIndex const& index) const {
+            LinkIndex linkId = index.linkIndex;
+            std::size_t linksCount = solution_->basis().structure().links().size();
+            if (linkId >= linksCount) {
+                std::stringstream msg;
+                msg << "Index " << linkId << " is out of range (size: " << linksCount << ").";
+                throw std::out_of_range(msg.str());
             }
-            return str << " }";
+            return ContactReference{ *solution_, index };
         }
-
-        LinkIndex linkIndex;
-        bool isOnLocalNode;
+    private:
+        SolutionData const* solution_;
     };
 }

@@ -40,16 +40,18 @@ namespace Gustave::Solvers {
         using ContactIndex = Common::ContactIndex<cfg>;
         using Link = Common::Link<cfg>;
         using LinkIndex = Cfg::LinkIndex<cfg>;
+        using Links = std::vector<Link>;
         using Node = Common::Node<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
+        using Nodes = std::vector<Node>;
 
         [[nodiscard]]
-        std::vector<Node> const& nodes() const {
+        Nodes const& nodes() const {
             return nodes_;
         }
 
         [[nodiscard]]
-        std::vector<Link> const& links() const {
+        Links const& links() const {
             return links_;
         }
 
@@ -73,7 +75,7 @@ namespace Gustave::Solvers {
             return result;
         }
     private:
-        std::vector<Node> nodes_;
-        std::vector<Link> links_;
+        Nodes nodes_;
+        Links links_;
     };
 }

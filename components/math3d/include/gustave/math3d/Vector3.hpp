@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
+#include <functional>
 #include <ostream>
 #include <utility>
 
@@ -312,7 +313,7 @@ namespace Gustave::Math3d {
             using RhsV3 = decltype(Meta::value(rhsV3));
             static_assert(rt == RhsV3::realTraits(), "Invalid comparison: different realTraits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid comparison: incompatible units.");
-            return std::ranges::equal(coords_, rhsV3.coords());
+            return std::ranges::equal(coords_, rhsV3.coords(), std::equal_to{});
         }
     private:
         std::array<Coord, 3> coords_;

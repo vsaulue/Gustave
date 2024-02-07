@@ -38,18 +38,25 @@ namespace Gustave::Solvers::Force1::detail {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
 
-        using NodeIndex = Cfg::NodeIndex<cfg>;
-
         static constexpr auto u = Cfg::units(cfg);
     public:
+        using LinkIndex = Cfg::LinkIndex<cfg>;
+        using NodeIndex = Cfg::NodeIndex<cfg>;
+
         [[nodiscard]]
-        explicit ContactInfo(NodeIndex otherIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) :
-            otherIndex_(otherIndex),
-            rMinus_(rMinus),
-            rPlus_(rPlus)
+        explicit ContactInfo(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus)
+            : otherIndex_{ otherIndex }
+            , linkIndex_{ linkIndex }
+            , rMinus_{ rMinus }
+            , rPlus_{ rPlus }
         {
             assert(rMinus > 0.f * u.resistance);
             assert(rPlus > 0.f * u.resistance);
+        }
+
+        [[nodiscard]]
+        LinkIndex linkIndex() const {
+            return linkIndex_;
         }
 
         [[nodiscard]]
@@ -68,6 +75,7 @@ namespace Gustave::Solvers::Force1::detail {
         }
     private:
         NodeIndex otherIndex_;
+        LinkIndex linkIndex_;
         Real<u.resistance> rMinus_;
         Real<u.resistance> rPlus_;
     };

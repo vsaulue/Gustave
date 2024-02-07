@@ -188,9 +188,8 @@ namespace Gustave::Worlds::Sync {
             auto const toIndex = data_->sceneStructure().solverIndexOf(to);
             auto const fromIndex = data_->sceneStructure().solverIndexOf(from);
             if (toIndex && fromIndex) {
-                return data_->solution().forceVector(*toIndex, *fromIndex);
-            }
-            else {
+                return data_->solution().nodes().at(*toIndex).forceVectorFrom(*fromIndex);
+            } else {
                 return {};
             }
         }

@@ -125,19 +125,24 @@ namespace Gustave::Solvers::Force1::detail {
         }
 
         [[nodiscard]]
-        Vector3<u.force> forceVector(NodeIndex to, NodeIndex from) const {
-            return forceCoord(to, from) * balancer_.normalizedG();
-        }
-
-        [[nodiscard]]
-        Vector3<u.force> forceVectorOnContact(ContactIndex const& index) const {
+        Real<u.force> forceCoordOnContact(ContactIndex const& index) const {
             Link const& link = balancer_.structure().links()[index.linkIndex];
             LinkInfo const& linkInfo = balancer_.linkInfos()[index.linkIndex];
             NodeIndex const nodeId = index.isOnLocalNode ? link.localNodeId() : link.otherNodeId();
             LocalContactIndex const localContactId = index.isOnLocalNode ? linkInfo.localContactId : linkInfo.otherContactId;
             ContactInfo const& contactInfo = balancer_.nodeInfos()[nodeId].contacts[localContactId];
             ContactStats const stats = contactStatsOf(contactInfo, potentials_[nodeId]);
-            return stats.force() * balancer_.normalizedG();
+            return stats.force();
+        }
+
+        [[nodiscard]]
+        Vector3<u.force> forceVector(NodeIndex to, NodeIndex from) const {
+            return forceCoord(to, from) * balancer_.normalizedG();
+        }
+
+        [[nodiscard]]
+        Vector3<u.force> forceVectorOnContact(ContactIndex const& index) const {
+            return forceCoordOnContact(index) * balancer_.normalizedG();
         }
     private:
         ForceBalancer const& balancer_;

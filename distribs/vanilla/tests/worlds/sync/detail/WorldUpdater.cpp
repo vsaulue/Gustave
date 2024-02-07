@@ -87,7 +87,7 @@ TEST_CASE("Worlds::Sync::detail::WorldUpdater") {
         auto const idFrom = worldStruct->sceneStructure().solverIndexOf(from);
         REQUIRE(idTo);
         REQUIRE(idFrom);
-        auto const force = worldStruct->solution().forceVector(*idTo, *idFrom);
+        auto const force = worldStruct->solution().nodes().at(*idTo).forceVectorFrom(*idFrom);
         CHECK_THAT(force, M::WithinRel(expectedForce, solverPrecision));
     };
 

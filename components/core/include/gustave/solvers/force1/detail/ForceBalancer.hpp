@@ -47,6 +47,7 @@ namespace Gustave::Solvers::Force1::detail {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
 
+        using LinkIndex = Cfg::LinkIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
 
@@ -74,8 +75,10 @@ namespace Gustave::Solvers::Force1::detail {
             for (Node const& node : nodes()) {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
-            linkInfos_.reserve(structure.links().size());
-            for (Link const& link : structure.links()) {
+            auto const& links = structure.links();
+            linkInfos_.reserve(links.size());
+            for (LinkIndex linkId = 0; linkId < links.size(); ++linkId) {
+                Link const& link = links[linkId];
                 NodeIndex const id1 = link.localNodeId();
                 NodeIndex const id2 = link.otherNodeId();
 
@@ -94,8 +97,8 @@ namespace Gustave::Solvers::Force1::detail {
                 Real<u.resistance> const pResist = std::max(pNormalResist, tangentResist);
                 Real<u.resistance> const nResist = std::max(nNormalResist, tangentResist);
 
-                LocalContactIndex contact1 = nodeInfos_[id1].addContact(id2, pResist, nResist);
-                LocalContactIndex contact2 = nodeInfos_[id2].addContact(id1, nResist, pResist);
+                LocalContactIndex contact1 = nodeInfos_[id1].addContact(id2, linkId, pResist, nResist);
+                LocalContactIndex contact2 = nodeInfos_[id2].addContact(id1, linkId, nResist, pResist);
                 linkInfos_.push_back(LinkInfo{ contact1, contact2 });
             }
         }

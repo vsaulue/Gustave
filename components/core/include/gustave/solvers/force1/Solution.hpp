@@ -32,6 +32,8 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/force1/detail/ForceBalancer.hpp>
 #include <gustave/solvers/force1/detail/SolutionData.hpp>
+#include <gustave/solvers/force1/solutionUtils/Contacts.hpp>
+#include <gustave/solvers/force1/solutionUtils/Nodes.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -55,6 +57,8 @@ namespace Gustave::Solvers::Force1 {
         static constexpr auto rt = cfg.realTraits;
     public:
         using Basis = SolutionBasis<cfg>;
+        using Contacts = SolutionUtils::Contacts<cfg>;
+        using Nodes = SolutionUtils::Nodes<cfg>;
         using Structure = typename Basis::Structure;
 
         using ContactIndex = typename Structure::ContactIndex;
@@ -71,28 +75,18 @@ namespace Gustave::Solvers::Force1 {
         {}
 
         [[nodiscard]]
-        Vector3<u.force> forceVectorOnContact(ContactIndex const& contactId) const {
-            return data_.forceRepartition().forceVectorOnContact(contactId);
-        }
-
-        [[nodiscard]]
-        Vector3<u.force> forceVector(NodeIndex to, NodeIndex from) const {
-            return data_.forceRepartition().forceVector(to, from);
-        }
-
-        [[nodiscard]]
         Real<u.one> maxRelativeError() const {
             return data_.forceRepartition().maxRelativeError();
         }
 
         [[nodiscard]]
-        Real<u.one> relativeErrorOf(NodeIndex id) const {
-            return data_.forceRepartition().relativeErrorOf(id);
+        Contacts contacts() const {
+            return Contacts{ data_ };
         }
 
         [[nodiscard]]
-        Real<u.one> sumRelativeError() const {
-            return data_.forceRepartition().sumRelativeError();
+        Nodes nodes() const {
+            return Nodes{ data_ };
         }
     private:
         SolutionData data_;
