@@ -43,12 +43,18 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
         using Blocks = SceneBlocks<cfg>;
-        using Structures = Utils::PointerHash::Set<std::shared_ptr<StructureData<cfg> const>>;
+        using StructureData = detail::StructureData<cfg>;
+        using Structures = Utils::PointerHash::Set<std::shared_ptr<StructureData const>>;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)
             : blocks{ blockSize }
         {}
+
+        [[nodiscard]]
+        bool isStructureValid(StructureData const* structure) const {
+            return structure != nullptr && structures.contains(structure);
+        }
 
         Blocks blocks;
         Structures structures;

@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <limits>
+
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
@@ -38,7 +40,12 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockMappedData") {
         const BlockConstructionInfo info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
         BlockMappedData data{ info };
 
+        constexpr LinkIndex maxLinkId = std::numeric_limits<LinkIndex>::max();
+
         CHECK(data.maxStress().maxTensileStress() == concrete_20m.maxTensileStress());
+        CHECK(data.linkIndices().plusX == maxLinkId);
+        CHECK(data.linkIndices().plusY == maxLinkId);
+        CHECK(data.linkIndices().plusZ == maxLinkId);
         CHECK(data.mass() == 5.f * u.mass);
         CHECK(data.isFoundation() == true);
         CHECK(data.structure() == nullptr);

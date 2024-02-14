@@ -27,8 +27,10 @@
 
 #include <cstdint>
 #include <functional>
+#include <optional>
 #include <ostream>
 
+#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/utils/Hasher.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -36,6 +38,7 @@ namespace Gustave::Scenes::CuboidGrid {
     struct BlockIndex {
     public:
         using Coord = std::int64_t;
+        using Direction = Math3d::BasicDirection;
 
         [[nodiscard]]
         explicit BlockIndex(Utils::NoInit) {}
@@ -46,6 +49,46 @@ namespace Gustave::Scenes::CuboidGrid {
             , y(y)
             , z(z)
         {}
+
+        [[nodiscard]]
+        std::optional<BlockIndex> neighbourAlong(Direction direction) const {
+            static constexpr Coord maxCoord = std::numeric_limits<Coord>::max();
+            static constexpr Coord minCoord = std::numeric_limits<Coord>::min();
+            std::optional<BlockIndex> result;
+            switch (direction) {
+            case Direction::plusX:
+                if (x < maxCoord) {
+                    result = BlockIndex{ x + 1, y ,z };
+                }
+                break;
+            case Direction::minusX:
+                if (x > minCoord) {
+                    result = BlockIndex{ x - 1, y, z };
+                }
+                break;
+            case Direction::plusY:
+                if (y < maxCoord) {
+                    result = BlockIndex{ x, y + 1, z };
+                }
+                break;
+            case Direction::minusY:
+                if (y > minCoord) {
+                    result = BlockIndex{ x, y - 1, z };
+                }
+                break;
+            case Direction::plusZ:
+                if (z < maxCoord) {
+                    result = BlockIndex{ x, y, z + 1 };
+                }
+                break;
+            case Direction::minusZ:
+                if (z > minCoord) {
+                    result = BlockIndex{ x, y, z - 1 };
+                }
+                break;
+            }
+            return result;
+        }
 
         [[nodiscard]]
         bool operator==(BlockIndex const&) const = default;

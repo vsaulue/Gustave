@@ -48,12 +48,12 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             , source_{ source }
             , count_{ 0 }
         {
-            addValue(!isMax(source.x), Direction::plusX,  {  1, 0, 0 });
-            addValue(!isMin(source.x), Direction::minusX, { -1, 0, 0 });
-            addValue(!isMax(source.y), Direction::plusY,  {  0, 1, 0 });
-            addValue(!isMin(source.y), Direction::minusY, {  0,-1, 0 });
-            addValue(!isMax(source.z), Direction::plusZ,  {  0, 0, 1 });
-            addValue(!isMin(source.z), Direction::minusZ, {  0, 0,-1 });
+            addValue(Direction::plusX);
+            addValue(Direction::minusX);
+            addValue(Direction::plusY);
+            addValue(Direction::minusY);
+            addValue(Direction::plusZ);
+            addValue(Direction::minusZ);
         }
 
         [[nodiscard]]
@@ -76,26 +76,14 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             return count_;
         }
     private:
-        using Limits = std::numeric_limits<Coord>;
-
         [[nodiscard]]
         static IndexNeighbour NO_INIT() {
             return IndexNeighbour{ Utils::NO_INIT };
         }
 
-        [[nodiscard]]
-        static bool isMin(Coord value) {
-            return value == Limits::min();
-        }
-
-        [[nodiscard]]
-        static bool isMax(Coord value) {
-            return value == Limits::max();
-        }
-
-        void addValue(bool condition, Direction direction, BlockIndex const& offset) {
-            if (condition) {
-                values_[count_] = { direction, source_ + offset };
+        void addValue(Direction direction) {
+            if (std::optional<BlockIndex> neighbourId = source_.neighbourAlong(direction)) {
+                values_[count_] = { direction, *neighbourId };
                 ++count_;
             }
         }

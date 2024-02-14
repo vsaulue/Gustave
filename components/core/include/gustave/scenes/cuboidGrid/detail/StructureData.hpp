@@ -28,14 +28,18 @@
 #include <cassert>
 #include <memory>
 #include <optional>
+#include <stack>
 #include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
+#include <gustave/scenes/cuboidGrid/detail/DataNeighbour.hpp>
+#include <gustave/scenes/cuboidGrid/detail/DataNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/solvers/Structure.hpp>
+#include <gustave/utils/prop/Ptr.hpp>
 
 namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg>
@@ -46,11 +50,13 @@ namespace Gustave::Scenes::CuboidGrid::detail {
     private:
         static constexpr auto u = Cfg::units(cfg);
 
-        using ConstBlockReference = detail::BlockDataReference<cfg, false>;
+        using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
+        using DataNeighbour = detail::DataNeighbour<cfg, true>;
+        using DataNeighbours = detail::DataNeighbours<cfg, true>;
+        using Direction = Math3d::BasicDirection;
+
         using MaxStress = Model::MaxStress<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using SceneData = detail::SceneData<cfg>;
         using SolverStructure = Solvers::Structure<cfg>;
 
         using Link = typename SolverStructure::Link;
@@ -59,37 +65,54 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
     public:
+        using BlockDataReference = detail::BlockDataReference<cfg, true>;
+        using LinkIndex = Cfg::LinkIndex<cfg>;
+        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using SceneData = detail::SceneData<cfg>;
         using SolverIndices = std::unordered_map<BlockIndex, NodeIndex>;
 
         [[nodiscard]]
-        explicit StructureData(SceneData const& sceneData)
-            : sceneData_{ sceneData }
+        explicit StructureData(SceneData& sceneData, BlockDataReference root)
+            : scene_{ &sceneData }
             , solverStructure_{ std::make_shared<SolverStructure>() }
-        {}
-
-        void addBlock(ConstBlockReference block) {
-            assert(block);
-            auto insertResult = solverIndices_.insert({ block.index(), NodeIndex{0} });
-            if (insertResult.second) {
-                NodeIndex newIndex = solverStructure_->addNode(Node{ block.mass(), block.isFoundation() });
-                insertResult.first->second = newIndex;
+        {
+            std::stack<BlockDataReference> remainingBlocks;
+            remainingBlocks.push(root);
+            while (!remainingBlocks.empty()) {
+                BlockDataReference curBlock = remainingBlocks.top();
+                remainingBlocks.pop();
+                assert(!curBlock.isFoundation());
+                if (curBlock.structure() != this) {
+                    declareBlock(curBlock);
+                    curBlock.structure() = this;
+                    for (DataNeighbour const& neighbour : DataNeighbours{ scene_->blocks, curBlock.index() }) {
+                        BlockDataReference nBlock = neighbour.block;
+                        if (nBlock.isFoundation()) {
+                            declareBlock(nBlock);
+                            addContact(curBlock, neighbour);
+                        } else {
+                            if (nBlock.structure() != this) {
+                                remainingBlocks.push(nBlock);
+                            } else {
+                                addContact(curBlock, neighbour);
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        void addContact(ConstBlockReference b1, ConstBlockReference b2, NormalizedVector3 const& normalOnB1,
-                        Real<u.area> area, Real<u.length> thickness, MaxStress const& maxConstraints)
-        {
-            solverStructure_->addLink(Link{ indexOf(b1), indexOf(b2), normalOnB1, area, thickness, maxConstraints });
-        }
+        StructureData(StructureData const&) = delete;
+        StructureData& operator=(StructureData const&) = delete;
 
         [[nodiscard]]
-        bool contains(ConstBlockReference block) const {
+        bool contains(ConstBlockDataReference block) const {
             return solverIndices_.contains(block.index());
         }
 
         [[nodiscard]]
         bool contains(BlockIndex const& index) const {
-            ConstBlockReference block = sceneData_.blocks.find(index);
+            ConstBlockDataReference block = scene_->blocks.find(index);
             if (block) {
                 return contains(block);
             } else {
@@ -99,16 +122,16 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         [[nodiscard]]
         bool isValid() const {
-            return sceneData_.structures.contains(this);
+            return scene_->structures.contains(this);
         }
 
         [[nodiscard]]
         SceneData const& sceneData() const {
-            return sceneData_;
+            return *scene_;
         }
 
         [[nodiscard]]
-        std::optional<NodeIndex> solverIndexOf(ConstBlockReference block) const {
+        std::optional<NodeIndex> solverIndexOf(ConstBlockDataReference block) const {
             auto const findResult = solverIndices_.find(block.index());
             if (findResult != solverIndices_.end()) {
                 return { findResult->second };
@@ -119,7 +142,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         [[nodiscard]]
         std::optional<NodeIndex> solverIndexOf(BlockIndex const& index) const {
-            ConstBlockReference const block = sceneData_.blocks.find(index);
+            ConstBlockDataReference const block = scene_->blocks.find(index);
             if (block) {
                 return solverIndexOf(block);
             } else {
@@ -142,12 +165,54 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             return solverStructure_;
         }
     private:
+        void declareBlock(ConstBlockDataReference block) {
+            assert(block);
+            auto insertResult = solverIndices_.insert({ block.index(), NodeIndex{0} });
+            if (insertResult.second) {
+                NodeIndex newIndex = solverStructure_->addNode(Node{ block.mass(), block.isFoundation() });
+                insertResult.first->second = newIndex;
+            }
+        }
+
+        void addContact(BlockDataReference source, DataNeighbour const& neighbour) {
+            Direction const direction = neighbour.direction;
+            BlockDataReference nBlock = neighbour.block;
+            switch (direction) {
+            case Direction::plusX:
+                source.linkIndices().plusX = addLink(source, nBlock, direction);
+                break;
+            case Direction::plusY:
+                source.linkIndices().plusY = addLink(source, nBlock, direction);
+                break;
+            case Direction::plusZ:
+                source.linkIndices().plusZ = addLink(source, nBlock, direction);
+                break;
+            case Direction::minusX:
+                nBlock.linkIndices().plusX = addLink(nBlock, source, Direction::plusX);
+                break;
+            case Direction::minusY:
+                nBlock.linkIndices().plusY = addLink(nBlock, source, Direction::plusY);
+                break;
+            case Direction::minusZ:
+                nBlock.linkIndices().plusZ = addLink(nBlock, source, Direction::plusZ);
+                break;
+            }
+        }
+
+        LinkIndex addLink(BlockDataReference localNode, BlockDataReference otherNode, Direction direction) {
+            NormalizedVector3 const normal = NormalizedVector3::basisVector(direction);
+            Real<u.area> const area = scene_->blocks.contactAreaAlong(direction);
+            Real<u.length> const thickness = scene_->blocks.thicknessAlong(direction);
+            MaxStress const maxStress = MaxStress::minResistance(localNode.maxStress(), otherNode.maxStress());
+            return solverStructure_->addLink(Link{ indexOf(localNode), indexOf(otherNode), normal, area, thickness, maxStress });
+        }
+
         [[nodiscard]]
-        NodeIndex indexOf(ConstBlockReference block) const {
+        NodeIndex indexOf(ConstBlockDataReference block) const {
             return solverIndices_.at(block.index());
         }
 
-        SceneData const& sceneData_;
+        Utils::Prop::Ptr<SceneData> scene_;
         std::shared_ptr<SolverStructure> solverStructure_;
         SolverIndices solverIndices_;
     };

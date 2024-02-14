@@ -26,6 +26,7 @@
 #pragma once
 
 #include <cassert>
+#include <limits>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
@@ -47,9 +48,18 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         using MaxStress = Model::MaxStress<cfg>;
     public:
+        using LinkIndex = Cfg::LinkIndex<cfg>;
+
+        struct LinkIndices {
+            LinkIndex plusX;
+            LinkIndex plusY;
+            LinkIndex plusZ;
+        };
+
         [[nodiscard]]
-        BlockMappedData(BlockConstructionInfo<cfg> const& info)
+        explicit BlockMappedData(BlockConstructionInfo<cfg> const& info)
             : maxStress_{ info.maxStress() }
+            , linkIndices_{ maxLinkId(), maxLinkId(), maxLinkId() }
             , mass_{ info.mass() }
             , isFoundation_{ info.isFoundation() }
             , structure_{ nullptr }
@@ -73,6 +83,16 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
+        LinkIndices& linkIndices() {
+            return linkIndices_;
+        }
+
+        [[nodiscard]]
+        LinkIndices const& linkIndices() const {
+            return linkIndices_;
+        }
+
+        [[nodiscard]]
         StructureData<cfg>*& structure() {
             return structure_;
         }
@@ -82,7 +102,13 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             return structure_;
         }
     private:
+        [[nodiscard]]
+        static constexpr LinkIndex maxLinkId() {
+            return std::numeric_limits<LinkIndex>::max();
+        }
+
         MaxStress maxStress_;
+        LinkIndices linkIndices_;
         Real<u.mass> mass_;
         bool isFoundation_;
         StructureData<cfg>* structure_;

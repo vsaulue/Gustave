@@ -35,6 +35,8 @@
 
 using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<cfg>;
 using BlockData = Gustave::Scenes::CuboidGrid::detail::BlockData<cfg>;
+using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
+using BlockMappedData = Gustave::Scenes::CuboidGrid::detail::BlockMappedData<cfg>;
 using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
 using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<cfg>;
 
@@ -42,23 +44,22 @@ template<bool isMutable>
 using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg, isMutable>;
 
 TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
-    BlockConstructionInfo const info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
-    BlockData data{ info.index(), { info } };
-    SceneData const sceneData{ vector3(1.f, 1.f, 1.f, u.length) };
+    SceneData sceneData{ vector3(1.f, 1.f, 1.f, u.length) };
+
+    BlockDataReference<true> b111 = sceneData.blocks.insert(BlockConstructionInfo{ {1,1,1}, concrete_20m, 5.f * u.mass, false });
+    BlockDataReference<true> b333 = sceneData.blocks.insert(BlockConstructionInfo{ {3,3,3}, concrete_20m, 10.f * u.mass, true });
 
     SECTION("<*,true>") {
         SECTION("// constructor & getters") {
-            BlockDataReference<true> ref{ &data };
-            CHECK(ref.index() == info.index());
-            CHECK(ref.mass() == 5.f * u.mass);
-            CHECK(ref.isFoundation() == true);
-            CHECK(ref.structure() == nullptr);
+            CHECK(b111.index() == BlockIndex{ 1,1,1 });
+            CHECK(b111.mass() == 5.f * u.mass);
+            CHECK(b111.isFoundation() == false);
+            CHECK(b111.structure() == nullptr);
         }
 
         SECTION("operator bool() const") {
             SECTION("// true") {
-                BlockDataReference<true> const ref{ &data };
-                CHECK(ref);
+                CHECK(b111);
             }
 
             SECTION("// false") {
@@ -68,36 +69,31 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
         }
 
         SECTION("::structure() // mutable") {
-            BlockDataReference<true> ref{ &data };
-            StructureData structure{ sceneData };
-            ref.structure() = &structure;
-            CHECK(data.second.structure() == &structure);
+            StructureData structure{ sceneData, b111 };
+            CHECK(b333.structure() == nullptr);
+            b333.structure() = &structure;
+            CHECK(b333.structure() == &structure);
         }
     }
 
     SECTION("<*,false>") {
-        BlockData const* const cData = &data;
-
         SECTION("::BlockDataReference(BlockData const*) // + getters") {
-            BlockDataReference<false> cRef{ cData };
-            CHECK(cRef.index() == info.index());
+            BlockDataReference<false> cRef{ b111.data() };
+            CHECK(cRef.index() == BlockIndex{ 1,1,1 });
             CHECK(cRef.mass() == 5.f * u.mass);
-            CHECK(cRef.isFoundation() == true);
+            CHECK(cRef.isFoundation() == false);
             CHECK(cRef.structure() == nullptr);
         }
 
         SECTION("::BlockDataReference(BlockDataReference<*,true> const&)") {
-            BlockDataReference<true> ref{ &data };
-            BlockDataReference<false> cRef{ ref };
-            CHECK(ref.data() == cRef.data());
+            BlockDataReference<false> cRef{ b111 };
+            CHECK(b111.data() == cRef.data());
         }
 
         SECTION("::operator==(BlockDataReference<*;true> const&)") {
-            BlockDataReference<true> validRef{ &data };
             BlockDataReference<true> nullRef{ nullptr };
-            BlockDataReference<false> cRef{ cData };
-
-            CHECK(cRef == validRef);
+            BlockDataReference<false> cRef{ b111.data() };
+            CHECK(cRef == b111);
             CHECK(cRef != nullRef);
         }
     }

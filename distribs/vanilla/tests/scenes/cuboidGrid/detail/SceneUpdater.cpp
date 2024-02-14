@@ -44,6 +44,7 @@ using BlockIndex = CuboidGrid::BlockIndex;
 using ConstBlockDataReference = CuboidGrid::detail::BlockDataReference<cfg, false>;
 using ConstDataNeighbours = CuboidGrid::detail::DataNeighbours<cfg, false>;
 using Direction = Gustave::Math3d::BasicDirection;
+using LinkIndices = ConstBlockDataReference::LinkIndices;
 using SceneData = CuboidGrid::detail::SceneData<cfg>;
 using SceneUpdater = CuboidGrid::detail::SceneUpdater<cfg>;
 using StructureData = CuboidGrid::detail::StructureData<cfg>;
@@ -92,16 +93,37 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
         // Check blocks.
         for (auto const& blockData : data.blocks) {
             ConstBlockDataReference blockRef{ &blockData };
+            StructureData const* blockStruct = blockRef.structure();
+            // structure
             if (blockRef.isFoundation()) {
-                REQUIRE(blockRef.structure() == nullptr);
+                REQUIRE(blockStruct == nullptr);
             } else {
-                REQUIRE(data.structures.contains(blockRef.structure()));
+                REQUIRE(data.structures.contains(blockStruct));
                 for (auto const& neighbour : ConstDataNeighbours{ data.blocks, blockRef.index() }) {
-                    auto const& structure = blockRef.structure();
-                    REQUIRE(data.structures.contains(structure));
-                    REQUIRE(structure->solverIndices().contains(neighbour.block.index()));
+                    REQUIRE(data.structures.contains(blockStruct));
+                    REQUIRE(blockStruct->solverIndices().contains(neighbour.block.index()));
                 }
             }
+            // linkIndices
+            auto checkNeighbour = [&](Direction direction, LinkIndex (LinkIndices::*indexField)) {
+                auto const neighbourIndex = blockRef.index().neighbourAlong(direction);
+                if (neighbourIndex) {
+                    auto const neighbourRef = data.blocks.find(*neighbourIndex);
+                    if (neighbourRef) {
+                        if (!blockRef.isFoundation() || !neighbourRef.isFoundation()) {
+                            StructureData const* structure = (blockStruct != nullptr) ? blockStruct : neighbourRef.structure();
+                            REQUIRE(structure != nullptr);
+                            LinkIndex const& linkId = blockRef.linkIndices().*indexField;
+                            SolverLink const& link = structure->solverStructure().links().at(linkId);
+                            CHECK(link.localNodeId() == *structure->solverIndexOf(blockRef.index()));
+                            CHECK(link.otherNodeId() == *structure->solverIndexOf(neighbourRef.index()));
+                        }
+                    }
+                }
+            };
+            checkNeighbour(Direction::plusX, &LinkIndices::plusX);
+            checkNeighbour(Direction::plusY, &LinkIndices::plusY);
+            checkNeighbour(Direction::plusZ, &LinkIndices::plusZ);
         }
         return result;
     };

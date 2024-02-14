@@ -54,6 +54,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         QualifiedBlockData* data_;
     public:
         using Hasher = Utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
+        using LinkIndices = typename BlockMappedData<cfg>::LinkIndices;
 
         [[nodiscard]]
         static constexpr bool isMutable() {
@@ -95,6 +96,11 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         [[nodiscard]]
         BlockData<cfg> const* data() const {
             return data_;
+        }
+
+        [[nodiscard]]
+        Meta::MutableIf<isMutable_,LinkIndices>& linkIndices() const {
+            return data_->second.linkIndices();
         }
 
         [[nodiscard]]
