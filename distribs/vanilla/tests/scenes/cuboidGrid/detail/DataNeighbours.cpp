@@ -70,8 +70,8 @@ TEST_CASE("Scene::CuboidGrid::detail::DataNeighbours") {
     DataNeighbours neighbours{ sceneBlocks, source.index() };
 
     std::vector<DataNeighbour> const expected = {
-        {Direction::plusX, plusX},
-        {Direction::minusZ, minusZ},
+        {Direction::plusX(), plusX},
+        {Direction::minusZ(), minusZ},
     };
 
     CHECK_THAT(neighbours, M::C2::RangeEquals(expected));

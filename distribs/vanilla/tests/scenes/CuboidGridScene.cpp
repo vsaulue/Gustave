@@ -83,6 +83,19 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
         CHECK(scene.blockSize() == blockSize);
     }
 
+    SECTION(".contacts()") {
+        Scene::Contacts contacts = scene.contacts();
+
+        Transaction t;
+        t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
+        t.addBlock({ {2,0,0}, concrete_20m, 5.f * blockMass, false });
+        scene.modify(t);
+
+        Scene::ContactReference contact = contacts.at(Scene::ContactIndex{ {1,0,0}, Direction::plusX() });
+        CHECK(contact.maxStress() == concrete_20m);
+        CHECK(contact.otherBlock().mass() == 5.f * blockMass);
+    }
+
     SECTION("::structures() const") {
         Scene::Structures structures = scene.structures();
 

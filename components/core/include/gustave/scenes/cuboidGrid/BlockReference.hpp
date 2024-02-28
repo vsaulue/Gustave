@@ -79,6 +79,7 @@ namespace Gustave::Scenes::CuboidGrid {
             [[nodiscard]]
             explicit Neighbour(Utils::NoInit NO_INIT)
                 : block_{ NO_INIT }
+                , direction_{ Direction::plusX() }
             {}
 
             [[nodiscard]]

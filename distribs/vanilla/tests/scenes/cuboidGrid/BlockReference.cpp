@@ -130,12 +130,12 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         SECTION("// 6 neighbours") {
             auto const neighbours = neighboursAsVector(b111);
             auto const expected = std::vector<Neighbour>{
-                Neighbour{ b011, Direction::minusX },
-                Neighbour{ b211, Direction::plusX },
-                Neighbour{ b101, Direction::minusY },
-                Neighbour{ b121, Direction::plusY },
-                Neighbour{ b110, Direction::minusZ },
-                Neighbour{ b112, Direction::plusZ },
+                Neighbour{ b011, Direction::minusX() },
+                Neighbour{ b211, Direction::plusX() },
+                Neighbour{ b101, Direction::minusY() },
+                Neighbour{ b121, Direction::plusY() },
+                Neighbour{ b110, Direction::minusZ() },
+                Neighbour{ b112, Direction::plusZ() },
             };
             CHECK_THAT(neighbours, M::C2::UnorderedEquals(expected));
         }
@@ -143,7 +143,7 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         SECTION("// 1 neighbour") {
             auto const neighbours = neighboursAsVector(b011);
             auto const expected = std::vector<Neighbour>{
-                Neighbour{ b111, Direction::plusX },
+                Neighbour{ b111, Direction::plusX()},
             };
             CHECK_THAT(neighbours, M::C2::UnorderedEquals(expected));
         }

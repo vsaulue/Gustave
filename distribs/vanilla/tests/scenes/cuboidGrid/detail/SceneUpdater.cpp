@@ -121,9 +121,9 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
                     }
                 }
             };
-            checkNeighbour(Direction::plusX, &LinkIndices::plusX);
-            checkNeighbour(Direction::plusY, &LinkIndices::plusY);
-            checkNeighbour(Direction::plusZ, &LinkIndices::plusZ);
+            checkNeighbour(Direction::plusX(), &LinkIndices::plusX);
+            checkNeighbour(Direction::plusY(), &LinkIndices::plusY);
+            checkNeighbour(Direction::plusZ(), &LinkIndices::plusZ);
         }
         return result;
     };
@@ -226,7 +226,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
                 NodeIndex const x1 = getSolverIndex(structureX, { 1,0,0 });
                 NodeIndex const origin = getSolverIndex(structureX, { 0,0,0 });
                 CHECK_FALSE(structureX.contains({ 0,1,0 }));
-                checkLink(structureX, origin, x1, Direction::plusX, concrete_20m);
+                checkLink(structureX, origin, x1, Direction::plusX(), concrete_20m);
             }
 
             {
@@ -234,7 +234,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
                 NodeIndex y1 = getSolverIndex(structureY, { 0,1,0 });
                 NodeIndex origin = getSolverIndex(structureY, { 0,0,0 });
                 CHECK_FALSE(structureY.contains({ 1,0,0 }));
-                checkLink(structureY, origin, y1, Direction::plusY, concrete_20m);
+                checkLink(structureY, origin, y1, Direction::plusY(), concrete_20m);
             }
         }
 
@@ -260,7 +260,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
                 NodeIndex const x1 = getSolverIndex(structure, { 1,0,0 });
                 NodeIndex const x2 = getSolverIndex(structure, { 2,0,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
-                checkLink(structure, x1, x2, Direction::plusX, concrete_20m);
+                checkLink(structure, x1, x2, Direction::plusX(), concrete_20m);
             }
         }
 
@@ -279,7 +279,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             for (int i = 0; i < 4; ++i) {
                 NodeIndex const bottom = getSolverIndex(structure, { 0,i,0 });
                 NodeIndex const top = getSolverIndex(structure, { 0,i + 1,0 });
-                checkLink(structure, bottom, top, Direction::plusY, concrete_20m);
+                checkLink(structure, bottom, top, Direction::plusY(), concrete_20m);
             }
         }
 
@@ -307,7 +307,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
                 NodeIndex const y1 = getSolverIndex(structure, { 0,1,0 });
                 CHECK_FALSE(structure.contains({ 0,3,0 }));
                 CHECK_FALSE(structure.contains({ 0,4,0 }));
-                checkLink(structure, y0, y1, Direction::plusY, concrete_20m);
+                checkLink(structure, y0, y1, Direction::plusY(), concrete_20m);
             }
 
             {
@@ -317,7 +317,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
                 NodeIndex const y4 = getSolverIndex(structure, { 0,4,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
                 CHECK_FALSE(structure.contains({ 0,1,0 }));
-                checkLink(structure, y3, y4, Direction::plusY, concrete_20m);
+                checkLink(structure, y3, y4, Direction::plusY(), concrete_20m);
             }
         }
 
@@ -345,10 +345,10 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             NodeIndex const z2 = getSolverIndex(structure, { 0,0,2 });
             NodeIndex const z3 = getSolverIndex(structure, { 0,0,3 });
             NodeIndex const z4 = getSolverIndex(structure, { 0,0,4 });
-            checkLink(structure, z0, z1, Direction::plusZ, concrete_20m);
-            checkLink(structure, z1, z2, Direction::plusZ, concrete_20m);
-            checkLink(structure, z2, z3, Direction::plusZ, concrete_20m);
-            checkLink(structure, z3, z4, Direction::plusZ, concrete_20m);
+            checkLink(structure, z0, z1, Direction::plusZ(), concrete_20m);
+            checkLink(structure, z1, z2, Direction::plusZ(), concrete_20m);
+            checkLink(structure, z2, z3, Direction::plusZ(), concrete_20m);
+            checkLink(structure, z3, z4, Direction::plusZ(), concrete_20m);
         }
 
         SECTION("// Transaction{3+} -> Transaction{1-}: unmodified structure is not invalidated or rebuilt.") {

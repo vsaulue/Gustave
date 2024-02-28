@@ -65,6 +65,11 @@ inline MaxStress const concrete_20m{
     14'000'000.f * u.pressure, // shear
     2'000'000.f * u.pressure, // tensile
 };
+inline MaxStress const concrete_40m{
+    40'000'000.f * u.pressure, // compressive
+    28'000'000.f * u.pressure, // shear
+    2'000'000.f * u.pressure, // tensile
+};
 
 // Utils
 

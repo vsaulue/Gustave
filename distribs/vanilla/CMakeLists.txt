@@ -43,6 +43,8 @@ add_executable(Test-Gustave-Vanilla
     "tests/scenes/cuboidGrid/BlockIndex.cpp"
     "tests/scenes/cuboidGrid/BlockReference.cpp"
     "tests/scenes/cuboidGrid/Blocks.cpp"
+    "tests/scenes/cuboidGrid/ContactReference.cpp"
+    "tests/scenes/cuboidGrid/Contacts.cpp"
     "tests/scenes/cuboidGrid/detail/BlockDataReference.cpp"
     "tests/scenes/cuboidGrid/detail/BlockMappedData.cpp"
     "tests/scenes/cuboidGrid/detail/DataNeighbours.cpp"

@@ -67,7 +67,6 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
         using SceneData = detail::SceneData<cfg>;
         using StructureData = detail::StructureData<cfg>;
-        using Transaction = CuboidGrid::Transaction<cfg>;
 
         template<Cfg::cUnitOf<cfg> auto unit>
         using Real = Cfg::Real<cfg, unit>;
@@ -78,6 +77,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             std::vector<std::shared_ptr<StructureData const>> removedStructures;
         };
     public:
+        using Transaction = CuboidGrid::Transaction<cfg>;
+
         struct Result {
             std::vector<std::shared_ptr<StructureData const>> newStructures;
             std::vector<std::shared_ptr<StructureData const>> removedStructures;

@@ -177,24 +177,24 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         void addContact(BlockDataReference source, DataNeighbour const& neighbour) {
             Direction const direction = neighbour.direction;
             BlockDataReference nBlock = neighbour.block;
-            switch (direction) {
-            case Direction::plusX:
+            switch (direction.id()) {
+            case Direction::Id::plusX:
                 source.linkIndices().plusX = addLink(source, nBlock, direction);
                 break;
-            case Direction::plusY:
+            case Direction::Id::plusY:
                 source.linkIndices().plusY = addLink(source, nBlock, direction);
                 break;
-            case Direction::plusZ:
+            case Direction::Id::plusZ:
                 source.linkIndices().plusZ = addLink(source, nBlock, direction);
                 break;
-            case Direction::minusX:
-                nBlock.linkIndices().plusX = addLink(nBlock, source, Direction::plusX);
+            case Direction::Id::minusX:
+                nBlock.linkIndices().plusX = addLink(nBlock, source, direction.opposite());
                 break;
-            case Direction::minusY:
-                nBlock.linkIndices().plusY = addLink(nBlock, source, Direction::plusY);
+            case Direction::Id::minusY:
+                nBlock.linkIndices().plusY = addLink(nBlock, source, direction.opposite());
                 break;
-            case Direction::minusZ:
-                nBlock.linkIndices().plusZ = addLink(nBlock, source, Direction::plusZ);
+            case Direction::Id::minusZ:
+                nBlock.linkIndices().plusZ = addLink(nBlock, source, direction.opposite());
                 break;
             }
         }

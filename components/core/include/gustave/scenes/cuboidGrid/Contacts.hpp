@@ -25,30 +25,35 @@
 
 #pragma once
 
-#include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
+#include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/cfg/LibTraits.hpp>
+#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
+#include <gustave/scenes/cuboidGrid/ContactReference.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    struct IndexNeighbour {
+namespace Gustave::Scenes::CuboidGrid {
+    template<Cfg::cLibConfig auto cfg>
+    class Contacts {
+    private:
+        using SceneData = detail::SceneData<cfg>;
     public:
-        using Direction = Math3d::BasicDirection;
+        using ContactReference = CuboidGrid::ContactReference<cfg>;
+
+        using ContactIndex = typename ContactReference::ContactIndex;
 
         [[nodiscard]]
-        explicit IndexNeighbour(Utils::NoInit NO_INIT)
-            : direction{ Direction::plusX() }
-            , index{ NO_INIT }
+        explicit Contacts(SceneData const& scene)
+            : scene_{ &scene }
         {}
 
         [[nodiscard]]
-        IndexNeighbour(Direction direction, BlockIndex const& index)
-            : direction{ direction }
-            , index{ index }
-        {}
-
-        [[nodiscard]]
-        bool operator==(IndexNeighbour const&) const = default;
-
-        Direction direction;
-        BlockIndex index;
+        ContactReference at(ContactIndex const& index) const {
+            ContactReference result{ *scene_, index };
+            if (!result.isValid()) {
+                throw std::out_of_range(result.invalidMessage());
+            }
+            return result;
+        }
+    private:
+        SceneData const* scene_;
     };
 }

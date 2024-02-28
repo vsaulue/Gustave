@@ -42,12 +42,12 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
     BlockDataReference b2 = sceneBlocks.insert({ {4,6,9}, concrete_20m, 25.f * u.mass, false });
 
     SECTION("::contactAreaAlong(BasicDirection)") {
-        CHECK(sceneBlocks.contactAreaAlong(Direction::minusX) == 6.f * u.area);
-        CHECK(sceneBlocks.contactAreaAlong(Direction::plusX) == 6.f * u.area);
-        CHECK(sceneBlocks.contactAreaAlong(Direction::minusY) == 3.f * u.area);
-        CHECK(sceneBlocks.contactAreaAlong(Direction::plusY) == 3.f * u.area);
-        CHECK(sceneBlocks.contactAreaAlong(Direction::minusZ) == 2.f * u.area);
-        CHECK(sceneBlocks.contactAreaAlong(Direction::plusZ) == 2.f * u.area);
+        CHECK(sceneBlocks.contactAreaAlong(Direction::minusX()) == 6.f * u.area);
+        CHECK(sceneBlocks.contactAreaAlong(Direction::plusX()) == 6.f * u.area);
+        CHECK(sceneBlocks.contactAreaAlong(Direction::minusY()) == 3.f * u.area);
+        CHECK(sceneBlocks.contactAreaAlong(Direction::plusY()) == 3.f * u.area);
+        CHECK(sceneBlocks.contactAreaAlong(Direction::minusZ()) == 2.f * u.area);
+        CHECK(sceneBlocks.contactAreaAlong(Direction::plusZ()) == 2.f * u.area);
     }
 
     SECTION("::contains(BlockIndex const&)") {
@@ -101,11 +101,11 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
     }
 
     SECTION("::thicknessAlong(BasicDirection)") {
-        CHECK(sceneBlocks.thicknessAlong(Direction::minusX) == 1.f * u.length);
-        CHECK(sceneBlocks.thicknessAlong(Direction::plusX) == 1.f * u.length);
-        CHECK(sceneBlocks.thicknessAlong(Direction::minusY) == 2.f * u.length);
-        CHECK(sceneBlocks.thicknessAlong(Direction::plusY) == 2.f * u.length);
-        CHECK(sceneBlocks.thicknessAlong(Direction::minusZ) == 3.f * u.length);
-        CHECK(sceneBlocks.thicknessAlong(Direction::plusZ) == 3.f * u.length);
+        CHECK(sceneBlocks.thicknessAlong(Direction::minusX()) == 1.f * u.length);
+        CHECK(sceneBlocks.thicknessAlong(Direction::plusX()) == 1.f * u.length);
+        CHECK(sceneBlocks.thicknessAlong(Direction::minusY()) == 2.f * u.length);
+        CHECK(sceneBlocks.thicknessAlong(Direction::plusY()) == 2.f * u.length);
+        CHECK(sceneBlocks.thicknessAlong(Direction::minusZ()) == 3.f * u.length);
+        CHECK(sceneBlocks.thicknessAlong(Direction::plusZ()) == 3.f * u.length);
     }
 }

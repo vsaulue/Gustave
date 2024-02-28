@@ -25,6 +25,107 @@
 
 #pragma once
 
+#include <functional>
+#include <ostream>
+#include <stdexcept>
+
 namespace Gustave::Math3d {
-    enum class BasicDirection { plusX, minusX, plusY, minusY, plusZ, minusZ };
+    class BasicDirection {
+    public:
+        enum class Id { plusX, minusX, plusY, minusY, plusZ, minusZ };
+
+        [[nodiscard]]
+        constexpr BasicDirection(Id id)
+            : id_{ id }
+        {
+            if (static_cast<int>(id_) >= 6) {
+                throw std::invalid_argument(invalidValueMsg());
+            }
+        }
+
+        [[nodiscard]]
+        static constexpr BasicDirection plusX() { return Id::plusX; }
+        [[nodiscard]]
+        static constexpr BasicDirection minusX() { return Id::minusX; }
+        [[nodiscard]]
+        static constexpr BasicDirection plusY() { return Id::plusY; }
+        [[nodiscard]]
+        static constexpr BasicDirection minusY() { return Id::minusY; }
+        [[nodiscard]]
+        static constexpr BasicDirection plusZ() { return Id::plusZ; }
+        [[nodiscard]]
+        static constexpr BasicDirection minusZ() { return Id::minusZ; }
+
+        [[nodiscard]]
+        constexpr Id id() const {
+            return id_;
+        }
+
+        [[nodiscard]]
+        std::string invalidValueMsg() const {
+            std::string msg = "Invalid BasicDirection : ";
+            msg += static_cast<int>(id_);
+            msg += '.';
+            throw msg;
+        }
+
+        [[nodiscard]]
+        constexpr BasicDirection opposite() const {
+            switch (id_) {
+            case Id::plusX:
+                return minusX();
+            case Id::minusX:
+                return plusX();
+            case Id::plusY:
+                return minusY();
+            case Id::minusY:
+                return plusY();
+            case Id::plusZ:
+                return minusZ();
+            case Id::minusZ:
+                return plusZ();
+            };
+            throw std::invalid_argument(invalidValueMsg());
+        };
+
+        constexpr friend std::ostream& operator<<(std::ostream& stream, BasicDirection direction) {
+            switch (direction.id_) {
+            case Id::plusX:
+                stream << "plusX";
+                break;
+            case Id::minusX:
+                stream << "minusX";
+                break;
+            case Id::plusY:
+                stream << "plusY";
+                break;
+            case Id::minusY:
+                stream << "minusY";
+                break;
+            case Id::plusZ:
+                stream << "plusZ";
+                break;
+            case Id::minusZ:
+                stream << "minusZ";
+                break;
+            }
+            return stream;
+        }
+
+        [[nodiscard]]
+        constexpr bool operator==(BasicDirection const& other) const = default;
+
+        struct Hasher {
+        public:
+            [[nodiscard]]
+            std::size_t operator()(BasicDirection direction) const {
+                return std::hash<Id>{}(direction.id_);
+            }
+        };
+    private:
+        Id id_;
+    };
 }
+
+template<>
+struct std::hash<Gustave::Math3d::BasicDirection> : Gustave::Math3d::BasicDirection::Hasher {};

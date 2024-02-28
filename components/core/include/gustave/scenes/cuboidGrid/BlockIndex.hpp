@@ -55,33 +55,33 @@ namespace Gustave::Scenes::CuboidGrid {
             static constexpr Coord maxCoord = std::numeric_limits<Coord>::max();
             static constexpr Coord minCoord = std::numeric_limits<Coord>::min();
             std::optional<BlockIndex> result;
-            switch (direction) {
-            case Direction::plusX:
+            switch (direction.id()) {
+            case Direction::Id::plusX:
                 if (x < maxCoord) {
                     result = BlockIndex{ x + 1, y ,z };
                 }
                 break;
-            case Direction::minusX:
+            case Direction::Id::minusX:
                 if (x > minCoord) {
                     result = BlockIndex{ x - 1, y, z };
                 }
                 break;
-            case Direction::plusY:
+            case Direction::Id::plusY:
                 if (y < maxCoord) {
                     result = BlockIndex{ x, y + 1, z };
                 }
                 break;
-            case Direction::minusY:
+            case Direction::Id::minusY:
                 if (y > minCoord) {
                     result = BlockIndex{ x, y - 1, z };
                 }
                 break;
-            case Direction::plusZ:
+            case Direction::Id::plusZ:
                 if (z < maxCoord) {
                     result = BlockIndex{ x, y, z + 1 };
                 }
                 break;
-            case Direction::minusZ:
+            case Direction::Id::minusZ:
                 if (z > minCoord) {
                     result = BlockIndex{ x, y, z - 1 };
                 }

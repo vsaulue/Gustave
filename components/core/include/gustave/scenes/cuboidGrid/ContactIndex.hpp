@@ -25,71 +25,65 @@
 
 #pragma once
 
-#include <array>
+#include <functional>
+#include <optional>
+#include <ostream>
 
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGrid/detail/IndexNeighbour.hpp>
-#include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/Hasher.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    class IndexNeighbours {
+namespace Gustave::Scenes::CuboidGrid {
+    class ContactIndex {
     public:
-        using Coord = BlockIndex::Coord;
+        using BlockIndex = CuboidGrid::BlockIndex;
         using Direction = Math3d::BasicDirection;
 
-        using Values = std::array<IndexNeighbour,6>;
-
-        using Iterator = Values::const_iterator;
+        [[nodiscard]]
+        explicit ContactIndex(BlockIndex const& localBlockIndex, Direction direction)
+            : localBlockIndex_{ localBlockIndex }
+            , direction_{ direction }
+        {}
 
         [[nodiscard]]
-        explicit IndexNeighbours(BlockIndex const& source)
-            : values_{ NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT() }
-            , source_{ source }
-            , count_{ 0 }
-        {
-            addValue(Direction::plusX());
-            addValue(Direction::minusX());
-            addValue(Direction::plusY());
-            addValue(Direction::minusY());
-            addValue(Direction::plusZ());
-            addValue(Direction::minusZ());
+        Direction direction() const {
+            return direction_;
         }
 
         [[nodiscard]]
-        Iterator begin() const {
-            return values_.begin();
+        BlockIndex const& localBlockIndex() const {
+            return localBlockIndex_;
         }
 
         [[nodiscard]]
-        Iterator end() const {
-            return values_.begin() + count_;
-        }
-
-        [[nodiscard]]
-        IndexNeighbour const& operator[](unsigned id) const {
-            return values_[id];
-        }
-
-        [[nodiscard]]
-        unsigned size() const {
-            return count_;
-        }
-    private:
-        [[nodiscard]]
-        static IndexNeighbour NO_INIT() {
-            return IndexNeighbour{ Utils::NO_INIT };
-        }
-
-        void addValue(Direction direction) {
-            if (std::optional<BlockIndex> neighbourId = source_.neighbourAlong(direction)) {
-                values_[count_] = { direction, *neighbourId };
-                ++count_;
+        std::optional<ContactIndex> opposite() const {
+            std::optional<BlockIndex> otherId = otherBlockIndex();
+            if (otherId) {
+                return ContactIndex{ *otherId, direction_.opposite() };
+            } else {
+                return {};
             }
         }
 
-        Values values_;
-        BlockIndex const& source_;
-        unsigned count_;
+        [[nodiscard]]
+        std::optional<BlockIndex> otherBlockIndex() const {
+            return localBlockIndex_.neighbourAlong(direction_);
+        }
+
+        [[nodiscard]]
+        bool operator==(ContactIndex const&) const = default;
+
+        [[nodiscard]]
+        friend std::ostream& operator<<(std::ostream& stream, ContactIndex const& index) {
+            return stream << "{ blockIndex: " << index.localBlockIndex_ << ", direction: " << index.direction_ << " }";
+        }
+    private:
+        BlockIndex localBlockIndex_;
+        Direction direction_;
+    public:
+        using Hasher = Utils::Hasher<ContactIndex, &ContactIndex::localBlockIndex_, &ContactIndex::direction_>;
     };
 }
+
+template<>
+struct std::hash<Gustave::Scenes::CuboidGrid::ContactIndex> : Gustave::Scenes::CuboidGrid::ContactIndex::Hasher{};

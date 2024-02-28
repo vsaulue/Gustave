@@ -37,7 +37,8 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         [[nodiscard]]
         DataNeighbour(Utils::NoInit NO_INIT)
-            : block{ NO_INIT }
+            : direction{ Direction::plusX() }
+            , block{ NO_INIT }
         {}
 
         [[nodiscard]]

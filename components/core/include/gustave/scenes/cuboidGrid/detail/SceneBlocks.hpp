@@ -77,17 +77,17 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         Real<u.area> contactAreaAlong(Direction direction) const {
             Vector3<u.length> const& dims = blockSize_;
             Real<u.area> result = 0.f * u.area;
-            switch (direction) {
-            case Direction::plusX:
-            case Direction::minusX:
+            switch (direction.id()) {
+            case Direction::Id::plusX:
+            case Direction::Id::minusX:
                 result = dims.y() * dims.z();
                 break;
-            case Direction::plusY:
-            case Direction::minusY:
+            case Direction::Id::plusY:
+            case Direction::Id::minusY:
                 result = dims.x() * dims.z();
                 break;
-            case Direction::plusZ:
-            case Direction::minusZ:
+            case Direction::Id::plusZ:
+            case Direction::Id::minusZ:
                 result = dims.x() * dims.y();
                 break;
             }
@@ -132,17 +132,17 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         [[nodiscard]]
         Real<u.length> thicknessAlong(Direction direction) const {
             Real<u.length> result = 0.f * u.length;
-            switch (direction) {
-            case Direction::plusX:
-            case Direction::minusX:
+            switch (direction.id()) {
+            case Direction::Id::plusX:
+            case Direction::Id::minusX:
                 result = blockSize_.x();
                 break;
-            case Direction::plusY:
-            case Direction::minusY:
+            case Direction::Id::plusY:
+            case Direction::Id::minusY:
                 result = blockSize_.y();
                 break;
-            case Direction::plusZ:
-            case Direction::minusZ:
+            case Direction::Id::plusZ:
+            case Direction::Id::minusZ:
                 result = blockSize_.z();
                 break;
             }

@@ -34,6 +34,9 @@
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/Blocks.hpp>
+#include <gustave/scenes/cuboidGrid/ContactIndex.hpp>
+#include <gustave/scenes/cuboidGrid/ContactReference.hpp>
+#include <gustave/scenes/cuboidGrid/Contacts.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneUpdater.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
@@ -61,6 +64,9 @@ namespace Gustave::Scenes {
         using BlockIndex = CuboidGrid::BlockIndex;
         using BlockReference = CuboidGrid::BlockReference<cfg>;
         using Blocks = CuboidGrid::Blocks<cfg>;
+        using ContactIndex = CuboidGrid::ContactIndex;
+        using ContactReference = CuboidGrid::ContactReference<cfg>;
+        using Contacts = CuboidGrid::Contacts<cfg>;
         using Direction = Math3d::BasicDirection;
         using StructureReference = CuboidGrid::StructureReference<cfg>;
         using Structures = CuboidGrid::Structures<cfg>;
@@ -88,6 +94,11 @@ namespace Gustave::Scenes {
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
             return data_.blocks.blockSize();
+        }
+
+        [[nodiscard]]
+        Contacts contacts() const {
+            return Contacts{ data_ };
         }
 
         [[nodiscard]]

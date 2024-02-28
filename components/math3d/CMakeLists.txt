@@ -30,6 +30,7 @@ target_link_libraries(Comp-Math
 )
 
 add_executable(Test-Comp-Math
+    "tests/BasicDirection.cpp"
     "tests/NormalizedVector3.cpp"
     "tests/Vector3.cpp"
 )

@@ -67,23 +67,23 @@ namespace Gustave::Math3d {
         [[nodiscard]]
         static NormalizedVector3 basisVector(BasicDirection direction) {
             NormalizedVector3 result{ UncheckedInit{}, 1.f, 0.f, 0.f };
-            switch (direction) {
-            case BasicDirection::plusX:
+            switch (direction.id()) {
+            case BasicDirection::Id::plusX:
                 result = { UncheckedInit{}, 1.f, 0.f, 0.f };
                 break;
-            case BasicDirection::minusX:
+            case BasicDirection::Id::minusX:
                 result = { UncheckedInit{}, -1.f, 0.f, 0.f };
                 break;
-            case BasicDirection::plusY:
+            case BasicDirection::Id::plusY:
                 result = { UncheckedInit{}, 0.f, 1.f, 0.f };
                 break;
-            case BasicDirection::minusY:
+            case BasicDirection::Id::minusY:
                 result = { UncheckedInit{}, 0.f, -1.f, 0.f };
                 break;
-            case BasicDirection::plusZ:
+            case BasicDirection::Id::plusZ:
                 result = { UncheckedInit{}, 0.f, 0.f, 1.f };
                 break;
-            case BasicDirection::minusZ:
+            case BasicDirection::Id::minusZ:
                 result = { UncheckedInit{}, 0.f, 0.f, -1.f };
                 break;
             }

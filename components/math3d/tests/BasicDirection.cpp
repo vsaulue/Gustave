@@ -23,32 +23,21 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include <catch2/catch_test_macros.hpp>
 
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    struct IndexNeighbour {
-    public:
-        using Direction = Math3d::BasicDirection;
+namespace Math3d = Gustave::Math3d;
 
-        [[nodiscard]]
-        explicit IndexNeighbour(Utils::NoInit NO_INIT)
-            : direction{ Direction::plusX() }
-            , index{ NO_INIT }
-        {}
+using Direction = Math3d::BasicDirection;
 
-        [[nodiscard]]
-        IndexNeighbour(Direction direction, BlockIndex const& index)
-            : direction{ direction }
-            , index{ index }
-        {}
-
-        [[nodiscard]]
-        bool operator==(IndexNeighbour const&) const = default;
-
-        Direction direction;
-        BlockIndex index;
-    };
+TEST_CASE("Math3d::BasicDirection") {
+    SECTION("opposite()") {
+        CHECK(Direction::plusX().opposite() == Direction::minusX());
+        CHECK(Direction::minusX().opposite() == Direction::plusX());
+        CHECK(Direction::plusY().opposite() == Direction::minusY());
+        CHECK(Direction::minusY().opposite() == Direction::plusY());
+        CHECK(Direction::plusZ().opposite() == Direction::minusZ());
+        CHECK(Direction::minusZ().opposite() == Direction::plusZ());
+    }
 }

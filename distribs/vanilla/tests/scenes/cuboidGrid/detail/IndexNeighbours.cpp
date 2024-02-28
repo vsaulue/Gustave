@@ -53,30 +53,30 @@ TEST_CASE("Scene::CuboidGrid::detail::IndexNeighbours") {
     SECTION("// (min,max,min)") {
         BlockIndex const p = { min,max,min };
         runTest(p, {
-            {Direction::plusX,  {min + 1, max,     min}},
-            {Direction::minusY, {min    , max - 1, min}},
-            {Direction::plusZ,  {min    , max,     min + 1}},
+            {Direction::plusX(),  {min + 1, max,     min}},
+            {Direction::minusY(), {min    , max - 1, min}},
+            {Direction::plusZ(),  {min    , max,     min + 1}},
         });
     }
 
     SECTION("// (max,min,max)") {
         BlockIndex const p = { max,min,max };
         runTest(p, {
-            {Direction::minusX, {max - 1, min    , max}},
-            {Direction::plusY,  {max    , min + 1, max}},
-            {Direction::minusZ, {max    , min    , max - 1}},
+            {Direction::minusX(), {max - 1, min    , max}},
+            {Direction::plusY(),  {max    , min + 1, max}},
+            {Direction::minusZ(), {max    , min    , max - 1}},
         });
     }
 
     SECTION("// (-1,5,8)") {
         BlockIndex const p = {-3,5,8};
         runTest(p, {
-            {Direction::plusX,  {-2,5,8}},
-            {Direction::minusX, {-4,5,8}},
-            {Direction::plusY,  {-3,6,8}},
-            {Direction::minusY, {-3,4,8}},
-            {Direction::plusZ,  {-3,5,9}},
-            {Direction::minusZ, {-3,5,7}},
+            {Direction::plusX(),  {-2,5,8}},
+            {Direction::minusX(), {-4,5,8}},
+            {Direction::plusY(),  {-3,6,8}},
+            {Direction::minusY(), {-3,4,8}},
+            {Direction::plusZ(),  {-3,5,9}},
+            {Direction::minusZ(), {-3,5,7}},
         });
     }
 }
