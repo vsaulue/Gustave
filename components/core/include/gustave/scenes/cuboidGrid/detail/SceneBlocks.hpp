@@ -48,6 +48,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
+        using BlockIndex = CuboidGrid::BlockIndex;
         using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<cfg>>;
         using Direction = Math3d::BasicDirection;
 

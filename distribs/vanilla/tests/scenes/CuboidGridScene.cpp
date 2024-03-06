@@ -50,7 +50,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
 
     Scene scene{blockSize};
 
-    SECTION("::blocks() const") {
+    SECTION(".blocks() const") {
         Scene::Blocks blocks = scene.blocks();
 
         SECTION("// empty") {
@@ -79,7 +79,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
         }
     }
 
-    SECTION("::blockSize() const") {
+    SECTION(".blockSize() const") {
         CHECK(scene.blockSize() == blockSize);
     }
 
@@ -96,7 +96,23 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
         CHECK(contact.otherBlock().mass() == 5.f * blockMass);
     }
 
-    SECTION("::structures() const") {
+    SECTION(".links()") {
+        Scene::Links links = scene.links();
+
+        Transaction t;
+        t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
+        t.addBlock({ {2,0,0}, concrete_20m, blockMass, false });
+        t.addBlock({ {3,0,0}, concrete_20m, blockMass, false });
+        scene.modify(t);
+
+        std::vector<Scene::ContactReference> const expected = {
+            scene.contacts().at(Scene::ContactIndex{ {1,0,0}, Direction::plusX() }),
+            scene.contacts().at(Scene::ContactIndex{ {2,0,0}, Direction::plusX() }),
+        };
+        CHECK_THAT(links, M::C2::UnorderedRangeEquals(expected));
+    }
+
+    SECTION(".structures() const") {
         Scene::Structures structures = scene.structures();
 
         SECTION("// empty") {

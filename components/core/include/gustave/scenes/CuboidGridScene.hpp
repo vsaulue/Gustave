@@ -37,6 +37,7 @@
 #include <gustave/scenes/cuboidGrid/ContactIndex.hpp>
 #include <gustave/scenes/cuboidGrid/ContactReference.hpp>
 #include <gustave/scenes/cuboidGrid/Contacts.hpp>
+#include <gustave/scenes/cuboidGrid/Links.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneUpdater.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
@@ -68,6 +69,7 @@ namespace Gustave::Scenes {
         using ContactReference = CuboidGrid::ContactReference<cfg>;
         using Contacts = CuboidGrid::Contacts<cfg>;
         using Direction = Math3d::BasicDirection;
+        using Links = CuboidGrid::Links<cfg>;
         using StructureReference = CuboidGrid::StructureReference<cfg>;
         using Structures = CuboidGrid::Structures<cfg>;
         using Transaction = CuboidGrid::Transaction<cfg>;
@@ -104,6 +106,11 @@ namespace Gustave::Scenes {
         [[nodiscard]]
         Real<u.area> contactAreaAlong(Direction direction) const {
             return data_.blocks.contactAreaAlong(direction);
+        }
+
+        [[nodiscard]]
+        Links links() const {
+            return Links{ data_ };
         }
 
         [[nodiscard]]

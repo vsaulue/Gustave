@@ -27,6 +27,8 @@
 
 #include <concepts>
 
+#include <catch2/catch_test_macros.hpp>
+
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/model/MaxStress.hpp>
