@@ -38,11 +38,16 @@
 #include <gustave/scenes/cuboidGrid/detail/IndexNeighbours.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
+#include <gustave/scenes/cuboidGrid/ContactReference.hpp>
+#include <gustave/scenes/cuboidGrid/StructureReference.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
+    template<Cfg::cLibConfig auto cfg>
+    class ContactReference;
+
     template<Cfg::cLibConfig auto cfg>
     class StructureReference;
 
@@ -65,8 +70,102 @@ namespace Gustave::Scenes::CuboidGrid {
         template<Cfg::cUnitOf<cfg> auto unit>
         using Vector3 = Cfg::Vector3<cfg, unit>;
     public:
+        using BlockIndex = CuboidGrid::BlockIndex;
         using Direction = Math3d::BasicDirection;
+        using ContactReference = CuboidGrid::ContactReference<cfg>;
         using StructureReference = CuboidGrid::StructureReference<cfg>;
+
+        class Contacts {
+        private:
+            using Values = std::array<Direction, 6>;
+            using DirIterator = Values::const_iterator;
+
+            class Enumerator {
+            public:
+                [[nodiscard]]
+                Enumerator()
+                    : contacts_{ nullptr }
+                    , value_ { Utils::NO_INIT }
+                    , state_{ 6 }
+                {}
+
+                [[nodiscard]]
+                explicit Enumerator(Contacts const& contacts)
+                    : contacts_{ &contacts }
+                    , value_{ Utils::NO_INIT }
+                    , state_{ 0 }
+                {
+                    next();
+                }
+
+                [[nodiscard]]
+                bool isEnd() const {
+                    return state_ >= 6;
+                }
+
+                void operator++() {
+                    ++state_;
+                    next();
+                }
+
+                [[nodiscard]]
+                ContactReference const& operator*() const {
+                    return value_;
+                }
+
+                [[nodiscard]]
+                bool operator==(Enumerator const& other) const {
+                    return (contacts_ == other.contacts_) && (state_ == other.state_);
+                }
+            private:
+                void next() {
+                    while (!isEnd()) {
+                        value_ = contacts_->alongUnchecked(static_cast<Direction::Id>(state_));
+                        if (value_.isValid()) {
+                            return;
+                        }
+                        state_++;
+                    }
+                }
+
+                Contacts const* contacts_;
+                ContactReference value_;
+                int state_;
+            };
+        public:
+            using Iterator = Utils::ForwardIterator<Enumerator>;
+
+            [[nodiscard]]
+            explicit Contacts(BlockReference const& source)
+                : source_{ &source }
+            {}
+
+            [[nodiscard]]
+            ContactReference along(Direction direction) const {
+                ContactReference result = alongUnchecked(direction);
+                if (!result.isValid()) {
+                    throw std::out_of_range(result.invalidMessage());
+                }
+                return result;
+            }
+
+            [[nodiscard]]
+            Iterator begin() const {
+                return Iterator{ *this };
+            }
+
+            [[nodiscard]]
+            Utils::EndIterator end() const {
+                return {};
+            }
+        private:
+            [[nodiscard]]
+            ContactReference alongUnchecked(Direction direction) const {
+                return ContactReference{ *source_->sceneData_, ContactIndex{ source_->index_, direction } };
+            }
+
+            BlockReference const* source_;
+        };
 
         class Neighbour {
         public:
@@ -257,6 +356,11 @@ namespace Gustave::Scenes::CuboidGrid {
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
             return sceneData_->blocks.blockSize();
+        }
+
+        [[nodiscard]]
+        Contacts contacts() const {
+            return Contacts{ *this };
         }
 
         [[nodiscard]]

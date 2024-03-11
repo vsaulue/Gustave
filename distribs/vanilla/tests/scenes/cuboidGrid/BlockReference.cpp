@@ -28,10 +28,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
-#include <gustave/scenes/cuboidGrid/StructureReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneUpdater.hpp>
 
@@ -39,15 +37,19 @@
 
 namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
 
-using BlockIndex = CuboidGrid::BlockIndex;
 using BlockReference = CuboidGrid::BlockReference<cfg>;
-using Direction = Gustave::Math3d::BasicDirection;
-using Neighbour = BlockReference::Neighbour;
 using SceneData = CuboidGrid::detail::SceneData<cfg>;
 using SceneUpdater = CuboidGrid::detail::SceneUpdater<cfg>;
-using StructureReference = CuboidGrid::StructureReference<cfg>;
-using Transaction = CuboidGrid::Transaction<cfg>;
 
+using BlockIndex = BlockReference::BlockIndex;
+using ContactIndex = BlockReference::ContactReference::ContactIndex;
+using ContactReference = BlockReference::ContactReference;
+using Direction = BlockReference::Direction;
+using Neighbour = BlockReference::Neighbour;
+using StructureReference = BlockReference::StructureReference;
+using Transaction = SceneUpdater::Transaction;
+
+static_assert(std::ranges::forward_range<BlockReference::Contacts>);
 static_assert(std::ranges::forward_range<BlockReference::Neighbours>);
 static_assert(std::ranges::forward_range<BlockReference::Structures>);
 
@@ -74,6 +76,42 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
 
     SECTION(".blockSize()") {
         CHECK(b101.blockSize() == blockSize);
+    }
+
+    SECTION(".contacts()") {
+        auto makeContactRef = [&](BlockReference const& source, Direction direction) {
+            return ContactReference{ sceneData, ContactIndex{ source.index(), direction}};
+        };
+
+        SECTION(".along()") {
+            SECTION("// valid") {
+                ContactReference contact = b121.contacts().along(Direction::minusY());
+                CHECK(contact == makeContactRef(b121, Direction::minusY()));
+            }
+
+            SECTION("// invalid") {
+                CHECK_THROWS_AS(b121.contacts().along(Direction::plusY()), std::out_of_range);
+            }
+        }
+
+        SECTION(".begin() // & .end()") {
+            SECTION("// empty") {
+                auto contacts = b000.contacts();
+                CHECK(contacts.begin() == contacts.end());
+            }
+
+            SECTION("// 6 contacts") {
+                std::vector<ContactReference> expected = {
+                    makeContactRef(b111, Direction::minusX()),
+                    makeContactRef(b111, Direction::plusX()),
+                    makeContactRef(b111, Direction::minusY()),
+                    makeContactRef(b111, Direction::plusY()),
+                    makeContactRef(b111, Direction::minusZ()),
+                    makeContactRef(b111, Direction::plusZ()),
+                };
+                CHECK_THAT(b111.contacts(), M::C2::UnorderedRangeEquals(expected));
+            }
+        }
     }
 
     SECTION(".index()") {
