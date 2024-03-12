@@ -28,21 +28,22 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/SceneUpdater.hpp>
 #include <gustave/scenes/cuboidGrid/StructureReference.hpp>
-#include <gustave/scenes/cuboidGrid/Transaction.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
-using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<cfg>;
+using StructureReference = Gustave::Scenes::CuboidGrid::StructureReference<cfg>;
 using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
 using SceneUpdater = Gustave::Scenes::CuboidGrid::detail::SceneUpdater<cfg>;
-using StructureReference = Gustave::Scenes::CuboidGrid::StructureReference<cfg>;
-using Transaction = Gustave::Scenes::CuboidGrid::Transaction<cfg>;
+
+using BlockIndex = StructureReference::BlockIndex;
+using BlockReference = StructureReference::BlockReference;
+using ContactIndex = StructureReference::ContactIndex;
+using ContactReference = StructureReference::ContactReference;
+using Direction = StructureReference::ContactIndex::Direction;
+using Transaction = SceneUpdater::Transaction;
 
 static_assert(std::ranges::forward_range<StructureReference::Blocks>);
 
@@ -119,6 +120,30 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
 
         SECTION(".size()") {
             CHECK(s3.blocks().size() == 3);
+        }
+    }
+
+    SECTION(".contacts()") {
+        auto makeContactRef = [&](BlockIndex const& source, Direction direction) {
+            return ContactReference{ data, ContactIndex{ source, direction } };
+        };
+        SECTION(".at()") {
+            SECTION("// valid") {
+                ContactReference contact = s1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() });
+                CHECK(contact == makeContactRef({ 1,0,0 }, Direction::plusX()));
+            }
+
+            SECTION("// invalid source") {
+                CHECK_THROWS_AS(s1.contacts().at(ContactIndex{ {0,0,0}, Direction::plusX() }), std::out_of_range);
+            }
+
+            SECTION("// invalid other") {
+                CHECK_THROWS_AS(s1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusY() }), std::out_of_range);
+            }
+
+            SECTION("// invalid structure") {
+                CHECK_THROWS_AS(s3.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() }), std::out_of_range);
+            }
         }
     }
 

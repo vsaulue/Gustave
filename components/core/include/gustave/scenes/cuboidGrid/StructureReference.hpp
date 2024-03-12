@@ -36,6 +36,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
+#include <gustave/scenes/cuboidGrid/ContactReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/solvers/Structure.hpp>
@@ -48,6 +49,9 @@ namespace Gustave::Scenes::CuboidGrid {
     class BlockReference;
 
     template<Cfg::cLibConfig auto cfg>
+    class ContactReference;
+
+    template<Cfg::cLibConfig auto cfg>
     class StructureReference;
 
     namespace detail {
@@ -58,12 +62,19 @@ namespace Gustave::Scenes::CuboidGrid {
     template<Cfg::cLibConfig auto cfg>
     class StructureReference {
     private:
-        using BlockReference = CuboidGrid::BlockReference<cfg>;
         using BlockData = detail::BlockData<cfg>;
+        using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
         using StructureData = detail::StructureData<cfg>;
+
+        using SceneData = typename StructureData::SceneData;
     public:
+        using BlockReference = CuboidGrid::BlockReference<cfg>;
+        using ContactReference = CuboidGrid::ContactReference<cfg>;
         using SolverStructure = Solvers::Structure<cfg>;
         using NodeIndex = Cfg::NodeIndex<cfg>;
+
+        using BlockIndex = typename BlockReference::BlockIndex;
+        using ContactIndex = typename ContactReference::ContactIndex;
 
         class Blocks {
         private:
@@ -174,6 +185,38 @@ namespace Gustave::Scenes::CuboidGrid {
             StructureData const* data_;
         };
 
+        class Contacts {
+        public:
+            [[nodiscard]]
+            explicit Contacts(StructureData const& structure)
+                : structure_{ &structure }
+            {}
+
+            [[nodiscard]]
+            ContactReference at(ContactIndex const& index) const {
+                SceneData const& scene = structure_->sceneData();
+                ContactReference result{ scene, index };
+                BlockIndex const& srcId = index.localBlockIndex();
+                ConstBlockDataReference srcBlock = scene.blocks.find(srcId);
+                if (srcBlock) {
+                    std::optional<BlockIndex> const otherId = srcId.neighbourAlong(index.direction());
+                    if (otherId) {
+                        ConstBlockDataReference otherBlock = scene.blocks.find(*otherId);
+                        if (otherBlock) {
+                            if ((structure_ == srcBlock.structure()) || (structure_ == otherBlock.structure())) {
+                                return result;
+                            }
+                        }
+                    }
+                }
+                std::stringstream msg;
+                msg << "Structure does not contain the contact at " << index << '.';
+                throw std::out_of_range(msg.str());
+            }
+        private:
+            StructureData const* structure_;
+        };
+
         [[nodiscard]]
         explicit StructureReference(std::shared_ptr<StructureData const> data)
             : data_{ std::move(data) }
@@ -189,6 +232,11 @@ namespace Gustave::Scenes::CuboidGrid {
         [[nodiscard]]
         Blocks blocks() const {
             return Blocks{ *data_ };
+        }
+
+        [[nodiscard]]
+        Contacts contacts() const {
+            return Contacts{ *data_ };
         }
 
         [[nodiscard]]
