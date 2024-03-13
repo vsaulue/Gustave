@@ -46,6 +46,7 @@ using Direction = StructureReference::ContactIndex::Direction;
 using Transaction = SceneUpdater::Transaction;
 
 static_assert(std::ranges::forward_range<StructureReference::Blocks>);
+static_assert(std::ranges::forward_range<StructureReference::Links>);
 
 TEST_CASE("Scene::CuboidGrid::StructureReference") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
@@ -57,6 +58,20 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
         t.addBlock({ {2,0,0}, concrete_20m, 2000.f * u.mass, true });
         t.addBlock({ {3,0,0}, concrete_20m, 3000.f * u.mass, false });
         t.addBlock({ {4,0,0}, concrete_20m, 4000.f * u.mass, false });
+
+        t.addBlock({ {5,6,6}, concrete_20m, 2000.f * u.mass, true });
+        t.addBlock({ {6,5,6}, concrete_20m, 2000.f * u.mass, true });
+        t.addBlock({ {6,6,5}, concrete_20m, 2000.f * u.mass, true });
+        t.addBlock({ {6,6,6}, concrete_20m, 2000.f * u.mass, false });
+        t.addBlock({ {6,6,7}, concrete_20m, 2000.f * u.mass, false });
+        t.addBlock({ {6,6,8}, concrete_20m, 2000.f * u.mass, true });
+        t.addBlock({ {6,6,9}, concrete_20m, 2000.f * u.mass, false });
+        t.addBlock({ {6,7,6}, concrete_20m, 2000.f * u.mass, false });
+        t.addBlock({ {6,8,6}, concrete_20m, 2000.f * u.mass, true });
+        t.addBlock({ {6,9,6}, concrete_20m, 2000.f * u.mass, false });
+        t.addBlock({ {7,6,6}, concrete_20m, 2000.f * u.mass, false });
+        t.addBlock({ {8,6,6}, concrete_20m, 2000.f * u.mass, true });
+        t.addBlock({ {9,6,6}, concrete_20m, 2000.f * u.mass, false });
         SceneUpdater{ data }.runTransaction(t);
     }
 
@@ -70,8 +85,13 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
         return StructureReference{ *it };
     };
 
+    auto makeContactRef = [&](BlockIndex const& source, Direction direction) {
+        return ContactReference{ data, ContactIndex{ source, direction } };
+    };
+
     auto const s1 = structureOf({ 1,0,0 });
     auto const s3 = structureOf({ 3,0,0 });
+    auto const s666 = structureOf({ 6,6,6, });
 
     SECTION(".blocks()") {
         SECTION(".at()") {
@@ -124,9 +144,6 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
     }
 
     SECTION(".contacts()") {
-        auto makeContactRef = [&](BlockIndex const& source, Direction direction) {
-            return ContactReference{ data, ContactIndex{ source, direction } };
-        };
         SECTION(".at()") {
             SECTION("// valid") {
                 ContactReference contact = s1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() });
@@ -157,6 +174,23 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
             t.removeBlock({ 1,0,0 });
             SceneUpdater{ data }.runTransaction(t);
             CHECK_FALSE(s1.isValid());
+        }
+    }
+
+    SECTION(".links()") {
+        SECTION(".begin() // && .end()") {
+            std::vector<ContactReference> expected = {
+                makeContactRef({5,6,6}, Direction::plusX()),
+                makeContactRef({6,5,6}, Direction::plusY()),
+                makeContactRef({6,6,5}, Direction::plusZ()),
+                makeContactRef({6,6,6}, Direction::plusX()),
+                makeContactRef({6,6,6}, Direction::plusY()),
+                makeContactRef({6,6,6}, Direction::plusZ()),
+                makeContactRef({6,6,7}, Direction::plusZ()),
+                makeContactRef({6,7,6}, Direction::plusY()),
+                makeContactRef({7,6,6}, Direction::plusX()),
+            };
+            CHECK_THAT(s666.links(), M::C2::UnorderedRangeEquals(expected));
         }
     }
 

@@ -38,6 +38,7 @@
 #include <gustave/scenes/cuboidGrid/BlockReference.hpp>
 #include <gustave/scenes/cuboidGrid/ContactReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockData.hpp>
+#include <gustave/scenes/cuboidGrid/detail/InternalLinks.hpp>
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/utils/EndIterator.hpp>
@@ -217,6 +218,108 @@ namespace Gustave::Scenes::CuboidGrid {
             StructureData const* structure_;
         };
 
+        class Links {
+        private:
+            using InternalLinks = detail::InternalLinks<cfg>;
+            using SolverIndexIterator = typename StructureData::SolverIndices::const_iterator;
+
+            class Enumerator {
+            public:
+                Enumerator()
+                    : structure_{ nullptr }
+                    , solverIndexIt_{}
+                    , internalLinks_{ Utils::NO_INIT }
+                    , linkIndex_{ 0 }
+                    , value_{ Utils::NO_INIT }
+                {}
+
+                explicit Enumerator(StructureData const& structure)
+                    : structure_{ &structure }
+                    , solverIndexIt_{ structure.solverIndices().begin() }
+                    , internalLinks_{ Utils::NO_INIT }
+                    , linkIndex_{ 0 }
+                    , value_{ Utils::NO_INIT }
+                {
+                    if (!isEnd()) {
+                        updateInternalLinks();
+                        next();
+                    }
+                }
+
+                void operator++() {
+                    ++linkIndex_;
+                    next();
+                }
+
+                [[nodiscard]]
+                ContactReference const& operator*() const {
+                    return value_;
+                }
+
+                [[nodiscard]]
+                bool isEnd() const {
+                    return solverIndexIt_ == structure_->solverIndices().end();
+                }
+
+                [[nodiscard]]
+                bool operator==(Enumerator const& other) const {
+                    return (solverIndexIt_ == other.solverIndexIt_) && (linkIndex_ == other.linkIndex_);
+                }
+            private:
+                void next() {
+                    while (true) {
+                        while (linkIndex_ < internalLinks_.size()) {
+                            if ((structure_ == internalLinks_.source().structure()) || (structure_ == internalLinks_[linkIndex_].otherBlock.structure())) {
+                                return updateValue();
+                            }
+                            ++linkIndex_;
+                        }
+                        ++solverIndexIt_;
+                        if (!isEnd()) {
+                            updateInternalLinks();
+                            linkIndex_ = 0;
+                        } else {
+                            return;
+                        }
+                    }
+                }
+
+                void updateInternalLinks() {
+                    internalLinks_ = InternalLinks{ structure_->sceneData(), solverIndexIt_->first };
+                }
+
+                void updateValue() {
+                    ContactIndex index{ solverIndexIt_->first, internalLinks_[linkIndex_].direction };
+                    value_ = ContactReference{ structure_->sceneData(), index };
+                }
+
+                StructureData const* structure_;
+                SolverIndexIterator solverIndexIt_;
+                InternalLinks internalLinks_;
+                std::size_t linkIndex_;
+                ContactReference value_;
+            };
+        public:
+            using Iterator = Utils::ForwardIterator<Enumerator>;
+
+            [[nodiscard]]
+            explicit Links(StructureData const& structure)
+                : structure_{ &structure }
+            {}
+
+            [[nodiscard]]
+            Iterator begin() const {
+                return Iterator{ *structure_ };
+            }
+
+            [[nodiscard]]
+            Utils::EndIterator end() const {
+                return {};
+            }
+        private:
+            StructureData const* structure_;
+        };
+
         [[nodiscard]]
         explicit StructureReference(std::shared_ptr<StructureData const> data)
             : data_{ std::move(data) }
@@ -237,6 +340,11 @@ namespace Gustave::Scenes::CuboidGrid {
         [[nodiscard]]
         Contacts contacts() const {
             return Contacts{ *data_ };
+        }
+
+        [[nodiscard]]
+        Links links() const {
+            return Links{ *data_ };
         }
 
         [[nodiscard]]

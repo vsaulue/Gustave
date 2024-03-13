@@ -36,8 +36,10 @@ using SceneData = Cuboid::detail::SceneData<cfg>;
 using SceneUpdater = Cuboid::detail::SceneUpdater<cfg>;
 
 using BlockIndex = SceneData::Blocks::BlockIndex;
+using ConstBlockDataReference = InternalLinks::ConstBlockDataReference;
 using Direction = InternalLinks::Direction;
 using Transaction = SceneUpdater::Transaction;
+using Value = InternalLinks::Value;
 
 TEST_CASE("Scene::CuboidGrid::detail::InternalLinks") {
     SceneData scene{ vector3(1.f, 2.f, 3.f, u.length) };
@@ -50,6 +52,10 @@ TEST_CASE("Scene::CuboidGrid::detail::InternalLinks") {
     t.addBlock({ {2,2,4}, concrete_20m, 1000.f * u.mass, true });
     SceneUpdater{ scene }.runTransaction(t);
 
+    auto getBlockData = [&](BlockIndex const& index) {
+        return scene.blocks.find(index);
+    };
+
     SECTION(".begin() // & .end() ") {
         SECTION("empty") {
             InternalLinks links{ scene, {2,2,3} };
@@ -58,7 +64,11 @@ TEST_CASE("Scene::CuboidGrid::detail::InternalLinks") {
 
         SECTION("non-empty") {
             InternalLinks links{ scene, {2,2,2} };
-            std::vector<Direction> expected = { Direction::plusX(), Direction::plusY(), Direction::plusZ() };
+            std::vector<Value> expected = {
+                Value{ getBlockData({3,2,2}), Direction::plusX() },
+                Value{ getBlockData({2,3,2}), Direction::plusY() },
+                Value{ getBlockData({2,2,3}), Direction::plusZ() },
+            };
             CHECK_THAT(links, M::C2::RangeEquals(expected));
         }
     }

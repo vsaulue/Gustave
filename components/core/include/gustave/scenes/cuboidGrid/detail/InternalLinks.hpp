@@ -38,34 +38,54 @@ namespace Gustave::Scenes::CuboidGrid::detail {
     template<Cfg::cLibConfig auto cfg>
     class InternalLinks {
     public:
+        using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
         using Direction = Math3d::BasicDirection;
-    private:
-        using BlockDataReference = detail::BlockDataReference<cfg, false>;
         using SceneData = detail::SceneData<cfg>;
-        using Values = std::array<Direction, 3>;
-    public:
-        using Iterator = Values::const_iterator;
+
+        struct Value {
+            [[nodiscard]]
+            Value()
+                : otherBlock{ nullptr }
+                , direction{ Direction::plusX() }
+            {}
+
+            [[nodiscard]]
+            explicit Value(ConstBlockDataReference otherBlock_, Direction direction_)
+                : otherBlock{ otherBlock_ }
+                , direction{ direction_ }
+            {}
+
+            [[nodiscard]]
+            bool operator==(Value const&) const = default;
+
+            ConstBlockDataReference otherBlock;
+            Direction direction;
+        };
+
+        using Values = std::array<Value, 3>;
+        using Iterator = typename Values::const_iterator;
 
         [[nodiscard]]
         explicit InternalLinks(Utils::NoInit)
-            : values_{ Direction::plusX(), Direction::plusX(), Direction::plusX() }
+            : source_{ nullptr }
+            , values_{}
             , size_{ 0 }
         {}
 
         [[nodiscard]]
         explicit InternalLinks(SceneData const& scene, BlockIndex const& blockIndex)
-            : values_{ Direction::plusX(), Direction::plusX(), Direction::plusX() }
+            : source_{ scene.blocks.find(blockIndex) }
+            , values_{}
             , size_{ 0 }
         {
-            BlockDataReference source = scene.blocks.find(blockIndex);
-            assert(source);
+            assert(source_);
             auto processNeighbour = [&](Direction direction) {
                 std::optional<BlockIndex> neighbourId = blockIndex.neighbourAlong(direction);
                 if (neighbourId) {
-                    BlockDataReference neighbour = scene.blocks.find(*neighbourId);
+                    ConstBlockDataReference neighbour = scene.blocks.find(*neighbourId);
                     if (neighbour) {
-                        if (!source.isFoundation() || !neighbour.isFoundation()) {
-                            addValue(direction);
+                        if (!source_.isFoundation() || !neighbour.isFoundation()) {
+                            addValue(neighbour, direction);
                         }
                     }
                 }
@@ -76,7 +96,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        Direction operator[](std::size_t index) const {
+        Value operator[](std::size_t index) const {
             return values_[index];
         }
 
@@ -94,12 +114,18 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         std::size_t size() const {
             return size_;
         }
+
+        [[nodiscard]]
+        ConstBlockDataReference source() const {
+            return source_;
+        }
     private:
-        void addValue(Direction direction) {
-            values_[size_] = direction;
+        void addValue(ConstBlockDataReference neighbour, Direction direction) {
+            values_[size_] = Value{ neighbour, direction };
             ++size_;
         }
 
+        ConstBlockDataReference source_;
         Values values_;
         std::size_t size_;
     };

@@ -106,7 +106,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             void updateValue() {
-                value_ = ContactReference{ *scene_, ContactIndex{ blockIt_->first, blockLinks_[internalLinkId_] } };
+                value_ = ContactReference{ *scene_, ContactIndex{ blockIt_->first, blockLinks_[internalLinkId_].direction } };
             }
 
             SceneData const* scene_;
