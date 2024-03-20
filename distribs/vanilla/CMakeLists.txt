@@ -59,6 +59,8 @@ add_executable(Test-Gustave-Vanilla
     "tests/scenes/CuboidGridScene.cpp"
     "tests/worlds/sync/BlockReference.cpp"
     "tests/worlds/sync/Blocks.cpp"
+    "tests/worlds/sync/ContactReference.cpp"
+    "tests/worlds/sync/Contacts.cpp"
     "tests/worlds/sync/detail/WorldUpdater.cpp"
     "tests/worlds/sync/StructureReference.cpp"
     "tests/worlds/sync/Structures.cpp"

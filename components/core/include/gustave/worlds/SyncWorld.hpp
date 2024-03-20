@@ -32,14 +32,10 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/scenes/CuboidGridScene.hpp>
-#include <gustave/solvers/Force1Solver.hpp>
-#include <gustave/utils/PointerHash.hpp>
-#include <gustave/worlds/sync/BlockReference.hpp>
 #include <gustave/worlds/sync/Blocks.hpp>
+#include <gustave/worlds/sync/Contacts.hpp>
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 #include <gustave/worlds/sync/detail/WorldUpdater.hpp>
-#include <gustave/worlds/sync/StructureReference.hpp>
 #include <gustave/worlds/sync/Structures.hpp>
 #include <gustave/worlds/WorldStructureState.hpp>
 
@@ -58,13 +54,16 @@ namespace Gustave::Worlds {
         using WorldData = Sync::detail::WorldData<cfg>;
         using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
     public:
-        using Solver = Solvers::Force1Solver<cfg>;
+        using Contacts = Sync::Contacts<cfg>;
+        using Blocks = Sync::Blocks<cfg>;
+        using Structures = Sync::Structures<cfg>;
 
         using BlockIndex = typename WorldData::Scene::BlockIndex;
-        using BlockReference = Sync::BlockReference<cfg>;
-        using Blocks = Sync::Blocks<cfg>;
-        using StructureReference = Sync::StructureReference<cfg>;
-        using Structures = Sync::Structures<cfg>;
+        using BlockReference = typename Blocks::BlockReference;
+        using ContactIndex = typename Contacts::ContactIndex;
+        using ContactReference = typename Contacts::ContactReference;
+        using Solver = typename WorldData::Solver;
+        using StructureReference = typename Structures::StructureReference;
         using Transaction = typename WorldData::Scene::Transaction;
 
         [[nodiscard]]
@@ -75,6 +74,11 @@ namespace Gustave::Worlds {
         [[nodiscard]]
         Blocks blocks() const {
             return Blocks{ data_ };
+        }
+
+        [[nodiscard]]
+        Contacts contacts() const {
+            return Contacts{ data_ };
         }
 
         void modify(Transaction const& transaction) {

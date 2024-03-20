@@ -62,4 +62,10 @@ TEST_CASE("Scene::CuboidGrid::Contacts") {
             CHECK_THROWS_AS(contacts.at(id), std::out_of_range);
         }
     }
+
+    SECTION(".find()") {
+        ContactIndex id{ {0,2,0}, Direction::minusY() };
+        ContactReference ref = contacts.find(id);
+        CHECK(ref == ContactReference{ scene, id });
+    }
 }

@@ -23,56 +23,57 @@
  * SOFTWARE.
  */
 
-#include <stdexcept>
+#include <memory>
 
-#include <catch2/catch_test_macros.hpp>
-
-#include <gustave/worlds/SyncWorld.hpp>
+#include <gustave/worlds/sync/Contacts.hpp>
+#include <gustave/worlds/sync/detail/WorldData.hpp>
+#include <gustave/worlds/sync/detail/WorldUpdater.hpp>
 
 #include <TestHelpers.hpp>
 
-using SyncWorld = Gustave::Worlds::SyncWorld<cfg>;
+using Contacts = Gustave::Worlds::Sync::Contacts<cfg>;
+using WorldData = Gustave::Worlds::Sync::detail::WorldData<cfg>;
+using WorldUpdater = Gustave::Worlds::Sync::detail::WorldUpdater<cfg>;
 
-using BlockIndex = SyncWorld::BlockIndex;
-using ContactIndex = SyncWorld::ContactIndex;
-using Direction = SyncWorld::ContactIndex::Direction;
-using Solver = SyncWorld::Solver;
+using ContactIndex = Contacts::ContactIndex;
+using Direction = ContactIndex::Direction;
+using Solver = WorldData::Solver;
+using Transaction = WorldUpdater::Transaction;
 
-static constexpr auto blockSize = vector3(1.f, 1.f, 1.f, u.length);
+static constexpr auto blockSize = vector3(3.f, 2.f, 1.f, u.length);
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
 static constexpr Real<u.mass> blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
 static constexpr float solverPrecision = 0.001f;
 
 [[nodiscard]]
-static SyncWorld makeWorld() {
-    auto const g = vector3(0.f, -10.f, 0.f, u.acceleration);
+static WorldData makeWorld() {
     auto solver = Solver{ std::make_shared<Solver::Config>(g, 1000, solverPrecision) };
-    return SyncWorld{ blockSize, std::move(solver) };
+    return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("SyncWorld") {
-    SyncWorld world = makeWorld();
-    {
-        SyncWorld::Transaction transaction;
-        for (int i = 0; i < 10; ++i) {
-            transaction.addBlock({ {0,i,0}, concrete_20m, blockMass, i == 0 });
+TEST_CASE("Worlds::Sync::Contacts") {
+    WorldData world = makeWorld();
+
+    Transaction t;
+    t.addBlock({ {2,2,2}, concrete_20m, blockMass, false });
+    t.addBlock({ {2,1,2}, concrete_20m, blockMass, true });
+    WorldUpdater{ world }.runTransaction(t);
+
+    Contacts contacts{ world };
+
+    SECTION(".at()") {
+        SECTION("// valid") {
+            auto contact = contacts.at(ContactIndex{ {2,1,2}, Direction::plusY() });
+            CHECK_THAT(contact.forceVector(), M::WithinRel(blockMass * g, solverPrecision));
         }
-        world.modify(transaction);
+
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(contacts.at(ContactIndex{ {2,1,2}, Direction::plusX() }), std::out_of_range);
+        }
     }
 
-    SECTION(".blocks()") {
-        auto const block = world.blocks().at({ 0,2,0 });
-        CHECK(block.mass() == blockMass);
-    }
-
-    SECTION(".contacts()") {
-        auto const contact = world.contacts().at(ContactIndex{ {0,0,0}, Direction::plusY() });
-        CHECK_THAT(contact.forceVector(), M::WithinRel(9.f * blockMass * g, solverPrecision));
-    }
-
-    SECTION(".structures()") {
-        auto const structureIt = world.structures().begin();
-        REQUIRE(structureIt != world.structures().end());
-        CHECK(structureIt->blocks().size() == 10);
+    SECTION(".find()") {
+        auto contact = contacts.find(ContactIndex{ {2,1,2}, Direction::plusY() });
+        CHECK_THAT(contact.forceVector(), M::WithinRel(blockMass * g, solverPrecision));
     }
 }

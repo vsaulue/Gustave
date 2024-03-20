@@ -25,40 +25,38 @@
 
 #pragma once
 
-#include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/cfg/LibTraits.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGrid/ContactReference.hpp>
+#include <gustave/worlds/sync/detail/WorldData.hpp>
+#include <gustave/worlds/sync/ContactReference.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
+namespace Gustave::Worlds::Sync {
     template<Cfg::cLibConfig auto cfg>
     class Contacts {
     private:
-        using SceneData = detail::SceneData<cfg>;
+        using WorldData = detail::WorldData<cfg>;
     public:
-        using ContactReference = CuboidGrid::ContactReference<cfg>;
+        using ContactReference = Sync::ContactReference<cfg>;
 
         using ContactIndex = typename ContactReference::ContactIndex;
 
         [[nodiscard]]
-        explicit Contacts(SceneData const& scene)
-            : scene_{ &scene }
+        explicit Contacts(WorldData const& world)
+            : world_{ &world }
         {}
 
         [[nodiscard]]
-        ContactReference find(ContactIndex const& index) const {
-            return ContactReference{ *scene_, index };
-        }
-
-        [[nodiscard]]
         ContactReference at(ContactIndex const& index) const {
-            ContactReference result{ *scene_, index };
+            ContactReference result{ *world_, index };
             if (!result.isValid()) {
                 throw std::out_of_range(result.invalidMessage());
             }
             return result;
         }
+
+        [[nodiscard]]
+        ContactReference find(ContactIndex const& index) const {
+            return ContactReference{ *world_, index };
+        }
     private:
-        SceneData const* scene_;
+        WorldData const* world_;
     };
 }
