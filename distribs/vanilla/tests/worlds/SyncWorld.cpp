@@ -70,6 +70,18 @@ TEST_CASE("SyncWorld") {
         CHECK_THAT(contact.forceVector(), M::WithinRel(9.f * blockMass * g, solverPrecision));
     }
 
+    SECTION(".links()") {
+        std::vector<ContactIndex> expected;
+        for (int i = 0; i < 9; ++i) {
+            expected.push_back(ContactIndex{ {0,i,0}, Direction::plusY() });
+        }
+        std::vector<ContactIndex> result;
+        for (auto const& contactRef : world.links()) {
+            result.push_back(contactRef.index());
+        }
+        CHECK_THAT(result, M::C2::UnorderedRangeEquals(expected));
+    }
+
     SECTION(".structures()") {
         auto const structureIt = world.structures().begin();
         REQUIRE(structureIt != world.structures().end());

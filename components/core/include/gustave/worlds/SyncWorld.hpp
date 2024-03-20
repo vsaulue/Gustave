@@ -34,6 +34,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/worlds/sync/Blocks.hpp>
 #include <gustave/worlds/sync/Contacts.hpp>
+#include <gustave/worlds/sync/Links.hpp>
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 #include <gustave/worlds/sync/detail/WorldUpdater.hpp>
 #include <gustave/worlds/sync/Structures.hpp>
@@ -54,8 +55,9 @@ namespace Gustave::Worlds {
         using WorldData = Sync::detail::WorldData<cfg>;
         using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
     public:
-        using Contacts = Sync::Contacts<cfg>;
         using Blocks = Sync::Blocks<cfg>;
+        using Contacts = Sync::Contacts<cfg>;
+        using Links = Sync::Links<cfg>;
         using Structures = Sync::Structures<cfg>;
 
         using BlockIndex = typename WorldData::Scene::BlockIndex;
@@ -79,6 +81,11 @@ namespace Gustave::Worlds {
         [[nodiscard]]
         Contacts contacts() const {
             return Contacts{ data_ };
+        }
+
+        [[nodiscard]]
+        Links links() const {
+            return Links{ data_ };
         }
 
         void modify(Transaction const& transaction) {

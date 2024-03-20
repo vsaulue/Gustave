@@ -68,6 +68,12 @@ namespace Gustave::Worlds::Sync {
         {}
 
         [[nodiscard]]
+        explicit ContactReference(Utils::NoInit NO_INIT)
+            : world_{ nullptr }
+            , index_{ NO_INIT }
+        {}
+
+        [[nodiscard]]
         Real<u.area> area() const {
             return sceneContact().area();
         }

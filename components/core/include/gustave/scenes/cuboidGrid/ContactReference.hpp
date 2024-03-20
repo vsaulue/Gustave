@@ -79,9 +79,9 @@ namespace Gustave::Scenes::CuboidGrid {
         using StructureReference = CuboidGrid::StructureReference<cfg>;
 
         [[nodiscard]]
-        explicit ContactReference(Utils::NoInit)
+        explicit ContactReference(Utils::NoInit NO_INIT)
             : scene_{ nullptr }
-            , index_{ ContactIndex{ {0,0,0}, Direction::plusX() } }
+            , index_{ NO_INIT }
         {}
 
         [[nodiscard]]

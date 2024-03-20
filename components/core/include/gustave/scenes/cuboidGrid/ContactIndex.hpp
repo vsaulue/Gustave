@@ -32,12 +32,19 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/utils/Hasher.hpp>
+#include <gustave/utils/NoInit.hpp>
 
 namespace Gustave::Scenes::CuboidGrid {
     class ContactIndex {
     public:
         using BlockIndex = CuboidGrid::BlockIndex;
         using Direction = Math3d::BasicDirection;
+
+        [[nodiscard]]
+        explicit ContactIndex(Utils::NoInit NO_INIT)
+            : localBlockIndex_{ NO_INIT }
+            , direction_{ Direction::plusX() }
+        {}
 
         [[nodiscard]]
         explicit ContactIndex(BlockIndex const& localBlockIndex, Direction direction)

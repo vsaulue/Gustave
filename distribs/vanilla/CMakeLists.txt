@@ -62,6 +62,7 @@ add_executable(Test-Gustave-Vanilla
     "tests/worlds/sync/ContactReference.cpp"
     "tests/worlds/sync/Contacts.cpp"
     "tests/worlds/sync/detail/WorldUpdater.cpp"
+    "tests/worlds/sync/Links.cpp"
     "tests/worlds/sync/StructureReference.cpp"
     "tests/worlds/sync/Structures.cpp"
     "tests/worlds/SyncWorld.cpp"
