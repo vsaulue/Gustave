@@ -183,6 +183,17 @@ TEST_CASE("Worlds::Sync::StructureReference") {
         }
     }
 
+    SECTION(".links()") {
+        SECTION(".begin() // .end()") {
+            std::vector<ContactReference> expected = {
+                ContactReference{ world, ContactIndex{ {0,0,0}, Direction::plusY() } },
+                ContactReference{ world, ContactIndex{ {0,1,0}, Direction::plusY() } },
+                ContactReference{ world, ContactIndex{ {0,2,0}, Direction::plusY() } },
+            };
+            CHECK_THAT(s1.links(), M::C2::UnorderedRangeEquals(expected));
+        }
+    }
+
     SECTION(".state()") {
         SECTION("// solved") {
             CHECK(s1.state() == StructureReference::State::Solved);

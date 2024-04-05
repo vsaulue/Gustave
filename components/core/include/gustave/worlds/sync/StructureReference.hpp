@@ -184,6 +184,82 @@ namespace Gustave::Worlds::Sync {
             StructureData const* structure_;
         };
 
+        class Links {
+        private:
+            using SceneStructLinks = typename WorldData::Scene::StructureReference::Links;
+            using SceneIterator = typename SceneStructLinks::Iterator;
+
+            class Enumerator {
+            public:
+                [[nodiscard]]
+                Enumerator()
+                    : links_{ nullptr }
+                    , sceneIterator_{}
+                    , value_{ Utils::NO_INIT }
+                {}
+
+                [[nodiscard]]
+                explicit Enumerator(Links const& links)
+                    : links_{ &links }
+                    , sceneIterator_{ links.sceneLinks_.begin() }
+                    , value_{ Utils::NO_INIT }
+                {
+                    updateValue();
+                }
+
+                [[nodiscard]]
+                bool isEnd() const {
+                    return sceneIterator_ == links_->sceneLinks_.end();
+                }
+
+                [[nodiscard]]
+                ContactReference const& operator*() const {
+                    return value_;
+                }
+
+                void operator++() {
+                    ++sceneIterator_;
+                    updateValue();
+                }
+
+                [[nodiscard]]
+                bool operator==(Enumerator const& other) const {
+                    return sceneIterator_ == other.sceneIterator_;
+                }
+            private:
+                void updateValue() {
+                    if (!isEnd()) {
+                        value_ = ContactReference{ links_->structure_->world(), sceneIterator_->index() };
+                    }
+                }
+
+                Links const* links_;
+                SceneIterator sceneIterator_;
+                ContactReference value_;
+            };
+        public:
+            using Iterator = Utils::ForwardIterator<Enumerator>;
+
+            [[nodiscard]]
+            explicit Links(StructureData const& structure)
+                : structure_{ &structure }
+                , sceneLinks_{ structure.sceneStructure().links() }
+            {}
+
+            [[nodiscard]]
+            Iterator begin() const {
+                return Iterator{ *this };
+            }
+
+            [[nodiscard]]
+            Utils::EndIterator end() const {
+                return {};
+            }
+        private:
+            StructureData const* structure_;
+            SceneStructLinks sceneLinks_;
+        };
+
         [[nodiscard]]
         explicit StructureReference(std::shared_ptr<StructureData const> data)
             : data_{ std::move(data) }
@@ -226,6 +302,11 @@ namespace Gustave::Worlds::Sync {
         [[nodiscard]]
         bool isValid() const {
             return data_->state() != State::Invalid;
+        }
+
+        [[nodiscard]]
+        Links links() const {
+            return Links{ *data_ };
         }
 
         [[nodiscard]]
