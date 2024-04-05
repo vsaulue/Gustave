@@ -34,12 +34,15 @@
 
 namespace Sync = Gustave::Worlds::Sync;
 
+using StructureReference = Sync::StructureReference<cfg>;
 using WorldData = Sync::detail::WorldData<cfg>;
 using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
-using BlockReference = Sync::BlockReference<cfg>;
-using StructureReference = Sync::StructureReference<cfg>;
 
 using BlockIndex = WorldData::Scene::BlockIndex;
+using BlockReference = StructureReference::BlockReference;
+using ContactIndex = WorldData::Scene::ContactIndex;
+using ContactReference = StructureReference::ContactReference;
+using Direction = ContactIndex::Direction;
 using Solver = WorldData::Solver;
 using Transaction = WorldData::Scene::Transaction;
 
@@ -125,6 +128,21 @@ TEST_CASE("Worlds::Sync::StructureReference") {
 
         SECTION(".size()") {
             CHECK(s1.blocks().size() == 4);
+        }
+    }
+
+    SECTION(".contacts()") {
+        SECTION(".at()") {
+            SECTION("// valid") {
+                auto const id = ContactIndex{ {0,0,0}, Direction::plusY() };
+                ContactReference contact = s1.contacts().at(id);
+                CHECK(contact == ContactReference{ world, id });
+            }
+
+            SECTION("// invalid") {
+                auto const id = ContactIndex{ {0,0,0}, Direction::plusY() };
+                CHECK_THROWS_AS(s4.contacts().at(id), std::out_of_range);
+            }
         }
     }
 

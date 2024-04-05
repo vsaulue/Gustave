@@ -34,11 +34,15 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 #include <gustave/worlds/sync/BlockReference.hpp>
+#include <gustave/worlds/sync/ContactReference.hpp>
 #include <gustave/worlds/sync/detail/StructureData.hpp>
 
 namespace Gustave::Worlds::Sync {
     template<Cfg::cLibConfig auto cfg>
     class BlockReference;
+
+    template<Cfg::cLibConfig auto cfg>
+    class ContactReference;
 
     template<Cfg::cLibConfig auto cfg>
     class StructureReference {
@@ -50,9 +54,13 @@ namespace Gustave::Worlds::Sync {
 
         using StructureData = detail::StructureData<cfg>;
         using WorldData = detail::WorldData<cfg>;
+
+        using SceneContactReference = typename WorldData::Scene::ContactReference;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
         using BlockReference = Sync::BlockReference<cfg>;
+        using ContactIndex = typename WorldData::Scene::ContactIndex;
+        using ContactReference = Sync::ContactReference<cfg>;
         using State = typename StructureData::State;
 
         class Blocks {
@@ -160,6 +168,22 @@ namespace Gustave::Worlds::Sync {
             SceneStructBlocks sceneBlocks_;
         };
 
+        class Contacts {
+        public:
+            [[nodiscard]]
+            explicit Contacts(StructureData const& structure)
+                : structure_{ &structure }
+            {}
+
+            [[nodiscard]]
+            ContactReference at(ContactIndex const& index) const {
+                SceneContactReference sceneContact = structure_->sceneStructure().contacts().at(index);
+                return ContactReference{ structure_->world(), sceneContact.index() };
+            }
+        private:
+            StructureData const* structure_;
+        };
+
         [[nodiscard]]
         explicit StructureReference(std::shared_ptr<StructureData const> data)
             : data_{ std::move(data) }
@@ -178,6 +202,11 @@ namespace Gustave::Worlds::Sync {
                 throw std::logic_error("This structure has been invalidated.");
             }
             return Blocks{ *data_ };
+        }
+
+        [[nodiscard]]
+        Contacts contacts() const {
+            return Contacts{ *data_ };
         }
 
         [[nodiscard]]
