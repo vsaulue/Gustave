@@ -137,7 +137,7 @@ namespace Gustave::Scenes::CuboidGrid {
 
             [[nodiscard]]
             explicit Contacts(BlockReference const& source)
-                : source_{ &source }
+                : source_{ source }
             {}
 
             [[nodiscard]]
@@ -161,10 +161,10 @@ namespace Gustave::Scenes::CuboidGrid {
         private:
             [[nodiscard]]
             ContactReference alongUnchecked(Direction direction) const {
-                return ContactReference{ *source_->sceneData_, ContactIndex{ source_->index_, direction } };
+                return ContactReference{ *source_.sceneData_, ContactIndex{ source_.index_, direction } };
             }
 
-            BlockReference const* source_;
+            BlockReference source_;
         };
 
         class Neighbour {

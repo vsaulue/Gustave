@@ -31,9 +31,13 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 #include <gustave/worlds/sync/detail/StructureData.hpp>
+#include <gustave/worlds/sync/ContactReference.hpp>
 #include <gustave/worlds/sync/StructureReference.hpp>
 
 namespace Gustave::Worlds::Sync {
+    template<Cfg::cLibConfig auto cfg>
+    class ContactReference;
+
     template<Cfg::cLibConfig auto cfg>
     class StructureReference;
 
@@ -52,8 +56,86 @@ namespace Gustave::Worlds::Sync {
         using SceneBlock = typename Scene::BlockReference;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
+        using ContactReference = Sync::ContactReference<cfg>;
         using MaxStress = Model::MaxStress<cfg>;
         using StructureReference = Sync::StructureReference<cfg>;
+
+        class Contacts {
+        private:
+            using SceneContacts = typename Scene::BlockReference::Contacts;
+
+            class Enumerator {
+            private:
+                using SceneIterator = typename SceneContacts::Iterator;
+            public:
+                [[nodiscard]]
+                Enumerator()
+                    : contacts_{ nullptr }
+                    , sceneIt_{}
+                    , value_{ Utils::NO_INIT }
+                {}
+
+                [[nodiscard]]
+                explicit Enumerator(Contacts const& contacts)
+                    : contacts_{ &contacts }
+                    , sceneIt_{ contacts.sceneContacts_.begin() }
+                    , value_{ Utils::NO_INIT }
+                {
+                    updateValue();
+                }
+
+                [[nodiscard]]
+                bool isEnd() const {
+                    return sceneIt_ == contacts_->sceneContacts_.end();
+                }
+
+                [[nodiscard]]
+                ContactReference const& operator*() const {
+                    return value_;
+                }
+
+                void operator++() {
+                    ++sceneIt_;
+                    updateValue();
+                }
+
+                [[nodiscard]]
+                bool operator==(Enumerator const& other) const {
+                    return sceneIt_ == other.sceneIt_;
+                }
+            private:
+                void updateValue() {
+                    if (!isEnd()) {
+                        value_ = ContactReference{ *contacts_->world_, sceneIt_->index() };
+                    }
+                }
+
+                Contacts const* contacts_;
+                SceneIterator sceneIt_;
+                ContactReference value_;
+            };
+        public:
+            using Iterator = Utils::ForwardIterator<Enumerator>;
+
+            [[nodiscard]]
+            explicit Contacts(BlockReference const& block)
+                : sceneContacts_{ block.sceneBlock().contacts() }
+                , world_{ block.world_ }
+            {}
+
+            [[nodiscard]]
+            Iterator begin() const {
+                return Iterator{ *this };
+            }
+
+            [[nodiscard]]
+            Utils::EndIterator end() const {
+                return {};
+            }
+        private:
+            SceneContacts sceneContacts_;
+            WorldData const* world_;
+        };
 
         class Neighbour {
         public:
@@ -249,9 +331,14 @@ namespace Gustave::Worlds::Sync {
 
         [[nodiscard]]
         explicit BlockReference(Utils::NoInit NO_INIT)
-            : world_{ nullptr}
+            : world_{ nullptr }
             , index_{ NO_INIT }
         {}
+
+        [[nodiscard]]
+        Contacts contacts() const {
+            return Contacts{ *this };
+        }
 
         [[nodiscard]]
         BlockIndex const& index() const {

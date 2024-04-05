@@ -28,18 +28,20 @@
 #include <gustave/worlds/sync/BlockReference.hpp>
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 #include <gustave/worlds/sync/detail/WorldUpdater.hpp>
-#include <gustave/worlds/sync/StructureReference.hpp>
 
 #include <TestHelpers.hpp>
 
 namespace Sync = Gustave::Worlds::Sync;
 
+using BlockReference = Sync::BlockReference<cfg>;
 using WorldData = Sync::detail::WorldData<cfg>;
 using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
-using BlockReference = Sync::BlockReference<cfg>;
-using StructureReference = Sync::StructureReference<cfg>;
 
-using BlockIndex = WorldData::Scene::BlockIndex;
+using BlockIndex = BlockReference::BlockIndex;
+using ContactReference = BlockReference::ContactReference;
+using ContactIndex = ContactReference::ContactIndex;
+using Direction = ContactIndex::Direction;
+using StructureReference = BlockReference::StructureReference;
 using Solver = WorldData::Solver;
 using Transaction = WorldUpdater::Transaction;
 
@@ -54,6 +56,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
+static_assert(std::ranges::forward_range<BlockReference::Contacts>);
 static_assert(std::ranges::forward_range<BlockReference::Neighbours>);
 static_assert(std::ranges::forward_range<BlockReference::Structures>);
 
@@ -80,6 +83,21 @@ TEST_CASE("Worlds::Sync::BlockReference") {
         t.removeBlock(index);
         WorldUpdater{ world }.runTransaction(t);
     };
+
+    SECTION(".contacts()") {
+        SECTION("// valid") {
+            std::vector<ContactReference> expected = {
+                ContactReference{ world, ContactIndex{ {0,0,0}, Direction::plusX() } },
+                ContactReference{ world, ContactIndex{ {0,0,0}, Direction::plusY() } },
+            };
+            CHECK_THAT(b000.contacts(), M::C2::UnorderedRangeEquals(expected));
+        }
+
+        SECTION("// invalid") {
+            removeBlock(b000.index());
+            CHECK_THROWS_AS(b000.contacts(), std::out_of_range);
+        }
+    }
 
     SECTION(".index()") {
         removeBlock({ 0,0,0 });
