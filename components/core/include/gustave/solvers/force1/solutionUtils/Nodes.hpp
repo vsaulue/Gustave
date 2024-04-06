@@ -38,15 +38,15 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 
-namespace Gustave::Solvers::Force1::SolutionUtils {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::solutionUtils {
+    template<cfg::cLibConfig auto libCfg>
     class Nodes {
     public:
-        using NodeReference = SolutionUtils::NodeReference<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using NodeReference = solutionUtils::NodeReference<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
     private:
-        using SolutionData = detail::SolutionData<cfg>;
-        using Structure = Solvers::Structure<cfg>;
+        using SolutionData = detail::SolutionData<libCfg>;
+        using Structure = solvers::Structure<libCfg>;
         using StructureNodes = typename Structure::Nodes;
 
         class Enumerator {
@@ -84,7 +84,7 @@ namespace Gustave::Solvers::Force1::SolutionUtils {
             NodeReference value_;
         };
     public:
-        using Iterator = Utils::ForwardIterator<Enumerator>;
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Nodes(SolutionData const& solution)
@@ -108,7 +108,7 @@ namespace Gustave::Solvers::Force1::SolutionUtils {
         }
 
         [[nodiscard]]
-        Utils::EndIterator end() const {
+        utils::EndIterator end() const {
             return {};
         }
 

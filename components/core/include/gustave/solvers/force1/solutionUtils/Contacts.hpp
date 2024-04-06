@@ -38,17 +38,17 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 
-namespace Gustave::Solvers::Force1::SolutionUtils {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::solutionUtils {
+    template<cfg::cLibConfig auto libCfg>
     class Contacts {
     private:
-        using SolutionData = detail::SolutionData<cfg>;
-        using Structure = Solvers::Structure<cfg>;
+        using SolutionData = detail::SolutionData<libCfg>;
+        using Structure = solvers::Structure<libCfg>;
 
         using LinkIndex = typename Structure::LinkIndex;
     public:
         using ContactIndex = typename Structure::ContactIndex;
-        using ContactReference = SolutionUtils::ContactReference<cfg>;
+        using ContactReference = solutionUtils::ContactReference<libCfg>;
 
         [[nodiscard]]
         explicit Contacts(SolutionData const& solution)

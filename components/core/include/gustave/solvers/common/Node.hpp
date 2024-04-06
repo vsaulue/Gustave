@@ -31,14 +31,14 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace Gustave::Solvers::Common {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::common {
+    template<cfg::cLibConfig auto libCfg>
     struct Node {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
     public:
         bool isFoundation;
 

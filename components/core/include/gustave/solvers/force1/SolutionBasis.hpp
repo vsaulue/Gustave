@@ -36,20 +36,20 @@
 #include <gustave/solvers/force1/Config.hpp>
 #include <gustave/solvers/Structure.hpp>
 
-namespace Gustave::Solvers::Force1 {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1 {
+    template<cfg::cLibConfig auto libCfg>
     class SolutionBasis {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Config = Force1::Config<cfg>;
-        using Structure = Solvers::Structure<cfg>;
+        using Config = force1::Config<libCfg>;
+        using Structure = solvers::Structure<libCfg>;
 
         [[nodiscard]]
         explicit SolutionBasis(std::shared_ptr<Structure const> structure, std::shared_ptr<Config const> config)

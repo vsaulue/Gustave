@@ -31,18 +31,18 @@
 #include <gustave/meta/Meta.hpp>
 #include <gustave/model/MaxStress.hpp>
 
-namespace Gustave::Solvers::Common {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::common {
+    template<cfg::cLibConfig auto libCfg>
     struct Link {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        using MaxStress = Model::MaxStress<cfg>;
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using MaxStress = model::MaxStress<libCfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
     public:
         [[nodiscard]]
         explicit Link(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, MaxStress const& maxStress)

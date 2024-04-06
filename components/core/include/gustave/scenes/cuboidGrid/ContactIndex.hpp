@@ -34,14 +34,14 @@
 #include <gustave/utils/Hasher.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
+namespace gustave::scenes::cuboidGrid {
     class ContactIndex {
     public:
-        using BlockIndex = CuboidGrid::BlockIndex;
-        using Direction = Math3d::BasicDirection;
+        using BlockIndex = cuboidGrid::BlockIndex;
+        using Direction = math3d::BasicDirection;
 
         [[nodiscard]]
-        explicit ContactIndex(Utils::NoInit NO_INIT)
+        explicit ContactIndex(utils::NoInit NO_INIT)
             : localBlockIndex_{ NO_INIT }
             , direction_{ Direction::plusX() }
         {}
@@ -88,9 +88,9 @@ namespace Gustave::Scenes::CuboidGrid {
         BlockIndex localBlockIndex_;
         Direction direction_;
     public:
-        using Hasher = Utils::Hasher<ContactIndex, &ContactIndex::localBlockIndex_, &ContactIndex::direction_>;
+        using Hasher = utils::Hasher<ContactIndex, &ContactIndex::localBlockIndex_, &ContactIndex::direction_>;
     };
 }
 
 template<>
-struct std::hash<Gustave::Scenes::CuboidGrid::ContactIndex> : Gustave::Scenes::CuboidGrid::ContactIndex::Hasher{};
+struct std::hash<gustave::scenes::cuboidGrid::ContactIndex> : gustave::scenes::cuboidGrid::ContactIndex::Hasher{};

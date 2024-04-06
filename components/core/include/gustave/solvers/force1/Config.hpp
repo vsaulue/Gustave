@@ -29,17 +29,17 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace Gustave::Solvers::Force1 {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1 {
+    template<cfg::cLibConfig auto libCfg>
     class Config {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = typename Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = typename cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = typename Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = typename cfg::Vector3<libCfg, unit>;
     public:
         using IterationIndex = std::uint64_t;
 

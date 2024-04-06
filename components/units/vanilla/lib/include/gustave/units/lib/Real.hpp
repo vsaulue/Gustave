@@ -33,7 +33,7 @@
 #include <gustave/units/lib/Unit.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Units::Lib {
+namespace gustave::units::lib {
     template<typename T>
     concept cRealRep = std::floating_point<T> && !std::is_const_v<T>;
 
@@ -49,7 +49,7 @@ namespace Gustave::Units::Lib {
         using Rep = Rep_;
 
         [[nodiscard]]
-        explicit constexpr Real(Utils::NoInit) {}
+        explicit constexpr Real(utils::NoInit) {}
 
         [[nodiscard]]
         constexpr Real(Rep value)

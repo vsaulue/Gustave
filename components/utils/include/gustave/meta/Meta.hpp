@@ -27,7 +27,7 @@
 
 #include <type_traits>
 
-namespace Gustave::Meta {
+namespace gustave::meta {
     namespace detail {
         template<typename T>
         constexpr bool alwaysFalse = false;

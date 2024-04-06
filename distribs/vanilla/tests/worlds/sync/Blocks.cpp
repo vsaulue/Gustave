@@ -25,21 +25,18 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/worlds/sync/BlockReference.hpp>
 #include <gustave/worlds/sync/Blocks.hpp>
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 #include <gustave/worlds/sync/detail/WorldUpdater.hpp>
 
 #include <TestHelpers.hpp>
 
-namespace Sync = Gustave::Worlds::Sync;
-
-using WorldData = Sync::detail::WorldData<cfg>;
-using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
-using BlockReference = Sync::BlockReference<cfg>;
-using Blocks = Sync::Blocks<cfg>;
+using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
+using Blocks = gustave::worlds::sync::Blocks<libCfg>;
 
 using BlockIndex = WorldData::Scene::BlockIndex;
+using BlockReference = Blocks::BlockReference;
 using Solver = WorldData::Solver;
 using Transaction = WorldUpdater::Transaction;
 
@@ -54,7 +51,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("Worlds::Sync::Blocks") {
+TEST_CASE("worlds::sync::Blocks") {
     WorldData world = makeWorld();
     Blocks blocks{ world };
 
@@ -85,7 +82,7 @@ TEST_CASE("Worlds::Sync::Blocks") {
             indices.push_back(block.index());
         }
         std::vector<BlockIndex> expected{ {0,0,0},{0,1,0},{0,2,0},{0,3,0} };
-        CHECK_THAT(indices, M::C2::UnorderedRangeEquals(expected));
+        CHECK_THAT(indices, matchers::c2::UnorderedRangeEquals(expected));
     }
 
     SECTION(".find()") {

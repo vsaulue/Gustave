@@ -35,14 +35,14 @@
 
 #include <TestHelpers.hpp>
 
-using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
-using BlockReference = Gustave::Scenes::CuboidGrid::BlockReference<cfg>;
-using Blocks = Gustave::Scenes::CuboidGrid::Blocks<cfg>;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
+using BlockIndex = gustave::scenes::cuboidGrid::BlockIndex;
+using BlockReference = gustave::scenes::cuboidGrid::BlockReference<libCfg>;
+using Blocks = gustave::scenes::cuboidGrid::Blocks<libCfg>;
+using SceneData = gustave::scenes::cuboidGrid::detail::SceneData<libCfg>;
 
 static_assert(std::ranges::forward_range<Blocks>);
 
-TEST_CASE("Scenes::CuboidGrid::Blocks") {
+TEST_CASE("scenes::cuboidGrid::Blocks") {
     Vector3<u.length> const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     SceneData sceneData{ blockSize };
     Blocks const blocks{ sceneData };
@@ -79,7 +79,7 @@ TEST_CASE("Scenes::CuboidGrid::Blocks") {
                 indices.push_back(block.index());
             }
             std::vector<BlockIndex> const expected = { {1,0,0},{3,0,0} };
-            CHECK_THAT(indices, M::C2::UnorderedEquals(expected));
+            CHECK_THAT(indices, matchers::c2::UnorderedEquals(expected));
         }
     }
 

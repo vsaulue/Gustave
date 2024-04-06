@@ -29,7 +29,7 @@
 #include <ostream>
 #include <stdexcept>
 
-namespace Gustave::Math3d {
+namespace gustave::math3d {
     class BasicDirection {
     public:
         enum class Id { plusX, minusX, plusY, minusY, plusZ, minusZ };
@@ -128,4 +128,4 @@ namespace Gustave::Math3d {
 }
 
 template<>
-struct std::hash<Gustave::Math3d::BasicDirection> : Gustave::Math3d::BasicDirection::Hasher {};
+struct std::hash<gustave::math3d::BasicDirection> : gustave::math3d::BasicDirection::Hasher {};

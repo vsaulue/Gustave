@@ -30,14 +30,14 @@
 #include <gustave/units/lib/Unit.hpp>
 #include <gustave/units/RealTraits.hpp>
 
-namespace Gustave::Vanilla {
+namespace gustave::vanilla {
     struct LibConfig {
-        static constexpr Units::RealTraits<double> realTraits{};
+        static constexpr units::RealTraits<double> realTraits{};
 
-        template<Units::Lib::cUnit auto unit>
-        using Vector3 = ::Gustave::Math3d::Vector3<realTraits, unit>;
+        template<units::lib::cUnit auto unit>
+        using Vector3 = ::gustave::math3d::Vector3<realTraits, unit>;
 
-        using NormalizedVector3 = ::Gustave::Math3d::NormalizedVector3<realTraits>;
+        using NormalizedVector3 = ::gustave::math3d::NormalizedVector3<realTraits>;
 
         using LinkIndex = std::size_t;
         using NodeIndex = std::size_t;

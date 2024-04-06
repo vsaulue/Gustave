@@ -28,7 +28,7 @@
 #include <concepts>
 #include <functional>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<typename T>
     concept cHashable = requires (T const& val) {
         { std::hash<T>{}(val) } -> std::convertible_to<std::size_t>;

@@ -31,7 +31,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     struct PointerHash {
     public:
         struct Hash {

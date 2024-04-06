@@ -29,14 +29,14 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg, bool isMutable_>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto cfg, bool isMutable_>
     struct DataNeighbour {
     public:
-        using Direction = Math3d::BasicDirection;
+        using Direction = math3d::BasicDirection;
 
         [[nodiscard]]
-        DataNeighbour(Utils::NoInit NO_INIT)
+        DataNeighbour(utils::NoInit NO_INIT)
             : direction{ Direction::plusX() }
             , block{ NO_INIT }
         {}

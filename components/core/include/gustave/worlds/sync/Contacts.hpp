@@ -28,13 +28,13 @@
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 #include <gustave/worlds/sync/ContactReference.hpp>
 
-namespace Gustave::Worlds::Sync {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync {
+    template<cfg::cLibConfig auto libCfg>
     class Contacts {
     private:
-        using WorldData = detail::WorldData<cfg>;
+        using WorldData = detail::WorldData<libCfg>;
     public:
-        using ContactReference = Sync::ContactReference<cfg>;
+        using ContactReference = sync::ContactReference<libCfg>;
 
         using ContactIndex = typename ContactReference::ContactIndex;
 

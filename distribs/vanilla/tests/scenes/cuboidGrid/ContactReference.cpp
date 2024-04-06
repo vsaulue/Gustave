@@ -35,19 +35,19 @@
 
 #include <TestHelpers.hpp>
 
-using ContactReference = Gustave::Scenes::CuboidGrid::ContactReference<cfg>;
-using MaxStress = Gustave::Model::MaxStress<cfg>;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
-using SceneUpdater = Gustave::Scenes::CuboidGrid::detail::SceneUpdater<cfg>;
-using StructureReference = Gustave::Scenes::CuboidGrid::StructureReference<cfg>;
+using ContactReference = gustave::scenes::cuboidGrid::ContactReference<libCfg>;
+using MaxStress = gustave::model::MaxStress<libCfg>;
+using SceneData = gustave::scenes::cuboidGrid::detail::SceneData<libCfg>;
+using SceneUpdater = gustave::scenes::cuboidGrid::detail::SceneUpdater<libCfg>;
+using StructureReference = gustave::scenes::cuboidGrid::StructureReference<libCfg>;
 
 using BlockIndex = ContactReference::BlockIndex;
 using BlockReference = ContactReference::BlockReference;
 using ContactIndex = ContactReference::ContactIndex;
 using Direction = ContactIndex::Direction;
-using Transaction = Gustave::Scenes::CuboidGrid::Transaction<cfg>;
+using Transaction = gustave::scenes::cuboidGrid::Transaction<libCfg>;
 
-TEST_CASE("Scene::CuboidGrid::ContactReference") {
+TEST_CASE("scenes::cuboidGrid::ContactReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
     SceneData scene{ blockSize };
 

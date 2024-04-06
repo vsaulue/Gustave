@@ -31,14 +31,14 @@
 #include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/worlds/WorldStructureState.hpp>
 
-namespace Gustave::Worlds::Sync::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync::detail {
+    template<cfg::cLibConfig auto libCfg>
     struct WorldData;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class StructureData {
     public:
-        using WorldData = detail::WorldData<cfg>;
+        using WorldData = detail::WorldData<libCfg>;
         using Scene = typename WorldData::Scene;
         using Solver = typename WorldData::Solver;
         using State = WorldStructureState;

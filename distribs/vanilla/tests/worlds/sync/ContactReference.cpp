@@ -29,9 +29,9 @@
 
 #include <TestHelpers.hpp>
 
-using ContactReference = Gustave::Worlds::Sync::ContactReference<cfg>;
-using WorldData = Gustave::Worlds::Sync::detail::WorldData<cfg>;
-using WorldUpdater = Gustave::Worlds::Sync::detail::WorldUpdater<cfg>;
+using ContactReference = gustave::worlds::sync::ContactReference<libCfg>;
+using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
 
 using BlockIndex = ContactReference::BlockReference::BlockIndex;
 using BlockReference = ContactReference::BlockReference;
@@ -52,7 +52,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("Worlds::Sync::ContactReference") {
+TEST_CASE("worlds::sync::ContactReference") {
     WorldData world = makeWorld();
 
     Transaction t;
@@ -80,7 +80,7 @@ TEST_CASE("Worlds::Sync::ContactReference") {
 
     SECTION(".forceVector()") {
         SECTION("// valid") {
-            CHECK_THAT(contact.forceVector(), M::WithinRel(-blockMass * g, solverPrecision));
+            CHECK_THAT(contact.forceVector(), matchers::WithinRel(-blockMass * g, solverPrecision));
         }
 
         SECTION("// invalid") {

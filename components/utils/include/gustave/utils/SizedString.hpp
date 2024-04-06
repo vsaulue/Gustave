@@ -37,7 +37,7 @@
 #include <gustave/utils/cChar.hpp>
 #include <gustave/utils/SizedStringView.hpp>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<cChar _Char, std::size_t length>
     struct SizedString {
     public:
@@ -155,15 +155,15 @@ namespace Gustave::Utils {
 
     [[nodiscard]]
     constexpr std::strong_ordering operator<=>(cSizedString auto const& lhs, cSizedString auto const& rhs) {
-        using LhsChar = typename decltype(Meta::value(lhs))::Char;
-        using RhsChar = typename decltype(Meta::value(rhs))::Char;
+        using LhsChar = typename decltype(meta::value(lhs))::Char;
+        using RhsChar = typename decltype(meta::value(rhs))::Char;
         static_assert(std::is_same_v<LhsChar,RhsChar>,"Invalid comparison: incompatible character types");
         return lhs.view() <=> rhs.view();
     }
 
     template<cChar Char, std::size_t length>
     std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& stream, SizedString<Char,length> const& string) {
-        using Str = decltype(Meta::value(string));
+        using Str = decltype(meta::value(string));
         if constexpr (Str::size() > 0) {
             stream.write(&string.data.front(), string.size());
         }

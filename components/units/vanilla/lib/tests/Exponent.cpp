@@ -27,86 +27,86 @@
 
 #include <gustave/units/lib/Exponent.hpp>
 
-namespace U = Gustave::Units::Lib;
+namespace u = gustave::units::lib;
 
 TEST_CASE("Exponent") {
     SECTION("::operator-()") {
-        constexpr auto exp = U::Exponent<3, 2>();
-        constexpr U::cExponent auto res = -exp;
+        constexpr auto exp = u::Exponent<3, 2>();
+        constexpr u::cExponent auto res = -exp;
         REQUIRE(res.num() == -3);
         REQUIRE(res.den() == 2);
     }
 
     SECTION("operator+(cExponent auto,cExponent auto)") {
-        constexpr auto lhs = U::Exponent<7, 4>();
-        constexpr auto rhs = U::Exponent<-1, 4>();
-        constexpr U::cExponent auto res = lhs + rhs;
+        constexpr auto lhs = u::Exponent<7, 4>();
+        constexpr auto rhs = u::Exponent<-1, 4>();
+        constexpr u::cExponent auto res = lhs + rhs;
         REQUIRE(res.num() == 3);
         REQUIRE(res.den() == 2);
     }
 
     SECTION("operator-(cExponent auto, cExponent auto)") {
-        constexpr auto lhs = U::Exponent<1,4>();
-        constexpr auto rhs = U::Exponent<1,3>();
-        constexpr U::cExponent auto res = lhs - rhs;
+        constexpr auto lhs = u::Exponent<1,4>();
+        constexpr auto rhs = u::Exponent<1,3>();
+        constexpr u::cExponent auto res = lhs - rhs;
         REQUIRE(res.num() == -1);
         REQUIRE(res.den() == 12);
     }
 
     SECTION("operator*(cExponent auto, cExponent auto)") {
-        constexpr auto lhs = U::Exponent<5, 6>();
-        constexpr auto rhs = U::Exponent<-2,5>();
-        constexpr U::cExponent auto res = lhs * rhs;
+        constexpr auto lhs = u::Exponent<5, 6>();
+        constexpr auto rhs = u::Exponent<-2,5>();
+        constexpr u::cExponent auto res = lhs * rhs;
         REQUIRE(res.num() == -1);
         REQUIRE(res.den() == 3);
     }
 
     SECTION("operator==(cExponent auto, cExponent auto)") {
-        constexpr auto lhs = U::Exponent<5, 6>{};
+        constexpr auto lhs = u::Exponent<5, 6>{};
 
         SECTION("// true") {
-            constexpr auto rhs = U::Exponent<5, 6>{};
+            constexpr auto rhs = u::Exponent<5, 6>{};
             REQUIRE(lhs == rhs);
         }
 
         SECTION("// false") {
-            constexpr auto rhs = U::Exponent<-5, 6>{};
+            constexpr auto rhs = u::Exponent<-5, 6>{};
             REQUIRE(lhs != rhs);
         }
     }
 
     SECTION("// zero simplification") {
-        constexpr auto val = U::Exponent<1, 4>{};
-        constexpr U::cExponent auto zero = val - val;
+        constexpr auto val = u::Exponent<1, 4>{};
+        constexpr u::cExponent auto zero = val - val;
         REQUIRE(zero.num() == 0);
         REQUIRE(zero.den() == 1);
     }
 
     SECTION("::isZero()") {
         SECTION("// true") {
-            constexpr auto zero = U::Exponent<0, 1>{};
+            constexpr auto zero = u::Exponent<0, 1>{};
             REQUIRE(zero.isZero());
         }
 
         SECTION("// false") {
-            constexpr auto notZero = U::Exponent<-1, 1>{};
+            constexpr auto notZero = u::Exponent<-1, 1>{};
             REQUIRE(!notZero.isZero());
         }
     }
 
     SECTION("::toString()") {
         SECTION("// 0") {
-            constexpr U::cExponent auto zero = U::Exponent<0, 1>{};
+            constexpr u::cExponent auto zero = u::Exponent<0, 1>{};
             REQUIRE(zero.toString().view() == "⁰");
         }
 
         SECTION("// -20") {
-            constexpr U::cExponent auto val = U::Exponent<-20, 1>{};
+            constexpr u::cExponent auto val = u::Exponent<-20, 1>{};
             REQUIRE(val.toString().view() == "⁻²⁰");
         }
 
         SECTION("// 3/2") {
-            constexpr U::cExponent auto val = U::Exponent<3, 2>{};
+            constexpr u::cExponent auto val = u::Exponent<3, 2>{};
             REQUIRE(val.toString().view() == "³⁄²");
         }
     }

@@ -28,7 +28,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cRealTraits.hpp>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     namespace detail {
         template<auto cfg>
         struct HasUnitConcept {

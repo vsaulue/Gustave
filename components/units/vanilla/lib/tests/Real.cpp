@@ -33,39 +33,39 @@
 #include <gustave/units/lib/Unit.hpp>
 #include <gustave/units/lib/UnitIdentifier.hpp>
 
-namespace U = Gustave::Units::Lib;
+namespace u = gustave::units::lib;
 
-static void testValue(U::cReal auto tested, std::floating_point auto expected) {
+static void testValue(u::cReal auto tested, std::floating_point auto expected) {
     using TestedRep = typename decltype(tested)::Rep;
     CHECK(std::is_same_v<TestedRep, decltype(expected)>);
     CHECK(tested.value() == expected);
 }
 
 TEST_CASE("Real") {
-    struct Kilogram : U::BasicUnitIdentifier<"kg"> {};
-    constexpr auto kg = U::makeUnitIdentifier<Kilogram>();
+    struct Kilogram : u::BasicUnitIdentifier<"kg"> {};
+    constexpr auto kg = u::makeUnitIdentifier<Kilogram>();
 
-    struct Metre : U::BasicUnitIdentifier<"m"> {};
-    constexpr auto m = U::makeUnitIdentifier<Metre>();
+    struct Metre : u::BasicUnitIdentifier<"m"> {};
+    constexpr auto m = u::makeUnitIdentifier<Metre>();
 
-    struct Second : U::BasicUnitIdentifier<"s"> {};
-    constexpr auto s = U::makeUnitIdentifier<Second>();
+    struct Second : u::BasicUnitIdentifier<"s"> {};
+    constexpr auto s = u::makeUnitIdentifier<Second>();
 
-    constexpr U::Unit<"N", kg * m / s.pow(U::Exponent<2>{})> newton{};
+    constexpr u::Unit<"N", kg * m / s.pow(u::Exponent<2>{})> newton{};
 
-    constexpr U::Unit<"NewtonLike", newton.unitId()> newtonLike{};
+    constexpr u::Unit<"NewtonLike", newton.unitId()> newtonLike{};
 
     // constructors
 
     SECTION("::Real(Rep, cUnit auto)") {
-        using R = U::Real<newton, double>;
+        using R = u::Real<newton, double>;
         const R val{ 5.f, newton };
         CHECK(val.unit().isAssignableFrom(newton));
         testValue(val, 5.0);
     }
 
     SECTION("::Real(Rep) // requires( unit_.isTrivialOne() )") {
-        using R = U::Real<U::one, double>;
+        using R = u::Real<u::one, double>;
         const R val{ 7.0 };
         testValue(val, 7.0);
     }
@@ -105,7 +105,7 @@ TEST_CASE("Real") {
     }
 
     SECTION("::operator+=(std::floating_point auto)") {
-        auto lhs = -2.0 * U::one;
+        auto lhs = -2.0 * u::one;
         auto& ref = (lhs += 3.0);
         testValue(lhs, 1.0);
         CHECK(&ref == &lhs);
@@ -120,14 +120,14 @@ TEST_CASE("Real") {
     }
 
     SECTION("operator+(cReal auto, std::floating_point auto)") {
-        auto res = (3.0f * U::one) + 1.5;
-        CHECK(res.unit() == U::one);
+        auto res = (3.0f * u::one) + 1.5;
+        CHECK(res.unit() == u::one);
         testValue(res, 4.5);
     }
 
     SECTION("operator+(std::floating_point auto, cReal auto)") {
-        auto res = -1.0f + (4.0 * U::one);
-        CHECK(res.unit() == U::one);
+        auto res = -1.0f + (4.0 * u::one);
+        CHECK(res.unit() == u::one);
         testValue(res, 3.0);
     }
 
@@ -142,7 +142,7 @@ TEST_CASE("Real") {
     }
 
     SECTION("::operator-=(std::floating_point auto)") {
-        auto lhs = 2.0 * U::one;
+        auto lhs = 2.0 * u::one;
         auto& ref = (lhs -= 3.0f);
         testValue(lhs, -1.0);
         CHECK(&ref == &lhs);
@@ -157,14 +157,14 @@ TEST_CASE("Real") {
     }
 
     SECTION("operator-(cReal auto, std::floating_point auto)") {
-        auto res = (1.0 * U::one) - 4.0;
-        CHECK(res.unit() == U::one);
+        auto res = (1.0 * u::one) - 4.0;
+        CHECK(res.unit() == u::one);
         testValue(res, -3.0);
     }
 
     SECTION("operator-(cReal auto, std::floating_point auto)") {
-        auto res = (-2.0 * U::one) - (-0.5f);
-        CHECK(res.unit() == U::one);
+        auto res = (-2.0 * u::one) - (-0.5f);
+        CHECK(res.unit() == u::one);
         testValue(res, -1.5);
     }
 
@@ -172,7 +172,7 @@ TEST_CASE("Real") {
 
     SECTION("::operator*=(cReal auto)") {
         auto lhs = -2.0 * m;
-        auto& ref = lhs *= (3.5 * U::one);
+        auto& ref = lhs *= (3.5 * u::one);
         testValue(lhs, -7.0);
         CHECK(&ref == &lhs);
     }
@@ -209,7 +209,7 @@ TEST_CASE("Real") {
 
     SECTION("::operator/=(cReal auto)") {
         auto lhs = 6.0f * s;
-        auto& ref = lhs /= (-2.0f * U::one);
+        auto& ref = lhs /= (-2.0f * u::one);
         testValue(lhs, -3.0f);
         CHECK(&ref == &lhs);
     }
@@ -256,13 +256,13 @@ TEST_CASE("Real") {
 
     SECTION("operator==(cReal auto, std::floating_point auto)") {
         SECTION("// true") {
-            const auto lhs = -3.0 * U::one;
+            const auto lhs = -3.0 * u::one;
             const auto rhs = -3.0f;
             CHECK(lhs == rhs);
         }
 
         SECTION("// false") {
-            const auto lhs = 2.0 * U::one;
+            const auto lhs = 2.0 * u::one;
             const auto rhs = 0.0;
             CHECK(lhs != rhs);
         }
@@ -271,13 +271,13 @@ TEST_CASE("Real") {
     SECTION("operator==(std::floating_point auto, cReal auto)") {
         SECTION("// true") {
             const auto lhs = 0.5f;
-            const auto rhs = 0.5f * U::one;
+            const auto rhs = 0.5f * u::one;
             CHECK(lhs == rhs);
         }
 
         SECTION("// false") {
             const auto lhs = 1.5f;
-            const auto rhs = 0.0 * U::one;
+            const auto rhs = 0.0 * u::one;
             CHECK(lhs != rhs);
         }
     }
@@ -291,21 +291,21 @@ TEST_CASE("Real") {
     }
 
     SECTION("operator<=>(cReal auto, std::floating_point)") {
-        const auto lhs = 2.0 * U::one;
+        const auto lhs = 2.0 * u::one;
         const auto rhs = -1.0f;
         CHECK(lhs > rhs);
     }
 
     SECTION("operator<=>(std::floating_point, cReal auto)") {
         const auto lhs = 3.0;
-        const auto rhs = 5.0 * U::one;
+        const auto rhs = 5.0 * u::one;
         CHECK(lhs < rhs);
     }
 
     // other
 
     SECTION("::zero()") {
-        constexpr auto val = U::Real<s, double>::zero();
+        constexpr auto val = u::Real<s, double>::zero();
         CHECK(val.unit().isAssignableFrom(s));
         testValue(val, 0.0);
     }
@@ -325,8 +325,8 @@ TEST_CASE("Real") {
     }
 
     SECTION("::isCompatible(cUnit auto)") {
-        CHECK(U::Real<newton, double>::isCompatible(newtonLike));
-        CHECK_FALSE(U::Real<s, double>::isCompatible(U::Unit{kg}));
+        CHECK(u::Real<newton, double>::isCompatible(newtonLike));
+        CHECK_FALSE(u::Real<s, double>::isCompatible(u::Unit{kg}));
     }
 
     SECTION("operator<<(std::ostream&, cReal auto)") {

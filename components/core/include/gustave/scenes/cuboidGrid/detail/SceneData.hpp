@@ -33,18 +33,18 @@
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/utils/PointerHash.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto cfg>
     struct SceneData {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(cfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<cfg> auto unit>
+        using Vector3 = cfg::Vector3<cfg, unit>;
     public:
         using Blocks = SceneBlocks<cfg>;
         using StructureData = detail::StructureData<cfg>;
-        using Structures = Utils::PointerHash::Set<std::shared_ptr<StructureData const>>;
+        using Structures = utils::PointerHash::Set<std::shared_ptr<StructureData const>>;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)

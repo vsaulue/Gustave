@@ -34,21 +34,21 @@
 #include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto cfg>
     class StructureData;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto cfg>
     class BlockMappedData {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(cfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<cfg> auto unit>
+        using Real = cfg::Real<cfg, unit>;
 
-        using MaxStress = Model::MaxStress<cfg>;
+        using MaxStress = model::MaxStress<cfg>;
     public:
-        using LinkIndex = Cfg::LinkIndex<cfg>;
+        using LinkIndex = cfg::LinkIndex<cfg>;
 
         struct LinkIndices {
             LinkIndex plusX;

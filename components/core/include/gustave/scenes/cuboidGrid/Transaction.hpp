@@ -35,11 +35,11 @@
 #include <gustave/utils/getter.hpp>
 #include <gustave/utils/HashEquals.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid {
+    template<cfg::cLibConfig auto cfg>
     class Transaction {
     private:
-        using ConstructionHashEquals = Utils::HashEquals<BlockConstructionInfo<cfg>, Utils::getter(&BlockConstructionInfo<cfg>::index)>;
+        using ConstructionHashEquals = utils::HashEquals<BlockConstructionInfo<cfg>, utils::getter(&BlockConstructionInfo<cfg>::index)>;
     public:
         using ConstructionSet = typename ConstructionHashEquals::Set;
         using DeletedSet = std::unordered_set<BlockIndex>;

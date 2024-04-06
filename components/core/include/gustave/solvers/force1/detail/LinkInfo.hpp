@@ -28,11 +28,11 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::detail {
+    template<cfg::cLibConfig auto libCfg>
     struct LinkInfo {
     public:
-        using LocalContactIndex = Cfg::LinkIndex<cfg>;
+        using LocalContactIndex = cfg::LinkIndex<libCfg>;
 
         LocalContactIndex localContactId;
         LocalContactIndex otherContactId;

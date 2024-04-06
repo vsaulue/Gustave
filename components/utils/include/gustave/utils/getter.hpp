@@ -25,7 +25,7 @@
 
 #pragma once
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<typename Object, typename Member>
     [[nodiscard]]
     constexpr auto getter(Member(Object::* arg)() const) {

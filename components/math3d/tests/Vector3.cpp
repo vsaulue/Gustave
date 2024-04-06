@@ -32,7 +32,7 @@
 #include <gustave/testing/Matchers.hpp>
 #include <TestHelpers.hpp>
 
-namespace M = Gustave::Testing::Matchers;
+namespace matchers = gustave::testing::matchers;
 
 TEST_CASE("Vector3") {
     constexpr auto acc = u.acceleration;
@@ -76,7 +76,7 @@ TEST_CASE("Vector3") {
     SECTION(".norm()") {
         auto const vec = vector3(1.f, 2.f, -2.f, kg);
         Real<kg> norm = vec.norm();
-        CHECK_THAT(norm, M::WithinRel(3.f * kg, epsilon));
+        CHECK_THAT(norm, matchers::WithinRel(3.f * kg, epsilon));
     }
 
     SECTION(".dot()") {

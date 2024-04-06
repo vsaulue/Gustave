@@ -33,8 +33,8 @@
 
 #include <gustave/cfg/cVector3.hpp>
 
-namespace Gustave::Testing::Matchers {
-    template<Cfg::cVector3 TargetVector>
+namespace gustave::testing::matchers {
+    template<cfg::cVector3 TargetVector>
     class Vector3WithinRelMatcher : public Catch::Matchers::MatcherGenericBase {
     public:
         using Coord = typename TargetVector::Coord;
@@ -50,7 +50,7 @@ namespace Gustave::Testing::Matchers {
             }
         }
 
-        template<Cfg::cVector3 TestedVector>
+        template<cfg::cVector3 TestedVector>
         [[nodiscard]]
         constexpr bool match(TestedVector tested) const {
             static_assert(TestedVector::realTraits() == TargetVector::realTraits(), "Invalid comparison: incompatible traits.");
@@ -73,12 +73,12 @@ namespace Gustave::Testing::Matchers {
         RealRep epsilon_;
     };
 
-    template<Cfg::cVector3 TargetVector>
+    template<cfg::cVector3 TargetVector>
     Vector3WithinRelMatcher(TargetVector, typename TargetVector::RealRep) -> Vector3WithinRelMatcher<TargetVector>;
 
     [[nodiscard]]
-    auto WithinRel(Cfg::cVector3 auto target, std::floating_point auto epsilon) {
-        using Rep = decltype(Meta::value(target.x().value() + epsilon));
+    auto WithinRel(cfg::cVector3 auto target, std::floating_point auto epsilon) {
+        using Rep = decltype(meta::value(target.x().value() + epsilon));
         return Vector3WithinRelMatcher{ target, Rep{epsilon} };
     }
 }

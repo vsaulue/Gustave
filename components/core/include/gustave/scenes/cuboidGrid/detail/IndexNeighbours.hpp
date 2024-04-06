@@ -32,11 +32,11 @@
 #include <gustave/scenes/cuboidGrid/detail/IndexNeighbour.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
+namespace gustave::scenes::cuboidGrid::detail {
     class IndexNeighbours {
     public:
         using Coord = BlockIndex::Coord;
-        using Direction = Math3d::BasicDirection;
+        using Direction = math3d::BasicDirection;
 
         using Values = std::array<IndexNeighbour,6>;
 
@@ -78,7 +78,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
     private:
         [[nodiscard]]
         static IndexNeighbour NO_INIT() {
-            return IndexNeighbour{ Utils::NO_INIT };
+            return IndexNeighbour{ utils::NO_INIT };
         }
 
         void addValue(Direction direction) {

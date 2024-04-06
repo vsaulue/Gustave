@@ -31,17 +31,17 @@
 
 #include <TestHelpers.hpp>
 
-using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg,true>;
-using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
-using Direction = Gustave::Math3d::BasicDirection;
-using SceneBlocks = Gustave::Scenes::CuboidGrid::detail::SceneBlocks<cfg>;
+using BlockDataReference = gustave::scenes::cuboidGrid::detail::BlockDataReference<libCfg,true>;
+using BlockIndex = gustave::scenes::cuboidGrid::BlockIndex;
+using Direction = gustave::math3d::BasicDirection;
+using SceneBlocks = gustave::scenes::cuboidGrid::detail::SceneBlocks<libCfg>;
 
-TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
+TEST_CASE("scenes::CuboidGrid::detail::SceneBlocks") {
     SceneBlocks sceneBlocks{ vector3(1.f, 2.f, 3.f, u.length) };
     BlockDataReference b1 = sceneBlocks.insert({ {2,3,4}, concrete_20m, 10.f * u.mass, true });
     BlockDataReference b2 = sceneBlocks.insert({ {4,6,9}, concrete_20m, 25.f * u.mass, false });
 
-    SECTION("::contactAreaAlong(BasicDirection)") {
+    SECTION(".contactAreaAlong(BasicDirection)") {
         CHECK(sceneBlocks.contactAreaAlong(Direction::minusX()) == 6.f * u.area);
         CHECK(sceneBlocks.contactAreaAlong(Direction::plusX()) == 6.f * u.area);
         CHECK(sceneBlocks.contactAreaAlong(Direction::minusY()) == 3.f * u.area);
@@ -50,7 +50,7 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
         CHECK(sceneBlocks.contactAreaAlong(Direction::plusZ()) == 2.f * u.area);
     }
 
-    SECTION("::contains(BlockIndex const&)") {
+    SECTION(".contains(BlockIndex const&)") {
         SECTION("// true") {
             CHECK(sceneBlocks.contains({ 2,3,4 }));
             CHECK(sceneBlocks.contains({ 4,6,9 }));
@@ -62,7 +62,7 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
         }
     }
 
-    SECTION("::erase(BlockIndex const&)") {
+    SECTION(".erase(BlockIndex const&)") {
         SECTION("// true") {
             bool deleted = sceneBlocks.erase({ 2,3,4 });
             CHECK(deleted);
@@ -74,7 +74,7 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
         }
     }
 
-    SECTION("::find(BlockIndex const&)") {
+    SECTION(".find(BlockIndex const&)") {
         SECTION("// true") {
             BlockDataReference f1 = sceneBlocks.find({ 2,3,4 });
             CHECK(f1 == b1);
@@ -88,7 +88,7 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
         }
     }
 
-    SECTION("::insert(BlockConstructionInfo const&)") {
+    SECTION(".insert(BlockConstructionInfo const&)") {
         REQUIRE(b1);
         CHECK(b1.index() == BlockIndex{2, 3, 4});
         CHECK(b1.mass() == 10.f * u.mass);
@@ -100,7 +100,7 @@ TEST_CASE("Scene::CuboidGrid::detail::SceneBlocks") {
         CHECK(b2.isFoundation() == false);
     }
 
-    SECTION("::thicknessAlong(BasicDirection)") {
+    SECTION(".thicknessAlong(BasicDirection)") {
         CHECK(sceneBlocks.thicknessAlong(Direction::minusX()) == 1.f * u.length);
         CHECK(sceneBlocks.thicknessAlong(Direction::plusX()) == 1.f * u.length);
         CHECK(sceneBlocks.thicknessAlong(Direction::minusY()) == 2.f * u.length);

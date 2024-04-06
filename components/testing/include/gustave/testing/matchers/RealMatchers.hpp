@@ -36,8 +36,8 @@
 #include <gustave/cfg/cReal.hpp>
 #include <gustave/meta/Meta.hpp>
 
-namespace Gustave::Testing::Matchers {
-    template<Cfg::cReal TargetReal>
+namespace gustave::testing::matchers {
+    template<cfg::cReal TargetReal>
     class RealWithinRelMatcher : public Catch::Matchers::MatcherGenericBase {
     public:
         using Rep = typename TargetReal::Rep;
@@ -52,11 +52,11 @@ namespace Gustave::Testing::Matchers {
             }
         }
 
-        template<Cfg::cReal TestedReal>
+        template<cfg::cReal TestedReal>
         [[nodiscard]]
         constexpr bool match(TestedReal tested) const {
             static_assert(TestedReal::unit().isAssignableFrom(TargetReal::unit()), "Invalid addition: incompatible units.");
-            using RealType = decltype(Meta::value(target_ + tested));
+            using RealType = decltype(meta::value(target_ + tested));
             auto const testedValue = RealType{ tested }.value();
             auto const targetValue = RealType{ target_ }.value();
             auto const margin = epsilon_ * std::max(std::fabs(testedValue), std::fabs(targetValue));
@@ -74,11 +74,11 @@ namespace Gustave::Testing::Matchers {
         Rep epsilon_;
     };
 
-    template<Cfg::cReal Target>
+    template<cfg::cReal Target>
     RealWithinRelMatcher(Target, typename Target::Rep) -> RealWithinRelMatcher<Target>;
 
     [[nodiscard]]
-    auto WithinRel(Cfg::cReal auto target, std::floating_point auto epsilon) {
+    auto WithinRel(cfg::cReal auto target, std::floating_point auto epsilon) {
         using Rep = decltype(target.value() + epsilon);
         return RealWithinRelMatcher{ Rep{target.value()} * target.unit(), Rep{epsilon} };
     }

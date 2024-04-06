@@ -40,25 +40,25 @@
 #include <gustave/worlds/sync/Structures.hpp>
 #include <gustave/worlds/WorldStructureState.hpp>
 
-namespace Gustave::Worlds {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds {
+    template<cfg::cLibConfig auto libCfg>
     class SyncWorld {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        using WorldData = Sync::detail::WorldData<cfg>;
-        using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
+        using WorldData = sync::detail::WorldData<libCfg>;
+        using WorldUpdater = sync::detail::WorldUpdater<libCfg>;
     public:
-        using Blocks = Sync::Blocks<cfg>;
-        using Contacts = Sync::Contacts<cfg>;
-        using Links = Sync::Links<cfg>;
-        using Structures = Sync::Structures<cfg>;
+        using Blocks = sync::Blocks<libCfg>;
+        using Contacts = sync::Contacts<libCfg>;
+        using Links = sync::Links<libCfg>;
+        using Structures = sync::Structures<libCfg>;
 
         using BlockIndex = typename WorldData::Scene::BlockIndex;
         using BlockReference = typename Blocks::BlockReference;

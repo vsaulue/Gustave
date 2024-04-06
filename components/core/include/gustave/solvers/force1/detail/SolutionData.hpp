@@ -34,13 +34,13 @@
 #include <gustave/solvers/force1/detail/ForceRepartition.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::detail {
+    template<cfg::cLibConfig auto libCfg>
     class SolutionData {
     public:
-        using Basis = SolutionBasis<cfg>;
-        using ForceBalancer = detail::ForceBalancer<cfg>;
-        using ForceRepartition = detail::ForceRepartition<cfg>;
+        using Basis = SolutionBasis<libCfg>;
+        using ForceBalancer = detail::ForceBalancer<libCfg>;
+        using ForceRepartition = detail::ForceRepartition<libCfg>;
 
         [[nodiscard]]
         explicit SolutionData(std::shared_ptr<const Basis>&& basis)

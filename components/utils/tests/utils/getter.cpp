@@ -39,8 +39,8 @@ namespace {
     };
 }
 
-TEST_CASE("Utils::getter") {
-    const auto method = Gustave::Utils::getter(&TestType::someMethod);
+TEST_CASE("utils::getter") {
+    const auto method = gustave::utils::getter(&TestType::someMethod);
     TestType obj;
     int methodResult = (obj.*method)();
     CHECK(methodResult == 0);

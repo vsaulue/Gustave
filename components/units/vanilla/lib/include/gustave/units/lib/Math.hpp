@@ -28,7 +28,7 @@
 #include "Exponent.hpp"
 #include "Real.hpp"
 
-namespace Gustave::Units::Lib {
+namespace gustave::units::lib {
     cReal auto sqrt(cReal auto real) {
         constexpr auto resUnit = real.unit().pow(Exponent<1, 2>{});
         return std::sqrt(real.value()) * resUnit;

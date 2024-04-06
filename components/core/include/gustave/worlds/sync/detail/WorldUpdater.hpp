@@ -30,11 +30,11 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 
-namespace Gustave::Worlds::Sync::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync::detail {
+    template<cfg::cLibConfig auto libCfg>
     class WorldUpdater {
     public:
-        using WorldData = detail::WorldData<cfg>;
+        using WorldData = detail::WorldData<libCfg>;
 
         using SceneStructure = typename WorldData::Scene::StructureReference;
         using SceneTransactionResult = typename WorldData::Scene::TransactionResult;

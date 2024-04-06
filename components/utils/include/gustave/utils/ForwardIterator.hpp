@@ -32,7 +32,7 @@
 #include <gustave/utils/cEnumerator.hpp>
 #include <gustave/utils/EndIterator.hpp>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<cEnumerator Enumerator>
     class ForwardIterator {
     public:

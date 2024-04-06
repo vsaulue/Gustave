@@ -31,17 +31,17 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::detail {
+    template<cfg::cLibConfig auto libCfg>
     class ContactInfo {
     private:
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
     public:
-        using LinkIndex = Cfg::LinkIndex<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using LinkIndex = cfg::LinkIndex<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
 
         [[nodiscard]]
         explicit ContactInfo(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus)

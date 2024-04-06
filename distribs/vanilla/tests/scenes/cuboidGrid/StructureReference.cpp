@@ -34,9 +34,9 @@
 
 #include <TestHelpers.hpp>
 
-using StructureReference = Gustave::Scenes::CuboidGrid::StructureReference<cfg>;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
-using SceneUpdater = Gustave::Scenes::CuboidGrid::detail::SceneUpdater<cfg>;
+using StructureReference = gustave::scenes::cuboidGrid::StructureReference<libCfg>;
+using SceneData = gustave::scenes::cuboidGrid::detail::SceneData<libCfg>;
+using SceneUpdater = gustave::scenes::cuboidGrid::detail::SceneUpdater<libCfg>;
 
 using BlockIndex = StructureReference::BlockIndex;
 using BlockReference = StructureReference::BlockReference;
@@ -48,7 +48,7 @@ using Transaction = SceneUpdater::Transaction;
 static_assert(std::ranges::forward_range<StructureReference::Blocks>);
 static_assert(std::ranges::forward_range<StructureReference::Links>);
 
-TEST_CASE("Scene::CuboidGrid::StructureReference") {
+TEST_CASE("scenes::cuboidGrid::StructureReference") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     SceneData data{ blockSize };
 
@@ -112,7 +112,7 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
                 blocks.push_back(block.index());
             }
             std::vector<BlockIndex> expected = { {1,0,0},{2,0,0} };
-            CHECK_THAT(blocks, M::C2::UnorderedRangeEquals(expected));
+            CHECK_THAT(blocks, matchers::c2::UnorderedRangeEquals(expected));
         }
 
         SECTION(".contains()") {
@@ -190,7 +190,7 @@ TEST_CASE("Scene::CuboidGrid::StructureReference") {
                 makeContactRef({6,7,6}, Direction::plusY()),
                 makeContactRef({7,6,6}, Direction::plusX()),
             };
-            CHECK_THAT(s666.links(), M::C2::UnorderedRangeEquals(expected));
+            CHECK_THAT(s666.links(), matchers::c2::UnorderedRangeEquals(expected));
         }
     }
 

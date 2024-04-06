@@ -34,15 +34,15 @@
 
 #include <TestHelpers.hpp>
 
-using Config = Gustave::Solvers::Force1::Config<cfg>;
-using Solution = Gustave::Solvers::Force1::Solution<cfg>;
+using Config = gustave::solvers::force1::Config<libCfg>;
+using Solution = gustave::solvers::force1::Solution<libCfg>;
 
 using ContactIndex = Solution::ContactIndex;
 using Link = Solution::Structure::Link;
 using Node = Solution::Structure::Node;
 using Structure = Solution::Structure;
 
-TEST_CASE("Force1::Solution") {
+TEST_CASE("force1::Solution") {
     auto structure = std::make_shared<Structure>();
     for (unsigned i = 1; i <= 7; ++i) {
         structure->addNode(Node{ (i * 1'000.f) * u.mass, i == 1 });
@@ -78,8 +78,8 @@ TEST_CASE("Force1::Solution") {
 
         SECTION(".forceVectorFrom()") {
             auto runTest = [&nodes](NodeIndex const to, NodeIndex const from, Vector3<u.force> const& expected) {
-                CHECK_THAT(nodes.at(to).forceVectorFrom(from), M::WithinRel(expected, epsilon));
-                CHECK_THAT(nodes.at(from).forceVectorFrom(to), M::WithinRel(-expected, epsilon));
+                CHECK_THAT(nodes.at(to).forceVectorFrom(from), matchers::WithinRel(expected, epsilon));
+                CHECK_THAT(nodes.at(from).forceVectorFrom(to), matchers::WithinRel(-expected, epsilon));
                 };
 
             SECTION("// 0-1") {
@@ -113,25 +113,25 @@ TEST_CASE("Force1::Solution") {
 
         SECTION(".relativeError()") {
             SECTION("// 0") {
-                CHECK_THAT(nodes.at(0).relativeError(), M::WithinRel(118.3f * u.one, epsilon));
+                CHECK_THAT(nodes.at(0).relativeError(), matchers::WithinRel(118.3f * u.one, epsilon));
             }
             SECTION("// 1") {
-                CHECK_THAT(nodes.at(1).relativeError(), M::WithinRel(0.3f * u.one, epsilon));
+                CHECK_THAT(nodes.at(1).relativeError(), matchers::WithinRel(0.3f * u.one, epsilon));
             }
             SECTION("// 2") {
-                CHECK_THAT(nodes.at(2).relativeError(), M::WithinRel((26.f / 30.f) * u.one, epsilon));
+                CHECK_THAT(nodes.at(2).relativeError(), matchers::WithinRel((26.f / 30.f) * u.one, epsilon));
             }
             SECTION("// 3") {
-                CHECK_THAT(nodes.at(3).relativeError(), M::WithinRel(0.1f * u.one, epsilon));
+                CHECK_THAT(nodes.at(3).relativeError(), matchers::WithinRel(0.1f * u.one, epsilon));
             }
             SECTION("// 4") {
-                CHECK_THAT(nodes.at(4).relativeError(), M::WithinRel(11.8f * u.one, epsilon));
+                CHECK_THAT(nodes.at(4).relativeError(), matchers::WithinRel(11.8f * u.one, epsilon));
             }
             SECTION("// 5") {
-                CHECK_THAT(nodes.at(5).relativeError(), M::WithinRel((115.f / 60.f) * u.one, epsilon));
+                CHECK_THAT(nodes.at(5).relativeError(), matchers::WithinRel((115.f / 60.f) * u.one, epsilon));
             }
             SECTION("// 6") {
-                CHECK_THAT(nodes.at(6).relativeError(), M::WithinRel((182.f / 70.f) * u.one, epsilon));
+                CHECK_THAT(nodes.at(6).relativeError(), matchers::WithinRel((182.f / 70.f) * u.one, epsilon));
             }
         }
     }
@@ -140,8 +140,8 @@ TEST_CASE("Force1::Solution") {
         auto const contacts = solution.contacts();
         auto runTest = [&contacts](LinkIndex const linkIndex, Vector3<u.force> const& expected) {
             ContactIndex localContactId{ linkIndex, true };
-            CHECK_THAT(contacts.at(localContactId).forceVector(), M::WithinRel(expected, epsilon));
-            CHECK_THAT(contacts.at(localContactId.opposite()).forceVector(), M::WithinRel(-expected, epsilon));
+            CHECK_THAT(contacts.at(localContactId).forceVector(), matchers::WithinRel(expected, epsilon));
+            CHECK_THAT(contacts.at(localContactId.opposite()).forceVector(), matchers::WithinRel(-expected, epsilon));
         };
 
         SECTION("// 0-1") {
@@ -170,6 +170,6 @@ TEST_CASE("Force1::Solution") {
     }
 
     SECTION(".maxRelativeError()") {
-        CHECK_THAT(solution.maxRelativeError(), M::WithinRel(11.8f * u.one, epsilon));
+        CHECK_THAT(solution.maxRelativeError(), matchers::WithinRel(11.8f * u.one, epsilon));
     }
 }

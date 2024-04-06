@@ -31,7 +31,7 @@
 
 #include <TestHelpers.hpp>
 
-using SyncWorld = Gustave::Worlds::SyncWorld<cfg>;
+using SyncWorld = gustave::worlds::SyncWorld<libCfg>;
 
 using BlockIndex = SyncWorld::BlockIndex;
 using ContactIndex = SyncWorld::ContactIndex;
@@ -50,7 +50,7 @@ static SyncWorld makeWorld() {
     return SyncWorld{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("SyncWorld") {
+TEST_CASE("worlds::SyncWorld") {
     SyncWorld world = makeWorld();
     {
         SyncWorld::Transaction transaction;
@@ -67,7 +67,7 @@ TEST_CASE("SyncWorld") {
 
     SECTION(".contacts()") {
         auto const contact = world.contacts().at(ContactIndex{ {0,0,0}, Direction::plusY() });
-        CHECK_THAT(contact.forceVector(), M::WithinRel(9.f * blockMass * g, solverPrecision));
+        CHECK_THAT(contact.forceVector(), matchers::WithinRel(9.f * blockMass * g, solverPrecision));
     }
 
     SECTION(".links()") {
@@ -79,7 +79,7 @@ TEST_CASE("SyncWorld") {
         for (auto const& contactRef : world.links()) {
             result.push_back(contactRef.index());
         }
-        CHECK_THAT(result, M::C2::UnorderedRangeEquals(expected));
+        CHECK_THAT(result, matchers::c2::UnorderedRangeEquals(expected));
     }
 
     SECTION(".structures()") {

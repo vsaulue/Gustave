@@ -62,13 +62,13 @@ namespace {
 }
 
 template<typename T>
-using Ptr = Gustave::Utils::Prop::Ptr<T>;
+using Ptr = gustave::utils::prop::Ptr<T>;
 
 static_assert(!cConstAssignable<Ptr<int>>);
 static_assert(!cConstCopiable<Ptr<int>>);
 static_assert(!std::convertible_to<Ptr<int> const, int*>);
 
-TEST_CASE("Utils::Prop::Ptr") {
+TEST_CASE("utils::prop::Ptr") {
     ConstDetector d1{ 1 };
     ConstDetector d2{ 2 };
     Ptr<ConstDetector> const cPtr = &d1;

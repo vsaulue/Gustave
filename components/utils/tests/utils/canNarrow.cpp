@@ -29,17 +29,17 @@
 
 #include <gustave/utils/canNarrow.hpp>
 
-namespace Utils = Gustave::Utils;
+namespace utils = gustave::utils;
 
-TEST_CASE("Utils::canNarrow") {
+TEST_CASE("utils::canNarrow") {
     constexpr std::uint64_t max32 = std::numeric_limits<std::uint32_t>::max();
 
     SECTION("// true") {
-        CHECK(Utils::canNarrow<std::uint8_t>(std::uint32_t{ 0 }));
-        CHECK(Utils::canNarrow<std::uint32_t>(max32));
+        CHECK(utils::canNarrow<std::uint8_t>(std::uint32_t{ 0 }));
+        CHECK(utils::canNarrow<std::uint32_t>(max32));
     }
 
     SECTION("// false") {
-        CHECK_FALSE(Utils::canNarrow<std::uint32_t>(1 + max32));
+        CHECK_FALSE(utils::canNarrow<std::uint32_t>(1 + max32));
     }
 }

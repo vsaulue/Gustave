@@ -41,34 +41,34 @@
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/utils/prop/Ptr.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto cfg>
     struct SceneData;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class StructureData {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
-        using DataNeighbour = detail::DataNeighbour<cfg, true>;
-        using DataNeighbours = detail::DataNeighbours<cfg, true>;
-        using Direction = Math3d::BasicDirection;
+        using ConstBlockDataReference = detail::BlockDataReference<libCfg, false>;
+        using DataNeighbour = detail::DataNeighbour<libCfg, true>;
+        using DataNeighbours = detail::DataNeighbours<libCfg, true>;
+        using Direction = math3d::BasicDirection;
 
-        using MaxStress = Model::MaxStress<cfg>;
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using SolverStructure = Solvers::Structure<cfg>;
+        using MaxStress = model::MaxStress<libCfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
+        using SolverStructure = solvers::Structure<libCfg>;
 
         using Link = typename SolverStructure::Link;
         using Node = typename SolverStructure::Node;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
     public:
-        using BlockDataReference = detail::BlockDataReference<cfg, true>;
-        using LinkIndex = Cfg::LinkIndex<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
-        using SceneData = detail::SceneData<cfg>;
+        using BlockDataReference = detail::BlockDataReference<libCfg, true>;
+        using LinkIndex = cfg::LinkIndex<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
+        using SceneData = detail::SceneData<libCfg>;
         using SolverIndices = std::unordered_map<BlockIndex, NodeIndex>;
 
         [[nodiscard]]
@@ -212,7 +212,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             return solverIndices_.at(block.index());
         }
 
-        Utils::Prop::Ptr<SceneData> scene_;
+        utils::prop::Ptr<SceneData> scene_;
         std::shared_ptr<SolverStructure> solverStructure_;
         SolverIndices solverIndices_;
     };

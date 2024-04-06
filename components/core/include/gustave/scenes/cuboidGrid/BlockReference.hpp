@@ -44,36 +44,36 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid {
+    template<cfg::cLibConfig auto libCfg>
     class ContactReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class StructureReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class BlockReference {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        using BlockDataReference = detail::BlockDataReference<cfg, false>;
-        using DataNeighbours = detail::DataNeighbours<cfg, false>;
-        using MaxStress = Model::MaxStress<cfg>;
+        using BlockDataReference = detail::BlockDataReference<libCfg, false>;
+        using DataNeighbours = detail::DataNeighbours<libCfg, false>;
+        using MaxStress = model::MaxStress<libCfg>;
         using IndexNeighbour = detail::IndexNeighbour;
         using IndexNeighbours = detail::IndexNeighbours;
-        using SceneData = detail::SceneData<cfg>;
-        using StructureData = detail::StructureData<cfg>;
+        using SceneData = detail::SceneData<libCfg>;
+        using StructureData = detail::StructureData<libCfg>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using BlockIndex = CuboidGrid::BlockIndex;
-        using Direction = Math3d::BasicDirection;
-        using ContactReference = CuboidGrid::ContactReference<cfg>;
-        using StructureReference = CuboidGrid::StructureReference<cfg>;
+        using BlockIndex = cuboidGrid::BlockIndex;
+        using Direction = math3d::BasicDirection;
+        using ContactReference = cuboidGrid::ContactReference<libCfg>;
+        using StructureReference = cuboidGrid::StructureReference<libCfg>;
 
         class Contacts {
         private:
@@ -85,14 +85,14 @@ namespace Gustave::Scenes::CuboidGrid {
                 [[nodiscard]]
                 Enumerator()
                     : contacts_{ nullptr }
-                    , value_ { Utils::NO_INIT }
+                    , value_ { utils::NO_INIT }
                     , state_{ 6 }
                 {}
 
                 [[nodiscard]]
                 explicit Enumerator(Contacts const& contacts)
                     : contacts_{ &contacts }
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                     , state_{ 0 }
                 {
                     next();
@@ -133,7 +133,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 int state_;
             };
         public:
-            using Iterator = Utils::ForwardIterator<Enumerator>;
+            using Iterator = utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
             explicit Contacts(BlockReference const& source)
@@ -155,7 +155,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            Utils::EndIterator end() const {
+            utils::EndIterator end() const {
                 return {};
             }
         private:
@@ -219,7 +219,7 @@ namespace Gustave::Scenes::CuboidGrid {
         private:
             [[nodiscard]]
             static StructureReference NO_INIT() {
-                return StructureReference{ Utils::NO_INIT };
+                return StructureReference{ utils::NO_INIT };
             }
 
             Values sceneStructures_;
@@ -233,7 +233,7 @@ namespace Gustave::Scenes::CuboidGrid {
         {}
 
         [[nodiscard]]
-        explicit BlockReference(Utils::NoInit NO_INIT)
+        explicit BlockReference(utils::NoInit NO_INIT)
             : index_{ NO_INIT }
         {}
 

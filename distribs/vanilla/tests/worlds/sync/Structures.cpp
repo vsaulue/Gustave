@@ -32,12 +32,10 @@
 
 #include <TestHelpers.hpp>
 
-namespace Sync = Gustave::Worlds::Sync;
-
-using WorldData = Sync::detail::WorldData<cfg>;
-using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
-using StructureReference = Sync::StructureReference<cfg>;
-using Structures = Sync::Structures<cfg>;
+using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
+using StructureReference = gustave::worlds::sync::StructureReference<libCfg>;
+using Structures = gustave::worlds::sync::Structures<libCfg>;
 
 using BlockIndex = WorldData::Scene::BlockIndex;
 using Solver = WorldData::Solver;
@@ -54,7 +52,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("Worlds::Sync::Structures") {
+TEST_CASE("worlds::sync::Structures") {
     WorldData world = makeWorld();
     Structures structures{ world };
 
@@ -74,7 +72,7 @@ TEST_CASE("Worlds::Sync::Structures") {
 
     SECTION(".begin() // & .end()") {
         std::vector<StructureReference> expected = { structureOf({0,0,0}), structureOf({0,2,0}) };
-        CHECK_THAT(structures, M::C2::UnorderedRangeEquals(expected));
+        CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));
     }
 
     SECTION(".size()") {

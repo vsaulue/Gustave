@@ -32,38 +32,38 @@
 
 using namespace std::string_view_literals;
 
-namespace Utils = Gustave::Utils;
+namespace utils = gustave::utils;
 
 static_assert(::Catch::Detail::IsStreamInsertable<std::string_view>::value);
 
-TEST_CASE("SizedString") {
+TEST_CASE("utils::SizedString") {
     SECTION("// empty string") {
-        constexpr Utils::SizedString<char,0> str = "";
+        constexpr utils::SizedString<char,0> str = "";
         REQUIRE(str == ""sv);
     }
 
     SECTION("::SizedString(SizedStringView)") {
-        constexpr Utils::SizedStringView<char, 4> sizedView = "abcde";
-        constexpr Utils::SizedString str{ sizedView };
+        constexpr utils::SizedStringView<char, 4> sizedView = "abcde";
+        constexpr utils::SizedString str{ sizedView };
         REQUIRE(str == "abcd"sv);
     }
 
 	SECTION("::SizedString(const char[])") {
-		constexpr auto str = Utils::SizedString("Hello world");
+		constexpr auto str = utils::SizedString("Hello world");
 		REQUIRE(str == "Hello world"sv);
 	}
 
 	SECTION("::SizedString(SizedStringView...)") {
-		constexpr Utils::SizedStringView str1{ "Hello" };
-		constexpr Utils::SizedStringView str2{ "World" };
-		constexpr Utils::SizedStringView str3{ "!!!" };
-		constexpr Utils::SizedString str{ str1, str2, str3};
+		constexpr utils::SizedStringView str1{ "Hello" };
+		constexpr utils::SizedStringView str2{ "World" };
+		constexpr utils::SizedStringView str3{ "!!!" };
+		constexpr utils::SizedString str{ str1, str2, str3};
 		REQUIRE(str == "HelloWorld!!!"sv);
 	}
 
 	SECTION("::operator<=>(cSizedString auto, cSizedString auto)") {
-		constexpr Utils::SizedString lhs = "abcd0";
-		constexpr Utils::SizedString rhs = "abcd9";
+		constexpr utils::SizedString lhs = "abcd0";
+		constexpr utils::SizedString rhs = "abcd9";
 		REQUIRE(lhs < rhs);
 	}
 
@@ -71,13 +71,13 @@ TEST_CASE("SizedString") {
         std::stringstream stream;
 
         SECTION("// non trivial string") {
-            constexpr Utils::SizedString str = "¹⁸⁴⁴⁶";
+            constexpr utils::SizedString str = "¹⁸⁴⁴⁶";
             stream << str;
             CHECK(stream.view() == "¹⁸⁴⁴⁶"sv);
         }
 
         SECTION("// empty string") {
-            constexpr Utils::SizedString<char, 0> str = "";
+            constexpr utils::SizedString<char, 0> str = "";
             stream << str;
             CHECK(stream.view() == ""sv);
         }

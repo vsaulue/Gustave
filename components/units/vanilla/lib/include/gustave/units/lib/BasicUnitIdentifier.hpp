@@ -29,8 +29,8 @@
 
 #include <gustave/utils/SizedString.hpp>
 
-namespace Gustave::Units::Lib {
-    template<Utils::SizedString symbol_>
+namespace gustave::units::lib {
+    template<utils::SizedString symbol_>
     struct BasicUnitIdentifier {
         using Char = typename decltype(symbol_)::Char;
 

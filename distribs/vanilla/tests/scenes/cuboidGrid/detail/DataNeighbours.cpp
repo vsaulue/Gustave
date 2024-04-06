@@ -37,14 +37,14 @@
 
 #include <TestHelpers.hpp>
 
-namespace Cuboid = Gustave::Scenes::CuboidGrid;
+namespace cuboid = gustave::scenes::cuboidGrid;
 
-using BlockIndex = Cuboid::BlockIndex;
-using BlockDataReference = Cuboid::detail::BlockDataReference<cfg,true>;
-using DataNeighbour = Cuboid::detail::DataNeighbour<cfg, true>;
-using DataNeighbours = Cuboid::detail::DataNeighbours<cfg, true>;
-using Direction = Gustave::Math3d::BasicDirection;
-using SceneBlocks = Cuboid::detail::SceneBlocks<cfg>;
+using BlockIndex = cuboid::BlockIndex;
+using BlockDataReference = cuboid::detail::BlockDataReference<libCfg,true>;
+using DataNeighbour = cuboid::detail::DataNeighbour<libCfg, true>;
+using DataNeighbours = cuboid::detail::DataNeighbours<libCfg, true>;
+using Direction = gustave::math3d::BasicDirection;
+using SceneBlocks = cuboid::detail::SceneBlocks<libCfg>;
 
 using Coord = BlockIndex::Coord;
 using Limits = std::numeric_limits<Coord>;
@@ -54,7 +54,7 @@ static constexpr Coord min{ Limits::min() };
 
 static_assert(std::ranges::forward_range<DataNeighbours>);
 
-TEST_CASE("Scene::CuboidGrid::detail::DataNeighbours") {
+TEST_CASE("scenes::cuboidGrid::detail::DataNeighbours") {
     SceneBlocks sceneBlocks{ vector3(2.f, 3.f, 1.f, u.length) };
 
     auto addBlock = [&](BlockIndex const& index) -> BlockDataReference {
@@ -74,5 +74,5 @@ TEST_CASE("Scene::CuboidGrid::detail::DataNeighbours") {
         {Direction::minusZ(), minusZ},
     };
 
-    CHECK_THAT(neighbours, M::C2::RangeEquals(expected));
+    CHECK_THAT(neighbours, matchers::c2::RangeEquals(expected));
 }

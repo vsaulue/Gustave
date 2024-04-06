@@ -30,13 +30,13 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/scenes/cuboidGrid/StructureReference.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid {
+    template<cfg::cLibConfig auto cfg>
     class TransactionResult {
     private:
         using StructureData = detail::StructureData<cfg>;
     public:
-        using StructureReference = CuboidGrid::StructureReference<cfg>;
+        using StructureReference = cuboidGrid::StructureReference<cfg>;
 
         using DeletedSet = std::vector<StructureReference>;
         using NewSet = std::vector<StructureReference>;

@@ -31,11 +31,11 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace Gustave::Solvers::Common {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::common {
+    template<cfg::cLibConfig auto cfg>
     struct ContactIndex {
     public:
-        using LinkIndex = Cfg::LinkIndex<cfg>;
+        using LinkIndex = cfg::LinkIndex<cfg>;
 
         [[nodiscard]]
         ContactIndex opposite() const {

@@ -29,11 +29,12 @@
 
 #include <TestConfig.hpp>
 
-using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
+using BlockIndex = gustave::scenes::cuboidGrid::BlockIndex;
+
 using Coord = BlockIndex::Coord;
 using Direction = BlockIndex::Direction;
 
-TEST_CASE("Scene::CuboidGrid::BlockIndex") {
+TEST_CASE("scenes::cuboidGrid::BlockIndex") {
     static constexpr Coord maxCoord = std::numeric_limits<Coord>::max();
     static constexpr Coord minCoord = std::numeric_limits<Coord>::min();
 

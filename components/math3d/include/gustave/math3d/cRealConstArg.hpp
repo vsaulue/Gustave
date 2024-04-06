@@ -30,17 +30,17 @@
 #include <gustave/cfg/cRealOf.hpp>
 #include <gustave/cfg/cRealTraits.hpp>
 
-namespace Gustave::Math3d {
+namespace gustave::math3d {
     namespace detail {
-        template<Cfg::cRealTraits Traits>
+        template<cfg::cRealTraits Traits>
         [[nodiscard]]
-        constexpr Cfg::cRealOf<Traits{}> auto asRealConstArg(Traits, std::floating_point auto const value) {
+        constexpr cfg::cRealOf<Traits{}> auto asRealConstArg(Traits, std::floating_point auto const value) {
             constexpr auto one = Traits::units().one;
             using Real = typename Traits::template Type<one>;
             return Real{ value };
         }
 
-        template<Cfg::cRealTraits Traits, Cfg::cRealOf<Traits{}> Real>
+        template<cfg::cRealTraits Traits, cfg::cRealOf<Traits{}> Real>
         [[nodiscard]]
         constexpr Real asRealConstArg(Traits, Real const value) {
             return value;
@@ -49,7 +49,7 @@ namespace Gustave::Math3d {
 
     template<typename T, auto traits>
     concept cRealConstArg = requires (T value) {
-        requires Cfg::cRealTraits<decltype(traits)>;
-        { detail::asRealConstArg(traits, value) } -> Cfg::cRealOf<traits>;
+        requires cfg::cRealTraits<decltype(traits)>;
+        { detail::asRealConstArg(traits, value) } -> cfg::cRealOf<traits>;
     };
 }

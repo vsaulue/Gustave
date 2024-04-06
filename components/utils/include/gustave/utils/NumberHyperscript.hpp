@@ -33,7 +33,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     struct HyperscriptText {
         static constexpr std::array<std::string_view, 10> digitToText = {
             "\u2070","\u00B9","\u00B2","\u00B3","\u2074","\u2075","\u2076","\u2077","\u2078","\u2079",

@@ -35,7 +35,7 @@
 TEST_CASE("RealWithinRelMatcher") {
     constexpr Real<u.area> target = -2.0 * l2;
     constexpr double epsilon = 0.25;
-    const M::RealWithinRelMatcher m{ target, epsilon };
+    const matchers::RealWithinRelMatcher m{ target, epsilon };
 
     SECTION("::match(cReal auto)") {
         CHECK(m.match(-1.6 * l2));
@@ -53,6 +53,6 @@ TEST_CASE("RealWithinRelMatcher") {
 }
 
 TEST_CASE("WithinRel(cReal auto, std::floating_point auto)") {
-    CHECK_THAT(1.6 * l2, M::WithinRel(2.0 * l2, 0.25));
-    CHECK_THAT(1.4 * l2, !M::WithinRel(2.0 * l2, 0.25));
+    CHECK_THAT(1.6 * l2, matchers::WithinRel(2.0 * l2, 0.25));
+    CHECK_THAT(1.4 * l2, !matchers::WithinRel(2.0 * l2, 0.25));
 }

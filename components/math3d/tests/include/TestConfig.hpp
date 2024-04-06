@@ -27,4 +27,4 @@
 
 #include <gustave/units/RealTraits.hpp>
 
-using RealTraits = Gustave::Units::RealTraits<double>;
+using RealTraits = gustave::units::RealTraits<double>;

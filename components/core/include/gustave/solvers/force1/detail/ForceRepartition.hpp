@@ -34,22 +34,22 @@
 #include <gustave/solvers/force1/detail/ForceBalancer.hpp>
 #include <gustave/solvers/force1/detail/NodeStats.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::detail {
+    template<cfg::cLibConfig auto libCfg>
     class ForceRepartition {
     private:
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
 
-        static constexpr auto u = Cfg::units(cfg);
-        static constexpr auto rt = cfg.realTraits;
+        static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto rt = libCfg.realTraits;
     public:
-        using ForceBalancer = detail::ForceBalancer<cfg>;
+        using ForceBalancer = detail::ForceBalancer<libCfg>;
         using Structure = typename ForceBalancer::Structure;
 
         using ContactIndex = typename Structure::ContactIndex;
@@ -59,7 +59,7 @@ namespace Gustave::Solvers::Force1::detail {
         using LocalContactIndex = typename LinkInfo::LocalContactIndex;
         using Node = typename Structure::Node;
         using NodeInfo = typename ForceBalancer::NodeInfo;
-        using NodeStats = detail::NodeStats<cfg>;
+        using NodeStats = detail::NodeStats<libCfg>;
 
         [[nodiscard]]
         explicit ForceRepartition(ForceBalancer const& balancer, std::span<Real<u.potential> const> potentials)

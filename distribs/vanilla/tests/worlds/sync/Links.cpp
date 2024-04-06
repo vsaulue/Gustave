@@ -31,9 +31,9 @@
 
 #include <TestHelpers.hpp>
 
-using Links = Gustave::Worlds::Sync::Links<cfg>;
-using WorldData = Gustave::Worlds::Sync::detail::WorldData<cfg>;
-using WorldUpdater = Gustave::Worlds::Sync::detail::WorldUpdater<cfg>;
+using Links = gustave::worlds::sync::Links<libCfg>;
+using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
 
 using ContactIndex = Links::ContactIndex;
 using ContactReference = Links::ContactReference;
@@ -52,7 +52,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("Worlds::Sync::Links") {
+TEST_CASE("worlds::sync::Links") {
     WorldData world = makeWorld();
 
     Transaction t;
@@ -68,6 +68,6 @@ TEST_CASE("Worlds::Sync::Links") {
             ContactReference{ world, ContactIndex{ {2,1,2}, Direction::plusY() } },
             ContactReference{ world, ContactIndex{ {2,2,2}, Direction::plusY() } },
         };
-        CHECK_THAT(links, M::C2::UnorderedRangeEquals(expected));
+        CHECK_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
     }
 }

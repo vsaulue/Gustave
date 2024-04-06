@@ -36,19 +36,19 @@
 
 #include <TestHelpers.hpp>
 
-using ContactReference = Gustave::Solvers::Force1::SolutionUtils::ContactReference<cfg>;
-using Contacts = Gustave::Solvers::Force1::SolutionUtils::Contacts<cfg>;
-using NodeReference = Gustave::Solvers::Force1::SolutionUtils::NodeReference<cfg>;
-using SolutionBasis = Gustave::Solvers::Force1::SolutionBasis<cfg>;
-using SolutionData = Gustave::Solvers::Force1::detail::SolutionData<cfg>;
-using SolverConfig = Gustave::Solvers::Force1::Config<cfg>;
-using Structure = Gustave::Solvers::Structure<cfg>;
+using ContactReference = gustave::solvers::force1::solutionUtils::ContactReference<libCfg>;
+using Contacts = gustave::solvers::force1::solutionUtils::Contacts<libCfg>;
+using NodeReference = gustave::solvers::force1::solutionUtils::NodeReference<libCfg>;
+using SolutionBasis = gustave::solvers::force1::SolutionBasis<libCfg>;
+using SolutionData = gustave::solvers::force1::detail::SolutionData<libCfg>;
+using SolverConfig = gustave::solvers::force1::Config<libCfg>;
+using Structure = gustave::solvers::Structure<libCfg>;
 
 using ContactIndex = Structure::ContactIndex;
 using Link = Structure::Link;
 using Node = Structure::Node;
 
-TEST_CASE("Force1::SolutionUtils::Contacts") {
+TEST_CASE("force1::solutionUtils::Contacts") {
     static constexpr Real<u.one> precision = 0.001f;
     auto const solverConfig = std::make_shared<SolverConfig const>(g, 1000, precision);
 

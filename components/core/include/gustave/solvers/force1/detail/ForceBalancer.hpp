@@ -37,32 +37,32 @@
 #include <gustave/solvers/force1/detail/LinkInfo.hpp>
 #include <gustave/solvers/force1/detail/NodeInfo.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::detail {
+    template<cfg::cLibConfig auto libCfg>
     class ForceBalancer {
     private:
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        using LinkIndex = Cfg::LinkIndex<cfg>;
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using LinkIndex = cfg::LinkIndex<libCfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
 
-        static constexpr auto u = Cfg::units(cfg);
-        static constexpr auto rt = cfg.realTraits;
+        static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto rt = libCfg.realTraits;
     public:
-        using Structure = Solvers::Structure<cfg>;
+        using Structure = solvers::Structure<libCfg>;
 
-        using Config = Force1::Config<cfg>;
-        using ContactInfo = detail::ContactInfo<cfg>;
+        using Config = force1::Config<libCfg>;
+        using ContactInfo = detail::ContactInfo<libCfg>;
         using Link = typename Structure::Link;
-        using LinkInfo = detail::LinkInfo<cfg>;
+        using LinkInfo = detail::LinkInfo<libCfg>;
         using LocalContactIndex = typename LinkInfo::LocalContactIndex;
         using Node = typename Structure::Node;
-        using NodeInfo = detail::NodeInfo<cfg>;
+        using NodeInfo = detail::NodeInfo<libCfg>;
 
         [[nodiscard]]
         explicit ForceBalancer(Structure const& structure, Config const& config)
@@ -85,8 +85,8 @@ namespace Gustave::Solvers::Force1::detail {
                 NormalizedVector3 const& normal = link.normal();
                 Real<u.one> const nComp = normal.dot(normalizedG_);
                 Real<u.resistance> const tangentResist = rt.sqrt(1.f - nComp * nComp) / link.shearConductivity();
-                Real<u.resistance> pNormalResist{ Utils::NO_INIT };
-                Real<u.resistance> nNormalResist{ Utils::NO_INIT };
+                Real<u.resistance> pNormalResist{ utils::NO_INIT };
+                Real<u.resistance> nNormalResist{ utils::NO_INIT };
                 if (nComp <= 0.f) {
                     pNormalResist = -nComp / link.compressionConductivity();
                     nNormalResist = -nComp / link.tensileConductivity();

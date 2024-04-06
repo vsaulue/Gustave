@@ -32,14 +32,14 @@
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 #include <gustave/worlds/sync/ContactReference.hpp>
 
-namespace Gustave::Worlds::Sync {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync {
+    template<cfg::cLibConfig auto libCfg>
     class Links {
     private:
-        using WorldData = detail::WorldData<cfg>;
+        using WorldData = detail::WorldData<libCfg>;
         using SceneLinks = typename WorldData::Scene::Links;
     public:
-        using ContactReference = Sync::ContactReference<cfg>;
+        using ContactReference = sync::ContactReference<libCfg>;
         using ContactIndex = typename ContactReference::ContactIndex;
     private:
         class Enumerator {
@@ -50,14 +50,14 @@ namespace Gustave::Worlds::Sync {
             Enumerator()
                 : links_{ nullptr }
                 , sceneIt_{}
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
             {}
 
             [[nodiscard]]
             explicit Enumerator(Links const& links)
                 : links_{ &links }
                 , sceneIt_{ links.sceneLinks_.begin() }
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
             {
                 updateValue();
             }
@@ -93,7 +93,7 @@ namespace Gustave::Worlds::Sync {
             ContactReference value_;
         };
     public:
-        using Iterator = Utils::ForwardIterator<Enumerator>;
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Links(WorldData const& world)
@@ -107,7 +107,7 @@ namespace Gustave::Worlds::Sync {
         }
 
         [[nodiscard]]
-        Utils::EndIterator end() const {
+        utils::EndIterator end() const {
             return {};
         }
     private:

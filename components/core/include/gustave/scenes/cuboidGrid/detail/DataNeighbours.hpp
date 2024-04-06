@@ -35,11 +35,11 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg, bool isMutable_>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto cfg, bool isMutable_>
     class DataNeighbours {
     private:
-        using QualifiedSceneBlocks = Meta::MutableIf<isMutable_, SceneBlocks<cfg>>;
+        using QualifiedSceneBlocks = meta::MutableIf<isMutable_, SceneBlocks<cfg>>;
         using IndexIterator = IndexNeighbours::Iterator;
 
         class Enumerator {
@@ -47,14 +47,14 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             [[nodiscard]]
             Enumerator()
                 : neighbours_{ nullptr }
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
                 , indexIterator_{}
             {}
 
             [[nodiscard]]
             explicit Enumerator(DataNeighbours& neighbours)
                 : neighbours_{ &neighbours }
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
                 , indexIterator_{ neighbours.indices_.begin() }
             {
                 next();
@@ -100,7 +100,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             IndexIterator indexIterator_;
         };
     public:
-        using Iterator = Utils::ForwardIterator<Enumerator>;
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit DataNeighbours(QualifiedSceneBlocks& blocks, BlockIndex const& source)
@@ -114,7 +114,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        constexpr Utils::EndIterator end() const {
+        constexpr utils::EndIterator end() const {
             return {};
         }
     private:

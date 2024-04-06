@@ -27,7 +27,7 @@
 
 #include <ostream>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     template<typename T>
     concept cPrintable = requires(T const& cv, std::ostream & stream) {
         stream << cv;

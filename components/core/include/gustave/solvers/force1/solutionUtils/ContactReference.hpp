@@ -33,34 +33,34 @@
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Solvers::Force1::SolutionUtils {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::solutionUtils {
+    template<cfg::cLibConfig auto libCfg>
     class NodeReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class ContactReference {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        using SolutionData = detail::SolutionData<cfg>;
-        using Structure = Solvers::Structure<cfg>;
+        using SolutionData = detail::SolutionData<libCfg>;
+        using Structure = solvers::Structure<libCfg>;
 
         using LinkIndex = typename Structure::LinkIndex;
         using StructureLink = typename Structure::Link;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
         using ContactIndex = typename Structure::ContactIndex;
         using NodeIndex = typename Structure::NodeIndex;
-        using NodeReference = SolutionUtils::NodeReference<cfg>;
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
+        using NodeReference = solutionUtils::NodeReference<libCfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
 
         [[nodiscard]]
-        explicit ContactReference(Utils::NoInit)
+        explicit ContactReference(utils::NoInit)
             : solution_{ nullptr }
             , index_{ 0, false }
         {}

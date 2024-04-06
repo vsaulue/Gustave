@@ -35,19 +35,19 @@
 #include <gustave/solvers/force1/detail/ContactInfo.hpp>
 #include <gustave/utils/canNarrow.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::detail {
+    template<cfg::cLibConfig auto libCfg>
     class NodeInfo {
     private:
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
     public:
-        using Contacts = std::vector<ContactInfo<cfg>>;
-        using LinkIndex = Cfg::LinkIndex<cfg>;
+        using Contacts = std::vector<ContactInfo<libCfg>>;
+        using LinkIndex = cfg::LinkIndex<libCfg>;
         using LocalContactIndex = LinkIndex;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
 
         [[nodiscard]]
         explicit NodeInfo(Real<u.force> weight)
@@ -58,7 +58,7 @@ namespace Gustave::Solvers::Force1::detail {
 
         LocalContactIndex addContact(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) {
             auto const result = contacts.size();
-            assert(Utils::canNarrow<LocalContactIndex>(result));
+            assert(utils::canNarrow<LocalContactIndex>(result));
             contacts.emplace_back(otherIndex, linkIndex, rPlus, rMinus);
             return result;
         }

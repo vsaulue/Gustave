@@ -32,7 +32,7 @@
 #include <gustave/utils/getMember.hpp>
 #include <gustave/utils/Hasher.hpp>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<typename T, typename Object>
     concept cEqualsMemberOf = requires (Object const& object, T const& getter) {
         { getMember(object, getter) } -> std::equality_comparable;

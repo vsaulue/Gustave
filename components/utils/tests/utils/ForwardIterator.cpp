@@ -31,7 +31,7 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <Point.hpp>
 
-namespace Utils = Gustave::Utils;
+namespace utils = gustave::utils;
 
 namespace {
     class Steps {
@@ -71,7 +71,7 @@ namespace {
             Coord value_;
         };
     public:
-        using Iterator = Utils::ForwardIterator<Enumerator>;
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Steps(int start, int end, int step)
@@ -88,7 +88,7 @@ namespace {
         }
 
         [[nodiscard]]
-        constexpr Utils::EndIterator end() const {
+        constexpr utils::EndIterator end() const {
             return {};
         }
     private:
@@ -100,7 +100,7 @@ namespace {
 
 static_assert(std::ranges::forward_range<Steps>);
 
-TEST_CASE("ForwardIterator") {
+TEST_CASE("utils::ForwardIterator") {
     Steps const steps{ 1, 8, 3 };
     Steps::Iterator it = steps.begin();
 

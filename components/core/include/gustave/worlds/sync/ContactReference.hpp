@@ -33,33 +33,33 @@
 #include <gustave/worlds/sync/BlockReference.hpp>
 #include <gustave/worlds/sync/StructureReference.hpp>
 
-namespace Gustave::Worlds::Sync {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync {
+    template<cfg::cLibConfig auto libCfg>
     class StructureReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class BlockReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class ContactReference {
     private:
-        using WorldData = detail::WorldData<cfg>;
+        using WorldData = detail::WorldData<libCfg>;
         using SceneContact = typename WorldData::Scene::ContactReference;
         using SceneStructure = typename WorldData::Scene::StructureReference;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
     public:
-        using BlockReference = Sync::BlockReference<cfg>;
+        using BlockReference = sync::BlockReference<libCfg>;
         using ContactIndex = typename WorldData::Scene::ContactIndex;
         using MaxStress = typename SceneContact::MaxStress;
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using StructureReference = Sync::StructureReference<cfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
+        using StructureReference = sync::StructureReference<libCfg>;
 
         [[nodiscard]]
         explicit ContactReference(WorldData const& world, ContactIndex const& index)
@@ -68,7 +68,7 @@ namespace Gustave::Worlds::Sync {
         {}
 
         [[nodiscard]]
-        explicit ContactReference(Utils::NoInit NO_INIT)
+        explicit ContactReference(utils::NoInit NO_INIT)
             : world_{ nullptr }
             , index_{ NO_INIT }
         {}

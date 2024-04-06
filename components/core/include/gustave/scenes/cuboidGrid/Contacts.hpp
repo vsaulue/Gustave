@@ -30,13 +30,13 @@
 #include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGrid/ContactReference.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid {
+    template<cfg::cLibConfig auto libCfg>
     class Contacts {
     private:
-        using SceneData = detail::SceneData<cfg>;
+        using SceneData = detail::SceneData<libCfg>;
     public:
-        using ContactReference = CuboidGrid::ContactReference<cfg>;
+        using ContactReference = cuboidGrid::ContactReference<libCfg>;
 
         using ContactIndex = typename ContactReference::ContactIndex;
 

@@ -31,16 +31,16 @@
 
 #include <TestHelpers.hpp>
 
-using Contacts = Gustave::Scenes::CuboidGrid::Contacts<cfg>;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
-using SceneUpdater = Gustave::Scenes::CuboidGrid::detail::SceneUpdater<cfg>;
+using Contacts = gustave::scenes::cuboidGrid::Contacts<libCfg>;
+using SceneData = gustave::scenes::cuboidGrid::detail::SceneData<libCfg>;
+using SceneUpdater = gustave::scenes::cuboidGrid::detail::SceneUpdater<libCfg>;
 
 using ContactIndex = Contacts::ContactIndex;
 using ContactReference = Contacts::ContactReference;
 using Direction = ContactIndex::Direction;
 using Transaction = SceneUpdater::Transaction;
 
-TEST_CASE("Scene::CuboidGrid::Contacts") {
+TEST_CASE("scenes::cuboidGrid::Contacts") {
     SceneData scene{ vector3(2.f, 3.f, 1.f, u.length) };
 
     Transaction t;

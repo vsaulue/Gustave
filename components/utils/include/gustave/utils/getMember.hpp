@@ -25,7 +25,7 @@
 
 #pragma once
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<typename Object, typename MemberType>
     [[nodiscard]]
     MemberType getMember(Object const& object, MemberType Object::* const memberPtr) {

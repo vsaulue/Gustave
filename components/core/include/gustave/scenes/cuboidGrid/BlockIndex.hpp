@@ -35,14 +35,14 @@
 #include <gustave/utils/Hasher.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
+namespace gustave::scenes::cuboidGrid {
     struct BlockIndex {
     public:
         using Coord = std::int64_t;
-        using Direction = Math3d::BasicDirection;
+        using Direction = math3d::BasicDirection;
 
         [[nodiscard]]
-        explicit BlockIndex(Utils::NoInit) {}
+        explicit BlockIndex(utils::NoInit) {}
 
         [[nodiscard]]
         BlockIndex(Coord x, Coord y, Coord z)
@@ -107,9 +107,9 @@ namespace Gustave::Scenes::CuboidGrid {
         Coord y;
         Coord z;
 
-        using Hasher = Utils::Hasher<BlockIndex, &BlockIndex::x, &BlockIndex::y, &BlockIndex::z>;
+        using Hasher = utils::Hasher<BlockIndex, &BlockIndex::x, &BlockIndex::y, &BlockIndex::z>;
     };
 }
 
 template<>
-struct std::hash<Gustave::Scenes::CuboidGrid::BlockIndex> : Gustave::Scenes::CuboidGrid::BlockIndex::Hasher {};
+struct std::hash<gustave::scenes::cuboidGrid::BlockIndex> : gustave::scenes::cuboidGrid::BlockIndex::Hasher {};

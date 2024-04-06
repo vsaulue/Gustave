@@ -25,7 +25,7 @@
 
 #pragma once
 
-namespace Gustave::Worlds {
+namespace gustave::worlds {
     enum class WorldStructureState {
         New,
         Solved,

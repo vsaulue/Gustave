@@ -30,10 +30,10 @@
 #include <gustave/cfg/cRealTraits.hpp>
 #include <gustave/meta/Meta.hpp>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     template<typename T>
     concept cLibConfig = requires {
-        requires cRealTraits<decltype(Meta::value(T::realTraits))>;
+        requires cRealTraits<decltype(meta::value(T::realTraits))>;
         typename T::NormalizedVector3;
         typename T::template Vector3<T::realTraits.units().one>;
         requires std::integral<typename T::LinkIndex>;

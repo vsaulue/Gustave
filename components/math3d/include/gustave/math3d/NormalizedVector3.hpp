@@ -33,8 +33,8 @@
 #include <gustave/math3d/cRealConstArg.hpp>
 #include <gustave/math3d/Vector3.hpp>
 
-namespace Gustave::Math3d {
-    template<Cfg::cRealTraits auto rt>
+namespace gustave::math3d {
+    template<cfg::cRealTraits auto rt>
     class NormalizedVector3;
 
     template<typename T>
@@ -50,7 +50,7 @@ namespace Gustave::Math3d {
         };
     }
 
-    template<Cfg::cRealTraits auto rt>
+    template<cfg::cRealTraits auto rt>
     class NormalizedVector3 {
     public:
         static constexpr auto one = rt.units().one;
@@ -115,7 +115,7 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        Cfg::cRealOf<rt> auto dot(cVector3ConstArg auto const& other) const {
+        cfg::cRealOf<rt> auto dot(cVector3ConstArg auto const& other) const {
             return value_.dot(other);
         }
 
@@ -168,7 +168,7 @@ namespace Gustave::Math3d {
 
         [[nodiscard]]
         static Vector normalize(cVector3 auto const& other) {
-            const Cfg::cRealOf<rt> auto norm = other.norm();
+            const cfg::cRealOf<rt> auto norm = other.norm();
             if (norm.value() < 0.00001) {
                 throw std::domain_error("Cannot normalize: vector is almost zero.");
             }

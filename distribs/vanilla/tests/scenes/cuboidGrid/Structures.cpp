@@ -34,16 +34,16 @@
 
 #include <TestHelpers.hpp>
 
-namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
+namespace cuboid = ::gustave::scenes::cuboidGrid;
 
-using SceneData = CuboidGrid::detail::SceneData<cfg>;
-using SceneUpdater = CuboidGrid::detail::SceneUpdater<cfg>;
-using Structures = CuboidGrid::Structures<cfg>;
-using Transaction = CuboidGrid::Transaction<cfg>;
+using SceneData = cuboid::detail::SceneData<libCfg>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
+using Structures = cuboid::Structures<libCfg>;
+using Transaction = cuboid::Transaction<libCfg>;
 
 static_assert(std::ranges::forward_range<Structures>);
 
-TEST_CASE("Scene::CuboidGrid::Structures") {
+TEST_CASE("scenes::cuboidGrid::Structures") {
     Vector3<u.length> const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     SceneData sceneData{ blockSize };
     Structures structures{ sceneData };

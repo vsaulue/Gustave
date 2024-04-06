@@ -32,15 +32,15 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/meta/Meta.hpp>
 
-namespace Gustave::Model {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::model {
+    template<cfg::cLibConfig auto libCfg>
     struct MaxStress {
     private:
-        static constexpr auto u = Cfg::units(cfg);
-        static constexpr auto rt = cfg.realTraits;
+        static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto rt = libCfg.realTraits;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
     public:
         [[nodiscard]]
         MaxStress(Real<u.pressure> maxCompression, Real<u.pressure> maxShear, Real<u.pressure> maxTensile)

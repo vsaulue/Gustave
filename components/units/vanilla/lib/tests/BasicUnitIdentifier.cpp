@@ -27,14 +27,14 @@
 
 #include <gustave/units/lib/BasicUnitIdentifier.hpp>
 
-namespace U = Gustave::Units::Lib;
+namespace u = gustave::units::lib;
 
 TEST_CASE("BasicUnitIdentifier") {
 
-    struct Metre : U::BasicUnitIdentifier<"m"> {};
+    struct Metre : u::BasicUnitIdentifier<"m"> {};
     constexpr Metre metre{};
 
-    struct Kilogram : U::BasicUnitIdentifier<"kg"> {};
+    struct Kilogram : u::BasicUnitIdentifier<"kg"> {};
     constexpr Kilogram kilogram{};
 
     SECTION("operator==(cBasicUnitIdentifier auto&, cbasicUnitIdentifier auto&)") {

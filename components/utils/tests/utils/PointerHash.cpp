@@ -29,11 +29,11 @@
 
 #include <gustave/utils/PointerHash.hpp>
 
-namespace Utils = Gustave::Utils;
+namespace utils = gustave::utils;
 
-TEST_CASE("PointerHash") {
+TEST_CASE("utils::PointerHash") {
     SECTION("::Set<unique_ptr<*>>") {
-        Utils::PointerHash::Set<std::unique_ptr<int>> set;
+        utils::PointerHash::Set<std::unique_ptr<int>> set;
         auto unique = std::make_unique<int>(8);
         int* const raw = unique.get();
         set.emplace(std::move(unique));
@@ -46,7 +46,7 @@ TEST_CASE("PointerHash") {
     }
 
     SECTION("::Set<shared_ptr<*>>") {
-        Utils::PointerHash::Set<std::shared_ptr<int>> set;
+        utils::PointerHash::Set<std::shared_ptr<int>> set;
         auto shared = std::make_shared<int>(5);
         set.insert(shared);
 

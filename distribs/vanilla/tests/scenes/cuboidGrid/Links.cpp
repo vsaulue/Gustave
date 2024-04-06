@@ -32,19 +32,19 @@
 
 #include <TestHelpers.hpp>
 
-namespace Cuboid = ::Gustave::Scenes::CuboidGrid;
+namespace cuboid = ::gustave::scenes::cuboidGrid;
 
-using Links = Cuboid::Links<cfg>;
-using SceneData = Cuboid::detail::SceneData<cfg>;
-using SceneUpdater = Cuboid::detail::SceneUpdater<cfg>;
+using Links = cuboid::Links<libCfg>;
+using SceneData = cuboid::detail::SceneData<libCfg>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
 
-using BlockIndex = Cuboid::BlockIndex;
+using BlockIndex = cuboid::BlockIndex;
 using ContactIndex = Links::ContactReference::ContactIndex;
 using ContactReference = Links::ContactReference;
 using Direction = ContactReference::Direction;
 using Transaction = SceneUpdater::Transaction;
 
-TEST_CASE("Scenes::CuboidGrid::Links") {
+TEST_CASE("scenes::cuboidGrid::links") {
     SceneData scene{ vector3(1.f, 2.f, 3.f, u.length) };
 
     Transaction t;
@@ -68,6 +68,6 @@ TEST_CASE("Scenes::CuboidGrid::Links") {
             makeContact({2,2,2}, Direction::plusZ()),
             makeContact({2,3,2}, Direction::plusZ()),
         };
-        CHECK_THAT(links, M::C2::UnorderedRangeEquals(expected));
+        CHECK_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
     }
 }

@@ -34,7 +34,7 @@
 #include <gustave/cfg/cRealTraits.hpp>
 #include <gustave/cfg/cUnit.hpp>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     template<typename T>
     concept cVector3 = requires (T v, T const cv) {
         requires cPrintable<T>;

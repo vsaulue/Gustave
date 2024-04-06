@@ -25,7 +25,7 @@
 
 #pragma once
 
-namespace Gustave::Utils::Prop {
+namespace gustave::utils::prop {
     template<typename T>
     class Ptr {
     private:

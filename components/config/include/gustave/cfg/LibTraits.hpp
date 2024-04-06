@@ -27,7 +27,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     [[nodiscard]]
     constexpr auto units(cLibConfig auto cfg) {
         return cfg.realTraits.units();

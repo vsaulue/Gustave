@@ -29,9 +29,9 @@
 #include <gustave/utils/cHashable.hpp>
 #include <gustave/utils/getMember.hpp>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<typename T, typename Object>
     concept cHashableMemberOf = requires (Object const& obj, T const& getter) {
-        { Meta::value(getMember(obj, getter)) } -> cHashable;
+        { meta::value(getMember(obj, getter)) } -> cHashable;
     };
 }

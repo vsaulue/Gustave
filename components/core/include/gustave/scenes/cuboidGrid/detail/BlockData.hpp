@@ -31,7 +31,7 @@
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockMappedData.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg>
-    using BlockData = std::pair<const BlockIndex, BlockMappedData<cfg>>;
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto libCfg>
+    using BlockData = std::pair<const BlockIndex, BlockMappedData<libCfg>>;
 }

@@ -29,9 +29,9 @@
 
 #include <TestHelpers.hpp>
 
-using MaxStress = Gustave::Model::MaxStress<cfg>;
+using MaxStress = gustave::model::MaxStress<libCfg>;
 
-TEST_CASE("Model::MaxStress") {
+TEST_CASE("model::MaxStress") {
     SECTION("::minResistance(MaxStress const&, MaxStress const&)") {
         MaxStress const m1{
             4.f * u.pressure, // compressive

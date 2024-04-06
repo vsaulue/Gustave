@@ -35,19 +35,19 @@
 
 #include <TestHelpers.hpp>
 
-using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
+using BlockIndex = gustave::scenes::cuboidGrid::BlockIndex;
 using Coord = BlockIndex::Coord;
-using Direction = Gustave::Math3d::BasicDirection;
+using Direction = gustave::math3d::BasicDirection;
 using Limits = std::numeric_limits<Coord>;
-using Neighbours = Gustave::Scenes::CuboidGrid::detail::IndexNeighbours;
-using IndexNeighbour = Gustave::Scenes::CuboidGrid::detail::IndexNeighbour;
+using Neighbours = gustave::scenes::cuboidGrid::detail::IndexNeighbours;
+using IndexNeighbour = gustave::scenes::cuboidGrid::detail::IndexNeighbour;
 
 static constexpr Coord max = Limits::max();
 static constexpr Coord min = Limits::min();
 
-TEST_CASE("Scene::CuboidGrid::detail::IndexNeighbours") {
+TEST_CASE("scenes::cuboidGrid::detail::IndexNeighbours") {
     auto runTest = [](BlockIndex const& source, std::vector<IndexNeighbour> const& expected) {
-        CHECK_THAT(Neighbours{ source }, M::C2::RangeEquals(expected));
+        CHECK_THAT(Neighbours{ source }, matchers::c2::RangeEquals(expected));
     };
 
     SECTION("// (min,max,min)") {

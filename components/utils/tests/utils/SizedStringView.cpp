@@ -30,10 +30,10 @@
 
 #include <gustave/utils/SizedStringView.hpp>
 
-namespace Utils = Gustave::Utils;
+namespace utils = gustave::utils;
 
-TEST_CASE("SizedStringView") {
-    constexpr Utils::SizedStringView<char, 4> view = "abcd";
+TEST_CASE("utils::SizedStringView") {
+    constexpr utils::SizedStringView<char, 4> view = "abcd";
     const std::string expected = "abcd";
 
     SECTION(".begin() // & .end()") {

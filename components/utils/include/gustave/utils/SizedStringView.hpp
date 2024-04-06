@@ -29,7 +29,7 @@
 
 #include <gustave/utils/cChar.hpp>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<cChar Char_, std::size_t length>
     class SizedStringView {
     public:

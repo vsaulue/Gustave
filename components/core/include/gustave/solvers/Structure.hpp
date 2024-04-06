@@ -33,16 +33,16 @@
 #include <gustave/solvers/common/Node.hpp>
 #include <gustave/utils/canNarrow.hpp>
 
-namespace Gustave::Solvers {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers {
+    template<cfg::cLibConfig auto libCfg>
     class Structure {
     public:
-        using ContactIndex = Common::ContactIndex<cfg>;
-        using Link = Common::Link<cfg>;
-        using LinkIndex = Cfg::LinkIndex<cfg>;
+        using ContactIndex = common::ContactIndex<libCfg>;
+        using Link = common::Link<libCfg>;
+        using LinkIndex = cfg::LinkIndex<libCfg>;
         using Links = std::vector<Link>;
-        using Node = Common::Node<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using Node = common::Node<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
         using Nodes = std::vector<Node>;
 
         [[nodiscard]]
@@ -57,7 +57,7 @@ namespace Gustave::Solvers {
 
         NodeIndex addNode(Node const& newNode) {
             auto const result = nodes_.size();
-            if (!Utils::canNarrow<NodeIndex>(result)) {
+            if (!utils::canNarrow<NodeIndex>(result)) {
                 throw std::overflow_error("Maximum number of nodes allowed by library configuration reached.");
             }
             nodes_.push_back(newNode);
@@ -66,7 +66,7 @@ namespace Gustave::Solvers {
 
         LinkIndex addLink(Link const& newLink) {
             auto const result = links_.size();
-            if (!Utils::canNarrow<LinkIndex>(result)) {
+            if (!utils::canNarrow<LinkIndex>(result)) {
                 throw std::overflow_error("Maximum number of links allowed by library configuration reached.");
             }
             assert(newLink.localNodeId() < nodes_.size());

@@ -30,11 +30,9 @@
 
 #include <TestHelpers.hpp>
 
-namespace Sync = Gustave::Worlds::Sync;
-
-using StructureData = Sync::detail::StructureData<cfg>;
-using WorldData = Sync::detail::WorldData<cfg>;
-using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
+using StructureData = gustave::worlds::sync::detail::StructureData<libCfg>;
+using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
 
 using Solver = WorldData::Solver;
 using Transaction = WorldUpdater::Transaction;
@@ -51,7 +49,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("Worlds::Sync::detail::WorldUpdater") {
+TEST_CASE("worlds::sync::detail::WorldUpdater") {
     WorldData world = makeWorld();
 
     auto runTransaction = [&](Transaction const& transaction) {
@@ -88,10 +86,10 @@ TEST_CASE("Worlds::Sync::detail::WorldUpdater") {
         REQUIRE(idTo);
         REQUIRE(idFrom);
         auto const force = worldStruct->solution().nodes().at(*idTo).forceVectorFrom(*idFrom);
-        CHECK_THAT(force, M::WithinRel(expectedForce, solverPrecision));
+        CHECK_THAT(force, matchers::WithinRel(expectedForce, solverPrecision));
     };
 
-    SECTION("::runTransaction(Transaction const&)") {
+    SECTION(".runTransaction(Transaction const&)") {
         SECTION("// Transaction{3+}: simple tower") {
             WorldUpdater::Transaction t;
             t.addBlock({ {0,0,0}, concrete_20m, blockMass, true });

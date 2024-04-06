@@ -27,7 +27,7 @@
 
 #include <concepts>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     template<typename T>
     concept cRealRep = ( std::floating_point<T> && !std::is_const_v<T> );
 }

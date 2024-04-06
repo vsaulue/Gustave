@@ -38,26 +38,26 @@
 
 #include <TestHelpers.hpp>
 
-namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
+namespace cuboid = gustave::scenes::cuboidGrid;
 
-using BlockIndex = CuboidGrid::BlockIndex;
-using ConstBlockDataReference = CuboidGrid::detail::BlockDataReference<cfg, false>;
-using ConstDataNeighbours = CuboidGrid::detail::DataNeighbours<cfg, false>;
-using Direction = Gustave::Math3d::BasicDirection;
+using BlockIndex = cuboid::BlockIndex;
+using ConstBlockDataReference = cuboid::detail::BlockDataReference<libCfg, false>;
+using ConstDataNeighbours = cuboid::detail::DataNeighbours<libCfg, false>;
+using Direction = gustave::math3d::BasicDirection;
 using LinkIndices = ConstBlockDataReference::LinkIndices;
-using SceneData = CuboidGrid::detail::SceneData<cfg>;
-using SceneUpdater = CuboidGrid::detail::SceneUpdater<cfg>;
-using StructureData = CuboidGrid::detail::StructureData<cfg>;
-using Transaction = CuboidGrid::Transaction<cfg>;
+using SceneData = cuboid::detail::SceneData<libCfg>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
+using StructureData = cuboid::detail::StructureData<libCfg>;
+using Transaction = cuboid::Transaction<libCfg>;
 
-using SolverStructure = Gustave::Solvers::Structure<cfg>;
+using SolverStructure = gustave::solvers::Structure<libCfg>;
 using SolverLink = SolverStructure::Link;
 using SolverNode = SolverStructure::Node;
 
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
-static constexpr Gustave::Utils::PointerHash::Equals ptrEquals;
+static constexpr gustave::utils::PointerHash::Equals ptrEquals;
 
-TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
+TEST_CASE("scenes::cuboid::detail::SceneUpdater") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
     SceneData data{ blockSize };
@@ -128,7 +128,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
         return result;
     };
 
-    SECTION("::runTransaction(Transaction const&)") {
+    SECTION(".runTransaction(Transaction const&)") {
         auto structureOf = [&data](BlockIndex const& index) -> StructureData const& {
             ConstBlockDataReference ref = data.blocks.find(index);
             REQUIRE(ref);
@@ -159,9 +159,9 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             }
             REQUIRE(selectedLink != nullptr);
             Real<u.length> const conductivityFactor = data.blocks.contactAreaAlong(sourceNormal) / data.blocks.thicknessAlong(sourceNormal);
-            CHECK_THAT(selectedLink->compressionConductivity(), M::WithinRel(conductivityFactor * maxStress.maxCompressionStress(), epsilon));
-            CHECK_THAT(selectedLink->shearConductivity(), M::WithinRel(conductivityFactor * maxStress.maxShearStress(), epsilon));
-            CHECK_THAT(selectedLink->tensileConductivity(), M::WithinRel(conductivityFactor * maxStress.maxTensileStress(), epsilon));
+            CHECK_THAT(selectedLink->compressionConductivity(), matchers::WithinRel(conductivityFactor * maxStress.maxCompressionStress(), epsilon));
+            CHECK_THAT(selectedLink->shearConductivity(), matchers::WithinRel(conductivityFactor * maxStress.maxShearStress(), epsilon));
+            CHECK_THAT(selectedLink->tensileConductivity(), matchers::WithinRel(conductivityFactor * maxStress.maxTensileStress(), epsilon));
         };
 
         SECTION(" // Transaction{1+}: single foundation") {
@@ -283,7 +283,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             }
         }
 
-        SECTION(" Transaction{5+} -> Transaction{1-}: split structure") {
+        SECTION("// Transaction{5+} -> Transaction{1-}: split structure") {
             Transaction t;
             for (int i = 0; i < 5; ++i) {
                 t.addBlock({ {0,i,0}, concrete_20m, blockMass, false });
@@ -296,13 +296,13 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             t.removeBlock({ 0,2,0 });
             auto const r2 = runTransaction(t);
             CHECK(r2.newStructures.size() == 2);
-            CHECK_THAT(r2.removedStructures, M::C2::UnorderedRangeEquals(r1.newStructures, ptrEquals));
+            CHECK_THAT(r2.removedStructures, matchers::c2::UnorderedRangeEquals(r1.newStructures, ptrEquals));
 
             CHECK(data.structures.size() == 2);
 
             {
                 StructureData const& structure = structureOf({ 0,0,0 });
-                CHECK_THAT(r2.newStructures, M::C2::Contains(&structure, ptrEquals));
+                CHECK_THAT(r2.newStructures, matchers::c2::Contains(&structure, ptrEquals));
                 NodeIndex const y0 = getSolverIndex(structure, { 0,0,0 });
                 NodeIndex const y1 = getSolverIndex(structure, { 0,1,0 });
                 CHECK_FALSE(structure.contains({ 0,3,0 }));
@@ -312,7 +312,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
 
             {
                 StructureData const& structure = structureOf({ 0,3,0 });
-                CHECK_THAT(r2.newStructures, M::C2::Contains(&structure, ptrEquals));
+                CHECK_THAT(r2.newStructures, matchers::c2::Contains(&structure, ptrEquals));
                 NodeIndex const y3 = getSolverIndex(structure, { 0,3,0 });
                 NodeIndex const y4 = getSolverIndex(structure, { 0,4,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
@@ -335,11 +335,11 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             t.addBlock({ { 0,0,2 }, concrete_20m, blockMass, false });
             auto const r2 = runTransaction(t);
             CHECK(r2.newStructures.size() == 1);
-            CHECK_THAT(r2.removedStructures, M::C2::UnorderedRangeEquals(r1.newStructures, ptrEquals));
+            CHECK_THAT(r2.removedStructures, matchers::c2::UnorderedRangeEquals(r1.newStructures, ptrEquals));
 
             CHECK(data.structures.size() == 1);
             StructureData const& structure = structureOf({ 0,0,1 });
-            CHECK_THAT(r2.newStructures, M::C2::Contains(&structure, ptrEquals));
+            CHECK_THAT(r2.newStructures, matchers::c2::Contains(&structure, ptrEquals));
             NodeIndex const z0 = getSolverIndex(structure, { 0,0,0 });
             NodeIndex const z1 = getSolverIndex(structure, { 0,0,1 });
             NodeIndex const z2 = getSolverIndex(structure, { 0,0,2 });
@@ -368,7 +368,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::SceneUpdater") {
             auto const r2 = runTransaction(t);
             CHECK(r2.newStructures.size() == 0);
             CHECK(r2.removedStructures.size() == 1);
-            CHECK_THAT(r2.removedStructures, M::C2::Contains(&structureOfY1, ptrEquals));
+            CHECK_THAT(r2.removedStructures, matchers::c2::Contains(&structureOfY1, ptrEquals));
 
             CHECK(data.structures.size() == 1);
             CHECK(&structureOfX1 == &structureOf({ 1,0,0 }));

@@ -27,9 +27,7 @@
 
 #include <gustave/math3d/BasicDirection.hpp>
 
-namespace Math3d = Gustave::Math3d;
-
-using Direction = Math3d::BasicDirection;
+using Direction = gustave::math3d::BasicDirection;
 
 TEST_CASE("Math3d::BasicDirection") {
     SECTION("opposite()") {

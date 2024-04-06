@@ -27,7 +27,7 @@
 
 #include <concepts>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     template<typename T>
     concept cUnit = requires (T t) {
         { t.isAssignableFrom(t) } -> std::convertible_to<bool>;

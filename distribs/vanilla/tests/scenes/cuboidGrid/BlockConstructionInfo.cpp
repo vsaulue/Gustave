@@ -32,10 +32,12 @@
 
 #include <TestHelpers.hpp>
 
-using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<cfg>;
-using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
+namespace cuboid = ::gustave::scenes::cuboidGrid;
 
-TEST_CASE("Scene::CuboidGrid::BlockConstructionInfo") {
+using BlockConstructionInfo = cuboid::BlockConstructionInfo<libCfg>;
+using BlockIndex = cuboid::BlockIndex;
+
+TEST_CASE("scenes::cuboidGrid::BlockConstructionInfo") {
     SECTION("// valid constructor & getters") {
         const BlockConstructionInfo obj{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
         CHECK(obj.index() == BlockIndex{4, 5, 6});
@@ -44,14 +46,14 @@ TEST_CASE("Scene::CuboidGrid::BlockConstructionInfo") {
         CHECK(obj.isFoundation() == true);
     }
 
-    SECTION(" // constructor: invalid mass") {
+    SECTION("// constructor: invalid mass") {
         auto constructor = []() {
             return BlockConstructionInfo{ {4,5,6}, concrete_20m, 0.f * u.mass, true };
         };
         CHECK_THROWS_AS(constructor(), std::invalid_argument);
     }
 
-    SECTION("::setMass(Real<u.mass>)") {
+    SECTION(".setMass(Real<u.mass>)") {
         BlockConstructionInfo obj{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
 
         SECTION("// valid") {

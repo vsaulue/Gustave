@@ -34,12 +34,12 @@
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto cfg>
     class InternalLinks {
     public:
         using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
-        using Direction = Math3d::BasicDirection;
+        using Direction = math3d::BasicDirection;
         using SceneData = detail::SceneData<cfg>;
 
         struct Value {
@@ -66,7 +66,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         using Iterator = typename Values::const_iterator;
 
         [[nodiscard]]
-        explicit InternalLinks(Utils::NoInit)
+        explicit InternalLinks(utils::NoInit)
             : source_{ nullptr }
             , values_{}
             , size_{ 0 }

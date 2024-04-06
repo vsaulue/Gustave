@@ -29,34 +29,34 @@
 #include <gustave/units/lib/UnitIdentifier.hpp>
 #include <gustave/units/lib/Unit.hpp>
 
-namespace Gustave::Units {
+namespace gustave::units {
     struct UnitSystem {
     private:
-        struct Kilogram : Lib::BasicUnitIdentifier<"kg"> {};
-        static constexpr auto kg = Lib::makeUnitIdentifier<Kilogram>();
+        struct Kilogram : lib::BasicUnitIdentifier<"kg"> {};
+        static constexpr auto kg = lib::makeUnitIdentifier<Kilogram>();
 
-        struct Metre : Lib::BasicUnitIdentifier<"m"> {};
-        static constexpr auto m = Lib::makeUnitIdentifier<Metre>();
+        struct Metre : lib::BasicUnitIdentifier<"m"> {};
+        static constexpr auto m = lib::makeUnitIdentifier<Metre>();
 
-        struct Second : Lib::BasicUnitIdentifier<"s"> {};
-        static constexpr auto s = Lib::makeUnitIdentifier<Second>();
+        struct Second : lib::BasicUnitIdentifier<"s"> {};
+        static constexpr auto s = lib::makeUnitIdentifier<Second>();
     public:
         // dimension one
-        static constexpr auto one = Lib::one;
+        static constexpr auto one = lib::one;
         // base units
-        static constexpr auto mass = Lib::Unit{ kg };
-        static constexpr auto length = Lib::Unit{ m };
-        static constexpr auto time = Lib::Unit{ s };
+        static constexpr auto mass = lib::Unit{ kg };
+        static constexpr auto length = lib::Unit{ m };
+        static constexpr auto time = lib::Unit{ s };
         // derived natural units
-        static constexpr auto acceleration = Lib::Unit{ m / s / s };
-        static constexpr auto area = Lib::Unit{ m * m };
-        static constexpr auto density = Lib::Unit{ kg / m / m / m };
-        static constexpr auto force = Lib::Unit<"N", kg * m / s / s>{};
-        static constexpr auto pressure = Lib::Unit<"Pa", kg / m / s / s>{};
-        static constexpr auto volume = Lib::Unit{ m * m * m };
+        static constexpr auto acceleration = lib::Unit{ m / s / s };
+        static constexpr auto area = lib::Unit{ m * m };
+        static constexpr auto density = lib::Unit{ kg / m / m / m };
+        static constexpr auto force = lib::Unit<"N", kg * m / s / s>{};
+        static constexpr auto pressure = lib::Unit<"Pa", kg / m / s / s>{};
+        static constexpr auto volume = lib::Unit{ m * m * m };
         // custom
-        static constexpr auto potential = Lib::Unit<"lP", m>{};
-        static constexpr auto resistance = Lib::Unit<"lR", length.unitId() / force.unitId()>{};
-        static constexpr auto conductivity = Lib::Unit<"lC", force.unitId() / length.unitId()>{};
+        static constexpr auto potential = lib::Unit<"lP", m>{};
+        static constexpr auto resistance = lib::Unit<"lR", length.unitId() / force.unitId()>{};
+        static constexpr auto conductivity = lib::Unit<"lC", force.unitId() / length.unitId()>{};
     };
 }

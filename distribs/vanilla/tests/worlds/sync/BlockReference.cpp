@@ -31,11 +31,9 @@
 
 #include <TestHelpers.hpp>
 
-namespace Sync = Gustave::Worlds::Sync;
-
-using BlockReference = Sync::BlockReference<cfg>;
-using WorldData = Sync::detail::WorldData<cfg>;
-using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
+using BlockReference = gustave::worlds::sync::BlockReference<libCfg>;
+using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
 
 using BlockIndex = BlockReference::BlockIndex;
 using ContactReference = BlockReference::ContactReference;
@@ -59,7 +57,7 @@ static WorldData makeWorld() {
 static_assert(std::ranges::forward_range<BlockReference::Contacts>);
 static_assert(std::ranges::forward_range<BlockReference::Structures>);
 
-TEST_CASE("Worlds::Sync::BlockReference") {
+TEST_CASE("worlds::sync::BlockReference") {
     WorldData world = makeWorld();
 
     {
@@ -89,7 +87,7 @@ TEST_CASE("Worlds::Sync::BlockReference") {
                 ContactReference{ world, ContactIndex{ {0,0,0}, Direction::plusX() } },
                 ContactReference{ world, ContactIndex{ {0,0,0}, Direction::plusY() } },
             };
-            CHECK_THAT(b000.contacts(), M::C2::UnorderedRangeEquals(expected));
+            CHECK_THAT(b000.contacts(), matchers::c2::UnorderedRangeEquals(expected));
         }
 
         SECTION("// invalid") {
@@ -174,7 +172,7 @@ TEST_CASE("Worlds::Sync::BlockReference") {
 
         SECTION("// singleton") {
             auto const structures = b020.structures();
-            CHECK(structures.size() == 1);
+            REQUIRE(structures.size() == 1);
             CHECK(structures[0] == structureOf({0,2,0}));
         }
 
@@ -183,7 +181,7 @@ TEST_CASE("Worlds::Sync::BlockReference") {
             CHECK(structures.size() == 2);
 
             std::vector<StructureReference> expected = { structureOf({1,0,0}), structureOf({0,1,0}) };
-            CHECK_THAT(structures, M::C2::UnorderedRangeEquals(expected));
+            CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));
         }
     }
 }

@@ -37,10 +37,10 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/math3d/cRealConstArg.hpp>
 
-namespace Gustave::Math3d {
+namespace gustave::math3d {
     // concept moved to `requires` for MSVC (https://developercommunity.visualstudio.com/t/Template-parameters:-constraints-dependi/10312655).
-    template<Cfg::cRealTraits auto rt, auto unit_>
-        requires Cfg::cUnitOf<decltype(unit_), rt>
+    template<cfg::cRealTraits auto rt, auto unit_>
+        requires cfg::cUnitOf<decltype(unit_), rt>
     class Vector3;
 
     template<typename T>
@@ -62,26 +62,26 @@ namespace Gustave::Math3d {
     template<typename T>
     concept cVector3ConstArg = requires (T const& cv) {
         requires requires (detail::AsVector3ConstArg<std::remove_cvref_t<T>> const& converter) {
-            { Meta::value(converter.convert(cv)) } -> cVector3;
+            { meta::value(converter.convert(cv)) } -> cVector3;
         };
     };
 
     [[nodiscard]]
     constexpr auto const& asVector3ConstArg(cVector3ConstArg auto const& vector) {
-        using Converter = detail::AsVector3ConstArg<decltype(Meta::value(vector))>;
+        using Converter = detail::AsVector3ConstArg<decltype(meta::value(vector))>;
         return Converter::convert(vector);
     }
 
     namespace detail {
-        template<Cfg::cRealTraits Traits, Cfg::cRealOf<Traits{}> Real>
+        template<cfg::cRealTraits Traits, cfg::cRealOf<Traits{}> Real>
         [[nodiscard]]
         constexpr cVector3 auto vector3(Traits, Real x, Real y, Real z) {
             return Vector3<Traits{}, Real::unit()>{x, y, z};
         }
     }
 
-    template<Cfg::cRealTraits auto rt, auto unit_>
-        requires Cfg::cUnitOf<decltype(unit_),rt>
+    template<cfg::cRealTraits auto rt, auto unit_>
+        requires cfg::cUnitOf<decltype(unit_),rt>
     class Vector3 {
     private:
         using Unit = decltype(unit_);
@@ -89,7 +89,7 @@ namespace Gustave::Math3d {
 
         static constexpr auto one = rt.units().one;
 
-        template<Cfg::cUnitOf<rt> auto u>
+        template<cfg::cUnitOf<rt> auto u>
         using Real = typename RealTraits::template Type<u>;
     public:
         using Coord = Real<unit_>;
@@ -106,7 +106,7 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        explicit constexpr Vector3(Utils::NoInit NO_INIT)
+        explicit constexpr Vector3(utils::NoInit NO_INIT)
             : coords_{ Coord{NO_INIT}, Coord{NO_INIT}, Coord{NO_INIT} }
         {}
 
@@ -118,7 +118,7 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        constexpr Vector3(RealRep x, RealRep y, RealRep z, Cfg::cUnitOf<rt> auto argUnit) :
+        constexpr Vector3(RealRep x, RealRep y, RealRep z, cfg::cUnitOf<rt> auto argUnit) :
             coords_{x * argUnit, y * argUnit, z * argUnit}
         {
 
@@ -126,21 +126,21 @@ namespace Gustave::Math3d {
 
         [[nodiscard]]
         constexpr Vector3(cVector3ConstArg auto const& other)
-            requires (!std::is_same_v<Vector3, decltype(Meta::value(other))>)
-            : Vector3{ Utils::NO_INIT }
+            requires (!std::is_same_v<Vector3, decltype(meta::value(other))>)
+            : Vector3{ utils::NO_INIT }
         {
             auto const& otherV3 = asVector3ConstArg(other);
-            using OtherV3 = decltype(Meta::value(otherV3));
+            using OtherV3 = decltype(meta::value(otherV3));
             static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
             static_assert(isCompatible(OtherV3::unit()), "Invalid conversion: incompatible units.");
             std::ranges::copy(otherV3.coords(), coords_.begin());
         }
 
         constexpr Vector3& operator=(cVector3ConstArg auto const& other)
-            requires (!std::is_same_v<Vector3,decltype(Meta::value(other))>)
+            requires (!std::is_same_v<Vector3,decltype(meta::value(other))>)
         {
             auto const& otherV3 = asVector3ConstArg(other);
-            using OtherV3 = decltype(Meta::value(otherV3));
+            using OtherV3 = decltype(meta::value(otherV3));
             static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
             static_assert(isCompatible(OtherV3::unit()), "Invalid conversion: incompatible units.");
             std::ranges::copy(otherV3.coords(), coords_.begin());
@@ -160,7 +160,7 @@ namespace Gustave::Math3d {
 
         constexpr Vector3& operator+=(cVector3ConstArg auto const& rhs) {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
-            using RhsV3 = decltype(Meta::value(rhsV3));
+            using RhsV3 = decltype(meta::value(rhsV3));
             static_assert(rt == RhsV3::realTraits(), "Invalid addition: incompatible traits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid addition: incompatible units.");
             for (std::size_t i = 0; i < coords_.size(); ++i) {
@@ -172,7 +172,7 @@ namespace Gustave::Math3d {
         [[nodiscard]]
         constexpr Vector3 operator+(cVector3ConstArg auto const& rhs) const {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
-            using RhsV3 = decltype(Meta::value(rhsV3));
+            using RhsV3 = decltype(meta::value(rhsV3));
             static_assert(rt == RhsV3::realTraits(), "Invalid addition: incompatible traits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid addition: incompatible units.");
             Vector3 result = *this;
@@ -184,7 +184,7 @@ namespace Gustave::Math3d {
 
         constexpr Vector3& operator-=(cVector3ConstArg auto const& rhs) {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
-            using RhsV3 = decltype(Meta::value(rhsV3));
+            using RhsV3 = decltype(meta::value(rhsV3));
             static_assert(rt == RhsV3::realTraits(), "Invalid substraction: incompatible traits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid substraction: incompatible units.");
             for (std::size_t i = 0; i < coords_.size(); ++i) {
@@ -196,7 +196,7 @@ namespace Gustave::Math3d {
         [[nodiscard]]
         constexpr Vector3 operator-(cVector3ConstArg auto const& rhs) const {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
-            using RhsV3 = decltype(Meta::value(rhsV3));
+            using RhsV3 = decltype(meta::value(rhsV3));
             static_assert(rt == RhsV3::realTraits(), "Invalid substraction: incompatible traits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid substraction: incompatible units.");
             Vector3 result = *this;
@@ -289,7 +289,7 @@ namespace Gustave::Math3d {
         [[nodiscard]]
         constexpr auto dot(cVector3ConstArg auto const& other) const {
             cVector3 auto const& otherV3 = asVector3ConstArg(other);
-            using OtherV3 = decltype(Meta::value(otherV3));
+            using OtherV3 = decltype(meta::value(otherV3));
             static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
             auto result = Real<unit() * OtherV3::unit()>::zero();
             for (unsigned i = 0; i < coords_.size(); ++i) {
@@ -299,7 +299,7 @@ namespace Gustave::Math3d {
         }
 
         [[nodiscard]]
-        static constexpr bool isCompatible(Cfg::cUnitOf<rt> auto otherUnit) {
+        static constexpr bool isCompatible(cfg::cUnitOf<rt> auto otherUnit) {
             return unit().isAssignableFrom(otherUnit);
         }
 
@@ -310,7 +310,7 @@ namespace Gustave::Math3d {
         [[nodiscard]]
         constexpr bool operator==(cVector3ConstArg auto const& rhs) const {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
-            using RhsV3 = decltype(Meta::value(rhsV3));
+            using RhsV3 = decltype(meta::value(rhsV3));
             static_assert(rt == RhsV3::realTraits(), "Invalid comparison: different realTraits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid comparison: incompatible units.");
             return std::ranges::equal(coords_, rhsV3.coords(), std::equal_to{});

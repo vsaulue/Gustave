@@ -28,13 +28,13 @@
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
+namespace gustave::scenes::cuboidGrid::detail {
     struct IndexNeighbour {
     public:
-        using Direction = Math3d::BasicDirection;
+        using Direction = math3d::BasicDirection;
 
         [[nodiscard]]
-        explicit IndexNeighbour(Utils::NoInit NO_INIT)
+        explicit IndexNeighbour(utils::NoInit NO_INIT)
             : direction{ Direction::plusX() }
             , index{ NO_INIT }
         {}

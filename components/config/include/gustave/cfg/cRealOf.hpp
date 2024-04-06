@@ -29,7 +29,7 @@
 
 #include <gustave/cfg/cRealTraits.hpp>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     template<typename T, auto realTraits>
     concept cRealOf = requires {
         requires cRealTraits<decltype(realTraits)>;

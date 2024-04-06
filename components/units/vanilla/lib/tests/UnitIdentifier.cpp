@@ -27,26 +27,26 @@
 
 #include <gustave/units/lib/UnitIdentifier.hpp>
 
-namespace U = Gustave::Units::Lib;
+namespace u = gustave::units::lib;
 
-template<U::cBasicUnitIdentifier id, U::ExpNum num, U::ExpDen den = 1>
-using Term = U::UnitTerm<id{}, U::Exponent<num, den>{}> ;
+template<u::cBasicUnitIdentifier id, u::ExpNum num, u::ExpDen den = 1>
+using Term = u::UnitTerm<id{}, u::Exponent<num, den>{}> ;
 
 TEST_CASE("UnitIdentifier") {
-    struct Kilogram : U::BasicUnitIdentifier<"kg"> {};
-    constexpr auto kg = U::makeUnitIdentifier<Kilogram>();
+    struct Kilogram : u::BasicUnitIdentifier<"kg"> {};
+    constexpr auto kg = u::makeUnitIdentifier<Kilogram>();
 
-    struct Metre : U::BasicUnitIdentifier<"m"> {};
-    constexpr auto m = U::makeUnitIdentifier<Metre>();
+    struct Metre : u::BasicUnitIdentifier<"m"> {};
+    constexpr auto m = u::makeUnitIdentifier<Metre>();
 
-    struct Second : U::BasicUnitIdentifier<"s"> {};
-    constexpr auto s = U::makeUnitIdentifier<Second>();
+    struct Second : u::BasicUnitIdentifier<"s"> {};
+    constexpr auto s = u::makeUnitIdentifier<Second>();
 
-    constexpr U::UnitIdentifier<> one{};
+    constexpr u::UnitIdentifier<> one{};
 
     SECTION("::inverse()") {
-        constexpr U::UnitIdentifier<Term<Kilogram, -1, 2>{}, Term<Metre, 3>{}> arg{};
-        constexpr U::UnitIdentifier<Term<Kilogram, 1, 2>{}, Term<Metre, -3>{} > expected{};
+        constexpr u::UnitIdentifier<Term<Kilogram, -1, 2>{}, Term<Metre, 3>{}> arg{};
+        constexpr u::UnitIdentifier<Term<Kilogram, 1, 2>{}, Term<Metre, -3>{} > expected{};
         REQUIRE(arg.inverse() == expected);
         REQUIRE(arg != expected);
     }
@@ -57,27 +57,27 @@ TEST_CASE("UnitIdentifier") {
         }
 
         SECTION("// false") {
-            constexpr U::cUnitIdentifier auto speed = m / s;
+            constexpr u::cUnitIdentifier auto speed = m / s;
             REQUIRE(!speed.isOne());
         }
     }
 
     SECTION("::pow()") {
         SECTION("// one ^ exp") {
-            constexpr U::Exponent<2, 1> exp{};
+            constexpr u::Exponent<2, 1> exp{};
             REQUIRE(one.pow(exp) == one);
         }
 
         SECTION("// non-trivial ^ exp") {
-            constexpr U::Exponent<-2, 3> exp{};
-            constexpr U::UnitIdentifier<Term<Metre, 3>{}, Term<Second,-4>{}> val{};
-            constexpr U::UnitIdentifier<Term<Metre, -2>{}, Term<Second, 8, 3>{}> expected{};
+            constexpr u::Exponent<-2, 3> exp{};
+            constexpr u::UnitIdentifier<Term<Metre, 3>{}, Term<Second,-4>{}> val{};
+            constexpr u::UnitIdentifier<Term<Metre, -2>{}, Term<Second, 8, 3>{}> expected{};
             REQUIRE(val.pow(exp) == expected);
         }
 
         SECTION("//non-trivial ^ 0") {
-            constexpr U::Exponent<0, 1> exp{};
-            constexpr U::UnitIdentifier<Term<Metre, 2>{}, Term<Second, -1>{}> val{};
+            constexpr u::Exponent<0, 1> exp{};
+            constexpr u::UnitIdentifier<Term<Metre, 2>{}, Term<Second, -1>{}> val{};
             REQUIRE(val.pow(exp) == one);
         }
     }
@@ -88,27 +88,27 @@ TEST_CASE("UnitIdentifier") {
         }
 
         SECTION(" // kg.m^-3") {
-            constexpr U::UnitIdentifier<Term<Kilogram, 1>{}, Term<Metre, -3>{}> id{};
+            constexpr u::UnitIdentifier<Term<Kilogram, 1>{}, Term<Metre, -3>{}> id{};
             REQUIRE(id.toString().view() == "kg.m⁻³");
         }
     }
 
     SECTION("operator==(cUnitIdentifier auto,cUnitIdentifier auto)") {
-        constexpr U::UnitIdentifier<Term<Metre,2>{}> sqrMetre{};
-        constexpr U::UnitIdentifier<Term<Second,-1>{}> hz{};
+        constexpr u::UnitIdentifier<Term<Metre,2>{}> sqrMetre{};
+        constexpr u::UnitIdentifier<Term<Second,-1>{}> hz{};
         REQUIRE(sqrMetre == sqrMetre);
         REQUIRE(sqrMetre != hz);
     }
 
     SECTION("operator*(cLikeUnitIdentifier auto, cLikeUnitIdentifier auto)") {
-        constexpr U::cUnitIdentifier auto val = (kg * m) * (s * m);
-        constexpr U::UnitIdentifier<Term<Kilogram, 1>{}, Term<Metre, 2>{}, Term<Second, 1>{}> exp{};
+        constexpr u::cUnitIdentifier auto val = (kg * m) * (s * m);
+        constexpr u::UnitIdentifier<Term<Kilogram, 1>{}, Term<Metre, 2>{}, Term<Second, 1>{}> exp{};
         REQUIRE(val == exp);
     }
 
     SECTION("operator-(cLikeUnitIdentifier auto, cLikeUnitIdentifier auto)") {
-        constexpr U::cUnitIdentifier auto val = (kg / s * m / s) / kg;
-        constexpr U::UnitIdentifier<Term<Metre, 1>{}, Term<Second, -2>{}> exp{};
+        constexpr u::cUnitIdentifier auto val = (kg / s * m / s) / kg;
+        constexpr u::UnitIdentifier<Term<Metre, 1>{}, Term<Second, -2>{}> exp{};
         REQUIRE(val == exp);
     }
 }

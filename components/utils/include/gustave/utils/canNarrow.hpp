@@ -28,7 +28,7 @@
 #include <concepts>
 #include <limits>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<std::unsigned_integral Target, std::unsigned_integral Arg>
     [[nodiscard]]
     constexpr bool canNarrow(Arg const value) {

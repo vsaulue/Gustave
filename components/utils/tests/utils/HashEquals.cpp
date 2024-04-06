@@ -30,11 +30,11 @@
 #include <gustave/utils/HashEquals.hpp>
 #include <Point.hpp>
 
-namespace Utils = Gustave::Utils;
+namespace utils = gustave::utils;
 
-TEST_CASE("HashEquals") {
+TEST_CASE("utils::HashEquals") {
     SECTION("// full HashEquals") {
-        using HE = Utils::HashEquals<Point, &Point::x, &Point::y, &Point::z>;
+        using HE = utils::HashEquals<Point, &Point::x, &Point::y, &Point::z>;
         HE::Set set;
         set.insert({ 0,0,0 });
         set.insert({ 1,0,0 });
@@ -47,7 +47,7 @@ TEST_CASE("HashEquals") {
     }
 
     SECTION("// partial HashEquals") {
-        using xyHE = Utils::HashEquals<Point, &Point::x, &Point::y>;
+        using xyHE = utils::HashEquals<Point, &Point::x, &Point::y>;
         xyHE::Set set;
         set.insert({ 0,0,0 });
         set.insert({ 1,0,0 });

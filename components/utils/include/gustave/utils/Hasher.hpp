@@ -32,7 +32,7 @@
 #include <gustave/utils/cHashableMemberOf.hpp>
 #include <gustave/utils/getMember.hpp>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     namespace detail {
         [[nodiscard]]
         inline std::size_t composeHash(std::size_t const h1, std::size_t const h2) {

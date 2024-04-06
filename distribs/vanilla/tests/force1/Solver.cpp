@@ -33,14 +33,14 @@
 
 #include <TestHelpers.hpp>
 
-using Solver = Gustave::Solvers::Force1Solver<cfg>;
+using Solver = gustave::solvers::Force1Solver<libCfg>;
 
 using Link = Solver::Structure::Link;
 using Node = Solver::Structure::Node;
 using Solution = Solver::Solution;
 using Structure = Solver::Structure;
 
-TEST_CASE("Force1::Solver") {
+TEST_CASE("force1::Solver") {
     SECTION("// pillar") {
         constexpr Real<u.mass> blockMass = 4000.f * u.mass;
         auto makePillar = [blockMass](unsigned blockCount) {
@@ -59,8 +59,8 @@ TEST_CASE("Force1::Solver") {
         auto const solver = Solver{ std::make_shared<Solver::Config const>(g, 1000, precision) };
         auto const result = solver.run(structure);
         auto const solvedNodes = result.solution().nodes();
-        CHECK_THAT(solvedNodes.at(0).forceVectorFrom(1), M::WithinRel(float(blockCount - 1) * blockMass * g, precision));
-        CHECK_THAT(solvedNodes.at(1).forceVectorFrom(2), M::WithinRel(float(blockCount - 2) * blockMass * g, precision));
-        CHECK_THAT(solvedNodes.at(2).forceVectorFrom(3), M::WithinRel(float(blockCount - 3) * blockMass * g, precision));
+        CHECK_THAT(solvedNodes.at(0).forceVectorFrom(1), matchers::WithinRel(float(blockCount - 1) * blockMass * g, precision));
+        CHECK_THAT(solvedNodes.at(1).forceVectorFrom(2), matchers::WithinRel(float(blockCount - 2) * blockMass * g, precision));
+        CHECK_THAT(solvedNodes.at(2).forceVectorFrom(3), matchers::WithinRel(float(blockCount - 3) * blockMass * g, precision));
     }
 }

@@ -27,7 +27,7 @@
 
 #include <type_traits>
 
-namespace Gustave::Meta {
+namespace gustave::meta {
     template<bool condition, typename T>
     using MutableIf = std::conditional_t<condition, T, T const>;
 }

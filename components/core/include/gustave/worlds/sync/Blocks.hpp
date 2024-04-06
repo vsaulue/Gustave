@@ -34,16 +34,16 @@
 #include <gustave/worlds/sync/BlockReference.hpp>
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 
-namespace Gustave::Worlds::Sync {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync {
+    template<cfg::cLibConfig auto libCfg>
     class Blocks {
     private:
-        using WorldData = detail::WorldData<cfg>;
+        using WorldData = detail::WorldData<libCfg>;
 
         using SceneBlocks = typename WorldData::Scene::Blocks;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
-        using BlockReference = Sync::BlockReference<cfg>;
+        using BlockReference = sync::BlockReference<libCfg>;
     private:
         class Enumerator {
         private:
@@ -58,7 +58,7 @@ namespace Gustave::Worlds::Sync {
             explicit Enumerator(Blocks const& blocks)
                 : blocks_{ &blocks }
                 , sceneIterator_{ blocks_->sceneBlocks_.begin() }
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
             {
                 updateValue();
             }
@@ -93,7 +93,7 @@ namespace Gustave::Worlds::Sync {
             BlockReference value_;
         };
     public:
-        using Iterator = Utils::ForwardIterator<Enumerator>;
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Blocks(WorldData const& data)
@@ -118,7 +118,7 @@ namespace Gustave::Worlds::Sync {
         }
 
         [[nodiscard]]
-        constexpr Utils::EndIterator end() const {
+        constexpr utils::EndIterator end() const {
             return {};
         }
 

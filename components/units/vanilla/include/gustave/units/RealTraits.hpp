@@ -33,49 +33,49 @@
 #include <gustave/units/lib/Unit.hpp>
 #include <gustave/units/UnitSystem.hpp>
 
-namespace Gustave::Units {
-    template<Cfg::cRealRep Rep>
+namespace gustave::units {
+    template<cfg::cRealRep Rep>
     struct RealTraits {
         [[nodiscard]]
         static constexpr UnitSystem units() {
             return {};
         }
 
-        template<Lib::cUnit auto unit>
-        using Type = Lib::Real<unit, Rep>;
+        template<lib::cUnit auto unit>
+        using Type = lib::Real<unit, Rep>;
 
         [[nodiscard]]
         static constexpr bool isUnit(auto unit) {
-            return Lib::cUnit<decltype(unit)>;
+            return lib::cUnit<decltype(unit)>;
         }
 
         [[nodiscard]]
         constexpr RealTraits() = default;
 
         [[nodiscard]]
-        static Lib::cReal auto sqrt(Lib::cReal auto const arg) {
-            return Lib::sqrt(arg);
+        static lib::cReal auto sqrt(lib::cReal auto const arg) {
+            return lib::sqrt(arg);
         }
 
-        template<Lib::cReal Arg>
+        template<lib::cReal Arg>
         [[nodiscard]]
         static constexpr Arg abs(Arg const arg) {
             return (arg.value() > 0.f) ? arg : -arg;
         }
 
-        template<Lib::cReal Arg>
+        template<lib::cReal Arg>
         [[nodiscard]]
         static constexpr Arg max(Arg const v1, Arg const v2) {
             return (v1 > v2) ? v1 : v2;
         }
 
-        template<Lib::cReal Arg>
+        template<lib::cReal Arg>
         [[nodiscard]]
         static constexpr Arg min(Arg const v1, Arg const v2) {
             return (v1 < v2) ? v1 : v2;
         }
 
-        template<Cfg::cRealRep ArgRep>
+        template<cfg::cRealRep ArgRep>
         [[nodiscard]]
         constexpr bool operator==(RealTraits<ArgRep> const&) const {
             return std::is_same_v<Rep, ArgRep>;

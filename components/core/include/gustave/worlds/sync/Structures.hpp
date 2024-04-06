@@ -34,13 +34,13 @@
 #include <gustave/worlds/sync/detail/WorldData.hpp>
 #include <gustave/worlds/sync/StructureReference.hpp>
 
-namespace Gustave::Worlds::Sync {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync {
+    template<cfg::cLibConfig auto libCfg>
     class Structures {
     public:
-        using StructureReference = Sync::StructureReference<cfg>;
+        using StructureReference = sync::StructureReference<libCfg>;
     private:
-        using WorldData = detail::WorldData<cfg>;
+        using WorldData = detail::WorldData<libCfg>;
 
         class Enumerator {
         private:
@@ -50,14 +50,14 @@ namespace Gustave::Worlds::Sync {
             Enumerator()
                 : world_{ nullptr }
                 , dataIterator_{}
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
             {}
 
             [[nodiscard]]
             explicit Enumerator(WorldData const& world)
                 : world_{ &world }
                 , dataIterator_{ world.structures.begin() }
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
             {
                 updateValue();
             }
@@ -92,7 +92,7 @@ namespace Gustave::Worlds::Sync {
             StructureReference value_;
         };
     public:
-        using Iterator = Utils::ForwardIterator<Enumerator>;
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Structures(WorldData const& world)
@@ -105,7 +105,7 @@ namespace Gustave::Worlds::Sync {
         }
 
         [[nodiscard]]
-        constexpr Utils::EndIterator end() const {
+        constexpr utils::EndIterator end() const {
             return {};
         }
 

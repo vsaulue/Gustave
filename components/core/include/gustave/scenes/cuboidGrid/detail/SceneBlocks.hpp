@@ -36,21 +36,21 @@
 #include <gustave/scenes/cuboidGrid/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGrid/detail/BlockMappedData.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto libCfg>
     class SceneBlocks {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using BlockIndex = CuboidGrid::BlockIndex;
-        using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<cfg>>;
-        using Direction = Math3d::BasicDirection;
+        using BlockIndex = cuboidGrid::BlockIndex;
+        using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<libCfg>>;
+        using Direction = math3d::BasicDirection;
 
         using const_iterator = typename BlockMap::const_iterator;
 
@@ -116,16 +116,16 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         }
 
         [[nodiscard]]
-        BlockDataReference<cfg,true> find(BlockIndex const& index) {
+        BlockDataReference<libCfg,true> find(BlockIndex const& index) {
             return doFind(*this, index);
         }
 
         [[nodiscard]]
-        BlockDataReference<cfg,false> find(BlockIndex const& index) const {
+        BlockDataReference<libCfg,false> find(BlockIndex const& index) const {
             return doFind(*this, index);
         }
 
-        BlockDataReference<cfg, true> insert(BlockConstructionInfo<cfg> const& info) {
+        BlockDataReference<libCfg, true> insert(BlockConstructionInfo<libCfg> const& info) {
             auto it = blocks_.emplace(info.index(), BlockMappedData{ info }).first;
             return { &(*it) };
         }

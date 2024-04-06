@@ -31,20 +31,19 @@
 #include <gustave/math3d/Vector3.hpp>
 #include <gustave/units/RealTraits.hpp>
 
-namespace G = Gustave;
-namespace Cfg = Gustave::Cfg;
-namespace M = Gustave::Testing::Matchers;
+namespace cfg = gustave::cfg;
+namespace matchers = gustave::testing::matchers;
 
 using Rep = double;
 
-using Rt = Gustave::Units::RealTraits<Rep>;
+using Rt = gustave::units::RealTraits<Rep>;
 inline constexpr Rt rt;
 inline constexpr auto u = rt.units();
 
-template<Cfg::cUnitOf<rt> auto unit>
+template<cfg::cUnitOf<rt> auto unit>
 using Real = Rt::Type<unit>;
 
-template<Cfg::cUnitOf<rt> auto unit>
-using Vector3 = Gustave::Math3d::Vector3<rt, unit>;
+template<cfg::cUnitOf<rt> auto unit>
+using Vector3 = gustave::math3d::Vector3<rt, unit>;
 
-inline constexpr Cfg::cUnitOf<rt> auto l2 = u.length * u.length;
+inline constexpr cfg::cUnitOf<rt> auto l2 = u.length * u.length;

@@ -37,24 +37,24 @@
 #include <gustave/utils/HashEquals.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg, bool isMutable_>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto libCfg, bool isMutable_>
     class BlockDataReference {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        using QualifiedBlockData = Meta::MutableIf<isMutable_, BlockData<cfg>>;
+        using QualifiedBlockData = meta::MutableIf<isMutable_, BlockData<libCfg>>;
 
-        using MaxStress = Model::MaxStress<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using MaxStress = model::MaxStress<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
         QualifiedBlockData* data_;
     public:
-        using Hasher = Utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
-        using LinkIndices = typename BlockMappedData<cfg>::LinkIndices;
+        using Hasher = utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
+        using LinkIndices = typename BlockMappedData<libCfg>::LinkIndices;
 
         [[nodiscard]]
         static constexpr bool isMutable() {
@@ -67,7 +67,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         {}
 
         [[nodiscard]]
-        explicit BlockDataReference(Utils::NoInit) {}
+        explicit BlockDataReference(utils::NoInit) {}
 
         [[nodiscard]]
         BlockDataReference(BlockDataReference const&) = default;
@@ -75,12 +75,12 @@ namespace Gustave::Scenes::CuboidGrid::detail {
         BlockDataReference& operator=(BlockDataReference const&) = default;
 
         [[nodiscard]]
-        BlockDataReference(BlockDataReference<cfg, true> const& otherBlock)
+        BlockDataReference(BlockDataReference<libCfg, true> const& otherBlock)
             requires (!isMutable_)
             : data_{ otherBlock.data() }
         {}
 
-        BlockDataReference& operator=(BlockDataReference<cfg, true> const& rhs)
+        BlockDataReference& operator=(BlockDataReference<libCfg, true> const& rhs)
             requires (!isMutable_)
         {
             data_ = rhs.data();
@@ -89,29 +89,29 @@ namespace Gustave::Scenes::CuboidGrid::detail {
 
         template<bool rhsMutable>
         [[nodiscard]]
-        bool operator==(BlockDataReference<cfg, rhsMutable> const& rhs) const {
+        bool operator==(BlockDataReference<libCfg, rhsMutable> const& rhs) const {
             return data_ == rhs.data();
         }
 
         [[nodiscard]]
-        BlockData<cfg> const* data() const {
+        BlockData<libCfg> const* data() const {
             return data_;
         }
 
         [[nodiscard]]
-        Meta::MutableIf<isMutable_,LinkIndices>& linkIndices() const {
+        meta::MutableIf<isMutable_,LinkIndices>& linkIndices() const {
             return data_->second.linkIndices();
         }
 
         [[nodiscard]]
-        StructureData<cfg>*& structure()
+        StructureData<libCfg>*& structure()
             requires (isMutable_)
         {
             return data_->second.structure();
         }
 
         [[nodiscard]]
-        StructureData<cfg> const* structure() const {
+        StructureData<libCfg> const* structure() const {
             return data_->second.structure();
         }
 
@@ -142,5 +142,5 @@ namespace Gustave::Scenes::CuboidGrid::detail {
     };
 }
 
-template<Gustave::Cfg::cLibConfig auto cfg, bool isMutable>
-struct std::hash<Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg,isMutable>> : Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg,isMutable>::Hasher {};
+template<gustave::cfg::cLibConfig auto libCfg, bool isMutable>
+struct std::hash<gustave::scenes::cuboidGrid::detail::BlockDataReference<libCfg,isMutable>> : gustave::scenes::cuboidGrid::detail::BlockDataReference<libCfg,isMutable>::Hasher {};

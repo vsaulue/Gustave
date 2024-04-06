@@ -33,18 +33,18 @@
 #include <gustave/solvers/Force1Solver.hpp>
 #include <gustave/worlds/sync/detail/StructureData.hpp>
 
-namespace Gustave::Worlds::Sync::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync::detail {
+    template<cfg::cLibConfig auto libCfg>
     struct WorldData {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Scene = Scenes::CuboidGridScene<cfg>;
-        using Solver = Solvers::Force1Solver<cfg>;
-        using StructureData = detail::StructureData<cfg>;
+        using Scene = scenes::CuboidGridScene<libCfg>;
+        using Solver = solvers::Force1Solver<libCfg>;
+        using StructureData = detail::StructureData<libCfg>;
 
         using SceneStructure = typename Scene::StructureReference;
         using Structures = std::unordered_map<SceneStructure, std::shared_ptr<StructureData>>;

@@ -30,17 +30,17 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/force1/detail/NodeInfo.hpp>
 
-namespace Gustave::Solvers::Force1::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::detail {
+    template<cfg::cLibConfig auto libCfg>
     class NodeStats {
     private:
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        static constexpr auto u = Cfg::units(cfg);
-        static constexpr auto rt = cfg.realTraits;
+        static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto rt = libCfg.realTraits;
     public:
-        using NodeInfo = detail::NodeInfo<cfg>;
+        using NodeInfo = detail::NodeInfo<libCfg>;
 
         [[nodiscard]]
         explicit NodeStats(NodeInfo const& info, Real<u.force> force, Real<u.conductivity> derivative)

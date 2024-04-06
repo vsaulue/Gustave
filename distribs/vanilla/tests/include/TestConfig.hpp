@@ -29,5 +29,5 @@
 
 // Config
 
-inline constexpr Gustave::Vanilla::LibConfig cfg{};
+inline constexpr gustave::vanilla::LibConfig libCfg{};
 inline constexpr float epsilon{ 0.0001f };

@@ -25,7 +25,7 @@
 
 #pragma once
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     class NoInit final {};
 
     inline constexpr NoInit NO_INIT{};

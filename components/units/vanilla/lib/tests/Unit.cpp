@@ -30,44 +30,44 @@
 
 #include <gustave/units/lib/Unit.hpp>
 
-namespace U = Gustave::Units::Lib;
+namespace u = gustave::units::lib;
 
-template<U::cUnitIdentifier Id>
-constexpr U::Unit<"", Id{}> makeUnit(Id) {
+template<u::cUnitIdentifier Id>
+constexpr u::Unit<"", Id{}> makeUnit(Id) {
     return {};
 }
 
 TEST_CASE("Unit") {
-    struct Kilogram : U::BasicUnitIdentifier<"kg"> {};
-    constexpr auto kg = U::makeUnitIdentifier<Kilogram>();
+    struct Kilogram : u::BasicUnitIdentifier<"kg"> {};
+    constexpr auto kg = u::makeUnitIdentifier<Kilogram>();
 
-    struct Metre : U::BasicUnitIdentifier<"m"> {};
-    constexpr auto m = U::makeUnitIdentifier<Metre>();
+    struct Metre : u::BasicUnitIdentifier<"m"> {};
+    constexpr auto m = u::makeUnitIdentifier<Metre>();
 
-    struct Second : U::BasicUnitIdentifier<"s"> {};
-    constexpr auto s = U::makeUnitIdentifier<Second>();
+    struct Second : u::BasicUnitIdentifier<"s"> {};
+    constexpr auto s = u::makeUnitIdentifier<Second>();
 
-    constexpr U::Unit<"N", kg * m / s.pow(U::Exponent<2>{})> newton{};
+    constexpr u::Unit<"N", kg * m / s.pow(u::Exponent<2>{})> newton{};
 
-    constexpr U::Unit<"rad", U::UnitIdentifier<>{}> rad{};
+    constexpr u::Unit<"rad", u::UnitIdentifier<>{}> rad{};
 
     SECTION("::Unit(UnitIdentifier) // template argument deduction") {
-        constexpr U::cUnit auto kgUnit = U::Unit(kg);
+        constexpr u::cUnit auto kgUnit = u::Unit(kg);
         CHECK(kgUnit.unitId() == kg);
         CHECK(kgUnit.symbol() == std::string_view("kg"));
     }
 
     SECTION("::isAssignableFrom()") {
         SECTION("// true") {
-            constexpr U::cUnitIdentifier auto otherId = m / s * kg / s;
-            constexpr U::Unit otherUnit = {otherId};
+            constexpr u::cUnitIdentifier auto otherId = m / s * kg / s;
+            constexpr u::Unit otherUnit = {otherId};
             CHECK(newton.isAssignableFrom(otherUnit));
             CHECK(newton.isAssignableFrom(otherId));
         }
 
         SECTION("// false") {
-            constexpr U::cUnitIdentifier auto otherId = m / s * kg;
-            constexpr U::Unit otherUnit = {otherId};
+            constexpr u::cUnitIdentifier auto otherId = m / s * kg;
+            constexpr u::Unit otherUnit = {otherId};
             CHECK(!newton.isAssignableFrom(otherUnit));
             CHECK(!newton.isAssignableFrom(otherId));
         }
@@ -76,7 +76,7 @@ TEST_CASE("Unit") {
     SECTION("::isOne()") {
         SECTION("// true") {
             CHECK(rad.isOne());
-            CHECK(U::one.isOne());
+            CHECK(u::one.isOne());
         }
 
         SECTION("// false") {
@@ -86,7 +86,7 @@ TEST_CASE("Unit") {
 
     SECTION("::isTrivialOne()") {
         SECTION("// true") {
-            CHECK(U::one.isTrivialOne());
+            CHECK(u::one.isTrivialOne());
         }
 
         SECTION("// false") {
@@ -95,13 +95,13 @@ TEST_CASE("Unit") {
     }
 
     SECTION("::inverse()") {
-        constexpr U::Unit inv = newton.inverse();
-        CHECK(inv.isAssignableFrom(s.pow(U::Exponent<2>{}) / kg / m));
+        constexpr u::Unit inv = newton.inverse();
+        CHECK(inv.isAssignableFrom(s.pow(u::Exponent<2>{}) / kg / m));
     }
 
     SECTION("::pow(cExponent auto)") {
-        constexpr U::Unit sqrM = { m * m };
-        constexpr U::Unit res = sqrM.pow(U::Exponent<-1, 2>{});
+        constexpr u::Unit sqrM = { m * m };
+        constexpr u::Unit res = sqrM.pow(u::Exponent<-1, 2>{});
         CHECK(res.isAssignableFrom(m.inverse()));
     }
 
@@ -111,24 +111,24 @@ TEST_CASE("Unit") {
         }
 
         SECTION("// false: non-assignable") {
-            CHECK(newton != U::Unit(s));
+            CHECK(newton != u::Unit(s));
         }
 
         SECTION("// false: assignable, different symbol") {
-            constexpr U::Unit newtonLike = { kg * m / s.pow(U::Exponent<2>{}) };
+            constexpr u::Unit newtonLike = { kg * m / s.pow(u::Exponent<2>{}) };
             CHECK(newton != newtonLike);
             CHECK(newton.isAssignableFrom(newtonLike));
         }
     }
 
     SECTION("operator*(cUnit auto, cUnit auto)") {
-        constexpr auto res = newton * U::Unit(s);
+        constexpr auto res = newton * u::Unit(s);
         CHECK(res.isAssignableFrom(kg * m / s));
     }
 
     SECTION("operator/(cUnit auto, cUnit auto)") {
-        constexpr auto res = newton / U::Unit(kg);
-        CHECK(res.isAssignableFrom(m / s.pow(U::Exponent<2>{})));
+        constexpr auto res = newton / u::Unit(kg);
+        CHECK(res.isAssignableFrom(m / s.pow(u::Exponent<2>{})));
     }
 
     SECTION("operator<<(std::ostream&, cUnit auto)") {

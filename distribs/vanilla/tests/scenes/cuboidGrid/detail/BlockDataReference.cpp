@@ -33,17 +33,17 @@
 
 #include <TestHelpers.hpp>
 
-using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<cfg>;
-using BlockData = Gustave::Scenes::CuboidGrid::detail::BlockData<cfg>;
-using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
-using BlockMappedData = Gustave::Scenes::CuboidGrid::detail::BlockMappedData<cfg>;
-using SceneData = Gustave::Scenes::CuboidGrid::detail::SceneData<cfg>;
-using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<cfg>;
+using BlockConstructionInfo = gustave::scenes::cuboidGrid::BlockConstructionInfo<libCfg>;
+using BlockData = gustave::scenes::cuboidGrid::detail::BlockData<libCfg>;
+using BlockIndex = gustave::scenes::cuboidGrid::BlockIndex;
+using BlockMappedData = gustave::scenes::cuboidGrid::detail::BlockMappedData<libCfg>;
+using SceneData = gustave::scenes::cuboidGrid::detail::SceneData<libCfg>;
+using StructureData = gustave::scenes::cuboidGrid::detail::StructureData<libCfg>;
 
 template<bool isMutable>
-using BlockDataReference = Gustave::Scenes::CuboidGrid::detail::BlockDataReference<cfg, isMutable>;
+using BlockDataReference = gustave::scenes::cuboidGrid::detail::BlockDataReference<libCfg, isMutable>;
 
-TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
+TEST_CASE("scenes::cuboidGrid::detail::BlockDataReference") {
     SceneData sceneData{ vector3(1.f, 1.f, 1.f, u.length) };
 
     BlockDataReference<true> b111 = sceneData.blocks.insert(BlockConstructionInfo{ {1,1,1}, concrete_20m, 5.f * u.mass, false });
@@ -68,7 +68,7 @@ TEST_CASE("Scenes::CuboidGrid::detail::BlockDataReference") {
             }
         }
 
-        SECTION("::structure() // mutable") {
+        SECTION(".structure() // mutable") {
             StructureData structure{ sceneData, b111 };
             CHECK(b333.structure() == nullptr);
             b333.structure() = &structure;

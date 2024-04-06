@@ -32,11 +32,9 @@
 
 #include <TestHelpers.hpp>
 
-namespace Sync = Gustave::Worlds::Sync;
-
-using StructureReference = Sync::StructureReference<cfg>;
-using WorldData = Sync::detail::WorldData<cfg>;
-using WorldUpdater = Sync::detail::WorldUpdater<cfg>;
+using StructureReference = gustave::worlds::sync::StructureReference<libCfg>;
+using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
 
 using BlockIndex = WorldData::Scene::BlockIndex;
 using BlockReference = StructureReference::BlockReference;
@@ -59,7 +57,7 @@ static WorldData makeWorld() {
 
 static_assert(std::ranges::forward_range<StructureReference::Blocks>);
 
-TEST_CASE("Worlds::Sync::StructureReference") {
+TEST_CASE("worlds::sync::StructureReference") {
     WorldData world = makeWorld();
 
     {
@@ -110,7 +108,7 @@ TEST_CASE("Worlds::Sync::StructureReference") {
                 indices.push_back(block.index());
             }
             std::vector<BlockIndex> expected = { {0,0,0},{0,1,0},{0,2,0},{0,3,0} };
-            CHECK_THAT(indices, M::C2::UnorderedRangeEquals(expected));
+            CHECK_THAT(indices, matchers::c2::UnorderedRangeEquals(expected));
         }
 
         SECTION(".find()") {
@@ -155,7 +153,7 @@ TEST_CASE("Worlds::Sync::StructureReference") {
         SECTION("// solved & non-zero contact") {
             auto optForce = s4.forceVector({ 0,3,0 }, { 0,4,0 });
             REQUIRE(optForce);
-            CHECK_THAT(*optForce, M::WithinRel(blockMass * g, solverPrecision));
+            CHECK_THAT(*optForce, matchers::WithinRel(blockMass * g, solverPrecision));
         }
 
         SECTION("// no contact") {
@@ -190,7 +188,7 @@ TEST_CASE("Worlds::Sync::StructureReference") {
                 ContactReference{ world, ContactIndex{ {0,1,0}, Direction::plusY() } },
                 ContactReference{ world, ContactIndex{ {0,2,0}, Direction::plusY() } },
             };
-            CHECK_THAT(s1.links(), M::C2::UnorderedRangeEquals(expected));
+            CHECK_THAT(s1.links(), matchers::c2::UnorderedRangeEquals(expected));
         }
     }
 

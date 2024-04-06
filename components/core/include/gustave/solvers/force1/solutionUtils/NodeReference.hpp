@@ -39,33 +39,33 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Solvers::Force1::SolutionUtils {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1::solutionUtils {
+    template<cfg::cLibConfig auto libCfg>
     class ContactReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class NodeReference {
     private:
-        using SolutionData = detail::SolutionData<cfg>;
-        using Structure = Solvers::Structure<cfg>;
+        using SolutionData = detail::SolutionData<libCfg>;
+        using Structure = solvers::Structure<libCfg>;
 
-        using LinkIndex = Cfg::LinkIndex<cfg>;
-        using NodeInfo = detail::NodeInfo<cfg>;
-        using NodeStats = detail::NodeStats<cfg>;
+        using LinkIndex = cfg::LinkIndex<libCfg>;
+        using NodeInfo = detail::NodeInfo<libCfg>;
+        using NodeStats = detail::NodeStats<libCfg>;
         using StructureNode = typename Structure::Node;
         using StructureLink = typename Structure::Link;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
     public:
         using ContactIndex = typename Structure::ContactIndex;
-        using ContactReference = SolutionUtils::ContactReference<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using ContactReference = solutionUtils::ContactReference<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
 
         class Contacts {
         private:
@@ -77,14 +77,14 @@ namespace Gustave::Solvers::Force1::SolutionUtils {
                 Enumerator()
                     : node_{ nullptr }
                     , dataIterator_{}
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
                 explicit Enumerator(NodeReference const& node)
                     : node_{ node }
                     , dataIterator_{ node.info().contacts.begin() }
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {
                     updateValue();
                 }
@@ -123,7 +123,7 @@ namespace Gustave::Solvers::Force1::SolutionUtils {
                 ContactReference value_;
             };
         public:
-            using Iterator = Utils::ForwardIterator<Enumerator>;
+            using Iterator = utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
             explicit Contacts(NodeReference const& node)
@@ -154,7 +154,7 @@ namespace Gustave::Solvers::Force1::SolutionUtils {
             }
 
             [[nodiscard]]
-            Utils::EndIterator end() const {
+            utils::EndIterator end() const {
                 return {};
             }
 
@@ -173,7 +173,7 @@ namespace Gustave::Solvers::Force1::SolutionUtils {
         {}
 
         [[nodiscard]]
-        explicit NodeReference(Utils::NoInit)
+        explicit NodeReference(utils::NoInit)
             : solution_{ nullptr }
             , index_{ 0 }
         {}

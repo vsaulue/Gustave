@@ -32,10 +32,10 @@
 
 #include <TestHelpers.hpp>
 
-using BlockConstructionInfo = Gustave::Scenes::CuboidGrid::BlockConstructionInfo<cfg>;
-using BlockMappedData = Gustave::Scenes::CuboidGrid::detail::BlockMappedData<cfg>;
+using BlockConstructionInfo = gustave::scenes::cuboidGrid::BlockConstructionInfo<libCfg>;
+using BlockMappedData = gustave::scenes::cuboidGrid::detail::BlockMappedData<libCfg>;
 
-TEST_CASE("Scenes::CuboidGrid::detail::BlockMappedData") {
+TEST_CASE("scenes::cuboidGrid::detail::BlockMappedData") {
     SECTION("// constructor & getters") {
         const BlockConstructionInfo info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
         BlockMappedData data{ info };

@@ -30,6 +30,6 @@
 #include <gustave/testing/matchers/RealMatchers.hpp>
 #include <gustave/testing/matchers/Vector3Matchers.hpp>
 
-namespace Gustave::Testing::Matchers {
-    namespace C2 = ::Catch::Matchers;
+namespace gustave::testing::matchers {
+    namespace c2 = ::Catch::Matchers;
 }

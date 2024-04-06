@@ -33,14 +33,14 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid {
+    template<cfg::cLibConfig auto libCfg>
     class Structures {
     public:
-        using StructureReference = CuboidGrid::StructureReference<cfg>;
+        using StructureReference = cuboidGrid::StructureReference<libCfg>;
     private:
-        using SceneData = detail::SceneData<cfg>;
-        using StructureData = detail::StructureData<cfg>;
+        using SceneData = detail::SceneData<libCfg>;
+        using StructureData = detail::StructureData<libCfg>;
 
         class Enumerator {
         public:
@@ -48,14 +48,14 @@ namespace Gustave::Scenes::CuboidGrid {
             Enumerator()
                 : data_{ nullptr }
                 , dataIterator_{}
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
             {}
 
             [[nodiscard]]
             explicit Enumerator(SceneData const& data)
                 : data_{ &data }
                 , dataIterator_{ data.structures.begin() }
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
             {
                 updateValue();
             }
@@ -91,7 +91,7 @@ namespace Gustave::Scenes::CuboidGrid {
             StructureReference value_;
         };
     public:
-        using Iterator = Utils::ForwardIterator<Enumerator>;
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Structures(SceneData const& data)
@@ -109,7 +109,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        constexpr Utils::EndIterator end() const {
+        constexpr utils::EndIterator end() const {
             return {};
         }
 

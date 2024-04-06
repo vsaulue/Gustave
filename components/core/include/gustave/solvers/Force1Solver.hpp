@@ -42,31 +42,31 @@
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/solvers/Structure.hpp>
 
-namespace Gustave::Solvers {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers {
+    template<cfg::cLibConfig auto libCfg>
     class Force1Solver {
     private:
-        static constexpr auto u = Cfg::units(cfg);
-        static constexpr auto rt = cfg.realTraits;
+        static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto rt = libCfg.realTraits;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = typename Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = typename cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = typename Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = typename cfg::Vector3<libCfg, unit>;
 
-        using NodeIndex = typename Cfg::NodeIndex<cfg>;
-        using NormalizedVector3 = typename Cfg::NormalizedVector3<cfg>;
+        using NodeIndex = typename cfg::NodeIndex<libCfg>;
+        using NormalizedVector3 = typename cfg::NormalizedVector3<libCfg>;
     public:
-        using Structure = Solvers::Structure<cfg>;
+        using Structure = solvers::Structure<libCfg>;
 
-        using Basis = Force1::SolutionBasis<cfg>;
-        using Config = Force1::Config<cfg>;
-        using ForceBalancer = Force1::detail::ForceBalancer<cfg>;
-        using ForceRepartition = Force1::detail::ForceRepartition<cfg>;
+        using Basis = force1::SolutionBasis<libCfg>;
+        using Config = force1::Config<libCfg>;
+        using ForceBalancer = force1::detail::ForceBalancer<libCfg>;
+        using ForceRepartition = force1::detail::ForceRepartition<libCfg>;
         using IterationIndex = std::uint64_t;
         using Node = typename Structure::Node;
-        using Solution = Force1::Solution<cfg>;
+        using Solution = force1::Solution<libCfg>;
 
         class Result {
         public:

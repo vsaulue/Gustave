@@ -46,34 +46,34 @@
 #include <gustave/scenes/cuboidGrid/TransactionResult.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes {
+    template<cfg::cLibConfig auto libCfg>
     class CuboidGridScene {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        using SceneData = CuboidGrid::detail::SceneData<cfg>;
-        using SceneUpdater = CuboidGrid::detail::SceneUpdater<cfg>;
-        using StructureData = CuboidGrid::detail::StructureData<cfg>;
+        using SceneData = cuboidGrid::detail::SceneData<libCfg>;
+        using SceneUpdater = cuboidGrid::detail::SceneUpdater<libCfg>;
+        using StructureData = cuboidGrid::detail::StructureData<libCfg>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using BlockIndex = CuboidGrid::BlockIndex;
-        using BlockReference = CuboidGrid::BlockReference<cfg>;
-        using Blocks = CuboidGrid::Blocks<cfg>;
-        using ContactIndex = CuboidGrid::ContactIndex;
-        using ContactReference = CuboidGrid::ContactReference<cfg>;
-        using Contacts = CuboidGrid::Contacts<cfg>;
-        using Direction = Math3d::BasicDirection;
-        using Links = CuboidGrid::Links<cfg>;
-        using StructureReference = CuboidGrid::StructureReference<cfg>;
-        using Structures = CuboidGrid::Structures<cfg>;
-        using Transaction = CuboidGrid::Transaction<cfg>;
-        using TransactionResult = CuboidGrid::TransactionResult<cfg>;
+        using BlockIndex = cuboidGrid::BlockIndex;
+        using BlockReference = cuboidGrid::BlockReference<libCfg>;
+        using Blocks = cuboidGrid::Blocks<libCfg>;
+        using ContactIndex = cuboidGrid::ContactIndex;
+        using ContactReference = cuboidGrid::ContactReference<libCfg>;
+        using Contacts = cuboidGrid::Contacts<libCfg>;
+        using Direction = math3d::BasicDirection;
+        using Links = cuboidGrid::Links<libCfg>;
+        using StructureReference = cuboidGrid::StructureReference<libCfg>;
+        using Structures = cuboidGrid::Structures<libCfg>;
+        using Transaction = cuboidGrid::Transaction<libCfg>;
+        using TransactionResult = cuboidGrid::TransactionResult<libCfg>;
 
         [[nodiscard]]
         explicit CuboidGridScene(Vector3<u.length> const& blockSize)

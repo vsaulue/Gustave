@@ -29,11 +29,11 @@
 
 #include <TestHelpers.hpp>
 
-namespace Cuboid = ::Gustave::Scenes::CuboidGrid;
+namespace cuboid = ::gustave::scenes::cuboidGrid;
 
-using InternalLinks = Cuboid::detail::InternalLinks<cfg>;
-using SceneData = Cuboid::detail::SceneData<cfg>;
-using SceneUpdater = Cuboid::detail::SceneUpdater<cfg>;
+using InternalLinks = cuboid::detail::InternalLinks<libCfg>;
+using SceneData = cuboid::detail::SceneData<libCfg>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
 
 using BlockIndex = SceneData::Blocks::BlockIndex;
 using ConstBlockDataReference = InternalLinks::ConstBlockDataReference;
@@ -41,7 +41,7 @@ using Direction = InternalLinks::Direction;
 using Transaction = SceneUpdater::Transaction;
 using Value = InternalLinks::Value;
 
-TEST_CASE("Scene::CuboidGrid::detail::InternalLinks") {
+TEST_CASE("scenes::cuboidGrid::detail::InternalLinks") {
     SceneData scene{ vector3(1.f, 2.f, 3.f, u.length) };
 
     Transaction t;
@@ -69,7 +69,7 @@ TEST_CASE("Scene::CuboidGrid::detail::InternalLinks") {
                 Value{ getBlockData({2,3,2}), Direction::plusY() },
                 Value{ getBlockData({2,2,3}), Direction::plusZ() },
             };
-            CHECK_THAT(links, M::C2::RangeEquals(expected));
+            CHECK_THAT(links, matchers::c2::RangeEquals(expected));
         }
     }
 

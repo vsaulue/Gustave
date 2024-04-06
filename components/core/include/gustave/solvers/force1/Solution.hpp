@@ -37,28 +37,28 @@
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Solvers::Force1 {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::solvers::force1 {
+    template<cfg::cLibConfig auto libCfg>
     class Solution {
     private:
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Vector3 = Cfg::Vector3<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
 
-        using ForceBalancer = detail::ForceBalancer<cfg>;
-        using SolutionData = detail::SolutionData<cfg>;
+        using ForceBalancer = detail::ForceBalancer<libCfg>;
+        using SolutionData = detail::SolutionData<libCfg>;
 
-        static constexpr auto u = Cfg::units(cfg);
-        static constexpr auto rt = cfg.realTraits;
+        static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto rt = libCfg.realTraits;
     public:
-        using Basis = SolutionBasis<cfg>;
-        using Contacts = SolutionUtils::Contacts<cfg>;
-        using Nodes = SolutionUtils::Nodes<cfg>;
+        using Basis = SolutionBasis<libCfg>;
+        using Contacts = solutionUtils::Contacts<libCfg>;
+        using Nodes = solutionUtils::Nodes<libCfg>;
         using Structure = typename Basis::Structure;
 
         using ContactIndex = typename Structure::ContactIndex;

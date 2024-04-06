@@ -25,7 +25,7 @@
 
 #pragma once
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     template<typename T>
     concept cChar = requires(const T * ptr, std::size_t len) {
         std::basic_string_view<T>(ptr, len);

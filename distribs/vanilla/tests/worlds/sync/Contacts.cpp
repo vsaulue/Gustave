@@ -31,9 +31,9 @@
 
 #include <TestHelpers.hpp>
 
-using Contacts = Gustave::Worlds::Sync::Contacts<cfg>;
-using WorldData = Gustave::Worlds::Sync::detail::WorldData<cfg>;
-using WorldUpdater = Gustave::Worlds::Sync::detail::WorldUpdater<cfg>;
+using Contacts = gustave::worlds::sync::Contacts<libCfg>;
+using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
 
 using ContactIndex = Contacts::ContactIndex;
 using Direction = ContactIndex::Direction;
@@ -51,7 +51,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("Worlds::Sync::Contacts") {
+TEST_CASE("worlds::sync::Contacts") {
     WorldData world = makeWorld();
 
     Transaction t;
@@ -64,7 +64,7 @@ TEST_CASE("Worlds::Sync::Contacts") {
     SECTION(".at()") {
         SECTION("// valid") {
             auto contact = contacts.at(ContactIndex{ {2,1,2}, Direction::plusY() });
-            CHECK_THAT(contact.forceVector(), M::WithinRel(blockMass * g, solverPrecision));
+            CHECK_THAT(contact.forceVector(), matchers::WithinRel(blockMass * g, solverPrecision));
         }
 
         SECTION("// invalid") {
@@ -74,6 +74,6 @@ TEST_CASE("Worlds::Sync::Contacts") {
 
     SECTION(".find()") {
         auto contact = contacts.find(ContactIndex{ {2,1,2}, Direction::plusY() });
-        CHECK_THAT(contact.forceVector(), M::WithinRel(blockMass * g, solverPrecision));
+        CHECK_THAT(contact.forceVector(), matchers::WithinRel(blockMass * g, solverPrecision));
     }
 }

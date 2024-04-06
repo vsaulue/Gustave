@@ -32,7 +32,7 @@
 TEST_CASE("Vector3WithinRelMatcher") {
     Vector3<u.area> target{1.0, 2.0, -2.0, l2};
     constexpr double epsilon = 0.25;
-    const M::Vector3WithinRelMatcher m{ target, epsilon };
+    const matchers::Vector3WithinRelMatcher m{ target, epsilon };
 
     SECTION("::match(cVector3 auto)") {
         CHECK(m.match(Vector3<l2>{1.0, 1.3, -2.0, l2}));
@@ -50,6 +50,6 @@ TEST_CASE("Vector3WithinRelMatcher") {
 }
 
 TEST_CASE("Vector3WithinRel(cVector3 auto, std::floating_point auto)") {
-    CHECK_THAT(Vector3<l2>(1.0, 0.0, 0.0, l2), M::WithinRel(Vector3<l2>(0.8, 0.0, 0.0, l2), 0.25));
-    CHECK_THAT(Vector3<l2>(1.0, 0.0, 0.0, l2), !M::WithinRel(Vector3<l2>(0.7, 0.0, 0.0, l2), 0.25));
+    CHECK_THAT(Vector3<l2>(1.0, 0.0, 0.0, l2), matchers::WithinRel(Vector3<l2>(0.8, 0.0, 0.0, l2), 0.25));
+    CHECK_THAT(Vector3<l2>(1.0, 0.0, 0.0, l2), !matchers::WithinRel(Vector3<l2>(0.7, 0.0, 0.0, l2), 0.25));
 }

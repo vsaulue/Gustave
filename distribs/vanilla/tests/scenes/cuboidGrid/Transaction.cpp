@@ -31,18 +31,18 @@
 
 #include <TestHelpers.hpp>
 
-namespace CuboidGrid = Gustave::Scenes::CuboidGrid;
+namespace cuboid = gustave::scenes::cuboidGrid;
 
-using BlockConstructionInfo = CuboidGrid::BlockConstructionInfo<cfg>;
-using BlockIndex = CuboidGrid::BlockIndex;
-using Transaction = CuboidGrid::Transaction<cfg>;
+using BlockConstructionInfo = cuboid::BlockConstructionInfo<libCfg>;
+using BlockIndex = cuboid::BlockIndex;
+using Transaction = cuboid::Transaction<libCfg>;
 
-TEST_CASE("Scene::CubeGrid::Transaction") {
+TEST_CASE("scenes::cuboidGrid::Transaction") {
     Transaction transaction;
     auto const& newBlocks = transaction.newBlocks();
     auto const& deletedBlocks = transaction.deletedBlocks();
 
-    SECTION("::addBlock(BlockConstructionInfo const&)") {
+    SECTION(".addBlock(BlockConstructionInfo const&)") {
         BlockConstructionInfo const new1{ {2,4,6}, concrete_20m, 2.f * u.mass, true };
         BlockConstructionInfo const new2{ {2,4,7}, concrete_20m, 5.f * u.mass, true };
         transaction.addBlock(new1);
@@ -61,14 +61,14 @@ TEST_CASE("Scene::CubeGrid::Transaction") {
         }
     }
 
-    SECTION("::removeBlock(BlockIndex const&)") {
+    SECTION(".removeBlock(BlockIndex const&)") {
         transaction.removeBlock({ 1,1,5 });
         transaction.removeBlock({ 2,1,5 });
 
         CHECK(deletedBlocks.contains({ 1,1,5 }));
     }
 
-    SECTION("::clear()") {
+    SECTION(".clear()") {
         transaction.addBlock({ {2,4,6}, concrete_20m, 2.f * u.mass, true });
         transaction.removeBlock({5,5,5});
 

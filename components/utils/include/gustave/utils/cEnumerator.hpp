@@ -28,7 +28,7 @@
 #include <concepts>
 #include <type_traits>
 
-namespace Gustave::Utils {
+namespace gustave::utils {
     namespace detail {
         template<typename T>
         concept cCanReference = std::is_reference_v<T>;

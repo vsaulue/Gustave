@@ -35,19 +35,19 @@
 
 #include <TestHelpers.hpp>
 
-using ContactReference = Gustave::Solvers::Force1::SolutionUtils::ContactReference<cfg>;
-using NodeReference = Gustave::Solvers::Force1::SolutionUtils::NodeReference<cfg>;
-using SolutionBasis = Gustave::Solvers::Force1::SolutionBasis<cfg>;
-using SolutionData = Gustave::Solvers::Force1::detail::SolutionData<cfg>;
-using SolverConfig = Gustave::Solvers::Force1::Config<cfg>;
-using Structure = Gustave::Solvers::Structure<cfg>;
+using ContactReference = gustave::solvers::force1::solutionUtils::ContactReference<libCfg>;
+using NodeReference = gustave::solvers::force1::solutionUtils::NodeReference<libCfg>;
+using SolutionBasis = gustave::solvers::force1::SolutionBasis<libCfg>;
+using SolutionData = gustave::solvers::force1::detail::SolutionData<libCfg>;
+using SolverConfig = gustave::solvers::force1::Config<libCfg>;
+using Structure = gustave::solvers::Structure<libCfg>;
 
 using ContactIndex = Structure::ContactIndex;
 using Link = Structure::Link;
 using LinkIndex = Structure::LinkIndex;
 using Node = Structure::Node;
 
-TEST_CASE("Force1::SolutionUtils::NodeReference") {
+TEST_CASE("force1::solutionUtils::NodeReference") {
     static constexpr Real<u.one> precision = 0.001f;
     auto const solverConfig = std::make_shared<SolverConfig const>(g, 1000, precision);
 
@@ -101,7 +101,7 @@ TEST_CASE("Force1::SolutionUtils::NodeReference") {
                 std::vector<ContactReference> const expected = {
                     makeContactRef( 1, false),
                 };
-                CHECK_THAT(n2.contacts(), M::C2::UnorderedRangeEquals(expected));
+                CHECK_THAT(n2.contacts(), matchers::c2::UnorderedRangeEquals(expected));
             }
 
             SECTION("// Node 1") {
@@ -109,7 +109,7 @@ TEST_CASE("Force1::SolutionUtils::NodeReference") {
                     makeContactRef(0, false),
                     makeContactRef(1, true),
                 };
-                CHECK_THAT(n1.contacts(), M::C2::UnorderedRangeEquals(expected));
+                CHECK_THAT(n1.contacts(), matchers::c2::UnorderedRangeEquals(expected));
             }
         }
 

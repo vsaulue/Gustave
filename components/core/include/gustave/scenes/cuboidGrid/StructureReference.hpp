@@ -45,22 +45,22 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid {
+    template<cfg::cLibConfig auto cfg>
     class BlockReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto cfg>
     class ContactReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto cfg>
     class StructureReference;
 
     namespace detail {
-        template<Cfg::cLibConfig auto cfg>
+        template<cfg::cLibConfig auto cfg>
         StructureData<cfg> const& structureDataOf(StructureReference<cfg> const&);
     }
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto cfg>
     class StructureReference {
     private:
         using BlockData = detail::BlockData<cfg>;
@@ -69,10 +69,10 @@ namespace Gustave::Scenes::CuboidGrid {
 
         using SceneData = typename StructureData::SceneData;
     public:
-        using BlockReference = CuboidGrid::BlockReference<cfg>;
-        using ContactReference = CuboidGrid::ContactReference<cfg>;
-        using SolverStructure = Solvers::Structure<cfg>;
-        using NodeIndex = Cfg::NodeIndex<cfg>;
+        using BlockReference = cuboidGrid::BlockReference<cfg>;
+        using ContactReference = cuboidGrid::ContactReference<cfg>;
+        using SolverStructure = solvers::Structure<cfg>;
+        using NodeIndex = cfg::NodeIndex<cfg>;
 
         using BlockIndex = typename BlockReference::BlockIndex;
         using ContactIndex = typename ContactReference::ContactIndex;
@@ -87,14 +87,14 @@ namespace Gustave::Scenes::CuboidGrid {
                 Enumerator()
                     : structureData_{ nullptr }
                     , dataIterator_{}
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
                 explicit Enumerator(StructureData const& structureData)
                     : structureData_{ &structureData }
                     , dataIterator_{ structureData.solverIndices().begin() }
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {
                     updateValue();
                 }
@@ -130,7 +130,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 BlockReference value_;
             };
         public:
-            using Iterator = Utils::ForwardIterator<Enumerator>;
+            using Iterator = utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
             explicit Blocks(StructureData const& data)
@@ -159,7 +159,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            constexpr Utils::EndIterator end() const {
+            constexpr utils::EndIterator end() const {
                 return {};
             }
 
@@ -228,17 +228,17 @@ namespace Gustave::Scenes::CuboidGrid {
                 Enumerator()
                     : structure_{ nullptr }
                     , solverIndexIt_{}
-                    , internalLinks_{ Utils::NO_INIT }
+                    , internalLinks_{ utils::NO_INIT }
                     , linkIndex_{ 0 }
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {}
 
                 explicit Enumerator(StructureData const& structure)
                     : structure_{ &structure }
                     , solverIndexIt_{ structure.solverIndices().begin() }
-                    , internalLinks_{ Utils::NO_INIT }
+                    , internalLinks_{ utils::NO_INIT }
                     , linkIndex_{ 0 }
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {
                     if (!isEnd()) {
                         updateInternalLinks();
@@ -300,7 +300,7 @@ namespace Gustave::Scenes::CuboidGrid {
                 ContactReference value_;
             };
         public:
-            using Iterator = Utils::ForwardIterator<Enumerator>;
+            using Iterator = utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
             explicit Links(StructureData const& structure)
@@ -313,7 +313,7 @@ namespace Gustave::Scenes::CuboidGrid {
             }
 
             [[nodiscard]]
-            Utils::EndIterator end() const {
+            utils::EndIterator end() const {
                 return {};
             }
         private:
@@ -328,7 +328,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        explicit StructureReference(Utils::NoInit)
+        explicit StructureReference(utils::NoInit)
             : data_{ nullptr }
         {}
 
@@ -365,21 +365,21 @@ namespace Gustave::Scenes::CuboidGrid {
         [[nodiscard]]
         bool operator==(StructureReference const&) const = default;
 
-        template<Cfg::cLibConfig auto cfg_>
-        friend detail::StructureData<cfg_> const& detail::structureDataOf(StructureReference<cfg_> const&);
+        template<cfg::cLibConfig auto libCfg_>
+        friend detail::StructureData<libCfg_> const& detail::structureDataOf(StructureReference<libCfg_> const&);
     private:
         std::shared_ptr<StructureData const> data_;
     public:
-        using Hasher = Utils::Hasher<StructureReference, &StructureReference::data_>;
+        using Hasher = utils::Hasher<StructureReference, &StructureReference::data_>;
     };
 
     namespace detail {
-        template<Cfg::cLibConfig auto cfg>
-        detail::StructureData<cfg> const& structureDataOf(StructureReference<cfg> const& ref) {
+        template<cfg::cLibConfig auto libCfg>
+        detail::StructureData<libCfg> const& structureDataOf(StructureReference<libCfg> const& ref) {
             return *ref.data_;
         }
     }
 }
 
-template<Gustave::Cfg::cLibConfig auto cfg>
-struct std::hash<Gustave::Scenes::CuboidGrid::StructureReference<cfg>> : Gustave::Scenes::CuboidGrid::StructureReference<cfg>::Hasher {};
+template<gustave::cfg::cLibConfig auto libCfg>
+struct std::hash<gustave::scenes::cuboidGrid::StructureReference<libCfg>> : gustave::scenes::cuboidGrid::StructureReference<libCfg>::Hasher {};

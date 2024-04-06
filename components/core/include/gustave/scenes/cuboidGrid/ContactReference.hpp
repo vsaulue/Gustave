@@ -37,21 +37,21 @@
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/scenes/cuboidGrid/ContactIndex.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid {
+    template<cfg::cLibConfig auto libCfg>
     class BlockReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class StructureReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class ContactReference {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        using BlockDataReference = detail::BlockDataReference<cfg, false>;
-        using SceneData = detail::SceneData<cfg>;
-        using StructureData = detail::StructureData<cfg>;
+        using BlockDataReference = detail::BlockDataReference<libCfg, false>;
+        using SceneData = detail::SceneData<libCfg>;
+        using StructureData = detail::StructureData<libCfg>;
 
         struct BlockDatas {
             BlockDataReference local;
@@ -66,20 +66,20 @@ namespace Gustave::Scenes::CuboidGrid {
             }
         };
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
     public:
-        using BlockIndex = CuboidGrid::BlockIndex;
-        using BlockReference = CuboidGrid::BlockReference<cfg>;
-        using ContactIndex = CuboidGrid::ContactIndex;
-        using Direction = Math3d::BasicDirection;
-        using MaxStress = Model::MaxStress<cfg>;
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using SolverContactIndex = typename Solvers::Structure<cfg>::ContactIndex;
-        using StructureReference = CuboidGrid::StructureReference<cfg>;
+        using BlockIndex = cuboidGrid::BlockIndex;
+        using BlockReference = cuboidGrid::BlockReference<libCfg>;
+        using ContactIndex = cuboidGrid::ContactIndex;
+        using Direction = math3d::BasicDirection;
+        using MaxStress = model::MaxStress<libCfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
+        using SolverContactIndex = typename solvers::Structure<libCfg>::ContactIndex;
+        using StructureReference = cuboidGrid::StructureReference<libCfg>;
 
         [[nodiscard]]
-        explicit ContactReference(Utils::NoInit NO_INIT)
+        explicit ContactReference(utils::NoInit NO_INIT)
             : scene_{ nullptr }
             , index_{ NO_INIT }
         {}

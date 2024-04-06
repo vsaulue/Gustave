@@ -29,21 +29,21 @@
 #include <gustave/units/lib/Real.hpp>
 #include <gustave/units/lib/Unit.hpp>
 
-namespace U = Gustave::Units::Lib;
+namespace u = gustave::units::lib;
 
 TEST_CASE("Math/") {
-    struct Kilogram : U::BasicUnitIdentifier<"kg"> {};
-    constexpr auto kg = U::makeUnitIdentifier<Kilogram>();
+    struct Kilogram : u::BasicUnitIdentifier<"kg"> {};
+    constexpr auto kg = u::makeUnitIdentifier<Kilogram>();
 
     SECTION("sqrt(cReal auto)") {
         SECTION("// dim one") {
-            constexpr U::cReal auto val = 4.0 * U::one;
-            REQUIRE(U::sqrt(val) == 2.0 * U::one);
+            constexpr u::cReal auto val = 4.0 * u::one;
+            REQUIRE(u::sqrt(val) == 2.0 * u::one);
         }
 
         SECTION("// kg ^ 2") {
-            constexpr U::cReal auto val = 16.0 * (kg * kg);
-            REQUIRE(U::sqrt(val) == 4.0 * kg);
+            constexpr u::cReal auto val = 16.0 * (kg * kg);
+            REQUIRE(u::sqrt(val) == 4.0 * kg);
         }
     }
 }

@@ -33,7 +33,7 @@
 #include <gustave/cfg/cUnit.hpp>
 #include <gustave/meta/Meta.hpp>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     namespace detail {
         template<typename To, auto from>
         concept cUnitAssignableFrom = requires {
@@ -44,19 +44,19 @@ namespace Gustave::Cfg {
 
         template<typename T>
         concept cUnitSystem = requires(T u) {
-            { Meta::value(u.acceleration) } -> cUnit;
-            { Meta::value(u.area) } -> cUnit;
-            { Meta::value(u.conductivity) } -> cUnit;
-            { Meta::value(u.density) } -> cUnit;
-            { Meta::value(u.force) } -> cUnit;
-            { Meta::value(u.length) } -> cUnit;
-            { Meta::value(u.mass) } -> cUnit;
-            { Meta::value(u.one) } -> cUnit;
-            { Meta::value(u.potential) } -> cUnit;
-            { Meta::value(u.pressure) } -> cUnit;
-            { Meta::value(u.resistance) } -> cUnit;
-            { Meta::value(u.time) } -> cUnit;
-            { Meta::value(u.volume) } -> cUnit;
+            { meta::value(u.acceleration) } -> cUnit;
+            { meta::value(u.area) } -> cUnit;
+            { meta::value(u.conductivity) } -> cUnit;
+            { meta::value(u.density) } -> cUnit;
+            { meta::value(u.force) } -> cUnit;
+            { meta::value(u.length) } -> cUnit;
+            { meta::value(u.mass) } -> cUnit;
+            { meta::value(u.one) } -> cUnit;
+            { meta::value(u.potential) } -> cUnit;
+            { meta::value(u.pressure) } -> cUnit;
+            { meta::value(u.resistance) } -> cUnit;
+            { meta::value(u.time) } -> cUnit;
+            { meta::value(u.volume) } -> cUnit;
 
             // one is identity
             { u.one * u.area } -> cUnitAssignableFrom<T::area>;
@@ -68,7 +68,7 @@ namespace Gustave::Cfg {
             { u.mass * u.acceleration } -> cUnitAssignableFrom<T::force>;
             { u.length * u.length } -> cUnitAssignableFrom<T::area>;
             { u.force / u.area } -> cUnitAssignableFrom<T::pressure>;
-            { Meta::value(u.potential) } -> cUnitAssignableFrom<T::length>;
+            { meta::value(u.potential) } -> cUnitAssignableFrom<T::length>;
             { u.potential / u.resistance } -> cUnitAssignableFrom<T::force>;
             { u.potential * u.conductivity } -> cUnitAssignableFrom<T::force>;
             { u.length * u.length * u.length } -> cUnitAssignableFrom<T::volume>;
@@ -104,18 +104,18 @@ namespace Gustave::Cfg {
             detail::Real<T, T::units().time> time,
             detail::Real<T, T::units().volume> volume
         ) {
-            { Meta::value(acceleration) } -> cReal;
-            { Meta::value(area) } -> cReal;
-            { Meta::value(density) } -> cReal;
-            { Meta::value(force) } -> cReal;
-            { Meta::value(length) } -> cReal;
-            { Meta::value(mass) } -> cReal;
-            { Meta::value(one) } -> cReal;
-            { Meta::value(potential) } -> cReal;
-            { Meta::value(pressure) } -> cReal;
-            { Meta::value(resistance) } -> cReal;
-            { Meta::value(time) } -> cReal;
-            { Meta::value(volume) } -> cReal;
+            { meta::value(acceleration) } -> cReal;
+            { meta::value(area) } -> cReal;
+            { meta::value(density) } -> cReal;
+            { meta::value(force) } -> cReal;
+            { meta::value(length) } -> cReal;
+            { meta::value(mass) } -> cReal;
+            { meta::value(one) } -> cReal;
+            { meta::value(potential) } -> cReal;
+            { meta::value(pressure) } -> cReal;
+            { meta::value(resistance) } -> cReal;
+            { meta::value(time) } -> cReal;
+            { meta::value(volume) } -> cReal;
 
             acceleration = length / time / time;
             area = length * length;

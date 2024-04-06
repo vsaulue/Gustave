@@ -30,7 +30,7 @@
 #include "BasicUnitIdentifier.hpp"
 #include "Exponent.hpp"
 
-namespace Gustave::Units::Lib {
+namespace gustave::units::lib {
     template<cBasicUnitIdentifier auto basicUnit_, Exponent exponent_>
     struct UnitTerm {
         using Char = typename decltype(basicUnit_)::Char;

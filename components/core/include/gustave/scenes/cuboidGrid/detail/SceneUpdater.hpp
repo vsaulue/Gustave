@@ -48,28 +48,28 @@
 #include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
 #include <gustave/utils/prop/Ptr.hpp>
 
-namespace Gustave::Scenes::CuboidGrid::detail {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid::detail {
+    template<cfg::cLibConfig auto libCfg>
     class SceneUpdater {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        using BlockConstructionInfo = CuboidGrid::BlockConstructionInfo<cfg>;
-        using BlockDataReference = detail::BlockDataReference<cfg, true>;
-        using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
-        using ConstDataNeighbour = detail::DataNeighbour<cfg, false>;
-        using ConstDataNeighbours = detail::DataNeighbours<cfg, false>;
-        using DataNeighbour = detail::DataNeighbour<cfg, true>;
-        using DataNeighbours = detail::DataNeighbours<cfg, true>;
-        using Direction = Math3d::BasicDirection;
-        using LinkIndex = Cfg::LinkIndex<cfg>;
-        using MaxStress = Model::MaxStress<cfg>;
-        using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
-        using SceneData = detail::SceneData<cfg>;
-        using StructureData = detail::StructureData<cfg>;
+        using BlockConstructionInfo = cuboidGrid::BlockConstructionInfo<libCfg>;
+        using BlockDataReference = detail::BlockDataReference<libCfg, true>;
+        using ConstBlockDataReference = detail::BlockDataReference<libCfg, false>;
+        using ConstDataNeighbour = detail::DataNeighbour<libCfg, false>;
+        using ConstDataNeighbours = detail::DataNeighbours<libCfg, false>;
+        using DataNeighbour = detail::DataNeighbour<libCfg, true>;
+        using DataNeighbours = detail::DataNeighbours<libCfg, true>;
+        using Direction = math3d::BasicDirection;
+        using LinkIndex = cfg::LinkIndex<libCfg>;
+        using MaxStress = model::MaxStress<libCfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
+        using SceneData = detail::SceneData<libCfg>;
+        using StructureData = detail::StructureData<libCfg>;
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
         struct TransactionContext {
             std::unordered_set<BlockDataReference> newRoots;
@@ -77,7 +77,7 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             std::vector<std::shared_ptr<StructureData const>> removedStructures;
         };
     public:
-        using Transaction = CuboidGrid::Transaction<cfg>;
+        using Transaction = cuboidGrid::Transaction<libCfg>;
 
         struct Result {
             std::vector<std::shared_ptr<StructureData const>> newStructures;
@@ -195,6 +195,6 @@ namespace Gustave::Scenes::CuboidGrid::detail {
             }
         }
 
-        Utils::Prop::Ptr<SceneData> data_;
+        utils::prop::Ptr<SceneData> data_;
     };
 }

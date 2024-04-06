@@ -32,10 +32,10 @@
 #include <gustave/cfg/cUnit.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Cfg {
+namespace gustave::cfg {
     template<typename T>
     concept cReal = requires (T v, const T cv) {
-        T{ Utils::NO_INIT };
+        T{ utils::NO_INIT };
 
         requires cPrintable<T>;
         requires cRealRep<typename T::Rep>;

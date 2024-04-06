@@ -37,21 +37,21 @@
 #include <TestConfig.hpp>
 
  // Aliases
-namespace Cfg = ::Gustave::Cfg;
-namespace M = ::Gustave::Testing::Matchers;
+namespace cfg = ::gustave::cfg;
+namespace matchers = ::gustave::testing::matchers;
 
-using LinkIndex = Cfg::LinkIndex<cfg>;
-using MaxStress = Gustave::Model::MaxStress<cfg>;
-using NodeIndex = Cfg::NodeIndex<cfg>;
-using NormalizedVector3 = Cfg::NormalizedVector3<cfg>;
+using LinkIndex = cfg::LinkIndex<libCfg>;
+using MaxStress = gustave::model::MaxStress<libCfg>;
+using NodeIndex = cfg::NodeIndex<libCfg>;
+using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
 
-template<Cfg::cUnitOf<cfg> auto unit>
-using Real = Cfg::Real<cfg, unit>;
+template<cfg::cUnitOf<libCfg> auto unit>
+using Real = cfg::Real<libCfg, unit>;
 
-template<Cfg::cUnitOf<cfg> auto unit>
-using Vector3 = Cfg::Vector3<cfg, unit>;
+template<cfg::cUnitOf<libCfg> auto unit>
+using Vector3 = cfg::Vector3<libCfg, unit>;
 
-inline constexpr auto u = Cfg::units(cfg);
+inline constexpr auto u = cfg::units(libCfg);
 
 // Constants
 
@@ -75,7 +75,7 @@ inline MaxStress const concrete_40m{
 
 // Utils
 
-template<Cfg::cUnitOf<cfg> Unit>
+template<cfg::cUnitOf<libCfg> Unit>
 [[nodiscard]]
 inline constexpr Vector3<Unit{}> vector3(std::floating_point auto x, std::floating_point auto y, std::floating_point auto z, Unit unit) {
     return { x, y, z, unit };

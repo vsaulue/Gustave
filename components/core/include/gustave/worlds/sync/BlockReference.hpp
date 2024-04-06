@@ -34,31 +34,31 @@
 #include <gustave/worlds/sync/ContactReference.hpp>
 #include <gustave/worlds/sync/StructureReference.hpp>
 
-namespace Gustave::Worlds::Sync {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::worlds::sync {
+    template<cfg::cLibConfig auto libCfg>
     class ContactReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class StructureReference;
 
-    template<Cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libCfg>
     class BlockReference {
     private:
-        static constexpr auto u = Cfg::units(cfg);
+        static constexpr auto u = cfg::units(libCfg);
 
-        template<Cfg::cUnitOf<cfg> auto unit>
-        using Real = Cfg::Real<cfg, unit>;
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        using StructureData = detail::StructureData<cfg>;
-        using WorldData = detail::WorldData<cfg>;
+        using StructureData = detail::StructureData<libCfg>;
+        using WorldData = detail::WorldData<libCfg>;
         using Scene = typename WorldData::Scene;
 
         using SceneBlock = typename Scene::BlockReference;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
-        using ContactReference = Sync::ContactReference<cfg>;
-        using MaxStress = Model::MaxStress<cfg>;
-        using StructureReference = Sync::StructureReference<cfg>;
+        using ContactReference = sync::ContactReference<libCfg>;
+        using MaxStress = model::MaxStress<libCfg>;
+        using StructureReference = sync::StructureReference<libCfg>;
 
         class Contacts {
         private:
@@ -72,14 +72,14 @@ namespace Gustave::Worlds::Sync {
                 Enumerator()
                     : contacts_{ nullptr }
                     , sceneIt_{}
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
                 explicit Enumerator(Contacts const& contacts)
                     : contacts_{ &contacts }
                     , sceneIt_{ contacts.sceneContacts_.begin() }
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {
                     updateValue();
                 }
@@ -115,7 +115,7 @@ namespace Gustave::Worlds::Sync {
                 ContactReference value_;
             };
         public:
-            using Iterator = Utils::ForwardIterator<Enumerator>;
+            using Iterator = utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
             explicit Contacts(BlockReference const& block)
@@ -129,7 +129,7 @@ namespace Gustave::Worlds::Sync {
             }
 
             [[nodiscard]]
-            Utils::EndIterator end() const {
+            utils::EndIterator end() const {
                 return {};
             }
         private:
@@ -145,7 +145,7 @@ namespace Gustave::Worlds::Sync {
             {}
 
             [[nodiscard]]
-            explicit Neighbour(Utils::NoInit NO_INIT)
+            explicit Neighbour(utils::NoInit NO_INIT)
                 : block_{ NO_INIT }
             {}
 
@@ -171,14 +171,14 @@ namespace Gustave::Worlds::Sync {
                 Enumerator()
                     : structures_{ nullptr }
                     , sceneIterator_{}
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
                 explicit Enumerator(Structures const& structures)
                     : structures_{ &structures }
                     , sceneIterator_{ structures.sceneStructures_.begin() }
-                    , value_{ Utils::NO_INIT }
+                    , value_{ utils::NO_INIT }
                 {
                     updateValue();
                 }
@@ -215,7 +215,7 @@ namespace Gustave::Worlds::Sync {
                 StructureReference value_;
             };
         public:
-            using Iterator = Utils::ForwardIterator<Enumerator>;
+            using Iterator = utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
             explicit Structures(BlockReference const& block)
@@ -234,7 +234,7 @@ namespace Gustave::Worlds::Sync {
             }
 
             [[nodiscard]]
-            constexpr Utils::EndIterator end() const {
+            constexpr utils::EndIterator end() const {
                 return {};
             }
 
@@ -254,7 +254,7 @@ namespace Gustave::Worlds::Sync {
         {}
 
         [[nodiscard]]
-        explicit BlockReference(Utils::NoInit NO_INIT)
+        explicit BlockReference(utils::NoInit NO_INIT)
             : world_{ nullptr }
             , index_{ NO_INIT }
         {}

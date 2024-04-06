@@ -33,16 +33,16 @@
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace Gustave::Scenes::CuboidGrid {
-    template<Cfg::cLibConfig auto cfg>
+namespace gustave::scenes::cuboidGrid {
+    template<cfg::cLibConfig auto libCfg>
     class Links {
     public:
-        using ContactReference = CuboidGrid::ContactReference<cfg>;
+        using ContactReference = cuboidGrid::ContactReference<libCfg>;
         using ContactIndex = typename ContactReference::ContactIndex;
     private:
-        using SceneData = detail::SceneData<cfg>;
+        using SceneData = detail::SceneData<libCfg>;
         using BlockDataIterator = typename SceneData::Blocks::const_iterator;
-        using InternalLinks = detail::InternalLinks<cfg>;
+        using InternalLinks = detail::InternalLinks<libCfg>;
         using LinkIterator = typename InternalLinks::Iterator;
 
         class Enumerator {
@@ -50,7 +50,7 @@ namespace Gustave::Scenes::CuboidGrid {
             [[nodiscard]]
             Enumerator()
                 : blockIt_{}
-                , blockLinks_{ Utils::NO_INIT }
+                , blockLinks_{ utils::NO_INIT }
                 , internalLinkId_{ 0 }
             {}
 
@@ -58,9 +58,9 @@ namespace Gustave::Scenes::CuboidGrid {
             explicit Enumerator(SceneData const& scene)
                 : scene_{ &scene }
                 , blockIt_{ scene.blocks.begin() }
-                , blockLinks_{ Utils::NO_INIT }
+                , blockLinks_{ utils::NO_INIT }
                 , internalLinkId_{ 0 }
-                , value_{ Utils::NO_INIT }
+                , value_{ utils::NO_INIT }
             {
                 if (blockIt_ != scene_->blocks.end()) {
                     blockLinks_ = InternalLinks{ *scene_, blockIt_->first };
@@ -116,7 +116,7 @@ namespace Gustave::Scenes::CuboidGrid {
             ContactReference value_;
         };
     public:
-        using Iterator = Utils::ForwardIterator<Enumerator>;
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Links(SceneData const& scene)
@@ -129,7 +129,7 @@ namespace Gustave::Scenes::CuboidGrid {
         }
 
         [[nodiscard]]
-        Utils::EndIterator end() const {
+        utils::EndIterator end() const {
             return {};
         }
     private:

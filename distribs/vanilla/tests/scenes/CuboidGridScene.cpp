@@ -27,24 +27,19 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
 #include <gustave/scenes/CuboidGridScene.hpp>
-#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
-#include <gustave/scenes/cuboidGrid/Transaction.hpp>
-#include <gustave/testing/Matchers.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockIndex = Gustave::Scenes::CuboidGrid::BlockIndex;
-using Direction = Gustave::Math3d::BasicDirection;
-using Scene = Gustave::Scenes::CuboidGridScene<cfg>;
-using StructureData = Gustave::Scenes::CuboidGrid::detail::StructureData<cfg>;
-using Transaction = Gustave::Scenes::CuboidGrid::Transaction<cfg>;
+using Scene = gustave::scenes::CuboidGridScene<libCfg>;
+
+using BlockIndex = Scene::BlockIndex;
+using Direction = Scene::Direction;
+using Transaction = Scene::Transaction;
 
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
 
-TEST_CASE("Scene::CuboidGrid::Scene") {
+TEST_CASE("scenes::CuboidGridScene") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
 
@@ -74,7 +69,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
                     indices.push_back(block.index());
                 }
                 std::vector<BlockIndex> expected{ {1,0,0}, {2,0,0} };
-                CHECK_THAT(indices, M::C2::UnorderedEquals(expected));
+                CHECK_THAT(indices, matchers::c2::UnorderedEquals(expected));
             }
         }
     }
@@ -109,7 +104,7 @@ TEST_CASE("Scene::CuboidGrid::Scene") {
             scene.contacts().at(Scene::ContactIndex{ {1,0,0}, Direction::plusX() }),
             scene.contacts().at(Scene::ContactIndex{ {2,0,0}, Direction::plusX() }),
         };
-        CHECK_THAT(links, M::C2::UnorderedRangeEquals(expected));
+        CHECK_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
     }
 
     SECTION(".structures() const") {
