@@ -45,12 +45,10 @@ using BlockIndex = BlockReference::BlockIndex;
 using ContactIndex = BlockReference::ContactReference::ContactIndex;
 using ContactReference = BlockReference::ContactReference;
 using Direction = BlockReference::Direction;
-using Neighbour = BlockReference::Neighbour;
 using StructureReference = BlockReference::StructureReference;
 using Transaction = SceneUpdater::Transaction;
 
 static_assert(std::ranges::forward_range<BlockReference::Contacts>);
-static_assert(std::ranges::forward_range<BlockReference::Neighbours>);
 static_assert(std::ranges::forward_range<BlockReference::Structures>);
 
 TEST_CASE("Scene::CuboidGrid::BlockReference") {
@@ -64,11 +62,11 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
     };
     BlockReference b000 = newBlock({ 0,0,0 }, 1000.f * u.mass, true);
     BlockReference b111 = newBlock({ 1,1,1 }, 3000.f * u.mass, false);
-    BlockReference b011 = newBlock({ 0,1,1 }, 4000.f * u.mass, false);
+    /* b011 */ newBlock({0,1,1}, 4000.f * u.mass, false);
     BlockReference b211 = newBlock({ 2,1,1 }, 5000.f * u.mass, false);
     BlockReference b101 = newBlock({ 1,0,1 }, 6000.f * u.mass, false);
     BlockReference b121 = newBlock({ 1,2,1 }, 7000.f * u.mass, true);
-    BlockReference b110 = newBlock({ 1,1,0 }, 8000.f * u.mass, false);
+    /* b110 */ newBlock({1,1,0}, 8000.f * u.mass, false);
     BlockReference b112 = newBlock({ 1,1,2 }, 9000.f * u.mass, true);
     /* b112 */ newBlock({1,2,2}, 2000.f * u.mass, false);
     /* b113 */ newBlock({1,1,3}, 1000.f * u.mass, true);
@@ -153,42 +151,6 @@ TEST_CASE("Scene::CuboidGrid::BlockReference") {
         SECTION("// invalid") {
             sceneData.blocks.erase({ 1,1,1 });
             CHECK_THROWS_AS(b111.maxStress() == concrete_20m, std::out_of_range);
-        }
-    }
-
-    SECTION(".neighbours()") {
-        auto neighboursAsVector = [](BlockReference const& block) -> std::vector<Neighbour> {
-            std::vector<Neighbour> result;
-            for (auto const& neighbour : block.neighbours()) {
-                result.push_back(neighbour);
-            }
-            return result;
-            };
-
-        SECTION("// 6 neighbours") {
-            auto const neighbours = neighboursAsVector(b111);
-            auto const expected = std::vector<Neighbour>{
-                Neighbour{ b011, Direction::minusX() },
-                Neighbour{ b211, Direction::plusX() },
-                Neighbour{ b101, Direction::minusY() },
-                Neighbour{ b121, Direction::plusY() },
-                Neighbour{ b110, Direction::minusZ() },
-                Neighbour{ b112, Direction::plusZ() },
-            };
-            CHECK_THAT(neighbours, M::C2::UnorderedEquals(expected));
-        }
-
-        SECTION("// 1 neighbour") {
-            auto const neighbours = neighboursAsVector(b011);
-            auto const expected = std::vector<Neighbour>{
-                Neighbour{ b111, Direction::plusX()},
-            };
-            CHECK_THAT(neighbours, M::C2::UnorderedEquals(expected));
-        }
-
-        SECTION("// 0 neighbour") {
-            auto const neighbours = neighboursAsVector(b000);
-            CHECK(neighbours.size() == 0);
         }
     }
 

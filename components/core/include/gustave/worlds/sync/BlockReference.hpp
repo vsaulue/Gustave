@@ -160,82 +160,6 @@ namespace Gustave::Worlds::Sync {
             BlockReference block_;
         };
 
-        class Neighbours {
-        private:
-            using SceneNeighbours = typename SceneBlock::Neighbours;
-            using SceneIterator = typename SceneNeighbours::Iterator;
-
-            class Enumerator {
-            public:
-                [[nodiscard]]
-                Enumerator()
-                    : neighbours_{ nullptr }
-                    , sceneIterator_{}
-                    , value_{ Utils::NO_INIT }
-                {}
-
-                [[nodiscard]]
-                explicit Enumerator(Neighbours const& neighbours)
-                    : neighbours_{ &neighbours }
-                    , sceneIterator_{ neighbours.sceneNeighbours_.begin() }
-                    , value_{ Utils::NO_INIT }
-                {
-                    updateValue();
-                }
-
-                void operator++() {
-                    ++sceneIterator_;
-                    updateValue();
-                }
-
-                [[nodiscard]]
-                Neighbour const& operator*() const {
-                    return value_;
-                }
-
-                [[nodiscard]]
-                bool isEnd() const {
-                    return sceneIterator_ == neighbours_->sceneNeighbours_.end();
-                }
-
-                [[nodiscard]]
-                bool operator==(Enumerator const& other) const {
-                    return sceneIterator_ == other.sceneIterator_;
-                }
-            private:
-                void updateValue() {
-                    if (!isEnd()) {
-                        value_ = Neighbour{ BlockReference{ *neighbours_->world_, (*sceneIterator_).block().index() }};
-                    }
-                }
-
-                Neighbours const* neighbours_;
-                SceneIterator sceneIterator_;
-                Neighbour value_;
-            };
-        public:
-            using Iterator = Utils::ForwardIterator<Enumerator>;
-
-            [[nodiscard]]
-            explicit Neighbours(BlockReference const& block)
-                : world_{ block.world_ }
-                , sceneNeighbours_{ block.sceneBlock().neighbours() }
-            {}
-
-            [[nodiscard]]
-            Iterator begin() const {
-                return Iterator{ *this };
-            }
-
-            [[nodiscard]]
-            constexpr Utils::EndIterator end() const {
-                return {};
-            }
-        private:
-            WorldData const* world_;
-            SceneNeighbours sceneNeighbours_;
-        };
-
         class Structures {
         private:
             using SceneStructures = typename SceneBlock::Structures;
@@ -363,11 +287,6 @@ namespace Gustave::Worlds::Sync {
         [[nodiscard]]
         MaxStress const& maxStress() const {
             return sceneBlock().maxStress();
-        }
-
-        [[nodiscard]]
-        Neighbours neighbours() const {
-            return Neighbours{ *this };
         }
 
         [[nodiscard]]

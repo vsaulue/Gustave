@@ -167,122 +167,6 @@ namespace Gustave::Scenes::CuboidGrid {
             BlockReference source_;
         };
 
-        class Neighbour {
-        public:
-            [[nodiscard]]
-            explicit Neighbour(BlockReference const& block, Direction direction)
-                : block_{ block }
-                , direction_{ direction }
-            {}
-
-            [[nodiscard]]
-            explicit Neighbour(Utils::NoInit NO_INIT)
-                : block_{ NO_INIT }
-                , direction_{ Direction::plusX() }
-            {}
-
-            [[nodiscard]]
-            BlockReference const& block() const {
-                return block_;
-            }
-
-            [[nodiscard]]
-            Direction direction() const {
-                return direction_;
-            }
-
-            [[nodiscard]]
-            bool operator==(Neighbour const&) const = default;
-        private:
-            BlockReference block_;
-            Direction direction_;
-        };
-
-        class Neighbours {
-        private:
-            using IndexIterator = typename IndexNeighbours::Iterator;
-
-            class Enumerator {
-            public:
-                [[nodiscard]]
-                Enumerator()
-                    : neighbours_{ nullptr }
-                    , index_{ nullptr }
-                    , value_{ Utils::NO_INIT }
-                {}
-
-                [[nodiscard]]
-                explicit Enumerator(Neighbours const& neighbours)
-                    : neighbours_{ &neighbours }
-                    , index_{ neighbours.indices_.begin() }
-                    , value_{ Utils::NO_INIT }
-                {
-                    next();
-                }
-
-                [[nodiscard]]
-                bool isEnd() const {
-                    return index_ == indices().end();
-                }
-
-                void operator++() {
-                    ++index_;
-                    next();
-                }
-
-                [[nodiscard]]
-                Neighbour const& operator*() const {
-                    return value_;
-                }
-
-                [[nodiscard]]
-                bool operator==(Enumerator const& other) const {
-                    return index_ == other.index_;
-                }
-            private:
-                [[nodiscard]]
-                IndexNeighbours const& indices() const {
-                    return neighbours_->indices_;
-                }
-
-                void next() {
-                    while (index_ != indices().end()) {
-                        IndexNeighbour const& idNeighbour = *index_;
-                        if (BlockDataReference neighbour = neighbours_->data_->blocks.find(idNeighbour.index)) {
-                            value_ = Neighbour{ BlockReference{ *neighbours_->data_, idNeighbour.index }, idNeighbour.direction };
-                            break;
-                        }
-                        ++index_;
-                    }
-                }
-
-                Neighbours const* neighbours_;
-                IndexIterator index_;
-                Neighbour value_;
-            };
-        public:
-            using Iterator = Utils::ForwardIterator<Enumerator>;
-
-            [[nodiscard]]
-            explicit Neighbours(SceneData const& data, BlockIndex const& source)
-                : data_{ &data }
-                , indices_ { source }
-            {}
-
-            [[nodiscard]]
-            Iterator begin() const {
-                return Iterator{ *this };
-            }
-
-            [[nodiscard]]
-            constexpr Utils::EndIterator end() const {
-                return {};
-            }
-        private:
-            SceneData const* data_;
-            IndexNeighbours indices_;
-        };
-
         class Structures {
         private:
             using Values = std::array<StructureReference, 6>;
@@ -386,11 +270,6 @@ namespace Gustave::Scenes::CuboidGrid {
         [[nodiscard]]
         MaxStress const& maxStress() const {
             return data().maxStress();
-        }
-
-        [[nodiscard]]
-        Neighbours neighbours() const {
-            return Neighbours{ *sceneData_, index_ };
         }
 
         [[nodiscard]]

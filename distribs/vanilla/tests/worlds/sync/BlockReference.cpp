@@ -57,7 +57,6 @@ static WorldData makeWorld() {
 }
 
 static_assert(std::ranges::forward_range<BlockReference::Contacts>);
-static_assert(std::ranges::forward_range<BlockReference::Neighbours>);
 static_assert(std::ranges::forward_range<BlockReference::Structures>);
 
 TEST_CASE("Worlds::Sync::BlockReference") {
@@ -147,21 +146,6 @@ TEST_CASE("Worlds::Sync::BlockReference") {
         SECTION("// invalid") {
             removeBlock({ 0,0,0 });
             CHECK_THROWS_AS(b000.maxStress(), std::out_of_range);
-        }
-    }
-
-    SECTION(".neighbours()") {
-        using Neighbour = BlockReference::Neighbour;
-
-        SECTION("// empty") {
-            auto const neighbours = b002.neighbours();
-            CHECK(neighbours.begin() == neighbours.end());
-        }
-
-        SECTION("// 2 neighbours") {
-            auto const neighbours = b010.neighbours();
-            std::vector<Neighbour> expected = { Neighbour{b000}, Neighbour{b020} };
-            CHECK_THAT(neighbours, M::C2::UnorderedRangeEquals(expected));
         }
     }
 
