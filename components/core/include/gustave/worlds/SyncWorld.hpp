@@ -32,12 +32,12 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/worlds/sync/Blocks.hpp>
-#include <gustave/worlds/sync/Contacts.hpp>
-#include <gustave/worlds/sync/Links.hpp>
-#include <gustave/worlds/sync/detail/WorldData.hpp>
-#include <gustave/worlds/sync/detail/WorldUpdater.hpp>
-#include <gustave/worlds/sync/Structures.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldUpdater.hpp>
+#include <gustave/worlds/syncWorld/Blocks.hpp>
+#include <gustave/worlds/syncWorld/Contacts.hpp>
+#include <gustave/worlds/syncWorld/Links.hpp>
+#include <gustave/worlds/syncWorld/Structures.hpp>
 #include <gustave/worlds/WorldStructureState.hpp>
 
 namespace gustave::worlds {
@@ -52,13 +52,13 @@ namespace gustave::worlds {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        using WorldData = sync::detail::WorldData<libCfg>;
-        using WorldUpdater = sync::detail::WorldUpdater<libCfg>;
+        using WorldData = syncWorld::detail::WorldData<libCfg>;
+        using WorldUpdater = syncWorld::detail::WorldUpdater<libCfg>;
     public:
-        using Blocks = sync::Blocks<libCfg>;
-        using Contacts = sync::Contacts<libCfg>;
-        using Links = sync::Links<libCfg>;
-        using Structures = sync::Structures<libCfg>;
+        using Blocks = syncWorld::Blocks<libCfg>;
+        using Contacts = syncWorld::Contacts<libCfg>;
+        using Links = syncWorld::Links<libCfg>;
+        using Structures = syncWorld::Structures<libCfg>;
 
         using BlockIndex = typename WorldData::Scene::BlockIndex;
         using BlockReference = typename Blocks::BlockReference;

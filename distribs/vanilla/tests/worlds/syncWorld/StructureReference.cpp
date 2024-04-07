@@ -23,18 +23,15 @@
  * SOFTWARE.
  */
 
-#include <catch2/catch_test_macros.hpp>
-
-#include <gustave/worlds/sync/BlockReference.hpp>
-#include <gustave/worlds/sync/detail/WorldData.hpp>
-#include <gustave/worlds/sync/detail/WorldUpdater.hpp>
-#include <gustave/worlds/sync/StructureReference.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldUpdater.hpp>
+#include <gustave/worlds/syncWorld/StructureReference.hpp>
 
 #include <TestHelpers.hpp>
 
-using StructureReference = gustave::worlds::sync::StructureReference<libCfg>;
-using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
-using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
+using StructureReference = gustave::worlds::syncWorld::StructureReference<libCfg>;
+using WorldData = gustave::worlds::syncWorld::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::syncWorld::detail::WorldUpdater<libCfg>;
 
 using BlockIndex = WorldData::Scene::BlockIndex;
 using BlockReference = StructureReference::BlockReference;
@@ -57,7 +54,7 @@ static WorldData makeWorld() {
 
 static_assert(std::ranges::forward_range<StructureReference::Blocks>);
 
-TEST_CASE("worlds::sync::StructureReference") {
+TEST_CASE("worlds::syncWorld::StructureReference") {
     WorldData world = makeWorld();
 
     {

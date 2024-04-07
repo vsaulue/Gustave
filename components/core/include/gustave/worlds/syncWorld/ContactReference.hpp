@@ -29,11 +29,11 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/worlds/sync/detail/WorldData.hpp>
-#include <gustave/worlds/sync/BlockReference.hpp>
-#include <gustave/worlds/sync/StructureReference.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/BlockReference.hpp>
+#include <gustave/worlds/syncWorld/StructureReference.hpp>
 
-namespace gustave::worlds::sync {
+namespace gustave::worlds::syncWorld {
     template<cfg::cLibConfig auto libCfg>
     class StructureReference;
 
@@ -55,11 +55,11 @@ namespace gustave::worlds::sync {
 
         static constexpr auto u = cfg::units(libCfg);
     public:
-        using BlockReference = sync::BlockReference<libCfg>;
+        using BlockReference = syncWorld::BlockReference<libCfg>;
         using ContactIndex = typename WorldData::Scene::ContactIndex;
         using MaxStress = typename SceneContact::MaxStress;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
-        using StructureReference = sync::StructureReference<libCfg>;
+        using StructureReference = syncWorld::StructureReference<libCfg>;
 
         [[nodiscard]]
         explicit ContactReference(WorldData const& world, ContactIndex const& index)

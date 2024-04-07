@@ -25,8 +25,6 @@
 
 #include <stdexcept>
 
-#include <catch2/catch_test_macros.hpp>
-
 #include <gustave/worlds/SyncWorld.hpp>
 
 #include <TestHelpers.hpp>

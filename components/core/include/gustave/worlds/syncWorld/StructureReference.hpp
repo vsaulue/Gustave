@@ -33,11 +33,11 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
-#include <gustave/worlds/sync/BlockReference.hpp>
-#include <gustave/worlds/sync/ContactReference.hpp>
-#include <gustave/worlds/sync/detail/StructureData.hpp>
+#include <gustave/worlds/syncWorld/detail/StructureData.hpp>
+#include <gustave/worlds/syncWorld/BlockReference.hpp>
+#include <gustave/worlds/syncWorld/ContactReference.hpp>
 
-namespace gustave::worlds::sync {
+namespace gustave::worlds::syncWorld {
     template<cfg::cLibConfig auto libCfg>
     class BlockReference;
 
@@ -58,9 +58,9 @@ namespace gustave::worlds::sync {
         using SceneContactReference = typename WorldData::Scene::ContactReference;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
-        using BlockReference = sync::BlockReference<libCfg>;
+        using BlockReference = syncWorld::BlockReference<libCfg>;
         using ContactIndex = typename WorldData::Scene::ContactIndex;
-        using ContactReference = sync::ContactReference<libCfg>;
+        using ContactReference = syncWorld::ContactReference<libCfg>;
         using State = typename StructureData::State;
 
         class Blocks {

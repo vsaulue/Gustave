@@ -25,16 +25,16 @@
 
 #pragma once
 
-#include <gustave/worlds/sync/detail/WorldData.hpp>
-#include <gustave/worlds/sync/ContactReference.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/ContactReference.hpp>
 
-namespace gustave::worlds::sync {
+namespace gustave::worlds::syncWorld {
     template<cfg::cLibConfig auto libCfg>
     class Contacts {
     private:
         using WorldData = detail::WorldData<libCfg>;
     public:
-        using ContactReference = sync::ContactReference<libCfg>;
+        using ContactReference = syncWorld::ContactReference<libCfg>;
 
         using ContactIndex = typename ContactReference::ContactIndex;
 

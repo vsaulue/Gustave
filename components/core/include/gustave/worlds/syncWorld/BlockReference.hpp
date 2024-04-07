@@ -30,11 +30,11 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
-#include <gustave/worlds/sync/detail/StructureData.hpp>
-#include <gustave/worlds/sync/ContactReference.hpp>
-#include <gustave/worlds/sync/StructureReference.hpp>
+#include <gustave/worlds/syncWorld/detail/StructureData.hpp>
+#include <gustave/worlds/syncWorld/ContactReference.hpp>
+#include <gustave/worlds/syncWorld/StructureReference.hpp>
 
-namespace gustave::worlds::sync {
+namespace gustave::worlds::syncWorld {
     template<cfg::cLibConfig auto libCfg>
     class ContactReference;
 
@@ -56,9 +56,9 @@ namespace gustave::worlds::sync {
         using SceneBlock = typename Scene::BlockReference;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
-        using ContactReference = sync::ContactReference<libCfg>;
+        using ContactReference = syncWorld::ContactReference<libCfg>;
         using MaxStress = model::MaxStress<libCfg>;
-        using StructureReference = sync::StructureReference<libCfg>;
+        using StructureReference = syncWorld::StructureReference<libCfg>;
 
         class Contacts {
         private:

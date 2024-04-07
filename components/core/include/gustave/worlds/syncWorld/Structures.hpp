@@ -25,93 +25,95 @@
 
 #pragma once
 
+#include <stdexcept>
+
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
-#include <gustave/worlds/sync/detail/WorldData.hpp>
-#include <gustave/worlds/sync/ContactReference.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/StructureReference.hpp>
 
-namespace gustave::worlds::sync {
+namespace gustave::worlds::syncWorld {
     template<cfg::cLibConfig auto libCfg>
-    class Links {
+    class Structures {
+    public:
+        using StructureReference = syncWorld::StructureReference<libCfg>;
     private:
         using WorldData = detail::WorldData<libCfg>;
-        using SceneLinks = typename WorldData::Scene::Links;
-    public:
-        using ContactReference = sync::ContactReference<libCfg>;
-        using ContactIndex = typename ContactReference::ContactIndex;
-    private:
+
         class Enumerator {
         private:
-            using SceneIterator = typename SceneLinks::Iterator;
+            using DataIterator = typename WorldData::Structures::const_iterator;
         public:
             [[nodiscard]]
             Enumerator()
-                : links_{ nullptr }
-                , sceneIt_{}
+                : world_{ nullptr }
+                , dataIterator_{}
                 , value_{ utils::NO_INIT }
             {}
 
             [[nodiscard]]
-            explicit Enumerator(Links const& links)
-                : links_{ &links }
-                , sceneIt_{ links.sceneLinks_.begin() }
+            explicit Enumerator(WorldData const& world)
+                : world_{ &world }
+                , dataIterator_{ world.structures.begin() }
                 , value_{ utils::NO_INIT }
             {
                 updateValue();
             }
 
+            [[nodiscard]]
+            bool isEnd() const {
+                return dataIterator_ == world_->structures.end();
+            }
+
             void operator++() {
-                ++sceneIt_;
+                ++dataIterator_;
                 updateValue();
             }
 
             [[nodiscard]]
-            bool isEnd() const {
-                return sceneIt_ == links_->sceneLinks_.end();
-            }
-
-            [[nodiscard]]
-            ContactReference const& operator*() const {
+            StructureReference const& operator*() const {
                 return value_;
             }
 
             [[nodiscard]]
             bool operator==(Enumerator const& other) const {
-                return sceneIt_ == other.sceneIt_;
+                return dataIterator_ == other.dataIterator_;
             }
         private:
             void updateValue() {
                 if (!isEnd()) {
-                    value_ = ContactReference{ *links_->world_, sceneIt_->index() };
+                    value_ = StructureReference{ dataIterator_->second };
                 }
             }
-
-            Links const* links_;
-            SceneIterator sceneIt_;
-            ContactReference value_;
+            WorldData const* world_;
+            DataIterator dataIterator_;
+            StructureReference value_;
         };
     public:
         using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
-        explicit Links(WorldData const& world)
+        explicit Structures(WorldData const& world)
             : world_{ &world }
-            , sceneLinks_{ world.scene.links() }
         {}
 
         [[nodiscard]]
         Iterator begin() const {
-            return Iterator{ *this };
+            return Iterator{ *world_ };
         }
 
         [[nodiscard]]
-        utils::EndIterator end() const {
+        constexpr utils::EndIterator end() const {
             return {};
+        }
+
+        [[nodiscard]]
+        std::size_t size() const {
+            return world_->structures.size();
         }
     private:
         WorldData const* world_;
-        SceneLinks sceneLinks_;
     };
 }

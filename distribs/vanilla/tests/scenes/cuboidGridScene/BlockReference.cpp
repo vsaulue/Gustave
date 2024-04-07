@@ -28,10 +28,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/scenes/cuboidGridScene/BlockReference.hpp>
 
 #include <TestHelpers.hpp>
 

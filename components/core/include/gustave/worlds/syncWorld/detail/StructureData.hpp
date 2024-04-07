@@ -31,7 +31,7 @@
 #include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/worlds/WorldStructureState.hpp>
 
-namespace gustave::worlds::sync::detail {
+namespace gustave::worlds::syncWorld::detail {
     template<cfg::cLibConfig auto libCfg>
     struct WorldData;
 

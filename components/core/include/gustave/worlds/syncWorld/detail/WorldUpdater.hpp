@@ -28,9 +28,9 @@
 #include <cassert>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/worlds/sync/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
 
-namespace gustave::worlds::sync::detail {
+namespace gustave::worlds::syncWorld::detail {
     template<cfg::cLibConfig auto libCfg>
     class WorldUpdater {
     public:

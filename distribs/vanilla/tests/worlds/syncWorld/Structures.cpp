@@ -23,22 +23,19 @@
  * SOFTWARE.
  */
 
-#include <catch2/catch_test_macros.hpp>
-
-#include <gustave/worlds/sync/detail/WorldData.hpp>
-#include <gustave/worlds/sync/detail/WorldUpdater.hpp>
-#include <gustave/worlds/sync/StructureReference.hpp>
-#include <gustave/worlds/sync/Structures.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldUpdater.hpp>
+#include <gustave/worlds/syncWorld/Structures.hpp>
 
 #include <TestHelpers.hpp>
 
-using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
-using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
-using StructureReference = gustave::worlds::sync::StructureReference<libCfg>;
-using Structures = gustave::worlds::sync::Structures<libCfg>;
+using WorldData = gustave::worlds::syncWorld::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::syncWorld::detail::WorldUpdater<libCfg>;
+using Structures = gustave::worlds::syncWorld::Structures<libCfg>;
 
 using BlockIndex = WorldData::Scene::BlockIndex;
 using Solver = WorldData::Solver;
+using StructureReference = Structures::StructureReference;
 using Transaction = WorldUpdater::Transaction;
 
 static constexpr auto blockSize = vector3(3.f, 2.f, 1.f, u.length);
@@ -52,7 +49,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("worlds::sync::Structures") {
+TEST_CASE("worlds::syncWorld::Structures") {
     WorldData world = makeWorld();
     Structures structures{ world };
 

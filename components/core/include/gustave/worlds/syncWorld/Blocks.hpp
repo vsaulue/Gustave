@@ -31,10 +31,10 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
-#include <gustave/worlds/sync/BlockReference.hpp>
-#include <gustave/worlds/sync/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/BlockReference.hpp>
 
-namespace gustave::worlds::sync {
+namespace gustave::worlds::syncWorld {
     template<cfg::cLibConfig auto libCfg>
     class Blocks {
     private:
@@ -43,7 +43,7 @@ namespace gustave::worlds::sync {
         using SceneBlocks = typename WorldData::Scene::Blocks;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
-        using BlockReference = sync::BlockReference<libCfg>;
+        using BlockReference = syncWorld::BlockReference<libCfg>;
     private:
         class Enumerator {
         private:

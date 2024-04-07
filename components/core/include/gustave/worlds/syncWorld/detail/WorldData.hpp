@@ -31,9 +31,9 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/scenes/CuboidGridScene.hpp>
 #include <gustave/solvers/Force1Solver.hpp>
-#include <gustave/worlds/sync/detail/StructureData.hpp>
+#include <gustave/worlds/syncWorld/detail/StructureData.hpp>
 
-namespace gustave::worlds::sync::detail {
+namespace gustave::worlds::syncWorld::detail {
     template<cfg::cLibConfig auto libCfg>
     struct WorldData {
     private:

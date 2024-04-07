@@ -23,20 +23,20 @@
  * SOFTWARE.
  */
 
-#include <catch2/catch_test_macros.hpp>
+#include <memory>
 
-#include <gustave/worlds/sync/Blocks.hpp>
-#include <gustave/worlds/sync/detail/WorldData.hpp>
-#include <gustave/worlds/sync/detail/WorldUpdater.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/worlds/syncWorld/detail/WorldUpdater.hpp>
+#include <gustave/worlds/syncWorld/Contacts.hpp>
 
 #include <TestHelpers.hpp>
 
-using WorldData = gustave::worlds::sync::detail::WorldData<libCfg>;
-using WorldUpdater = gustave::worlds::sync::detail::WorldUpdater<libCfg>;
-using Blocks = gustave::worlds::sync::Blocks<libCfg>;
+using Contacts = gustave::worlds::syncWorld::Contacts<libCfg>;
+using WorldData = gustave::worlds::syncWorld::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::worlds::syncWorld::detail::WorldUpdater<libCfg>;
 
-using BlockIndex = WorldData::Scene::BlockIndex;
-using BlockReference = Blocks::BlockReference;
+using ContactIndex = Contacts::ContactIndex;
+using Direction = ContactIndex::Direction;
 using Solver = WorldData::Solver;
 using Transaction = WorldUpdater::Transaction;
 
@@ -51,46 +51,29 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("worlds::sync::Blocks") {
+TEST_CASE("worlds::syncWorld::Contacts") {
     WorldData world = makeWorld();
-    Blocks blocks{ world };
 
-    {
-        Transaction t;
-        t.addBlock({ {0,0,0}, concrete_20m, blockMass, true });
-        t.addBlock({ {0,1,0}, concrete_20m, blockMass, false });
-        t.addBlock({ {0,2,0}, concrete_20m, blockMass, false });
-        t.addBlock({ {0,3,0}, concrete_20m, blockMass, false });
-        WorldUpdater{ world }.runTransaction(t);
-    }
+    Transaction t;
+    t.addBlock({ {2,2,2}, concrete_20m, blockMass, false });
+    t.addBlock({ {2,1,2}, concrete_20m, blockMass, true });
+    WorldUpdater{ world }.runTransaction(t);
+
+    Contacts contacts{ world };
 
     SECTION(".at()") {
         SECTION("// valid") {
-            auto const block = blocks.at({ 0,0,0 });
-            REQUIRE(block.isValid());
-            CHECK(block.isFoundation());
+            auto contact = contacts.at(ContactIndex{ {2,1,2}, Direction::plusY() });
+            CHECK_THAT(contact.forceVector(), matchers::WithinRel(blockMass * g, solverPrecision));
         }
 
         SECTION("// invalid") {
-            CHECK_THROWS_AS(blocks.at({ 1,0,0 }), std::out_of_range);
+            CHECK_THROWS_AS(contacts.at(ContactIndex{ {2,1,2}, Direction::plusX() }), std::out_of_range);
         }
-    }
-
-    SECTION(".begin() // & .end()") {
-        std::vector<BlockIndex> indices;
-        for (auto const& block : blocks) {
-            indices.push_back(block.index());
-        }
-        std::vector<BlockIndex> expected{ {0,0,0},{0,1,0},{0,2,0},{0,3,0} };
-        CHECK_THAT(indices, matchers::c2::UnorderedRangeEquals(expected));
     }
 
     SECTION(".find()") {
-        CHECK(blocks.find({ 0,0,0 }).isValid());
-        CHECK_FALSE(blocks.find({ 0,0,1 }).isValid());
-    }
-
-    SECTION(".size()") {
-        CHECK(blocks.size() == 4);
+        auto contact = contacts.find(ContactIndex{ {2,1,2}, Direction::plusY() });
+        CHECK_THAT(contact.forceVector(), matchers::WithinRel(blockMass * g, solverPrecision));
     }
 }
