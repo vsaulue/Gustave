@@ -33,17 +33,17 @@
 #include <gustave/solvers/force1/detail/NodeInfo.hpp>
 #include <gustave/solvers/force1/detail/NodeStats.hpp>
 #include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solutionUtils/NodeReference.hpp>
+#include <gustave/solvers/force1/solution/NodeReference.hpp>
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 
-namespace gustave::solvers::force1::solutionUtils {
+namespace gustave::solvers::force1::solution {
     template<cfg::cLibConfig auto libCfg>
     class Nodes {
     public:
-        using NodeReference = solutionUtils::NodeReference<libCfg>;
-        using NodeIndex = cfg::NodeIndex<libCfg>;
+        using NodeReference = solution::NodeReference<libCfg>;
+        using NodeIndex = typename NodeReference::NodeIndex;
     private:
         using SolutionData = detail::SolutionData<libCfg>;
         using Structure = solvers::Structure<libCfg>;

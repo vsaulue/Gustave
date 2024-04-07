@@ -28,25 +28,24 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solutionUtils/NodeReference.hpp>
-#include <gustave/solvers/force1/solutionUtils/ContactReference.hpp>
-#include <gustave/solvers/force1/SolutionBasis.hpp>
-#include <gustave/solvers/Structure.hpp>
+#include <gustave/solvers/force1/solution/Contacts.hpp>
 
 #include <TestHelpers.hpp>
 
-using ContactReference = gustave::solvers::force1::solutionUtils::ContactReference<libCfg>;
-using NodeReference = gustave::solvers::force1::solutionUtils::NodeReference<libCfg>;
-using SolutionBasis = gustave::solvers::force1::SolutionBasis<libCfg>;
+using Contacts = gustave::solvers::force1::solution::Contacts<libCfg>;
 using SolutionData = gustave::solvers::force1::detail::SolutionData<libCfg>;
-using SolverConfig = gustave::solvers::force1::Config<libCfg>;
-using Structure = gustave::solvers::Structure<libCfg>;
 
-using ContactIndex = Structure::ContactIndex;
+using Structure = SolutionData::Basis::Structure;
+
+using ContactIndex = Contacts::ContactIndex;
+using ContactReference = Contacts::ContactReference;
 using Link = Structure::Link;
 using Node = Structure::Node;
+using NodeReference = Contacts::ContactReference::NodeReference;
+using SolutionBasis = SolutionData::Basis;
+using SolverConfig = SolutionData::Basis::Config;
 
-TEST_CASE("force1::solutionUtils::ContactReference") {
+TEST_CASE("force1::solutionUtils::Contacts") {
     static constexpr Real<u.one> precision = 0.001f;
     auto const solverConfig = std::make_shared<SolverConfig const>(g, 1000, precision);
 
@@ -64,68 +63,17 @@ TEST_CASE("force1::solutionUtils::ContactReference") {
 
     SolutionData data{ basis };
 
-    NodeReference n1{ data, 1 };
-    NodeReference n2{ data, 2 };
-
     ContactReference c12{ data, ContactIndex{ 1, true } };
-    ContactReference c21{ data, ContactIndex{ 1, false } };
 
-    SECTION(".compressionConductivity()") {
-        CHECK(c12.compressionConductivity() == 20'000'000.f * u.conductivity);
-    }
+    Contacts contacts{ data };
 
-    SECTION(".forceCoord()") {
-        CHECK(c12.forceCoord() == 2'500'000.f * u.force);
-    }
-
-    SECTION(".forceVector()") {
-        CHECK(c21.forceVector() == vector3(0.f, 2'500'000.f, 0.f, u.force));
-    }
-
-    SECTION(".index()") {
-        CHECK(c21.index() == ContactIndex{ 1, false });
-    }
-
-    SECTION(".localNode()") {
-        SECTION("// isLocal == true") {
-            CHECK(c12.localNode() == n1);
+    SECTION(".at()") {
+        SECTION("// valid") {
+            CHECK(contacts.at(ContactIndex{ 1,true }) == c12);
         }
 
-        SECTION("// isLocal == false") {
-            CHECK(c21.localNode() == n2);
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(contacts.at(ContactIndex{2,false}), std::out_of_range);
         }
-    }
-
-    SECTION(".normal()") {
-        SECTION("// isLocal == true") {
-            CHECK(c12.normal() == Normals::y);
-        }
-
-        SECTION("// isLocal == false") {
-            CHECK(c21.normal() == -Normals::y);
-        }
-    }
-
-    SECTION(".opposite()") {
-        CHECK(c12.opposite() == c21);
-        CHECK(c21.opposite() == c12);
-    }
-
-    SECTION(".otherNode()") {
-        SECTION("// isLocal == true") {
-            CHECK(c12.otherNode() == n2);
-        }
-
-        SECTION("// isLocal == false") {
-            CHECK(c21.otherNode() == n1);
-        }
-    }
-
-    SECTION(".shearConductivity()") {
-        CHECK(c21.shearConductivity() == 14'000'000.f * u.conductivity);
-    }
-
-    SECTION(".tensileConductivity()") {
-        CHECK(c21.tensileConductivity() == 2'000'000.f * u.conductivity);
     }
 }

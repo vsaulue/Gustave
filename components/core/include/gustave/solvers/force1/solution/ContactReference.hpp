@@ -29,11 +29,11 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solutionUtils/NodeReference.hpp>
+#include <gustave/solvers/force1/solution/NodeReference.hpp>
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace gustave::solvers::force1::solutionUtils {
+namespace gustave::solvers::force1::solution {
     template<cfg::cLibConfig auto libCfg>
     class NodeReference;
 
@@ -56,7 +56,7 @@ namespace gustave::solvers::force1::solutionUtils {
     public:
         using ContactIndex = typename Structure::ContactIndex;
         using NodeIndex = typename Structure::NodeIndex;
-        using NodeReference = solutionUtils::NodeReference<libCfg>;
+        using NodeReference = solution::NodeReference<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
 
         [[nodiscard]]

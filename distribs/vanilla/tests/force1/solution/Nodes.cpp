@@ -29,21 +29,18 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solutionUtils/NodeReference.hpp>
-#include <gustave/solvers/force1/solutionUtils/Nodes.hpp>
-#include <gustave/solvers/force1/SolutionBasis.hpp>
-#include <gustave/solvers/Structure.hpp>
+#include <gustave/solvers/force1/solution/Nodes.hpp>
 
 #include <TestHelpers.hpp>
 
-using NodeReference = gustave::solvers::force1::solutionUtils::NodeReference<libCfg>;
-using Nodes = gustave::solvers::force1::solutionUtils::Nodes<libCfg>;
-using SolutionBasis = gustave::solvers::force1::SolutionBasis<libCfg>;
+using Nodes = gustave::solvers::force1::solution::Nodes<libCfg>;
 using SolutionData = gustave::solvers::force1::detail::SolutionData<libCfg>;
-using SolverConfig = gustave::solvers::force1::Config<libCfg>;
-using Structure = gustave::solvers::Structure<libCfg>;
 
-using Node = Structure::Node;
+using Node = SolutionData::Basis::Structure::Node;
+using NodeReference = Nodes::NodeReference;
+using SolutionBasis = SolutionData::Basis;
+using SolverConfig = SolutionData::SolutionData::Basis::Config;
+using Structure = SolutionData::Basis::Structure;
 
 static_assert(std::ranges::forward_range<Nodes>);
 

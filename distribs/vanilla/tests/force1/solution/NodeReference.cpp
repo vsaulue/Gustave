@@ -28,24 +28,22 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solutionUtils/ContactReference.hpp>
-#include <gustave/solvers/force1/solutionUtils/NodeReference.hpp>
-#include <gustave/solvers/force1/SolutionBasis.hpp>
-#include <gustave/solvers/Structure.hpp>
+#include <gustave/solvers/force1/solution/NodeReference.hpp>
 
 #include <TestHelpers.hpp>
 
-using ContactReference = gustave::solvers::force1::solutionUtils::ContactReference<libCfg>;
-using NodeReference = gustave::solvers::force1::solutionUtils::NodeReference<libCfg>;
-using SolutionBasis = gustave::solvers::force1::SolutionBasis<libCfg>;
+using NodeReference = gustave::solvers::force1::solution::NodeReference<libCfg>;
 using SolutionData = gustave::solvers::force1::detail::SolutionData<libCfg>;
-using SolverConfig = gustave::solvers::force1::Config<libCfg>;
-using Structure = gustave::solvers::Structure<libCfg>;
+
+using Structure = SolutionData::Basis::Structure;
 
 using ContactIndex = Structure::ContactIndex;
+using ContactReference = NodeReference::ContactReference;
 using Link = Structure::Link;
 using LinkIndex = Structure::LinkIndex;
 using Node = Structure::Node;
+using SolutionBasis = SolutionData::Basis;
+using SolverConfig = SolutionData::Basis::Config;
 
 TEST_CASE("force1::solutionUtils::NodeReference") {
     static constexpr Real<u.one> precision = 0.001f;

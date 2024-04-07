@@ -32,8 +32,8 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/force1/detail/ForceBalancer.hpp>
 #include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solutionUtils/Contacts.hpp>
-#include <gustave/solvers/force1/solutionUtils/Nodes.hpp>
+#include <gustave/solvers/force1/solution/Contacts.hpp>
+#include <gustave/solvers/force1/solution/Nodes.hpp>
 #include <gustave/solvers/force1/SolutionBasis.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -48,7 +48,6 @@ namespace gustave::solvers::force1 {
         using Vector3 = cfg::Vector3<libCfg, unit>;
 
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
-        using NodeIndex = cfg::NodeIndex<libCfg>;
 
         using ForceBalancer = detail::ForceBalancer<libCfg>;
         using SolutionData = detail::SolutionData<libCfg>;
@@ -57,12 +56,15 @@ namespace gustave::solvers::force1 {
         static constexpr auto rt = libCfg.realTraits;
     public:
         using Basis = SolutionBasis<libCfg>;
-        using Contacts = solutionUtils::Contacts<libCfg>;
-        using Nodes = solutionUtils::Nodes<libCfg>;
-        using Structure = typename Basis::Structure;
+        using Contacts = solution::Contacts<libCfg>;
+        using Nodes = solution::Nodes<libCfg>;
 
-        using ContactIndex = typename Structure::ContactIndex;
-        using Link = typename Structure::Link;
+        using ContactIndex = typename Basis::Structure::ContactIndex;
+        using ContactReference = typename Contacts::ContactReference;
+        using Link = typename Basis::Structure::Link;
+        using NodeIndex = typename Nodes::NodeReference::NodeIndex;
+        using NodeReference = typename Nodes::NodeReference;
+        using Structure = typename Basis::Structure;
 
         [[nodiscard]]
         explicit Solution(std::shared_ptr<const Basis> basis)

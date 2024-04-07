@@ -33,12 +33,12 @@
 #include <gustave/solvers/force1/detail/NodeInfo.hpp>
 #include <gustave/solvers/force1/detail/NodeStats.hpp>
 #include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solutionUtils/ContactReference.hpp>
+#include <gustave/solvers/force1/solution/ContactReference.hpp>
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 
-namespace gustave::solvers::force1::solutionUtils {
+namespace gustave::solvers::force1::solution {
     template<cfg::cLibConfig auto libCfg>
     class Contacts {
     private:
@@ -48,7 +48,7 @@ namespace gustave::solvers::force1::solutionUtils {
         using LinkIndex = typename Structure::LinkIndex;
     public:
         using ContactIndex = typename Structure::ContactIndex;
-        using ContactReference = solutionUtils::ContactReference<libCfg>;
+        using ContactReference = solution::ContactReference<libCfg>;
 
         [[nodiscard]]
         explicit Contacts(SolutionData const& solution)

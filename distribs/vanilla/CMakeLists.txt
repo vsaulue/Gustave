@@ -32,10 +32,10 @@ target_link_libraries(Gustave-Vanilla
 )
 
 add_executable(Test-Gustave-Vanilla
-    "tests/force1/solutionUtils/ContactReference.cpp"
-    "tests/force1/solutionUtils/Contacts.cpp"
-    "tests/force1/solutionUtils/NodeReference.cpp"
-    "tests/force1/solutionUtils/Nodes.cpp"
+    "tests/force1/solution/ContactReference.cpp"
+    "tests/force1/solution/Contacts.cpp"
+    "tests/force1/solution/NodeReference.cpp"
+    "tests/force1/solution/Nodes.cpp"
     "tests/force1/Solution.cpp"
     "tests/force1/Solver.cpp"
     "tests/model/MaxStress.cpp"
