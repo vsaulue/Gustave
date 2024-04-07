@@ -29,7 +29,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/scenes/CuboidGridScene.hpp>
-#include <gustave/worlds/WorldStructureState.hpp>
+#include <gustave/worlds/syncWorld/StructureState.hpp>
 
 namespace gustave::worlds::syncWorld::detail {
     template<cfg::cLibConfig auto libCfg>
@@ -41,7 +41,7 @@ namespace gustave::worlds::syncWorld::detail {
         using WorldData = detail::WorldData<libCfg>;
         using Scene = typename WorldData::Scene;
         using Solver = typename WorldData::Solver;
-        using State = WorldStructureState;
+        using State = StructureState;
 
         using SceneStructure = typename Scene::StructureReference;
         using Solution = typename Solver::Solution;

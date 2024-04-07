@@ -38,7 +38,6 @@
 #include <gustave/worlds/syncWorld/Contacts.hpp>
 #include <gustave/worlds/syncWorld/Links.hpp>
 #include <gustave/worlds/syncWorld/Structures.hpp>
-#include <gustave/worlds/WorldStructureState.hpp>
 
 namespace gustave::worlds {
     template<cfg::cLibConfig auto libCfg>
