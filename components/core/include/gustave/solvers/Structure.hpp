@@ -28,21 +28,23 @@
 #include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/solvers/common/ContactIndex.hpp>
-#include <gustave/solvers/common/Link.hpp>
-#include <gustave/solvers/common/Node.hpp>
+#include <gustave/solvers/structure/ContactIndex.hpp>
+#include <gustave/solvers/structure/Link.hpp>
+#include <gustave/solvers/structure/Node.hpp>
 #include <gustave/utils/canNarrow.hpp>
 
 namespace gustave::solvers {
     template<cfg::cLibConfig auto libCfg>
     class Structure {
     public:
-        using ContactIndex = common::ContactIndex<libCfg>;
-        using Link = common::Link<libCfg>;
-        using LinkIndex = cfg::LinkIndex<libCfg>;
+        using ContactIndex = structure::ContactIndex<libCfg>;
+        using Link = structure::Link<libCfg>;
+        using Node = structure::Node<libCfg>;
+
+        using LinkIndex = typename Link::LinkIndex;
+        using NodeIndex = typename Node::NodeIndex;
+
         using Links = std::vector<Link>;
-        using Node = common::Node<libCfg>;
-        using NodeIndex = cfg::NodeIndex<libCfg>;
         using Nodes = std::vector<Node>;
 
         [[nodiscard]]

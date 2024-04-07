@@ -25,37 +25,38 @@
 
 #pragma once
 
-#include <ostream>
+#include <cassert>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace gustave::solvers::common {
-    template<cfg::cLibConfig auto cfg>
-    struct ContactIndex {
+namespace gustave::solvers::structure {
+    template<cfg::cLibConfig auto libCfg>
+    struct Node {
+    private:
+        static constexpr auto u = cfg::units(libCfg);
+
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
     public:
-        using LinkIndex = cfg::LinkIndex<cfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
+
+        bool isFoundation;
 
         [[nodiscard]]
-        ContactIndex opposite() const {
-            return ContactIndex{ linkIndex, !isOnLocalNode };
+        explicit Node(Real<u.mass> mass, bool isFoundation)
+            : isFoundation(isFoundation)
+            , mass_(mass)
+        {
+            assert(mass > 0.f * u.mass);
         }
 
         [[nodiscard]]
-        bool operator==(ContactIndex const&) const = default;
-
-        friend std::ostream& operator<<(std::ostream& str, ContactIndex const& index) {
-            str << "{ linkIndex: " << index.linkIndex << ", isOnLocalNode: ";
-            if (index.isOnLocalNode) {
-                str << "true";
-            } else {
-                str << "false";
-            }
-            return str << " }";
+        Real<u.mass> mass() const {
+            return mass_;
         }
-
-        LinkIndex linkIndex;
-        bool isOnLocalNode;
+    private:
+        Real<u.mass> mass_;
     };
 }

@@ -31,7 +31,7 @@
 #include <gustave/meta/Meta.hpp>
 #include <gustave/model/MaxStress.hpp>
 
-namespace gustave::solvers::common {
+namespace gustave::solvers::structure {
     template<cfg::cLibConfig auto libCfg>
     struct Link {
     private:
@@ -42,8 +42,10 @@ namespace gustave::solvers::common {
 
         using MaxStress = model::MaxStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
-        using NodeIndex = cfg::NodeIndex<libCfg>;
     public:
+        using LinkIndex = cfg::LinkIndex<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
+
         [[nodiscard]]
         explicit Link(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, MaxStress const& maxStress)
             : localNodeId_{ id1 }
