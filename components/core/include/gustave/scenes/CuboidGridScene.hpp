@@ -30,20 +30,15 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGrid/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGrid/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGrid/BlockReference.hpp>
-#include <gustave/scenes/cuboidGrid/Blocks.hpp>
-#include <gustave/scenes/cuboidGrid/ContactIndex.hpp>
-#include <gustave/scenes/cuboidGrid/ContactReference.hpp>
-#include <gustave/scenes/cuboidGrid/Contacts.hpp>
-#include <gustave/scenes/cuboidGrid/Links.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGrid/detail/SceneUpdater.hpp>
-#include <gustave/scenes/cuboidGrid/detail/StructureData.hpp>
-#include <gustave/scenes/cuboidGrid/Structures.hpp>
-#include <gustave/scenes/cuboidGrid/Transaction.hpp>
-#include <gustave/scenes/cuboidGrid/TransactionResult.hpp>
+#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/scenes/cuboidGridScene/Blocks.hpp>
+#include <gustave/scenes/cuboidGridScene/Contacts.hpp>
+#include <gustave/scenes/cuboidGridScene/Links.hpp>
+#include <gustave/scenes/cuboidGridScene/Structures.hpp>
+#include <gustave/scenes/cuboidGridScene/Transaction.hpp>
+#include <gustave/scenes/cuboidGridScene/TransactionResult.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::scenes {
@@ -52,9 +47,9 @@ namespace gustave::scenes {
     private:
         static constexpr auto u = cfg::units(libCfg);
 
-        using SceneData = cuboidGrid::detail::SceneData<libCfg>;
-        using SceneUpdater = cuboidGrid::detail::SceneUpdater<libCfg>;
-        using StructureData = cuboidGrid::detail::StructureData<libCfg>;
+        using SceneData = cuboidGridScene::detail::SceneData<libCfg>;
+        using SceneUpdater = cuboidGridScene::detail::SceneUpdater<libCfg>;
+        using StructureData = cuboidGridScene::detail::StructureData<libCfg>;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -62,18 +57,20 @@ namespace gustave::scenes {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using BlockIndex = cuboidGrid::BlockIndex;
-        using BlockReference = cuboidGrid::BlockReference<libCfg>;
-        using Blocks = cuboidGrid::Blocks<libCfg>;
-        using ContactIndex = cuboidGrid::ContactIndex;
-        using ContactReference = cuboidGrid::ContactReference<libCfg>;
-        using Contacts = cuboidGrid::Contacts<libCfg>;
-        using Direction = math3d::BasicDirection;
-        using Links = cuboidGrid::Links<libCfg>;
-        using StructureReference = cuboidGrid::StructureReference<libCfg>;
-        using Structures = cuboidGrid::Structures<libCfg>;
-        using Transaction = cuboidGrid::Transaction<libCfg>;
-        using TransactionResult = cuboidGrid::TransactionResult<libCfg>;
+        using Blocks = cuboidGridScene::Blocks<libCfg>;
+        using Contacts = cuboidGridScene::Contacts<libCfg>;
+        using Links = cuboidGridScene::Links<libCfg>;
+        using Structures = cuboidGridScene::Structures<libCfg>;
+        using Transaction = cuboidGridScene::Transaction<libCfg>;
+        using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
+
+        using BlockIndex = typename Blocks::BlockIndex;
+        using BlockReference = typename Blocks::BlockReference;
+        using ContactIndex = typename Contacts::ContactIndex;
+        using ContactReference = typename Contacts::ContactReference;
+        using Direction = typename Contacts::ContactIndex::Direction;
+        using StructureReference = typename Structures::StructureReference;
+
 
         [[nodiscard]]
         explicit CuboidGridScene(Vector3<u.length> const& blockSize)
