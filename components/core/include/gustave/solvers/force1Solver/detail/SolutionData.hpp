@@ -30,11 +30,11 @@
 #include <utility>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/solvers/force1/detail/ForceBalancer.hpp>
-#include <gustave/solvers/force1/detail/ForceRepartition.hpp>
-#include <gustave/solvers/force1/SolutionBasis.hpp>
+#include <gustave/solvers/force1Solver/detail/ForceBalancer.hpp>
+#include <gustave/solvers/force1Solver/detail/ForceRepartition.hpp>
+#include <gustave/solvers/force1Solver/SolutionBasis.hpp>
 
-namespace gustave::solvers::force1::detail {
+namespace gustave::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
     class SolutionData {
     public:

@@ -30,14 +30,14 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/force1/detail/ForceBalancer.hpp>
-#include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solution/Contacts.hpp>
-#include <gustave/solvers/force1/solution/Nodes.hpp>
-#include <gustave/solvers/force1/SolutionBasis.hpp>
+#include <gustave/solvers/force1Solver/detail/ForceBalancer.hpp>
+#include <gustave/solvers/force1Solver/detail/SolutionData.hpp>
+#include <gustave/solvers/force1Solver/solution/Contacts.hpp>
+#include <gustave/solvers/force1Solver/solution/Nodes.hpp>
+#include <gustave/solvers/force1Solver/SolutionBasis.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace gustave::solvers::force1 {
+namespace gustave::solvers::force1Solver {
     template<cfg::cLibConfig auto libCfg>
     class Solution {
     private:

@@ -24,60 +24,56 @@
  */
 
 #include <memory>
-#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solution/Nodes.hpp>
+#include <gustave/solvers/force1Solver/detail/SolutionData.hpp>
+#include <gustave/solvers/force1Solver/solution/Contacts.hpp>
 
 #include <TestHelpers.hpp>
 
-using Nodes = gustave::solvers::force1::solution::Nodes<libCfg>;
-using SolutionData = gustave::solvers::force1::detail::SolutionData<libCfg>;
+using Contacts = gustave::solvers::force1Solver::solution::Contacts<libCfg>;
+using SolutionData = gustave::solvers::force1Solver::detail::SolutionData<libCfg>;
 
-using Node = SolutionData::Basis::Structure::Node;
-using NodeReference = Nodes::NodeReference;
-using SolutionBasis = SolutionData::Basis;
-using SolverConfig = SolutionData::SolutionData::Basis::Config;
 using Structure = SolutionData::Basis::Structure;
 
-static_assert(std::ranges::forward_range<Nodes>);
+using ContactIndex = Contacts::ContactIndex;
+using ContactReference = Contacts::ContactReference;
+using Link = Structure::Link;
+using Node = Structure::Node;
+using NodeReference = Contacts::ContactReference::NodeReference;
+using SolutionBasis = SolutionData::Basis;
+using SolverConfig = SolutionData::Basis::Config;
 
-TEST_CASE("force1::solutionUtils::Nodes") {
+TEST_CASE("force1::solutionUtils::Contacts") {
     static constexpr Real<u.one> precision = 0.001f;
     auto const solverConfig = std::make_shared<SolverConfig const>(g, 1000, precision);
 
     auto structure = std::make_shared<Structure>();
     structure->addNode(Node{ 5'000.f * u.mass, true });
-    structure->addNode(Node{ 10'000.f * u.mass, false });
+    structure->addNode(Node{ 15'000.f * u.mass, false });
+    structure->addNode(Node{ 7'500.f * u.mass, false });
+    structure->addLink(Link{ 0, 1, Normals::y, 2.f * u.area, 1.f * u.length, concrete_20m });
+    structure->addLink(Link{ 1, 2, Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });
 
     auto const basis = std::make_shared<SolutionBasis>(structure, solverConfig);
     basis->spanPotentials()[0] = 0.f * u.potential;
     basis->spanPotentials()[1] = 0.125f * u.potential;
+    basis->spanPotentials()[2] = 0.25f * u.potential;
 
     SolutionData data{ basis };
-    Nodes nodes{ data };
+
+    ContactReference c12{ data, ContactIndex{ 1, true } };
+
+    Contacts contacts{ data };
 
     SECTION(".at()") {
         SECTION("// valid") {
-            CHECK(nodes.at(1) == NodeReference{ data, 1 });
+            CHECK(contacts.at(ContactIndex{ 1,true }) == c12);
         }
 
         SECTION("// invalid") {
-            CHECK_THROWS_AS(nodes.at(2), std::out_of_range);
+            CHECK_THROWS_AS(contacts.at(ContactIndex{2,false}), std::out_of_range);
         }
-    }
-
-    SECTION(".begin() // & .end()") {
-        std::vector<NodeReference> const expected = {
-            NodeReference{ data, 0 },
-            NodeReference{ data, 1 },
-        };
-        CHECK_THAT(nodes, matchers::c2::RangeEquals(expected));
-    }
-
-    SECTION(".size()") {
-        CHECK(nodes.size() == 2);
     }
 }

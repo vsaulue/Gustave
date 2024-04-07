@@ -30,15 +30,15 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/force1/detail/NodeInfo.hpp>
-#include <gustave/solvers/force1/detail/NodeStats.hpp>
-#include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solution/NodeReference.hpp>
+#include <gustave/solvers/force1Solver/detail/NodeInfo.hpp>
+#include <gustave/solvers/force1Solver/detail/NodeStats.hpp>
+#include <gustave/solvers/force1Solver/detail/SolutionData.hpp>
+#include <gustave/solvers/force1Solver/solution/NodeReference.hpp>
 #include <gustave/solvers/Structure.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 
-namespace gustave::solvers::force1::solution {
+namespace gustave::solvers::force1Solver::solution {
     template<cfg::cLibConfig auto libCfg>
     class Nodes {
     public:

@@ -27,13 +27,13 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/solvers/force1/detail/SolutionData.hpp>
-#include <gustave/solvers/force1/solution/ContactReference.hpp>
+#include <gustave/solvers/force1Solver/detail/SolutionData.hpp>
+#include <gustave/solvers/force1Solver/solution/ContactReference.hpp>
 
 #include <TestHelpers.hpp>
 
-using ContactReference = gustave::solvers::force1::solution::ContactReference<libCfg>;
-using SolutionData = gustave::solvers::force1::detail::SolutionData<libCfg>;
+using ContactReference = gustave::solvers::force1Solver::solution::ContactReference<libCfg>;
+using SolutionData = gustave::solvers::force1Solver::detail::SolutionData<libCfg>;
 
 using Structure = SolutionData::Basis::Structure;
 

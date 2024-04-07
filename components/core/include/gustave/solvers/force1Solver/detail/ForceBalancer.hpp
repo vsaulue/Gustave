@@ -32,12 +32,12 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/solvers/Structure.hpp>
-#include <gustave/solvers/force1/Config.hpp>
-#include <gustave/solvers/force1/detail/ContactInfo.hpp>
-#include <gustave/solvers/force1/detail/LinkInfo.hpp>
-#include <gustave/solvers/force1/detail/NodeInfo.hpp>
+#include <gustave/solvers/force1Solver/detail/ContactInfo.hpp>
+#include <gustave/solvers/force1Solver/detail/LinkInfo.hpp>
+#include <gustave/solvers/force1Solver/detail/NodeInfo.hpp>
+#include <gustave/solvers/force1Solver/Config.hpp>
 
-namespace gustave::solvers::force1::detail {
+namespace gustave::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
     class ForceBalancer {
     private:
@@ -56,7 +56,7 @@ namespace gustave::solvers::force1::detail {
     public:
         using Structure = solvers::Structure<libCfg>;
 
-        using Config = force1::Config<libCfg>;
+        using Config = force1Solver::Config<libCfg>;
         using ContactInfo = detail::ContactInfo<libCfg>;
         using Link = typename Structure::Link;
         using LinkInfo = detail::LinkInfo<libCfg>;

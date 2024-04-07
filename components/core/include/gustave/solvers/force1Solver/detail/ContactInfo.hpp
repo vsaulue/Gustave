@@ -26,44 +26,57 @@
 #pragma once
 
 #include <cassert>
-#include <stdexcept>
-#include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/force1/detail/ContactInfo.hpp>
-#include <gustave/utils/canNarrow.hpp>
 
-namespace gustave::solvers::force1::detail {
+namespace gustave::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
-    class NodeInfo {
+    class ContactInfo {
     private:
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
 
         static constexpr auto u = cfg::units(libCfg);
     public:
-        using Contacts = std::vector<ContactInfo<libCfg>>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
-        using LocalContactIndex = LinkIndex;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
         [[nodiscard]]
-        explicit NodeInfo(Real<u.force> weight)
-            : weight{ weight }
+        explicit ContactInfo(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus)
+            : otherIndex_{ otherIndex }
+            , linkIndex_{ linkIndex }
+            , rMinus_{ rMinus }
+            , rPlus_{ rPlus }
         {
-            assert(weight > 0.f * u.force);
+            assert(rMinus > 0.f * u.resistance);
+            assert(rPlus > 0.f * u.resistance);
         }
 
-        LocalContactIndex addContact(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) {
-            auto const result = contacts.size();
-            assert(utils::canNarrow<LocalContactIndex>(result));
-            contacts.emplace_back(otherIndex, linkIndex, rPlus, rMinus);
-            return result;
+        [[nodiscard]]
+        LinkIndex linkIndex() const {
+            return linkIndex_;
         }
 
-        Contacts contacts;
-        Real<u.force> weight;
+        [[nodiscard]]
+        NodeIndex otherIndex() const {
+            return otherIndex_;
+        }
+
+        [[nodiscard]]
+        Real<u.resistance> rMinus() const {
+            return rMinus_;
+        }
+
+        [[nodiscard]]
+        Real<u.resistance> rPlus() const {
+            return rPlus_;
+        }
+    private:
+        NodeIndex otherIndex_;
+        LinkIndex linkIndex_;
+        Real<u.resistance> rMinus_;
+        Real<u.resistance> rPlus_;
     };
 }

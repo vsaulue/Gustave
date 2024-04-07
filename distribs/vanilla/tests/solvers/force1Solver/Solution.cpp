@@ -29,14 +29,14 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include <gustave/solvers/force1/Config.hpp>
-#include <gustave/solvers/force1/Solution.hpp>
+#include <gustave/solvers/force1Solver/Config.hpp>
+#include <gustave/solvers/force1Solver/Solution.hpp>
 
 #include <TestHelpers.hpp>
 
-using Config = gustave::solvers::force1::Config<libCfg>;
-using Solution = gustave::solvers::force1::Solution<libCfg>;
+using Solution = gustave::solvers::force1Solver::Solution<libCfg>;
 
+using Config = Solution::Basis::Config;
 using ContactIndex = Solution::ContactIndex;
 using Link = Solution::Structure::Link;
 using Node = Solution::Structure::Node;

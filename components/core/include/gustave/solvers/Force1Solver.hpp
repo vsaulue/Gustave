@@ -35,11 +35,11 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/force1/detail/ForceBalancer.hpp>
-#include <gustave/solvers/force1/detail/ForceRepartition.hpp>
-#include <gustave/solvers/force1/Config.hpp>
-#include <gustave/solvers/force1/Solution.hpp>
-#include <gustave/solvers/force1/SolutionBasis.hpp>
+#include <gustave/solvers/force1Solver/detail/ForceBalancer.hpp>
+#include <gustave/solvers/force1Solver/detail/ForceRepartition.hpp>
+#include <gustave/solvers/force1Solver/Config.hpp>
+#include <gustave/solvers/force1Solver/Solution.hpp>
+#include <gustave/solvers/force1Solver/SolutionBasis.hpp>
 #include <gustave/solvers/Structure.hpp>
 
 namespace gustave::solvers {
@@ -60,13 +60,13 @@ namespace gustave::solvers {
     public:
         using Structure = solvers::Structure<libCfg>;
 
-        using Basis = force1::SolutionBasis<libCfg>;
-        using Config = force1::Config<libCfg>;
-        using ForceBalancer = force1::detail::ForceBalancer<libCfg>;
-        using ForceRepartition = force1::detail::ForceRepartition<libCfg>;
+        using Basis = force1Solver::SolutionBasis<libCfg>;
+        using Config = force1Solver::Config<libCfg>;
+        using ForceBalancer = force1Solver::detail::ForceBalancer<libCfg>;
+        using ForceRepartition = force1Solver::detail::ForceRepartition<libCfg>;
         using IterationIndex = std::uint64_t;
         using Node = typename Structure::Node;
-        using Solution = force1::Solution<libCfg>;
+        using Solution = force1Solver::Solution<libCfg>;
 
         class Result {
         public:

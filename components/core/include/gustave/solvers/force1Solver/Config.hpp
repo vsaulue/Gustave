@@ -28,49 +28,47 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/force1/detail/NodeInfo.hpp>
 
-namespace gustave::solvers::force1::detail {
+namespace gustave::solvers::force1Solver {
     template<cfg::cLibConfig auto libCfg>
-    class NodeStats {
+    class Config {
     private:
-        template<cfg::cUnitOf<libCfg> auto unit>
-        using Real = cfg::Real<libCfg, unit>;
-
         static constexpr auto u = cfg::units(libCfg);
-        static constexpr auto rt = libCfg.realTraits;
+
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = typename cfg::Real<libCfg, unit>;
+
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = typename cfg::Vector3<libCfg, unit>;
     public:
-        using NodeInfo = detail::NodeInfo<libCfg>;
+        using IterationIndex = std::uint64_t;
 
         [[nodiscard]]
-        explicit NodeStats(NodeInfo const& info, Real<u.force> force, Real<u.conductivity> derivative)
-            : info_{ info }
-            , force_{ force }
-            , derivative_{ derivative }
-        {}
-
-        [[nodiscard]]
-        Real<u.one> relativeError() const {
-            return rt.abs(force_ / info_.weight);
+        explicit Config(Vector3<u.acceleration> const& g, IterationIndex maxIterations, Real<u.one> targetMaxError)
+            : g_{ g }
+            , maxIterations_{ maxIterations }
+            , targetMaxError_{ targetMaxError }
+        {
+            assert(targetMaxError > 0.f);
         }
 
         [[nodiscard]]
-        NodeInfo const& info() const {
-            return info_;
+        Vector3<u.acceleration> const& g() const {
+            return g_;
         }
 
         [[nodiscard]]
-        Real<u.force> force() const {
-            return force_;
+        IterationIndex maxIterations() const {
+            return maxIterations_;
         }
 
         [[nodiscard]]
-        Real<u.conductivity> derivative() const {
-            return derivative_;
+        Real<u.one> targetMaxError() const {
+            return targetMaxError_;
         }
     private:
-        NodeInfo const& info_;
-        Real<u.force> force_;
-        Real<u.conductivity> derivative_;
+        Vector3<u.acceleration> g_;
+        IterationIndex maxIterations_;
+        Real<u.one> targetMaxError_;
     };
 }

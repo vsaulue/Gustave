@@ -26,15 +26,51 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/solvers/force1Solver/detail/NodeInfo.hpp>
 
-namespace gustave::solvers::force1::detail {
+namespace gustave::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
-    struct LinkInfo {
-    public:
-        using LocalContactIndex = cfg::LinkIndex<libCfg>;
+    class NodeStats {
+    private:
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
 
-        LocalContactIndex localContactId;
-        LocalContactIndex otherContactId;
+        static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto rt = libCfg.realTraits;
+    public:
+        using NodeInfo = detail::NodeInfo<libCfg>;
+
+        [[nodiscard]]
+        explicit NodeStats(NodeInfo const& info, Real<u.force> force, Real<u.conductivity> derivative)
+            : info_{ info }
+            , force_{ force }
+            , derivative_{ derivative }
+        {}
+
+        [[nodiscard]]
+        Real<u.one> relativeError() const {
+            return rt.abs(force_ / info_.weight);
+        }
+
+        [[nodiscard]]
+        NodeInfo const& info() const {
+            return info_;
+        }
+
+        [[nodiscard]]
+        Real<u.force> force() const {
+            return force_;
+        }
+
+        [[nodiscard]]
+        Real<u.conductivity> derivative() const {
+            return derivative_;
+        }
+    private:
+        NodeInfo const& info_;
+        Real<u.force> force_;
+        Real<u.conductivity> derivative_;
     };
 }

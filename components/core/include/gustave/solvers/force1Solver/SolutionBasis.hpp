@@ -33,10 +33,10 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/solvers/force1/Config.hpp>
+#include <gustave/solvers/force1Solver/Config.hpp>
 #include <gustave/solvers/Structure.hpp>
 
-namespace gustave::solvers::force1 {
+namespace gustave::solvers::force1Solver {
     template<cfg::cLibConfig auto libCfg>
     class SolutionBasis {
     private:
@@ -48,7 +48,7 @@ namespace gustave::solvers::force1 {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Config = force1::Config<libCfg>;
+        using Config = force1Solver::Config<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
         [[nodiscard]]

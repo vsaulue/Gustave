@@ -26,49 +26,15 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace gustave::solvers::force1 {
+namespace gustave::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
-    class Config {
-    private:
-        static constexpr auto u = cfg::units(libCfg);
-
-        template<cfg::cUnitOf<libCfg> auto unit>
-        using Real = typename cfg::Real<libCfg, unit>;
-
-        template<cfg::cUnitOf<libCfg> auto unit>
-        using Vector3 = typename cfg::Vector3<libCfg, unit>;
+    struct LinkInfo {
     public:
-        using IterationIndex = std::uint64_t;
+        using LocalContactIndex = cfg::LinkIndex<libCfg>;
 
-        [[nodiscard]]
-        explicit Config(Vector3<u.acceleration> const& g, IterationIndex maxIterations, Real<u.one> targetMaxError)
-            : g_{ g }
-            , maxIterations_{ maxIterations }
-            , targetMaxError_{ targetMaxError }
-        {
-            assert(targetMaxError > 0.f);
-        }
-
-        [[nodiscard]]
-        Vector3<u.acceleration> const& g() const {
-            return g_;
-        }
-
-        [[nodiscard]]
-        IterationIndex maxIterations() const {
-            return maxIterations_;
-        }
-
-        [[nodiscard]]
-        Real<u.one> targetMaxError() const {
-            return targetMaxError_;
-        }
-    private:
-        Vector3<u.acceleration> g_;
-        IterationIndex maxIterations_;
-        Real<u.one> targetMaxError_;
+        LocalContactIndex localContactId;
+        LocalContactIndex otherContactId;
     };
 }
