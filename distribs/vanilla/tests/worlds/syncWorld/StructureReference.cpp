@@ -64,6 +64,8 @@ TEST_CASE("worlds::syncWorld::StructureReference") {
         t.addBlock({ {0,2,0}, concrete_20m, blockMass, false });
         t.addBlock({ {0,3,0}, concrete_20m, blockMass, true });
         t.addBlock({ {0,4,0}, concrete_20m, blockMass, false });
+        t.addBlock({ {2,0,2}, concrete_20m, blockMass, false });
+        t.addBlock({ {2,1,2}, concrete_20m, blockMass, false });
         WorldUpdater{ world }.runTransaction(t);
     }
 
@@ -79,29 +81,30 @@ TEST_CASE("worlds::syncWorld::StructureReference") {
         WorldUpdater{ world }.runTransaction(t);
     };
 
-    StructureReference const s1 = structureOf({ 0,1,0 });
-    StructureReference const s4 = structureOf({ 0,4,0 });
+    StructureReference const s010 = structureOf({ 0,1,0 });
+    StructureReference const s040 = structureOf({ 0,4,0 });
+    StructureReference const s202 = structureOf({ 2,0,2 });
 
     SECTION(".blocks()") {
         SECTION(".at()") {
             SECTION("// valid") {
-                BlockReference block = s1.blocks().at({ 0,0,0 });
+                BlockReference block = s010.blocks().at({ 0,0,0 });
                 CHECK(block == BlockReference{ world, {0,0,0} });
             }
 
             SECTION("// invalid") {
-                CHECK_THROWS_AS(s1.blocks().at({ 0,4,0 }), std::logic_error);
+                CHECK_THROWS_AS(s010.blocks().at({ 0,4,0 }), std::logic_error);
             }
         }
 
         SECTION(".contains()") {
-            CHECK(s1.blocks().contains({ 0,0,0 }));
-            CHECK_FALSE(s1.blocks().contains({ 0,4,0 }));
+            CHECK(s010.blocks().contains({ 0,0,0 }));
+            CHECK_FALSE(s010.blocks().contains({ 0,4,0 }));
         }
 
         SECTION(".begin() // & .end()") {
             std::vector<BlockIndex> indices;
-            for (auto const& block : s1.blocks()) {
+            for (auto const& block : s010.blocks()) {
                 indices.push_back(block.index());
             }
             std::vector<BlockIndex> expected = { {0,0,0},{0,1,0},{0,2,0},{0,3,0} };
@@ -110,19 +113,19 @@ TEST_CASE("worlds::syncWorld::StructureReference") {
 
         SECTION(".find()") {
             SECTION("// valid") {
-                auto optBlock = s4.blocks().find({ 0,4,0 });
+                auto optBlock = s040.blocks().find({ 0,4,0 });
                 REQUIRE(optBlock);
                 CHECK(*optBlock == BlockReference{ world, {0,4,0} });
             }
 
             SECTION("// invalid") {
-                auto optBlock = s4.blocks().find({ 0,2,0 });
+                auto optBlock = s040.blocks().find({ 0,2,0 });
                 CHECK_FALSE(optBlock);
             }
         }
 
         SECTION(".size()") {
-            CHECK(s1.blocks().size() == 4);
+            CHECK(s010.blocks().size() == 4);
         }
     }
 
@@ -130,51 +133,56 @@ TEST_CASE("worlds::syncWorld::StructureReference") {
         SECTION(".at()") {
             SECTION("// valid") {
                 auto const id = ContactIndex{ {0,0,0}, Direction::plusY() };
-                ContactReference contact = s1.contacts().at(id);
+                ContactReference contact = s010.contacts().at(id);
                 CHECK(contact == ContactReference{ world, id });
             }
 
             SECTION("// invalid") {
                 auto const id = ContactIndex{ {0,0,0}, Direction::plusY() };
-                CHECK_THROWS_AS(s4.contacts().at(id), std::out_of_range);
+                CHECK_THROWS_AS(s040.contacts().at(id), std::out_of_range);
             }
         }
     }
 
     SECTION(".forceVector()") {
-        SECTION("// invalid") {
+        SECTION("// invalid contact") {
             removeBlock({ 0,3,0 });
-            CHECK_FALSE(s1.forceVector({ 0,0,0 }, { 0,1,0 }));
+            CHECK_FALSE(s010.forceVector({ 0,0,0 }, { 0,1,0 }));
+        }
+
+        SECTION("// unsolved contact") {
+            auto optForce = s202.forceVector({ 2,0,2 }, { 2,1,2 });
+            CHECK_FALSE(optForce);
         }
 
         SECTION("// solved & non-zero contact") {
-            auto optForce = s4.forceVector({ 0,3,0 }, { 0,4,0 });
+            auto optForce = s040.forceVector({ 0,3,0 }, { 0,4,0 });
             REQUIRE(optForce);
             CHECK_THAT(*optForce, matchers::WithinRel(blockMass * g, solverPrecision));
         }
 
         SECTION("// no contact") {
-            auto optForce = s1.forceVector({ 0,0,0 }, { 0,2,0 });
+            auto optForce = s010.forceVector({ 0,0,0 }, { 0,2,0 });
             REQUIRE(optForce);
             CHECK(*optForce == Vector3<u.force>::zero());
         }
 
         SECTION("// block not in structure") {
-            auto opt1 = s1.forceVector({ 0,0,0 }, { 0,4,0 });
+            auto opt1 = s010.forceVector({ 0,0,0 }, { 0,4,0 });
             CHECK_FALSE(opt1);
-            auto opt2 = s1.forceVector({ 0,4,0 }, { 0,0,0 });
+            auto opt2 = s010.forceVector({ 0,4,0 }, { 0,0,0 });
             CHECK_FALSE(opt2);
         }
     }
 
     SECTION(".isValid()") {
         SECTION("// true") {
-            CHECK(s1.isValid());
+            CHECK(s010.isValid());
         }
 
         SECTION("// false") {
             removeBlock({ 0,0,0 });
-            CHECK_FALSE(s1.isValid());
+            CHECK_FALSE(s010.isValid());
         }
     }
 
@@ -185,18 +193,18 @@ TEST_CASE("worlds::syncWorld::StructureReference") {
                 ContactReference{ world, ContactIndex{ {0,1,0}, Direction::plusY() } },
                 ContactReference{ world, ContactIndex{ {0,2,0}, Direction::plusY() } },
             };
-            CHECK_THAT(s1.links(), matchers::c2::UnorderedRangeEquals(expected));
+            CHECK_THAT(s010.links(), matchers::c2::UnorderedRangeEquals(expected));
         }
     }
 
     SECTION(".state()") {
         SECTION("// solved") {
-            CHECK(s1.state() == StructureReference::State::Solved);
+            CHECK(s010.state() == StructureReference::State::Solved);
         }
 
         SECTION("// invalid") {
             removeBlock({ 0,0,0 });
-            CHECK(s1.state() == StructureReference::State::Invalid);
+            CHECK(s010.state() == StructureReference::State::Invalid);
         }
     }
 }

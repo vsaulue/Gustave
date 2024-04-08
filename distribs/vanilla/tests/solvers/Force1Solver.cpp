@@ -37,11 +37,15 @@ using Solver = gustave::solvers::Force1Solver<libCfg>;
 
 using Link = Solver::Structure::Link;
 using Node = Solver::Structure::Node;
+using NodeIndex = Solver::Structure::NodeIndex;
 using Solution = Solver::Solution;
 using Structure = Solver::Structure;
 
 TEST_CASE("force1::Solver") {
-    SECTION("// pillar") {
+    constexpr float precision = 0.001f;
+    auto const solver = Solver{ std::make_shared<Solver::Config const>(g, 1000, precision) };
+
+    SECTION("// solvable: pillar") {
         constexpr Real<u.mass> blockMass = 4000.f * u.mass;
         auto makePillar = [blockMass](unsigned blockCount) {
             Structure structure;
@@ -54,13 +58,24 @@ TEST_CASE("force1::Solver") {
             return structure;
         };
         constexpr unsigned blockCount = 10;
-        constexpr float precision = 0.001f;
         auto structure = std::make_shared<Structure const>(makePillar(blockCount));
-        auto const solver = Solver{ std::make_shared<Solver::Config const>(g, 1000, precision) };
         auto const result = solver.run(structure);
         auto const solvedNodes = result.solution().nodes();
         CHECK_THAT(solvedNodes.at(0).forceVectorFrom(1), matchers::WithinRel(float(blockCount - 1) * blockMass * g, precision));
         CHECK_THAT(solvedNodes.at(1).forceVectorFrom(2), matchers::WithinRel(float(blockCount - 2) * blockMass * g, precision));
         CHECK_THAT(solvedNodes.at(2).forceVectorFrom(3), matchers::WithinRel(float(blockCount - 3) * blockMass * g, precision));
+    }
+
+    SECTION("// unsolvable: unreachable non-foundation") {
+        auto structure = std::make_shared<Structure>();
+        NodeIndex node1 = structure->addNode(Node{ 1000.f * u.mass, true });
+        NodeIndex node2 = structure->addNode(Node{ 1000.f * u.mass, false });
+        NodeIndex node3 = structure->addNode(Node{ 1000.f * u.mass, false });
+        NodeIndex node4 = structure->addNode(Node{ 1000.f * u.mass, false });
+
+        structure->addLink(Link{ node1, node2, Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });
+        structure->addLink(Link{ node3, node4, Normals::y, 1.f * u.area, 1.f * u.length, concrete_20m });
+        auto const result = solver.run(structure);
+        CHECK_FALSE(result.isSolved());
     }
 }

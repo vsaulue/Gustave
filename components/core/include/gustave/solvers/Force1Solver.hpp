@@ -29,6 +29,7 @@
 #include <cassert>
 #include <cstdint>
 #include <memory>
+#include <stack>
 #include <utility>
 #include <vector>
 
@@ -77,12 +78,20 @@ namespace gustave::solvers {
             {}
 
             [[nodiscard]]
+            bool isSolved() const {
+                return solution_ != nullptr;
+            }
+
+            [[nodiscard]]
             IterationIndex iterations() const {
                 return iterations_;
             }
 
             [[nodiscard]]
             Solution const& solution() const {
+                if (!isSolved()) {
+                    throw std::logic_error("The solver didn't generate a valid solution.");
+                }
                 return *solution_;
             }
 
@@ -95,6 +104,32 @@ namespace gustave::solvers {
             std::shared_ptr<Solution const> solution_;
         };
 
+    private:
+        struct SolvingContext {
+            [[nodiscard]]
+            explicit SolvingContext(Structure const& structure, Config const& config)
+                : balancer{ structure, config }
+                , iterationIndex{ 0 }
+                , potentials(structure.nodes().size(), 0.f * u.potential)
+                , nextPotentials(structure.nodes().size(), 0.f * u.potential)
+            {}
+
+            [[nodiscard]]
+            std::vector<Node> const& nodes() const {
+                return balancer.structure().nodes();
+            }
+
+            ForceBalancer balancer;
+            IterationIndex iterationIndex;
+            std::vector<Real<u.potential>> potentials;
+            std::vector<Real<u.potential>> nextPotentials;
+        };
+
+        struct StepResult {
+            Real<u.one> currentMaxError;
+        };
+    public:
+
         [[nodiscard]]
         explicit Force1Solver(std::shared_ptr<Config const> config)
             : config_{ std::move(config) }
@@ -103,38 +138,87 @@ namespace gustave::solvers {
         }
 
         [[nodiscard]]
+        Config const& config() const {
+            return *config_;
+        }
+
+        [[nodiscard]]
         Result run(std::shared_ptr<Structure const> structure) const {
-            ForceBalancer balancer{ *structure, *config_ };
-            IterationIndex iteration = 0;
-            std::vector<Real<u.potential>> potentials(balancer.structure().nodes().size(), 0.f * u.potential);
-            std::vector<Real<u.potential>> nextPotentials{ potentials };
+            if (structure == nullptr) {
+                throw std::logic_error("Unexpected null pointer for argument 'structure'.");
+            }
+            SolvingContext ctx{ *structure, *config_ };
+            if (!isSolvable(ctx.balancer)) {
+                return makeInvalidResult(std::move(ctx));
+            }
 
-            std::vector<Node> const& nodes = balancer.structure().nodes();
-            constexpr Real<u.one> convergenceFactor = 0.5f;
             do {
-                ForceRepartition repartition{ balancer, potentials };
-                Real<u.one> currentMaxError = 0.f;
-                for (NodeIndex id = 0; id < nodes.size(); ++id) {
-                    Node const& node = nodes[id];
-                    if (!node.isFoundation) {
-                        auto const nodeStats = repartition.statsOf(id);
-                        nextPotentials[id] = potentials[id] - nodeStats.force() / nodeStats.derivative() * convergenceFactor;
-                        currentMaxError = rt.max(currentMaxError, nodeStats.relativeError());
-                    }
+                StepResult const stepResult = runStep(ctx);
+                if (stepResult.currentMaxError >= config_->targetMaxError()) {
+                    ctx.potentials.swap(ctx.nextPotentials);
+                    ++ctx.iterationIndex;
+                } else {
+                    return makeValidResult(std::move(ctx), std::move(structure));
                 }
-                if (currentMaxError >= balancer.config().targetMaxError()) {
-                    potentials.swap(nextPotentials);
-                    ++iteration;
-                }
-                else {
-                    break;
-                }
-            } while (iteration < balancer.config().maxIterations());
-
-            auto basis = std::make_shared<Basis const>(std::move(structure), config_, std::move(potentials));
-            return Result{ iteration, std::make_shared<Solution const>(std::move(basis), std::move(balancer)) };
+            } while (ctx.iterationIndex < config_->maxIterations());
+            return makeInvalidResult(std::move(ctx));
         }
     private:
+        [[nodiscard]]
+        static bool isSolvable(ForceBalancer const& balancer) {
+            std::vector<bool> reached(balancer.nodeInfos().size(), false);
+            std::stack<NodeIndex> remainingIndices;
+            std::size_t reachedCount = 0;
+            for (std::size_t nodeId = 0; nodeId < reached.size(); ++nodeId) {
+                Node const& node = balancer.structure().nodes()[nodeId];
+                if (node.isFoundation) {
+                    ++reachedCount;
+                    reached[nodeId] = true;
+                    remainingIndices.push(nodeId);
+                }
+            }
+            while (!remainingIndices.empty()) {
+                NodeIndex const nodeId = remainingIndices.top();
+                remainingIndices.pop();
+                for (auto const& contactInfo : balancer.nodeInfos()[nodeId].contacts) {
+                    NodeIndex const otherNodeId = contactInfo.otherIndex();
+                    if (!reached[otherNodeId]) {
+                        reached[otherNodeId] = true;
+                        ++reachedCount;
+                        remainingIndices.push(otherNodeId);
+                    }
+                }
+            }
+            return reachedCount == balancer.nodeInfos().size();
+        }
+
+        [[nodiscard]]
+        Result makeInvalidResult(SolvingContext&& ctx) const {
+            return Result{ ctx.iterationIndex, nullptr };
+        }
+
+        [[nodiscard]]
+        Result makeValidResult(SolvingContext&& ctx, std::shared_ptr<Structure const>&& structure) const {
+            auto basis = std::make_shared<Basis const>(std::move(structure), config_, std::move(ctx.potentials));
+            return Result{ ctx.iterationIndex, std::make_shared<Solution const>(std::move(basis), std::move(ctx.balancer)) };
+        }
+
+        [[nodiscard]]
+        StepResult runStep(SolvingContext& ctx) const {
+            static constexpr Real<u.one> convergenceFactor = 0.5f;
+            ForceRepartition repartition{ ctx.balancer, ctx.potentials };
+            Real<u.one> currentMaxError = 0.f;
+            for (NodeIndex id = 0; id < ctx.nodes().size(); ++id) {
+                Node const& node = ctx.nodes()[id];
+                if (!node.isFoundation) {
+                    auto const nodeStats = repartition.statsOf(id);
+                    ctx.nextPotentials[id] = ctx.potentials[id] - nodeStats.force() / nodeStats.derivative() * convergenceFactor;
+                    currentMaxError = rt.max(currentMaxError, nodeStats.relativeError());
+                }
+            }
+            return StepResult{ currentMaxError };
+        }
+
         std::shared_ptr<Config const> config_;
     };
 }

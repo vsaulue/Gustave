@@ -68,14 +68,22 @@ namespace gustave::worlds::syncWorld::detail {
 
         [[nodiscard]]
         Solution const& solution() const {
+            if (state_ != State::Solved) {
+                throw std::logic_error("The structure must be in the 'Solved' state.");
+            }
             return *solution_;
         }
 
         void solve(std::shared_ptr<Solution const> solution) {
             assert(state_ == State::New);
-            assert(solution);
-            solution_ = std::move(solution);
-            state_ = State::Solved;
+            if (solution != nullptr) {
+                assert(&solution->basis().structure() == &sceneStructure_.solverStructure());
+                assert(&solution->basis().config() == &world_.solver.config());
+                solution_ = std::move(solution);
+                state_ = State::Solved;
+            } else {
+                state_ = State::Unsolvable;
+            }
         }
 
         [[nodiscard]]

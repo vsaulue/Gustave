@@ -353,6 +353,11 @@ namespace gustave::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
+        SolverStructure const& solverStructure() const {
+            return data_->solverStructure();
+        }
+
+        [[nodiscard]]
         std::shared_ptr<SolverStructure const> solverStructurePtr() const {
             return data_->solverStructurePtr();
         }

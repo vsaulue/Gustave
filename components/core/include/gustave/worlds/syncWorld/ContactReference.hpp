@@ -82,7 +82,6 @@ namespace gustave::worlds::syncWorld {
         Vector3<u.force> forceVector() const {
             auto const sContact = sceneContact();
             auto const& structureData = *world_->structures.at(sContact.structure());
-            assert(structureData.state() == StructureState::Solved);
             return structureData.solution().contacts().at(sContact.solverIndex()).forceVector();
         }
 

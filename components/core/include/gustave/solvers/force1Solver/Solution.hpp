@@ -77,6 +77,11 @@ namespace gustave::solvers::force1Solver {
         {}
 
         [[nodiscard]]
+        Basis const& basis() const {
+            return data_.basis();
+        }
+
+        [[nodiscard]]
         Real<u.one> maxRelativeError() const {
             return data_.forceRepartition().maxRelativeError();
         }

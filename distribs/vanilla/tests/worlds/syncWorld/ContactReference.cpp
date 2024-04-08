@@ -58,11 +58,14 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
     Transaction t;
     t.addBlock({ {2,2,2}, concrete_20m, blockMass, false });
     t.addBlock({ {2,1,2}, concrete_20m, blockMass, true });
+    t.addBlock({ {4,1,4}, concrete_20m, blockMass, false });
+    t.addBlock({ {4,2,4}, concrete_20m, blockMass, false });
     WorldUpdater{ world }.runTransaction(t);
 
     auto const contactId = ContactIndex{ {2,2,2}, Direction::minusY() };
     auto const contact = ContactReference{ world, contactId };
     auto const invalidContact = ContactReference{ world, ContactIndex{ {2,2,2}, Direction::plusZ() } };
+    auto const unsolvedContact = ContactReference{ world, ContactIndex{ {4,1,4}, Direction::plusY() } };
 
     auto makeBlockRef = [&](BlockIndex const& index) {
         return BlockReference{ world, index };
@@ -83,8 +86,12 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
             CHECK_THAT(contact.forceVector(), matchers::WithinRel(-blockMass * g, solverPrecision));
         }
 
-        SECTION("// invalid") {
+        SECTION("// invalid (contact doesn't exist)") {
             CHECK_THROWS_AS(invalidContact.forceVector(), std::out_of_range);
+        }
+
+        SECTION("// unsolved") {
+            CHECK_THROWS_AS(unsolvedContact.forceVector(), std::logic_error);
         }
     }
 

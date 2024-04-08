@@ -29,6 +29,7 @@ namespace gustave::worlds::syncWorld {
     enum class StructureState {
         New,
         Solved,
+        Unsolvable,
         Invalid,
     };
 }
