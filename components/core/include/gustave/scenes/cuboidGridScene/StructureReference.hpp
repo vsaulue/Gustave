@@ -37,6 +37,7 @@
 #include <gustave/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/scenes/cuboidGridScene/detail/structureDataOf.hpp>
 #include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/scenes/cuboidGridScene/ContactReference.hpp>
@@ -51,14 +52,6 @@ namespace gustave::scenes::cuboidGridScene {
 
     template<cfg::cLibConfig auto cfg>
     class ContactReference;
-
-    template<cfg::cLibConfig auto cfg>
-    class StructureReference;
-
-    namespace detail {
-        template<cfg::cLibConfig auto cfg>
-        StructureData<cfg> const& structureDataOf(StructureReference<cfg> const&);
-    }
 
     template<cfg::cLibConfig auto cfg>
     class StructureReference {

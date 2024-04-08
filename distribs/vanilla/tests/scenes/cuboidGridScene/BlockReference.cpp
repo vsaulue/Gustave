@@ -67,8 +67,12 @@ TEST_CASE("scenes::cuboidGridScene::BlockReference") {
     BlockReference b121 = newBlock({ 1,2,1 }, 7000.f * u.mass, true);
     /* b110 */ newBlock({1,1,0}, 8000.f * u.mass, false);
     BlockReference b112 = newBlock({ 1,1,2 }, 9000.f * u.mass, true);
-    /* b112 */ newBlock({1,2,2}, 2000.f * u.mass, false);
+    BlockReference b122 = newBlock({1,2,2}, 2000.f * u.mass, false);
     /* b113 */ newBlock({1,1,3}, 1000.f * u.mass, true);
+    BlockReference b777 = newBlock({ 7,7,7 }, 1000.f * u.mass, true);
+    BlockReference b778 = newBlock({ 7,7,8 }, 1000.f * u.mass, false);
+    /* b787 */ newBlock({7,8,7}, 1000.f * u.mass, false);
+    /* b788 */ newBlock({7,8,8}, 1000.f * u.mass, false);
     SceneUpdater{ sceneData }.runTransaction(t);
 
     SECTION(".blockSize()") {
@@ -158,23 +162,41 @@ TEST_CASE("scenes::cuboidGridScene::BlockReference") {
     }
 
     SECTION(".structures()") {
+        auto structureOf = [&](BlockReference const& block) {
+            auto const blockDataRef = sceneData.blocks.find(block.index());
+            REQUIRE(blockDataRef);
+            auto const structureDataPtr = blockDataRef.structure();
+            REQUIRE(structureDataPtr != nullptr);
+            auto iterator = sceneData.structures.find(structureDataPtr);
+            REQUIRE(iterator != sceneData.structures.end());
+            return StructureReference{ *iterator };
+        };
         SECTION("// non-foundation") {
             auto const structures = b111.structures();
             REQUIRE(structures.size() == 1);
-            CHECK(structures[0].blocks().contains(b111.index()));
+            std::vector<StructureReference> expected = {
+                structureOf(b111),
+            };
+            CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));
         }
 
         SECTION("// foundation") {
             auto const structures = b112.structures();
             REQUIRE(structures.size() == 2);
-            CHECK(structures[0] != structures[1]);
-            bool has111 = false;
-            bool has122 = false;
-            for (auto const& structure : structures) {
-                has111 = has111 || structure.blocks().contains({ 1,1,1 });
-                has122 = has122 || structure.blocks().contains({ 1,2,2 });
-            }
-            CHECK((has111 && has122));
+            std::vector<StructureReference> expected = {
+                structureOf(b111),
+                structureOf(b122),
+            };
+            CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));
+        }
+
+        SECTION("// foundation, ensures duplicates are filtered") {
+            auto const structures = b777.structures();
+            REQUIRE(structures.size() == 1);
+            std::vector<StructureReference> expected = {
+                structureOf(b778),
+            };
+            CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));
         }
     }
 }

@@ -37,6 +37,7 @@
 #include <gustave/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/scenes/cuboidGridScene/detail/structureDataOf.hpp>
 #include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/scenes/cuboidGridScene/ContactReference.hpp>
 #include <gustave/scenes/cuboidGridScene/StructureReference.hpp>
@@ -180,9 +181,11 @@ namespace gustave::scenes::cuboidGridScene {
             {
                 auto const& structures = block.sceneData_->structures;
                 auto addValue = [this, &structures](StructureData const* data) {
-                    auto const sharedStructure = *structures.find(data);
-                    sceneStructures_[size_] = StructureReference{ std::move(sharedStructure) };
-                    ++size_;
+                    if (!contains(data)) {
+                        auto sharedStructure = *structures.find(data);
+                        sceneStructures_[size_] = StructureReference{ std::move(sharedStructure) };
+                        ++size_;
+                    }
                 };
 
                 if (block.isFoundation()) {
@@ -220,6 +223,16 @@ namespace gustave::scenes::cuboidGridScene {
             [[nodiscard]]
             static StructureReference NO_INIT() {
                 return StructureReference{ utils::NO_INIT };
+            }
+
+            [[nodiscard]]
+            bool contains(StructureData const* data) const {
+                for (std::size_t id = 0; id < size_; ++id) {
+                    if (data == &detail::structureDataOf(sceneStructures_[id])) {
+                        return true;
+                    }
+                }
+                return false;
             }
 
             Values sceneStructures_;
