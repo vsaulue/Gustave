@@ -68,8 +68,8 @@ TEST_CASE("force1::solutionUtils::ContactReference") {
     ContactReference c12{ data, ContactIndex{ 1, true } };
     ContactReference c21{ data, ContactIndex{ 1, false } };
 
-    SECTION(".compressionConductivity()") {
-        CHECK(c12.compressionConductivity() == 20'000'000.f * u.conductivity);
+    SECTION(".conductivity()") {
+        CHECK(c12.conductivity() == concrete_20m * (1.f * u.length));
     }
 
     SECTION(".forceCoord()") {
@@ -117,13 +117,5 @@ TEST_CASE("force1::solutionUtils::ContactReference") {
         SECTION("// isLocal == false") {
             CHECK(c21.otherNode() == n1);
         }
-    }
-
-    SECTION(".shearConductivity()") {
-        CHECK(c21.shearConductivity() == 14'000'000.f * u.conductivity);
-    }
-
-    SECTION(".tensileConductivity()") {
-        CHECK(c21.tensileConductivity() == 2'000'000.f * u.conductivity);
     }
 }

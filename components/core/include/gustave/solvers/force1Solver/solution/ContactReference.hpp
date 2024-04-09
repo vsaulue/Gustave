@@ -54,6 +54,7 @@ namespace gustave::solvers::force1Solver::solution {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
+        using Conductivity = typename StructureLink::Conductivity;
         using ContactIndex = typename Structure::ContactIndex;
         using NodeIndex = typename Structure::NodeIndex;
         using NodeReference = solution::NodeReference<libCfg>;
@@ -72,8 +73,8 @@ namespace gustave::solvers::force1Solver::solution {
         {}
 
         [[nodiscard]]
-        Real<u.conductivity> compressionConductivity() const {
-            return structureLink().compressionConductivity();
+        Conductivity const& conductivity() const {
+            return structureLink().conductivity();
         }
 
         [[nodiscard]]
@@ -124,16 +125,6 @@ namespace gustave::solvers::force1Solver::solution {
             } else {
                 return NodeReference{ *solution_, link.localNodeId() };
             }
-        }
-
-        [[nodiscard]]
-        Real<u.conductivity> shearConductivity() const {
-            return structureLink().shearConductivity();
-        }
-
-        [[nodiscard]]
-        Real<u.conductivity> tensileConductivity() const {
-            return structureLink().tensileConductivity();
         }
 
         [[nodiscard]]

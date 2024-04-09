@@ -55,7 +55,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
         using DataNeighbours = detail::DataNeighbours<libCfg, true>;
         using Direction = math3d::BasicDirection;
 
-        using MaxStress = model::MaxStress<libCfg>;
+        using PressureStress = model::PressureStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using SolverStructure = solvers::Structure<libCfg>;
 
@@ -203,7 +203,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
             NormalizedVector3 const normal = NormalizedVector3::basisVector(direction);
             Real<u.area> const area = scene_->blocks.contactAreaAlong(direction);
             Real<u.length> const thickness = scene_->blocks.thicknessAlong(direction);
-            MaxStress const maxStress = MaxStress::minResistance(localNode.maxStress(), otherNode.maxStress());
+            PressureStress const maxStress = PressureStress::minStress(localNode.maxStress(), otherNode.maxStress());
             return solverStructure_->addLink(Link{ indexOf(localNode), indexOf(otherNode), normal, area, thickness, maxStress });
         }
 

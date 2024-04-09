@@ -84,15 +84,15 @@ namespace gustave::solvers::force1Solver::detail {
 
                 NormalizedVector3 const& normal = link.normal();
                 Real<u.one> const nComp = normal.dot(normalizedG_);
-                Real<u.resistance> const tangentResist = rt.sqrt(1.f - nComp * nComp) / link.shearConductivity();
+                Real<u.resistance> const tangentResist = rt.sqrt(1.f - nComp * nComp) / link.conductivity().shear();
                 Real<u.resistance> pNormalResist{ utils::NO_INIT };
                 Real<u.resistance> nNormalResist{ utils::NO_INIT };
                 if (nComp <= 0.f) {
-                    pNormalResist = -nComp / link.compressionConductivity();
-                    nNormalResist = -nComp / link.tensileConductivity();
+                    pNormalResist = -nComp / link.conductivity().compression();
+                    nNormalResist = -nComp / link.conductivity().tensile();
                 } else {
-                    pNormalResist = nComp / link.tensileConductivity();
-                    nNormalResist = nComp / link.compressionConductivity();
+                    pNormalResist = nComp / link.conductivity().tensile();
+                    nNormalResist = nComp / link.conductivity().compression();
                 }
                 Real<u.resistance> const pResist = std::max(pNormalResist, tangentResist);
                 Real<u.resistance> const nResist = std::max(nNormalResist, tangentResist);

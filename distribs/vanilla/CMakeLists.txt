@@ -38,7 +38,7 @@ add_executable(Test-Gustave-Vanilla
     "tests/solvers/force1Solver/solution/Nodes.cpp"
     "tests/solvers/force1Solver/Solution.cpp"
     "tests/solvers/Force1Solver.cpp"
-    "tests/model/MaxStress.cpp"
+    "tests/model/Stress.cpp"
     "tests/scenes/cuboidGridScene/BlockConstructionInfo.cpp"
     "tests/scenes/cuboidGridScene/BlockIndex.cpp"
     "tests/scenes/cuboidGridScene/BlockReference.cpp"

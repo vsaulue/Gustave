@@ -32,7 +32,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/model/MaxStress.hpp>
+#include <gustave/model/Stress.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
@@ -59,7 +59,6 @@ namespace gustave::scenes::cuboidGridScene {
 
         using BlockDataReference = detail::BlockDataReference<libCfg, false>;
         using DataNeighbours = detail::DataNeighbours<libCfg, false>;
-        using MaxStress = model::MaxStress<libCfg>;
         using IndexNeighbour = detail::IndexNeighbour;
         using IndexNeighbours = detail::IndexNeighbours;
         using SceneData = detail::SceneData<libCfg>;
@@ -74,6 +73,7 @@ namespace gustave::scenes::cuboidGridScene {
         using BlockIndex = cuboidGridScene::BlockIndex;
         using Direction = math3d::BasicDirection;
         using ContactReference = cuboidGridScene::ContactReference<libCfg>;
+        using PressureStress = model::PressureStress<libCfg>;
         using StructureReference = cuboidGridScene::StructureReference<libCfg>;
 
         class Contacts {
@@ -281,7 +281,7 @@ namespace gustave::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        MaxStress const& maxStress() const {
+        PressureStress const& maxStress() const {
             return data().maxStress();
         }
 

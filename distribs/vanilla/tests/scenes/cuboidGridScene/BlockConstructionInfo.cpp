@@ -41,7 +41,7 @@ TEST_CASE("scenes::cuboidGridScene::BlockConstructionInfo") {
     SECTION("// valid constructor & getters") {
         const BlockConstructionInfo obj{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
         CHECK(obj.index() == BlockIndex{4, 5, 6});
-        CHECK(obj.maxStress().maxTensileStress() == concrete_20m.maxTensileStress());
+        CHECK(obj.maxStress().tensile() == concrete_20m.tensile());
         CHECK(obj.mass() == 5.f * u.mass);
         CHECK(obj.isFoundation() == true);
     }

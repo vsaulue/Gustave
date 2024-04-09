@@ -36,7 +36,6 @@
 #include <TestHelpers.hpp>
 
 using ContactReference = gustave::scenes::cuboidGridScene::ContactReference<libCfg>;
-using MaxStress = gustave::model::MaxStress<libCfg>;
 using SceneData = gustave::scenes::cuboidGridScene::detail::SceneData<libCfg>;
 using SceneUpdater = gustave::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
 using StructureReference = gustave::scenes::cuboidGridScene::StructureReference<libCfg>;
@@ -51,14 +50,14 @@ TEST_CASE("scenes::cuboidGridScene::ContactReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
     SceneData scene{ blockSize };
 
-    MaxStress highTensile{
+    PressureStress highTensile{
         1'000'000.f * u.pressure,
         15'000'000.f * u.pressure,
         20'000'000.f * u.pressure,
     };
 
     Transaction t;
-    auto newBlock = [&](BlockIndex const& index, MaxStress const& material, bool isFoundation) {
+    auto newBlock = [&](BlockIndex const& index, PressureStress const& material, bool isFoundation) {
         t.addBlock({ index, material, 1000.f * u.mass, isFoundation });
         return BlockReference{ scene, index };
     };
@@ -135,7 +134,7 @@ TEST_CASE("scenes::cuboidGridScene::ContactReference") {
     SECTION(".maxStress()") {
         SECTION("// valid") {
             ContactReference contact = contactReference({ 1,2,2 }, Direction::plusX());
-            CHECK(contact.maxStress() == MaxStress::minResistance(concrete_20m, highTensile));
+            CHECK(contact.maxStress() == PressureStress::minStress(concrete_20m, highTensile));
         }
 
         SECTION("// invalid") {

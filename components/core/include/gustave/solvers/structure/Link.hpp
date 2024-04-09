@@ -29,7 +29,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/meta/Meta.hpp>
-#include <gustave/model/MaxStress.hpp>
+#include <gustave/model/Stress.hpp>
 
 namespace gustave::solvers::structure {
     template<cfg::cLibConfig auto libCfg>
@@ -40,25 +40,24 @@ namespace gustave::solvers::structure {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
 
-        using MaxStress = model::MaxStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
     public:
         using LinkIndex = cfg::LinkIndex<libCfg>;
+        using Conductivity = model::ConductivityStress<libCfg>;
+        using PressureStress = model::PressureStress<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
         [[nodiscard]]
-        explicit Link(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, MaxStress const& maxStress)
+        explicit Link(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, PressureStress const& maxStress)
             : localNodeId_{ id1 }
             , otherNodeId_{ id2 }
             , normal_{ normal }
-            , compressionConductivity_{ maxStress.maxCompressionStress() * area / thickness }
-            , shearConductivity_{ maxStress.maxShearStress() * area / thickness }
-            , tensileConductivity_{ maxStress.maxTensileStress() * area / thickness }
+            , conductivity_{ (area / thickness) * maxStress }
         {
             assert(id1 != id2);
-            assert(compressionConductivity_ > 0.f * u.conductivity);
-            assert(shearConductivity_ > 0.f * u.conductivity);
-            assert(tensileConductivity_ > 0.f * u.conductivity);
+            assert(conductivity_.compression() > 0.f * u.conductivity);
+            assert(conductivity_.shear() > 0.f * u.conductivity);
+            assert(conductivity_.tensile() > 0.f * u.conductivity);
         }
 
         [[nodiscard]]
@@ -77,25 +76,13 @@ namespace gustave::solvers::structure {
         }
 
         [[nodiscard]]
-        Real<u.conductivity> compressionConductivity() const {
-            return compressionConductivity_;
-        }
-
-        [[nodiscard]]
-        Real<u.conductivity> shearConductivity() const {
-            return shearConductivity_;
-        }
-
-        [[nodiscard]]
-        Real<u.conductivity> tensileConductivity() const {
-            return tensileConductivity_;
+        Conductivity const& conductivity() const {
+            return conductivity_;
         }
     private:
         NodeIndex localNodeId_;
         NodeIndex otherNodeId_;
         NormalizedVector3 normal_; // normal at the surface of localNode.
-        Real<u.conductivity> compressionConductivity_;
-        Real<u.conductivity> shearConductivity_;
-        Real<u.conductivity> tensileConductivity_;
+        Conductivity conductivity_;
     };
 }

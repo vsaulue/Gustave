@@ -32,6 +32,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/meta/MutableIf.hpp>
+#include <gustave/model/Stress.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/utils/HashEquals.hpp>
@@ -45,7 +46,6 @@ namespace gustave::scenes::cuboidGridScene::detail {
 
         using QualifiedBlockData = meta::MutableIf<isMutable_, BlockData<libCfg>>;
 
-        using MaxStress = model::MaxStress<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
         template<cfg::cUnitOf<libCfg> auto unit>
@@ -55,6 +55,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
     public:
         using Hasher = utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
         using LinkIndices = typename BlockMappedData<libCfg>::LinkIndices;
+        using MaxPressure = model::PressureStress<libCfg>;
 
         [[nodiscard]]
         static constexpr bool isMutable() {
@@ -126,7 +127,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        MaxStress const& maxStress() const {
+        MaxPressure const& maxStress() const {
             return data_->second.maxStress();
         }
 

@@ -31,7 +31,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/MaxStress.hpp>
+#include <gustave/model/Stress.hpp>
 #include <gustave/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
 
 namespace gustave::scenes::cuboidGridScene::detail {
@@ -45,10 +45,9 @@ namespace gustave::scenes::cuboidGridScene::detail {
 
         template<cfg::cUnitOf<cfg> auto unit>
         using Real = cfg::Real<cfg, unit>;
-
-        using MaxStress = model::MaxStress<cfg>;
     public:
         using LinkIndex = cfg::LinkIndex<cfg>;
+        using PressureStress = model::PressureStress<cfg>;
 
         struct LinkIndices {
             LinkIndex plusX;
@@ -73,7 +72,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        MaxStress const& maxStress() const {
+        PressureStress const& maxStress() const {
             return maxStress_;
         }
 
@@ -107,7 +106,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
             return std::numeric_limits<LinkIndex>::max();
         }
 
-        MaxStress maxStress_;
+        PressureStress maxStress_;
         LinkIndices linkIndices_;
         Real<u.mass> mass_;
         bool isFoundation_;

@@ -57,7 +57,7 @@ namespace gustave::worlds::syncWorld {
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
         using ContactReference = syncWorld::ContactReference<libCfg>;
-        using MaxStress = model::MaxStress<libCfg>;
+        using PressureStress = model::PressureStress<libCfg>;
         using StructureReference = syncWorld::StructureReference<libCfg>;
 
         class Contacts {
@@ -285,7 +285,7 @@ namespace gustave::worlds::syncWorld {
         }
 
         [[nodiscard]]
-        MaxStress const& maxStress() const {
+        PressureStress const& maxStress() const {
             return sceneBlock().maxStress();
         }
 

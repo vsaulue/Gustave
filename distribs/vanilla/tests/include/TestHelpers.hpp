@@ -31,7 +31,7 @@
 
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/MaxStress.hpp>
+#include <gustave/model/Stress.hpp>
 #include <gustave/testing/Matchers.hpp>
 
 #include <TestConfig.hpp>
@@ -41,7 +41,7 @@ namespace cfg = ::gustave::cfg;
 namespace matchers = ::gustave::testing::matchers;
 
 using LinkIndex = cfg::LinkIndex<libCfg>;
-using MaxStress = gustave::model::MaxStress<libCfg>;
+using PressureStress = gustave::model::PressureStress<libCfg>;
 using NodeIndex = cfg::NodeIndex<libCfg>;
 using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
 
@@ -62,12 +62,12 @@ struct Normals {
 };
 
 inline Vector3<u.acceleration> const g{ 0.f, -10.f, 0.f, u.acceleration };
-inline MaxStress const concrete_20m{
+inline PressureStress const concrete_20m{
     20'000'000.f * u.pressure, // compressive
     14'000'000.f * u.pressure, // shear
     2'000'000.f * u.pressure, // tensile
 };
-inline MaxStress const concrete_40m{
+inline PressureStress const concrete_40m{
     40'000'000.f * u.pressure, // compressive
     28'000'000.f * u.pressure, // shear
     2'000'000.f * u.pressure, // tensile

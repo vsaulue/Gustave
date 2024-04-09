@@ -36,7 +36,6 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/model/MaxStress.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
 #include <gustave/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
@@ -63,7 +62,6 @@ namespace gustave::scenes::cuboidGridScene::detail {
         using DataNeighbours = detail::DataNeighbours<libCfg, true>;
         using Direction = math3d::BasicDirection;
         using LinkIndex = cfg::LinkIndex<libCfg>;
-        using MaxStress = model::MaxStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using SceneData = detail::SceneData<libCfg>;
         using StructureData = detail::StructureData<libCfg>;

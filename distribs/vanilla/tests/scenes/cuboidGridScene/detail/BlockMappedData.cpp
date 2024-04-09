@@ -42,7 +42,7 @@ TEST_CASE("scenes::cuboidGridScene::detail::BlockMappedData") {
 
         constexpr LinkIndex maxLinkId = std::numeric_limits<LinkIndex>::max();
 
-        CHECK(data.maxStress().maxTensileStress() == concrete_20m.maxTensileStress());
+        CHECK(data.maxStress() == concrete_20m);
         CHECK(data.linkIndices().plusX == maxLinkId);
         CHECK(data.linkIndices().plusY == maxLinkId);
         CHECK(data.linkIndices().plusZ == maxLinkId);

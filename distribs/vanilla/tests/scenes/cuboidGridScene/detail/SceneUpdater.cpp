@@ -142,7 +142,7 @@ TEST_CASE("scenes::cuboidGridScene::detail::SceneUpdater") {
             return *optBlock;
         };
 
-        auto checkLink = [&data](StructureData const& structure, NodeIndex source, NodeIndex dest, Direction sourceNormal, MaxStress const& maxStress) {
+        auto checkLink = [&data](StructureData const& structure, NodeIndex source, NodeIndex dest, Direction sourceNormal, PressureStress const& maxStress) {
             NormalizedVector3 const normal = NormalizedVector3::basisVector(sourceNormal);
             SolverLink const* selectedLink = nullptr;
             for (SolverLink const& link : structure.solverStructure().links()) {
@@ -159,9 +159,9 @@ TEST_CASE("scenes::cuboidGridScene::detail::SceneUpdater") {
             }
             REQUIRE(selectedLink != nullptr);
             Real<u.length> const conductivityFactor = data.blocks.contactAreaAlong(sourceNormal) / data.blocks.thicknessAlong(sourceNormal);
-            CHECK_THAT(selectedLink->compressionConductivity(), matchers::WithinRel(conductivityFactor * maxStress.maxCompressionStress(), epsilon));
-            CHECK_THAT(selectedLink->shearConductivity(), matchers::WithinRel(conductivityFactor * maxStress.maxShearStress(), epsilon));
-            CHECK_THAT(selectedLink->tensileConductivity(), matchers::WithinRel(conductivityFactor * maxStress.maxTensileStress(), epsilon));
+            CHECK_THAT(selectedLink->conductivity().compression(), matchers::WithinRel(conductivityFactor * maxStress.compression(), epsilon));
+            CHECK_THAT(selectedLink->conductivity().shear(), matchers::WithinRel(conductivityFactor * maxStress.shear(), epsilon));
+            CHECK_THAT(selectedLink->conductivity().tensile(), matchers::WithinRel(conductivityFactor * maxStress.tensile(), epsilon));
         };
 
         SECTION(" // Transaction{1+}: single foundation") {

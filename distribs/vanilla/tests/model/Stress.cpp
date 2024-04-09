@@ -25,30 +25,46 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/model/MaxStress.hpp>
+#include <gustave/model/Stress.hpp>
 
 #include <TestHelpers.hpp>
 
-using MaxStress = gustave::model::MaxStress<libCfg>;
+using ForceStress = gustave::model::ForceStress<libCfg>;
 
-TEST_CASE("model::MaxStress") {
-    SECTION("::minResistance(MaxStress const&, MaxStress const&)") {
-        MaxStress const m1{
+TEST_CASE("model::Stress") {
+    SECTION("::minStress(PressureStress const&, PressureStress const&)") {
+        PressureStress const m1{
             4.f * u.pressure, // compressive
             1.f * u.pressure, // shear
             7.f * u.pressure, // tensile
         };
-        MaxStress const m2{
+        PressureStress const m2{
             3.f * u.pressure,
             5.f * u.pressure,
             6.f * u.pressure,
         };
-        MaxStress const expected{
+        PressureStress const expected{
             3.f * u.pressure,
             1.f * u.pressure,
             6.f * u.pressure,
         };
-        CHECK(MaxStress::minResistance(m1, m2) == expected);
-        CHECK(MaxStress::minResistance(m2, m1) == expected);
+        CHECK(PressureStress::minStress(m1, m2) == expected);
+        CHECK(PressureStress::minStress(m2, m1) == expected);
+    }
+
+    SECTION("// Stress * Real") {
+        PressureStress const stress = {
+            4.f * u.pressure, // compressive
+            1.f * u.pressure, // shear
+            7.f * u.pressure, // tensile
+        };
+        Real<u.area> const real = 2.f * u.area;
+        ForceStress const expected = {
+            8.f * u.force,
+            2.f * u.force,
+            14.f * u.force,
+        };
+        CHECK(stress * real == expected);
+        CHECK(real * stress == expected);
     }
 }
