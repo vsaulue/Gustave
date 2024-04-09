@@ -30,6 +30,7 @@
 #include <TestHelpers.hpp>
 
 using ForceStress = gustave::model::ForceStress<libCfg>;
+using StressRatio = gustave::model::StressRatio<libCfg>;
 
 TEST_CASE("model::Stress") {
     SECTION("::minStress(PressureStress const&, PressureStress const&)") {
@@ -66,5 +67,24 @@ TEST_CASE("model::Stress") {
         };
         CHECK(stress * real == expected);
         CHECK(real * stress == expected);
+    }
+
+    SECTION("// Stress / Stress") {
+        ForceStress const num = {
+            9.f * u.force,
+            8.f * u.force,
+            10.f * u.force,
+        };
+        ForceStress const den = {
+            3.f * u.force,
+            2.f * u.force,
+            5.f * u.force,
+        };
+        StressRatio const expected = {
+            3.f * u.one,
+            4.f * u.one,
+            2.f * u.one,
+        };
+        CHECK(num / den == expected);
     }
 }
