@@ -37,6 +37,7 @@ using BlockIndex = ContactReference::BlockReference::BlockIndex;
 using BlockReference = ContactReference::BlockReference;
 using ContactIndex = ContactReference::ContactIndex;
 using Direction = ContactIndex::Direction;
+using ForceStress = ContactReference::ForceStress;
 using Solver = WorldData::Solver;
 using StructureReference = ContactReference::StructureReference;
 using Transaction = WorldUpdater::Transaction;
@@ -55,17 +56,23 @@ static WorldData makeWorld() {
 TEST_CASE("worlds::syncWorld::ContactReference") {
     WorldData world = makeWorld();
 
-    Transaction t;
-    t.addBlock({ {2,2,2}, concrete_20m, blockMass, false });
-    t.addBlock({ {2,1,2}, concrete_20m, blockMass, true });
-    t.addBlock({ {4,1,4}, concrete_20m, blockMass, false });
-    t.addBlock({ {4,2,4}, concrete_20m, blockMass, false });
-    WorldUpdater{ world }.runTransaction(t);
+    {
+        Transaction t;
+        t.addBlock({ {2,2,2}, concrete_20m, blockMass, false });
+        t.addBlock({ {2,1,2}, concrete_20m, blockMass, true });
+        t.addBlock({ {4,1,4}, concrete_20m, blockMass, false });
+        t.addBlock({ {4,2,4}, concrete_20m, blockMass, false });
+        WorldUpdater{ world }.runTransaction(t);
+    }
+
+    auto makeContactRef = [&](BlockIndex const& sourceBlockId, Direction direction) {
+        return ContactReference{ world, ContactIndex{ sourceBlockId, direction } };
+    };
 
     auto const contactId = ContactIndex{ {2,2,2}, Direction::minusY() };
     auto const contact = ContactReference{ world, contactId };
-    auto const invalidContact = ContactReference{ world, ContactIndex{ {2,2,2}, Direction::plusZ() } };
-    auto const unsolvedContact = ContactReference{ world, ContactIndex{ {4,1,4}, Direction::plusY() } };
+    auto const invalidContact = makeContactRef({ 2,2,2 }, Direction::plusZ());
+    auto const unsolvedContact = makeContactRef({ 4,1,4 }, Direction::plusY());
 
     auto makeBlockRef = [&](BlockIndex const& index) {
         return BlockReference{ world, index };
@@ -78,6 +85,56 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
 
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.area(), std::out_of_range);
+        }
+    }
+
+    SECTION(".forceStress()") {
+        {
+            Transaction t;
+            t.addBlock({ {6,6,6}, concrete_20m, blockMass, true });
+            t.addBlock({ {7,5,6}, concrete_20m, blockMass, false });
+            t.addBlock({ {7,6,6}, concrete_20m, blockMass, false });
+            t.addBlock({ {7,7,6}, concrete_20m, blockMass, false });
+            WorldUpdater{ world }.runTransaction(t);
+        }
+
+        auto checkForceStress = [&](ForceStress const& value, ForceStress const& expected) {
+            CHECK_THAT(value.compression(), matchers::WithinRel(expected.compression(), solverPrecision));
+            CHECK_THAT(value.shear(), matchers::WithinRel(expected.shear(), solverPrecision));
+            CHECK_THAT(value.tensile(), matchers::WithinRel(expected.tensile(), solverPrecision));
+        };
+
+        SECTION("// compression") {
+            auto const c7 = makeContactRef({ 7,7,6 }, Direction::minusY());
+            auto const expected = ForceStress{
+                blockMass * g.norm(),
+                0.f * u.force,
+                0.f * u.force,
+            };
+            checkForceStress(c7.forceStress(), expected);
+            checkForceStress(c7.opposite().forceStress(), expected);
+        }
+
+        SECTION("// shear") {
+            auto const c6 = makeContactRef({ 7,6,6 }, Direction::minusX());
+            auto const expected = ForceStress{
+                0.f * u.force,
+                3.f * blockMass * g.norm(),
+                0.f * u.force,
+            };
+            checkForceStress(c6.forceStress(), expected);
+            checkForceStress(c6.opposite().forceStress(), expected);
+        }
+
+        SECTION("// tensile") {
+            auto const c5 = makeContactRef({ 7,5,6 }, Direction::plusY());
+            auto const expected = ForceStress{
+                0.f * u.force,
+                0.f * u.force,
+                blockMass * g.norm(),
+            };
+            checkForceStress(c5.forceStress(), expected);
+            checkForceStress(c5.opposite().forceStress(), expected);
         }
     }
 

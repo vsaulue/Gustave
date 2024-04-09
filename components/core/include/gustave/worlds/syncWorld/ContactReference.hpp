@@ -29,6 +29,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/model/Stress.hpp>
 #include <gustave/worlds/syncWorld/detail/WorldData.hpp>
 #include <gustave/worlds/syncWorld/BlockReference.hpp>
 #include <gustave/worlds/syncWorld/StructureReference.hpp>
@@ -57,6 +58,7 @@ namespace gustave::worlds::syncWorld {
     public:
         using BlockReference = syncWorld::BlockReference<libCfg>;
         using ContactIndex = typename WorldData::Scene::ContactIndex;
+        using ForceStress = model::ForceStress<libCfg>;
         using PressureStress = typename SceneContact::PressureStress;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using StructureReference = syncWorld::StructureReference<libCfg>;
@@ -76,6 +78,22 @@ namespace gustave::worlds::syncWorld {
         [[nodiscard]]
         Real<u.area> area() const {
             return sceneContact().area();
+        }
+
+        [[nodiscard]]
+        ForceStress forceStress() const {
+            Vector3<u.force> const vector = forceVector();
+            NormalizedVector3 const norm = normal();
+            Real<u.force> const normalCoord = vector.dot(norm);
+            Real<u.force> compression = 0.f * u.force;
+            Real<u.force> tensile = 0.f * u.force;
+            if (normalCoord < 0.f * u.force) {
+                compression = -normalCoord;
+            } else {
+                tensile = normalCoord;
+            }
+            Real<u.force> shear = (vector - normalCoord * norm).norm();
+            return ForceStress{ compression, shear, tensile };
         }
 
         [[nodiscard]]
