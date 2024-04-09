@@ -39,6 +39,7 @@ using ContactIndex = ContactReference::ContactIndex;
 using Direction = ContactIndex::Direction;
 using ForceStress = ContactReference::ForceStress;
 using Solver = WorldData::Solver;
+using StressRatio = ContactReference::StressRatio;
 using StructureReference = ContactReference::StructureReference;
 using Transaction = WorldUpdater::Transaction;
 
@@ -62,6 +63,10 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
         t.addBlock({ {2,1,2}, concrete_20m, blockMass, true });
         t.addBlock({ {4,1,4}, concrete_20m, blockMass, false });
         t.addBlock({ {4,2,4}, concrete_20m, blockMass, false });
+        t.addBlock({ {6,6,6}, concrete_20m, blockMass, true });
+        t.addBlock({ {7,5,6}, concrete_20m, blockMass, false });
+        t.addBlock({ {7,6,6}, concrete_20m, blockMass, false });
+        t.addBlock({ {7,7,6}, concrete_20m, blockMass, false });
         WorldUpdater{ world }.runTransaction(t);
     }
 
@@ -73,6 +78,10 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
     auto const contact = ContactReference{ world, contactId };
     auto const invalidContact = makeContactRef({ 2,2,2 }, Direction::plusZ());
     auto const unsolvedContact = makeContactRef({ 4,1,4 }, Direction::plusY());
+
+    auto const c5 = makeContactRef({ 7,5,6 }, Direction::plusY());
+    auto const c6 = makeContactRef({ 7,6,6 }, Direction::minusX());
+    auto const c7 = makeContactRef({ 7,7,6 }, Direction::minusY());
 
     auto makeBlockRef = [&](BlockIndex const& index) {
         return BlockReference{ world, index };
@@ -89,15 +98,6 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
     }
 
     SECTION(".forceStress()") {
-        {
-            Transaction t;
-            t.addBlock({ {6,6,6}, concrete_20m, blockMass, true });
-            t.addBlock({ {7,5,6}, concrete_20m, blockMass, false });
-            t.addBlock({ {7,6,6}, concrete_20m, blockMass, false });
-            t.addBlock({ {7,7,6}, concrete_20m, blockMass, false });
-            WorldUpdater{ world }.runTransaction(t);
-        }
-
         auto checkForceStress = [&](ForceStress const& value, ForceStress const& expected) {
             CHECK_THAT(value.compression(), matchers::WithinRel(expected.compression(), solverPrecision));
             CHECK_THAT(value.shear(), matchers::WithinRel(expected.shear(), solverPrecision));
@@ -105,7 +105,6 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
         };
 
         SECTION("// compression") {
-            auto const c7 = makeContactRef({ 7,7,6 }, Direction::minusY());
             auto const expected = ForceStress{
                 blockMass * g.norm(),
                 0.f * u.force,
@@ -116,7 +115,6 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
         }
 
         SECTION("// shear") {
-            auto const c6 = makeContactRef({ 7,6,6 }, Direction::minusX());
             auto const expected = ForceStress{
                 0.f * u.force,
                 3.f * blockMass * g.norm(),
@@ -127,7 +125,6 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
         }
 
         SECTION("// tensile") {
-            auto const c5 = makeContactRef({ 7,5,6 }, Direction::plusY());
             auto const expected = ForceStress{
                 0.f * u.force,
                 0.f * u.force,
@@ -200,6 +197,44 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
             static constexpr auto coordMax = std::numeric_limits<BlockIndex::Coord>::max();
             auto const limitContact = ContactReference{ world, ContactIndex{ {0,coordMax,0}, Direction::plusY() } };
             CHECK_THROWS_AS(limitContact.opposite(), std::out_of_range);
+        }
+    }
+
+    SECTION(".stressRatio()") {
+        auto checkStressRatio = [&](StressRatio const& value, StressRatio const& expected) {
+            CHECK_THAT(value.compression(), matchers::WithinRel(expected.compression(), solverPrecision));
+            CHECK_THAT(value.shear(), matchers::WithinRel(expected.shear(), solverPrecision));
+            CHECK_THAT(value.tensile(), matchers::WithinRel(expected.tensile(), solverPrecision));
+        };
+
+        SECTION("// compression") {
+            auto const expected = StressRatio{
+                blockMass * g.norm() / (concrete_20m.compression() * c7.area()),
+                0.f,
+                0.f,
+            };
+            checkStressRatio(c7.stressRatio(), expected);
+            checkStressRatio(c7.opposite().stressRatio(), expected);
+        }
+
+        SECTION("// shear") {
+            auto const expected = StressRatio{
+                0.f,
+                3.f * blockMass * g.norm() / (concrete_20m.shear() * c6.area()),
+                0.f,
+            };
+            checkStressRatio(c6.stressRatio(), expected);
+            checkStressRatio(c6.opposite().stressRatio(), expected);
+        }
+
+        SECTION("// tensile") {
+            auto const expected = StressRatio{
+                0.f,
+                0.f,
+                blockMass * g.norm() / (concrete_20m.tensile() * c5.area()),
+            };
+            checkStressRatio(c5.stressRatio(), expected);
+            checkStressRatio(c5.opposite().stressRatio(), expected);
         }
     }
 

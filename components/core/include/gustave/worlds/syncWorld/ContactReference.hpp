@@ -61,6 +61,7 @@ namespace gustave::worlds::syncWorld {
         using ForceStress = model::ForceStress<libCfg>;
         using PressureStress = typename SceneContact::PressureStress;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
+        using StressRatio = model::StressRatio<libCfg>;
         using StructureReference = syncWorld::StructureReference<libCfg>;
 
         [[nodiscard]]
@@ -142,6 +143,12 @@ namespace gustave::worlds::syncWorld {
                 throw std::out_of_range(msg.str());
             }
             return ContactReference{ *world_, *oppositeId };
+        }
+
+        [[nodiscard]]
+        StressRatio stressRatio() const {
+            auto sContact = sceneContact();
+            return forceStress() / (sContact.maxStress() * sContact.area());
         }
 
         [[nodiscard]]
