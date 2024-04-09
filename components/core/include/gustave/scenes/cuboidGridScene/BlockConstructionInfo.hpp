@@ -53,6 +53,15 @@ namespace gustave::scenes::cuboidGridScene {
             , isFoundation_{ isFoundation }
         {
             checkMass(mass);
+            if (maxStress_.compression() <= 0.f * u.pressure) {
+                throw invalidMaxStressError("compression", maxStress_.compression());
+            }
+            if (maxStress_.shear() <= 0.f * u.pressure) {
+                throw invalidMaxStressError("shear", maxStress_.shear());
+            }
+            if (maxStress_.tensile() <= 0.f * u.pressure) {
+                throw invalidMaxStressError("tensile", maxStress_.tensile());
+            }
         }
 
         [[nodiscard]]
@@ -102,6 +111,13 @@ namespace gustave::scenes::cuboidGridScene {
         PressureStress maxStress_;
         Real<u.mass> mass_;
         bool isFoundation_;
+
+        [[nodiscard]]
+        static std::invalid_argument invalidMaxStressError(std::string name, Real<u.pressure> value) {
+            std::stringstream result;
+            result << "maxStress." << name << " must be strictly positive (passed: " << value << ").";
+            return std::invalid_argument(result.str());
+        }
 
         void checkMass(Real<u.mass> value) {
             if (value <= 0.f * u.mass) {
