@@ -39,6 +39,7 @@ using ContactIndex = ContactReference::ContactIndex;
 using Direction = ContactIndex::Direction;
 using StructureReference = BlockReference::StructureReference;
 using Solver = WorldData::Solver;
+using StressRatio = BlockReference::StressRatio;
 using Transaction = WorldUpdater::Transaction;
 
 static constexpr auto blockSize = vector3(3.f, 2.f, 1.f, u.length);
@@ -65,6 +66,10 @@ TEST_CASE("worlds::syncWorld::BlockReference") {
         t.addBlock({ {0,2,0}, concrete_20m, blockMass, false });
         t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
         t.addBlock({ {0,0,2}, concrete_20m, blockMass, true });
+        t.addBlock({ {6,6,6}, concrete_20m, blockMass, true });
+        t.addBlock({ {7,5,6}, concrete_20m, blockMass, false });
+        t.addBlock({ {7,6,6}, concrete_40m, blockMass, false });
+        t.addBlock({ {7,7,6}, concrete_20m, blockMass, false });
         WorldUpdater{ world }.runTransaction(t);
     }
 
@@ -72,6 +77,7 @@ TEST_CASE("worlds::syncWorld::BlockReference") {
     BlockReference b010{ world, {0,1,0} };
     BlockReference b020{ world, {0,2,0} };
     BlockReference b002{ world, {0,0,2} };
+    BlockReference b766{ world, {7,6,6} };
 
     auto removeBlock = [&](BlockIndex const& index) {
         Transaction t;
@@ -154,6 +160,19 @@ TEST_CASE("worlds::syncWorld::BlockReference") {
             removeBlock({ 0,2,0 });
             CHECK_THROWS_AS(b020.position(), std::out_of_range);
         }
+    }
+
+    SECTION(".stressRatio()") {
+        Real<u.force> const blockWeight = (blockMass * g).norm();
+        StressRatio const expected{
+            blockWeight / (concrete_40m.compression() * blockSize.x() * blockSize.z()),
+            3.f * blockWeight / (concrete_40m.shear() * blockSize.y() * blockSize.z()),
+            blockWeight / (concrete_40m.tensile() * blockSize.x() * blockSize.z()),
+        };
+        StressRatio const result = b766.stressRatio();
+        CHECK_THAT(result.compression(), matchers::WithinRel(expected.compression(), solverPrecision));
+        CHECK_THAT(result.shear(), matchers::WithinRel(expected.shear(), solverPrecision));
+        CHECK_THAT(result.tensile(), matchers::WithinRel(expected.tensile(), solverPrecision));
     }
 
     SECTION(".structures()") {

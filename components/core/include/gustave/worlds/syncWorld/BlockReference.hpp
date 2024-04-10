@@ -27,6 +27,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/model/Stress.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
@@ -58,6 +59,7 @@ namespace gustave::worlds::syncWorld {
         using BlockIndex = typename WorldData::Scene::BlockIndex;
         using ContactReference = syncWorld::ContactReference<libCfg>;
         using PressureStress = model::PressureStress<libCfg>;
+        using StressRatio = model::StressRatio<libCfg>;
         using StructureReference = syncWorld::StructureReference<libCfg>;
 
         class Contacts {
@@ -292,6 +294,16 @@ namespace gustave::worlds::syncWorld {
         [[nodiscard]]
         decltype(auto) position() const {
             return sceneBlock().position();
+        }
+
+        [[nodiscard]]
+        StressRatio stressRatio() const {
+            PressureStress const stressMax = maxStress();
+            StressRatio result{ 0.f * u.one, 0.f * u.one, 0.f * u.one };
+            for (auto const& contact : contacts()) {
+                result.mergeMax(contact.pressureStress() / stressMax);
+            }
+            return result;
         }
 
         [[nodiscard]]
