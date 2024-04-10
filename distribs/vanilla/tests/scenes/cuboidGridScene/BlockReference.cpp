@@ -146,14 +146,14 @@ TEST_CASE("scenes::cuboidGridScene::BlockReference") {
         }
     }
 
-    SECTION(".maxStress()") {
+    SECTION(".maxPressureStress()") {
         SECTION("// valid") {
-            CHECK(b111.maxStress() == concrete_20m);
+            CHECK(b111.maxPressureStress() == concrete_20m);
         }
 
         SECTION("// invalid") {
             sceneData.blocks.erase({ 1,1,1 });
-            CHECK_THROWS_AS(b111.maxStress() == concrete_20m, std::out_of_range);
+            CHECK_THROWS_AS(b111.maxPressureStress() == concrete_20m, std::out_of_range);
         }
     }
 

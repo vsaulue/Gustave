@@ -57,7 +57,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
 
         [[nodiscard]]
         explicit BlockMappedData(BlockConstructionInfo<cfg> const& info)
-            : maxStress_{ info.maxStress() }
+            : maxPressureStress_{ info.maxPressureStress() }
             , linkIndices_{ maxLinkId(), maxLinkId(), maxLinkId() }
             , mass_{ info.mass() }
             , isFoundation_{ info.isFoundation() }
@@ -72,8 +72,8 @@ namespace gustave::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        PressureStress const& maxStress() const {
-            return maxStress_;
+        PressureStress const& maxPressureStress() const {
+            return maxPressureStress_;
         }
 
         [[nodiscard]]
@@ -106,7 +106,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
             return std::numeric_limits<LinkIndex>::max();
         }
 
-        PressureStress maxStress_;
+        PressureStress maxPressureStress_;
         LinkIndices linkIndices_;
         Real<u.mass> mass_;
         bool isFoundation_;

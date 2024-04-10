@@ -42,7 +42,7 @@ TEST_CASE("scenes::cuboidGridScene::BlockConstructionInfo") {
         SECTION("// valid constructor & getters") {
             const BlockConstructionInfo obj{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
             CHECK(obj.index() == BlockIndex{ 4, 5, 6 });
-            CHECK(obj.maxStress().tensile() == concrete_20m.tensile());
+            CHECK(obj.maxPressureStress().tensile() == concrete_20m.tensile());
             CHECK(obj.mass() == 5.f * u.mass);
             CHECK(obj.isFoundation() == true);
         }
@@ -54,38 +54,38 @@ TEST_CASE("scenes::cuboidGridScene::BlockConstructionInfo") {
             CHECK_THROWS_AS(constructor(), std::invalid_argument);
         }
 
-        SECTION("// constructor: invalid maxStress.compression") {
-            PressureStress maxStress{
+        SECTION("// constructor: invalid maxPressureStress.compression") {
+            PressureStress maxPressureStress{
                 0.f * u.pressure,
                 1000.f * u.pressure,
                 1000.f * u.pressure,
             };
             auto constructor = [&]() {
-                return BlockConstructionInfo{ {0,0,0}, maxStress, 1000.f * u.mass, true };
+                return BlockConstructionInfo{ {0,0,0}, maxPressureStress, 1000.f * u.mass, true };
             };
             CHECK_THROWS_AS(constructor(), std::invalid_argument);
         }
 
-        SECTION("// constructor: invalid maxStress.shear") {
-            PressureStress maxStress{
+        SECTION("// constructor: invalid maxPressureStress.shear") {
+            PressureStress maxPressureStress{
                 1000.f * u.pressure,
                 0.f * u.pressure,
                 1000.f * u.pressure,
             };
             auto constructor = [&]() {
-                return BlockConstructionInfo{ {0,0,0}, maxStress, 1000.f * u.mass, true };
+                return BlockConstructionInfo{ {0,0,0}, maxPressureStress, 1000.f * u.mass, true };
             };
             CHECK_THROWS_AS(constructor(), std::invalid_argument);
         }
 
-        SECTION("// constructor: invalid maxStress.tensile") {
-            PressureStress maxStress{
+        SECTION("// constructor: invalid maxPressureStress.tensile") {
+            PressureStress maxPressureStress{
                 1000.f * u.pressure,
                 1000.f * u.pressure,
                 0.f * u.pressure,
             };
             auto constructor = [&]() {
-                return BlockConstructionInfo{ {0,0,0}, maxStress, 1000.f * u.mass, true };
+                return BlockConstructionInfo{ {0,0,0}, maxPressureStress, 1000.f * u.mass, true };
             };
             CHECK_THROWS_AS(constructor(), std::invalid_argument);
         }

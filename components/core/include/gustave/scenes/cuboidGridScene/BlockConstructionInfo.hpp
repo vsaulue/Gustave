@@ -46,21 +46,21 @@ namespace gustave::scenes::cuboidGridScene {
         using PressureStress = model::PressureStress<libCfg>;
 
         [[nodiscard]]
-        BlockConstructionInfo(BlockIndex const& index, PressureStress const& maxStress, Real<u.mass> mass, bool isFoundation)
+        BlockConstructionInfo(BlockIndex const& index, PressureStress const& maxPressureStress, Real<u.mass> mass, bool isFoundation)
             : index_{ index }
-            , maxStress_{ maxStress }
+            , maxPressureStress_{ maxPressureStress }
             , mass_{ mass }
             , isFoundation_{ isFoundation }
         {
             checkMass(mass);
-            if (maxStress_.compression() <= 0.f * u.pressure) {
-                throw invalidMaxStressError("compression", maxStress_.compression());
+            if (maxPressureStress_.compression() <= 0.f * u.pressure) {
+                throw invalidMaxStressError("compression", maxPressureStress_.compression());
             }
-            if (maxStress_.shear() <= 0.f * u.pressure) {
-                throw invalidMaxStressError("shear", maxStress_.shear());
+            if (maxPressureStress_.shear() <= 0.f * u.pressure) {
+                throw invalidMaxStressError("shear", maxPressureStress_.shear());
             }
-            if (maxStress_.tensile() <= 0.f * u.pressure) {
-                throw invalidMaxStressError("tensile", maxStress_.tensile());
+            if (maxPressureStress_.tensile() <= 0.f * u.pressure) {
+                throw invalidMaxStressError("tensile", maxPressureStress_.tensile());
             }
         }
 
@@ -75,13 +75,8 @@ namespace gustave::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        PressureStress& maxStress() {
-            return maxStress_;
-        }
-
-        [[nodiscard]]
-        PressureStress const& maxStress() const {
-            return maxStress_;
+        PressureStress const& maxPressureStress() const {
+            return maxPressureStress_;
         }
 
         [[nodiscard]]
@@ -108,14 +103,14 @@ namespace gustave::scenes::cuboidGridScene {
         bool operator==(BlockConstructionInfo const&) const = default;
     private:
         BlockIndex index_;
-        PressureStress maxStress_;
+        PressureStress maxPressureStress_;
         Real<u.mass> mass_;
         bool isFoundation_;
 
         [[nodiscard]]
         static std::invalid_argument invalidMaxStressError(std::string name, Real<u.pressure> value) {
             std::stringstream result;
-            result << "maxStress." << name << " must be strictly positive (passed: " << value << ").";
+            result << "maxPressureStress." << name << " must be strictly positive (passed: " << value << ").";
             return std::invalid_argument(result.str());
         }
 

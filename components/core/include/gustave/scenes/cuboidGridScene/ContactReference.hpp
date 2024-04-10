@@ -122,12 +122,12 @@ namespace gustave::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        PressureStress maxStress() const {
+        PressureStress maxPressureStress() const {
             BlockDatas blocks = blockDatas();
             if (!blocks.isValid()) {
                 throw std::out_of_range(invalidMessage());
             }
-            return PressureStress::minStress(blocks.local.maxStress(), blocks.other.maxStress());
+            return PressureStress::minStress(blocks.local.maxPressureStress(), blocks.other.maxPressureStress());
         }
 
         [[nodiscard]]

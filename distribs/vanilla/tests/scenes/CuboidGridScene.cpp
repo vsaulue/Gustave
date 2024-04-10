@@ -87,7 +87,7 @@ TEST_CASE("scenes::CuboidGridScene") {
         scene.modify(t);
 
         Scene::ContactReference contact = contacts.at(Scene::ContactIndex{ {1,0,0}, Direction::plusX() });
-        CHECK(contact.maxStress() == concrete_20m);
+        CHECK(contact.maxPressureStress() == concrete_20m);
         CHECK(contact.otherBlock().mass() == 5.f * blockMass);
     }
 

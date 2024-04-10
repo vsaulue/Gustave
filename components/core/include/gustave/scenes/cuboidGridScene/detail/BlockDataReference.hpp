@@ -55,7 +55,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
     public:
         using Hasher = utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
         using LinkIndices = typename BlockMappedData<libCfg>::LinkIndices;
-        using MaxPressure = model::PressureStress<libCfg>;
+        using PressureStress = model::PressureStress<libCfg>;
 
         [[nodiscard]]
         static constexpr bool isMutable() {
@@ -127,8 +127,8 @@ namespace gustave::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        MaxPressure const& maxStress() const {
-            return data_->second.maxStress();
+        PressureStress const& maxPressureStress() const {
+            return data_->second.maxPressureStress();
         }
 
         [[nodiscard]]

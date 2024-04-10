@@ -281,8 +281,8 @@ namespace gustave::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        PressureStress const& maxStress() const {
-            return data().maxStress();
+        PressureStress const& maxPressureStress() const {
+            return data().maxPressureStress();
         }
 
         [[nodiscard]]

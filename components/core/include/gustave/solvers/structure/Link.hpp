@@ -48,11 +48,11 @@ namespace gustave::solvers::structure {
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
         [[nodiscard]]
-        explicit Link(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, PressureStress const& maxStress)
+        explicit Link(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, PressureStress const& maxPressureStress)
             : localNodeId_{ id1 }
             , otherNodeId_{ id2 }
             , normal_{ normal }
-            , conductivity_{ (area / thickness) * maxStress }
+            , conductivity_{ (area / thickness) * maxPressureStress }
         {
             assert(id1 != id2);
             assert(conductivity_.compression() > 0.f * u.conductivity);

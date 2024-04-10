@@ -125,8 +125,8 @@ namespace gustave::worlds::syncWorld {
         }
 
         [[nodiscard]]
-        PressureStress maxStress() const {
-            return sceneContact().maxStress();
+        PressureStress maxPressureStress() const {
+            return sceneContact().maxPressureStress();
         }
 
         [[nodiscard]]
@@ -153,7 +153,7 @@ namespace gustave::worlds::syncWorld {
         [[nodiscard]]
         StressRatio stressRatio() const {
             auto sContact = sceneContact();
-            return forceStress() / (sContact.maxStress() * sContact.area());
+            return forceStress() / (sContact.maxPressureStress() * sContact.area());
         }
 
         [[nodiscard]]

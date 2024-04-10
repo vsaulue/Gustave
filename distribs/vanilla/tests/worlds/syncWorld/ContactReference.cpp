@@ -167,13 +167,13 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
         CHECK(contact.localBlock() == makeBlockRef({ 2,2,2 }));
     }
 
-    SECTION(".maxStress()") {
+    SECTION(".maxPressureStress()") {
         SECTION("// valid") {
-            CHECK(contact.maxStress() == concrete_20m);
+            CHECK(contact.maxPressureStress() == concrete_20m);
         }
 
         SECTION("// invalid") {
-            CHECK_THROWS_AS(invalidContact.maxStress(), std::out_of_range);
+            CHECK_THROWS_AS(invalidContact.maxPressureStress(), std::out_of_range);
         }
     }
 

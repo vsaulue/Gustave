@@ -287,8 +287,8 @@ namespace gustave::worlds::syncWorld {
         }
 
         [[nodiscard]]
-        PressureStress const& maxStress() const {
-            return sceneBlock().maxStress();
+        PressureStress const& maxPressureStress() const {
+            return sceneBlock().maxPressureStress();
         }
 
         [[nodiscard]]
@@ -298,7 +298,7 @@ namespace gustave::worlds::syncWorld {
 
         [[nodiscard]]
         StressRatio stressRatio() const {
-            PressureStress const stressMax = maxStress();
+            PressureStress const stressMax = maxPressureStress();
             StressRatio result{ 0.f * u.one, 0.f * u.one, 0.f * u.one };
             for (auto const& contact : contacts()) {
                 result.mergeMax(contact.pressureStress() / stressMax);

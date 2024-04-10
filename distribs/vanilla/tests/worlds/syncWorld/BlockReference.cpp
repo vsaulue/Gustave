@@ -140,14 +140,14 @@ TEST_CASE("worlds::syncWorld::BlockReference") {
         }
     }
 
-    SECTION(".maxStress()") {
+    SECTION(".maxPressureStress()") {
         SECTION("// valid") {
-            CHECK(b000.maxStress() == concrete_20m);
+            CHECK(b000.maxPressureStress() == concrete_20m);
         }
 
         SECTION("// invalid") {
             removeBlock({ 0,0,0 });
-            CHECK_THROWS_AS(b000.maxStress(), std::out_of_range);
+            CHECK_THROWS_AS(b000.maxPressureStress(), std::out_of_range);
         }
     }
 

@@ -131,14 +131,14 @@ TEST_CASE("scenes::cuboidGridScene::ContactReference") {
         }
     }
 
-    SECTION(".maxStress()") {
+    SECTION(".maxPressureStress()") {
         SECTION("// valid") {
             ContactReference contact = contactReference({ 1,2,2 }, Direction::plusX());
-            CHECK(contact.maxStress() == PressureStress::minStress(concrete_20m, highTensile));
+            CHECK(contact.maxPressureStress() == PressureStress::minStress(concrete_20m, highTensile));
         }
 
         SECTION("// invalid") {
-            CHECK_THROWS_AS(invalidContact.maxStress(), std::out_of_range);
+            CHECK_THROWS_AS(invalidContact.maxPressureStress(), std::out_of_range);
         }
     }
 
