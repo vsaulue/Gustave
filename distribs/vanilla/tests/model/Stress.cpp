@@ -69,6 +69,21 @@ TEST_CASE("model::Stress") {
         CHECK(real * stress == expected);
     }
 
+    SECTION("// Stress / Real") {
+        ForceStress const num = {
+            10.f * u.force,
+            4.f * u.force,
+            6.f * u.force,
+        };
+        Real<u.area> const den = 2.f * u.area;
+        PressureStress const expected = {
+            5.f * u.pressure,
+            2.f * u.pressure,
+            3.f * u.pressure,
+        };
+        CHECK(num / den == expected);
+    }
+
     SECTION("// Stress / Stress") {
         ForceStress const num = {
             9.f * u.force,

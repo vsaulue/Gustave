@@ -111,6 +111,11 @@ namespace gustave::model {
             return { compression_ / rhs.compression(), shear_ / rhs.shear(), tensile_ / rhs.tensile() };
         }
 
+        [[nodiscard]]
+        auto operator/(cfg::cReal auto rhs) const {
+            return Stress<libCfg, unit_ / decltype(rhs)::unit()>{ compression_ / rhs, shear_ / rhs, tensile_ / rhs };
+        }
+
         template<cfg::cUnitOf<libCfg> auto otherUnit>
         [[nodiscard]]
         bool operator==(Stress<libCfg, otherUnit> const& other) const {
