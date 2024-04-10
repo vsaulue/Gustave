@@ -200,6 +200,44 @@ TEST_CASE("worlds::syncWorld::ContactReference") {
         }
     }
 
+    SECTION(".pressureStress()") {
+        auto checkPressureStress = [&](PressureStress const& value, PressureStress const& expected) {
+            CHECK_THAT(value.compression(), matchers::WithinRel(expected.compression(), solverPrecision));
+            CHECK_THAT(value.shear(), matchers::WithinRel(expected.shear(), solverPrecision));
+            CHECK_THAT(value.tensile(), matchers::WithinRel(expected.tensile(), solverPrecision));
+        };
+
+        SECTION("// compression") {
+            auto const expected = PressureStress{
+                blockMass * g.norm() / c7.area(),
+                0.f * u.pressure,
+                0.f * u.pressure,
+            };
+            checkPressureStress(c7.pressureStress(), expected);
+            checkPressureStress(c7.opposite().pressureStress(), expected);
+        }
+
+        SECTION("// shear") {
+            auto const expected = PressureStress{
+                0.f * u.pressure,
+                3.f * blockMass * g.norm() / c6.area(),
+                0.f * u.pressure,
+            };
+            checkPressureStress(c6.pressureStress(), expected);
+            checkPressureStress(c6.opposite().pressureStress(), expected);
+        }
+
+        SECTION("// tensile") {
+            auto const expected = PressureStress{
+                0.f * u.pressure,
+                0.f * u.pressure,
+                blockMass * g.norm() / c5.area(),
+            };
+            checkPressureStress(c5.pressureStress(), expected);
+            checkPressureStress(c5.opposite().pressureStress(), expected);
+        }
+    }
+
     SECTION(".stressRatio()") {
         auto checkStressRatio = [&](StressRatio const& value, StressRatio const& expected) {
             CHECK_THAT(value.compression(), matchers::WithinRel(expected.compression(), solverPrecision));
