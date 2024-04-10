@@ -53,6 +53,35 @@ TEST_CASE("model::Stress") {
         CHECK(PressureStress::minStress(m2, m1) == expected);
     }
 
+    SECTION(".mergeMax()") {
+        StressRatio const ratio1{
+            3.f * u.one,
+            0.f * u.one,
+            2.f * u.one,
+        };
+        StressRatio const ratio2{
+            1.f * u.one,
+            4.f * u.one,
+            5.f * u.one,
+        };
+        StressRatio const expected{
+            3.f * u.one,
+            4.f * u.one,
+            5.f * u.one,
+        };
+
+        {
+            StressRatio copy1 = ratio1;
+            copy1.mergeMax(ratio2);
+            CHECK(copy1 == expected);
+        }
+        {
+            StressRatio copy2 = ratio2;
+            copy2.mergeMax(ratio1);
+            CHECK(copy2 == expected);
+        }
+    }
+
     SECTION("// Stress * Real") {
         PressureStress const stress = {
             4.f * u.pressure, // compressive

@@ -73,6 +73,13 @@ namespace gustave::model {
             };
         }
 
+        template<cfg::cUnitOf<libCfg> auto otherUnit_>
+        void mergeMax(Stress<libCfg, otherUnit_> const& other) {
+            compression_ = rt.max(compression_, other.compression());
+            shear_ = rt.max(shear_, other.shear());
+            tensile_ = rt.max(tensile_, other.tensile());
+        }
+
         [[nodiscard]]
         Coord compression() const {
             return compression_;
