@@ -24,6 +24,7 @@
 
 add_library(Gustave-Vanilla INTERFACE)
 target_include_directories(Gustave-Vanilla INTERFACE "include")
+install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
 
 target_link_libraries(Gustave-Vanilla
     INTERFACE Comp-Core

@@ -24,6 +24,7 @@
 
 add_library(Comp-Math INTERFACE)
 target_include_directories(Comp-Math INTERFACE "include")
+install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
 
 target_link_libraries(Comp-Math
     INTERFACE Comp-Config

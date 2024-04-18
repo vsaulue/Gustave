@@ -25,9 +25,9 @@
 add_subdirectory("lib")
 
 add_library(Comp-Units-Vanilla INTERFACE)
-target_include_directories(Comp-Units-Vanilla INTERFACE
-    "include"
-)
+target_include_directories(Comp-Units-Vanilla INTERFACE "include")
+install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
+
 target_link_libraries(Comp-Units-Vanilla
     INTERFACE Comp-Config
     INTERFACE Comp-Units-Vanilla-Lib
