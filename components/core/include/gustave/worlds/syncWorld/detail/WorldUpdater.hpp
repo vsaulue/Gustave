@@ -57,7 +57,7 @@ namespace gustave::worlds::syncWorld::detail {
                 std::shared_ptr<StructureData> worldStructure = std::make_shared<StructureData>(data_, sceneStructure);
                 auto const result = data_.solver.run(worldStructure->sceneStructure().solverStructurePtr());
                 worldStructure->solve(result.solutionPtr());
-                auto const insertResult = data_.structures.insert({ worldStructure->sceneStructure(), std::move(worldStructure) });
+                [[maybe_unused]] auto const insertResult = data_.structures.insert({ worldStructure->sceneStructure(), std::move(worldStructure) });
                 assert(insertResult.second);
             }
         }

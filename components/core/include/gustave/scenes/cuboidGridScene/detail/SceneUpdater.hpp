@@ -178,7 +178,7 @@ namespace gustave::scenes::cuboidGridScene::detail {
             for (DataNeighbour const& neighbour : neighbours(deletedIndex)) {
                 declareRoot(ctx, neighbour.block);
             }
-            bool isDeleted = data_->blocks.erase(deletedIndex);
+            [[maybe_unused]] bool isDeleted = data_->blocks.erase(deletedIndex);
             assert(isDeleted);
         }
 
