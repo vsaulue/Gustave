@@ -131,8 +131,8 @@ namespace gustave::solvers {
     public:
 
         [[nodiscard]]
-        explicit Force1Solver(std::shared_ptr<Config const> config)
-            : config_{ std::move(config) }
+        explicit Force1Solver(Config const& config)
+            : config_{ std::make_shared<Config const>(config) }
         {
             assert(config_);
         }

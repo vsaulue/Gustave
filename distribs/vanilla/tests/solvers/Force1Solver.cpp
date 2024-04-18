@@ -43,7 +43,7 @@ using Structure = Solver::Structure;
 
 TEST_CASE("force1::Solver") {
     constexpr float precision = 0.001f;
-    auto const solver = Solver{ std::make_shared<Solver::Config const>(g, 1000, precision) };
+    auto const solver = Solver{ Solver::Config{ g, 1000, precision } };
 
     SECTION("// solvable: pillar") {
         constexpr Real<u.mass> blockMass = 4000.f * u.mass;

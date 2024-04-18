@@ -49,7 +49,7 @@ static constexpr float solverPrecision = 0.001f;
 
 [[nodiscard]]
 static WorldData makeWorld() {
-    auto solver = Solver{ std::make_shared<Solver::Config>(g, 1000, solverPrecision) };
+    auto solver = Solver{ Solver::Config{ g, 1000, solverPrecision } };
     return WorldData{ blockSize, std::move(solver) };
 }
 

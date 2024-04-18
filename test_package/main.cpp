@@ -35,7 +35,7 @@ static auto const solverPrecision = 0.001f;
 
 G::Worlds::SyncWorld newWorld() {
     using Solver = G::Worlds::SyncWorld::Solver;
-    auto solver = Solver{ std::make_shared<Solver::Config>(gravity, 1000, solverPrecision) };
+    auto solver = Solver{ Solver::Config{ gravity, 1000, solverPrecision } };
     return G::Worlds::SyncWorld{ blockDimensions, std::move(solver) };
 }
 
