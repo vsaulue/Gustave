@@ -47,7 +47,7 @@ using SolverConfig = SolutionData::Basis::Config;
 
 TEST_CASE("force1::solutionUtils::NodeReference") {
     static constexpr Real<u.one> precision = 0.001f;
-    auto const solverConfig = std::make_shared<SolverConfig const>(g, 1000, precision);
+    auto const solverConfig = std::make_shared<SolverConfig const>(g, precision);
 
     auto structure = std::make_shared<Structure>();
     structure->addNode(Node{ 5'000.f * u.mass, true });

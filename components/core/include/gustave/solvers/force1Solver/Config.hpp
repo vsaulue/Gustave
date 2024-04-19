@@ -44,12 +44,12 @@ namespace gustave::solvers::force1Solver {
         using IterationIndex = std::uint64_t;
 
         [[nodiscard]]
-        explicit Config(Vector3<u.acceleration> const& g, IterationIndex maxIterations, Real<u.one> targetMaxError)
+        explicit Config(Vector3<u.acceleration> const& g, Real<u.one> targetMaxError, IterationIndex maxIterations = 10000)
             : g_{ g }
             , maxIterations_{ maxIterations }
             , targetMaxError_{ targetMaxError }
         {
-            assert(targetMaxError > 0.f);
+            setTargetMaxError(targetMaxError); // check value correctness
         }
 
         [[nodiscard]]
@@ -57,14 +57,31 @@ namespace gustave::solvers::force1Solver {
             return g_;
         }
 
+        void setG(Vector3<u.acceleration> const& newValue) {
+            g_ = newValue;
+        }
+
         [[nodiscard]]
         IterationIndex maxIterations() const {
             return maxIterations_;
         }
 
+        void setMaxIterations(IterationIndex newValue) {
+            maxIterations_ = newValue;
+        }
+
         [[nodiscard]]
         Real<u.one> targetMaxError() const {
             return targetMaxError_;
+        }
+
+        void setTargetMaxError(Real<u.one> newValue) {
+            if (newValue <= 0.f) {
+                std::stringstream msg;
+                msg << "targetMaxError must be strictly positive (provided: " << newValue << ")";
+                throw std::invalid_argument(msg.str());
+            }
+            targetMaxError_ = newValue;
         }
     private:
         Vector3<u.acceleration> g_;

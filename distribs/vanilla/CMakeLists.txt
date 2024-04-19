@@ -37,6 +37,7 @@ add_executable(Test-Gustave-Vanilla
     "tests/solvers/force1Solver/solution/Contacts.cpp"
     "tests/solvers/force1Solver/solution/NodeReference.cpp"
     "tests/solvers/force1Solver/solution/Nodes.cpp"
+    "tests/solvers/force1Solver/Config.cpp"
     "tests/solvers/force1Solver/Solution.cpp"
     "tests/solvers/Force1Solver.cpp"
     "tests/model/Stress.cpp"

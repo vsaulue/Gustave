@@ -43,7 +43,7 @@ static constexpr float solverPrecision = 0.001f;
 
 [[nodiscard]]
 static SyncWorld makeWorld() {
-    auto solver = Solver{ Solver::Config{ g, 1000, solverPrecision } };
+    auto solver = Solver{ Solver::Config{ g, solverPrecision } };
     return SyncWorld{ blockSize, std::move(solver) };
 }
 

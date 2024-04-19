@@ -55,7 +55,7 @@ TEST_CASE("force1::Solution") {
     structure->addLink(Link{ 6, 0, -Normals::z, 1.f * u.area, 2.f * u.length, concrete_20m });
 
     constexpr float precision = 0.001f;
-    auto config = std::make_shared<Config const>(g, 1000, precision);
+    auto config = std::make_shared<Config const>(g, precision);
     auto basis = std::make_shared<Solution::Basis>(structure, config);
     Solution solution{ basis };
     auto potentials = basis->spanPotentials();
