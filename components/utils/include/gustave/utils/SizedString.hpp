@@ -39,6 +39,12 @@
 
 namespace gustave::utils {
     template<cChar _Char, std::size_t length>
+    struct SizedString;
+
+    template<typename T>
+    concept cSizedString = std::same_as<T, SizedString<typename T::Char, T::size()>>;
+
+    template<cChar _Char, std::size_t length>
     struct SizedString {
     public:
         using Char = _Char;
@@ -137,11 +143,13 @@ namespace gustave::utils {
             }
         }
 
+        [[nodiscard]]
+        constexpr bool operator==(cSizedString auto const& other) const {
+            return view() == other.view();
+        }
+
         Data data;
     };
-
-    template<typename T>
-    concept cSizedString = std::same_as<T,SizedString<typename T::Char, T::size()>>;
 
     template<cChar Char, std::size_t length>
     SizedString(const Char(&val)[length]) -> SizedString<Char, length - 1>;

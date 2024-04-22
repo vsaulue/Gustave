@@ -37,8 +37,8 @@ TEST_CASE("BasicUnitIdentifier") {
     struct Kilogram : u::BasicUnitIdentifier<"kg"> {};
     constexpr Kilogram kilogram{};
 
-    SECTION("operator==(cBasicUnitIdentifier auto&, cbasicUnitIdentifier auto&)") {
-        CHECK(metre == Metre{});
+    SECTION("BasicUnitIdentifier == BasicUnitIdentifier") {
+        CHECK((metre == Metre{}));
         CHECK(metre != kilogram);
     }
 }

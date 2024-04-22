@@ -31,6 +31,12 @@
 
 namespace gustave::units::lib {
     template<utils::SizedString symbol_>
+    struct BasicUnitIdentifier;
+
+    template<typename T>
+    concept cBasicUnitIdentifier = std::derived_from<T, BasicUnitIdentifier<T::symbol()>>;
+
+    template<utils::SizedString symbol_>
     struct BasicUnitIdentifier {
         using Char = typename decltype(symbol_)::Char;
 
@@ -42,14 +48,12 @@ namespace gustave::units::lib {
         [[nodiscard]]
         constexpr BasicUnitIdentifier() = default;
 
+        template<utils::SizedString rhsSymbol>
+        [[nodiscard]]
+        constexpr bool operator==(BasicUnitIdentifier<rhsSymbol> const&) const {
+            return symbol_ == rhsSymbol;
+        }
+
         static_assert(std::same_as<Char, char>, "Only char strings are supported");
     };
-
-    template<typename T>
-    concept cBasicUnitIdentifier = std::derived_from<T, BasicUnitIdentifier<T::symbol()>>;
-
-    [[nodiscard]]
-    constexpr bool operator==(cBasicUnitIdentifier auto lhs, cBasicUnitIdentifier auto rhs) {
-        return std::same_as<decltype(lhs), decltype(rhs)>;
-    }
 }

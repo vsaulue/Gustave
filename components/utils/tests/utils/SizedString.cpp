@@ -61,6 +61,20 @@ TEST_CASE("utils::SizedString") {
 		REQUIRE(str == "HelloWorld!!!"sv);
 	}
 
+    SECTION("SizedString == SizedString") {
+        SECTION("// true") {
+            constexpr utils::SizedString lhs = "abcd0";
+            constexpr utils::SizedString rhs = "abcd0";
+            REQUIRE(lhs == rhs);
+        }
+
+        SECTION("// false") {
+            constexpr utils::SizedString lhs = "abcd00";
+            constexpr utils::SizedString rhs = "abcd0";
+            REQUIRE(lhs != rhs);
+        }
+    }
+
 	SECTION("::operator<=>(cSizedString auto, cSizedString auto)") {
 		constexpr utils::SizedString lhs = "abcd0";
 		constexpr utils::SizedString rhs = "abcd9";
