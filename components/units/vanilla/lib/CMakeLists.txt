@@ -27,6 +27,7 @@ target_include_directories(Comp-Units-Vanilla-Lib INTERFACE "include")
 install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
 
 target_link_libraries(Comp-Units-Vanilla-Lib
+    INTERFACE Comp-Config
     INTERFACE Comp-Utils
 )
 

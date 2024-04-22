@@ -305,8 +305,8 @@ TEST_CASE("Real") {
     // other
 
     SECTION("::zero()") {
-        constexpr auto val = u::Real<s, double>::zero();
-        CHECK(val.unit().isAssignableFrom(s));
+        constexpr auto val = u::Real<newton, double>::zero();
+        CHECK(val.unit().isAssignableFrom(newton));
         testValue(val, 0.0);
     }
 
@@ -326,7 +326,7 @@ TEST_CASE("Real") {
 
     SECTION("::isCompatible(cUnit auto)") {
         CHECK(u::Real<newton, double>::isCompatible(newtonLike));
-        CHECK_FALSE(u::Real<s, double>::isCompatible(u::Unit{kg}));
+        CHECK_FALSE(u::Real<newton, double>::isCompatible(u::Unit{ kg }));
     }
 
     SECTION("operator<<(std::ostream&, cReal auto)") {

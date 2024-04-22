@@ -27,11 +27,12 @@
 
 #include <type_traits>
 
-#include "BasicUnitIdentifier.hpp"
-#include "Exponent.hpp"
+#include <gustave/units/lib/concepts.hpp>
+#include <gustave/units/lib/BasicUnitIdentifier.hpp>
+#include <gustave/units/lib/Exponent.hpp>
 
 namespace gustave::units::lib {
-    template<cBasicUnitIdentifier auto basicUnit_, Exponent exponent_>
+    template<cBasicUnitIdentifier auto basicUnit_, cExponent auto exponent_>
     struct UnitTerm {
         using Char = typename decltype(basicUnit_)::Char;
 
@@ -53,9 +54,6 @@ namespace gustave::units::lib {
             return UnitTerm<basicUnit(), -exponent()>{};
         }
     };
-
-    template<typename T>
-    concept cUnitTerm = std::same_as<T, UnitTerm<T::basicUnit(), T::exponent()>>;
 
     [[nodiscard]]
     constexpr auto operator+(cUnitTerm auto lhs, cUnitTerm auto rhs) {

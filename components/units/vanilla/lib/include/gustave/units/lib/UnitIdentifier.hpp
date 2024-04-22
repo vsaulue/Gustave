@@ -27,15 +27,13 @@
 
 #include <type_traits>
 
+#include <gustave/cfg/cRealRep.hpp>
+#include <gustave/units/lib/concepts.hpp>
+#include <gustave/units/lib/Exponent.hpp>
+#include <gustave/units/lib/UnitTerm.hpp>
 #include <gustave/utils/SizedString.hpp>
 
-#include "Exponent.hpp"
-#include "UnitTerm.hpp"
-
 namespace gustave::units::lib {
-    template<UnitTerm... terms>
-    class UnitIdentifier;
-    
     template<UnitTerm headTerm_, UnitTerm... tailTerms_>
     class UnitIdentifier<headTerm_, tailTerms_...> {
     public:
@@ -83,6 +81,16 @@ namespace gustave::units::lib {
             } else {
                 return utils::SizedString{ headText().sizedView(), utils::SizedStringView{"."}, tailUnit().toString().sizedView()};
             }
+        }
+
+        [[nodiscard]]
+        friend constexpr cReal auto operator*(cfg::cRealRep auto value, UnitIdentifier unitId) {
+            return Real{ value, unitId };
+        }
+
+        [[nodiscard]]
+        friend constexpr cReal auto operator/(cfg::cRealRep auto value, UnitIdentifier invUnitId) {
+            return Real{ value, invUnitId.inverse() };
         }
     private:
         [[nodiscard]]
@@ -140,6 +148,16 @@ namespace gustave::units::lib {
         static constexpr utils::SizedString<char, 0> toString() {
             return {};
         }
+
+        [[nodiscard]]
+        friend constexpr cReal auto operator*(cfg::cRealRep auto value, UnitIdentifier unitId) {
+            return Real{ value, unitId };
+        }
+
+        [[nodiscard]]
+        friend constexpr cReal auto operator/(cfg::cRealRep auto value, UnitIdentifier invUnitId) {
+            return Real{ value, invUnitId.inverse() };
+        }
     };
 
     template<UnitTerm headTerm_, UnitTerm... tailTerms_>
@@ -150,17 +168,6 @@ namespace gustave::units::lib {
             return UnitIdentifier<headTerm()* exp, tailTerms_* exp...>{};
         }
     }
-
-    namespace detail {
-        template<typename T>
-        struct IsUnitIdentifier : std::false_type {};
-
-        template<cUnitTerm auto... terms>
-        struct IsUnitIdentifier<UnitIdentifier<terms...>> : std::true_type {};
-    };
-
-    template<typename T>
-    concept cUnitIdentifier = detail::IsUnitIdentifier<T>::value;
 
     template<cBasicUnitIdentifier BasicId>
     [[nodiscard]]

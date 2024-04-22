@@ -26,29 +26,66 @@
 #pragma once
 
 #include <concepts>
+#include <type_traits>
 
-#include <gustave/units/lib/concepts.hpp>
+#include <gustave/cfg/cRealTraits.hpp>
 #include <gustave/utils/SizedString.hpp>
 
 namespace gustave::units::lib {
     template<utils::SizedString symbol_>
-    struct BasicUnitIdentifier {
-        using Char = typename decltype(symbol_)::Char;
+    struct BasicUnitIdentifier;
 
-        [[nodiscard]]
-        static constexpr auto const& symbol() {
-            return symbol_;
-        };
+    template<typename T>
+    concept cBasicUnitIdentifier = std::derived_from<T, BasicUnitIdentifier<T::symbol()>>;
 
-        [[nodiscard]]
-        constexpr BasicUnitIdentifier() = default;
 
-        template<utils::SizedString rhsSymbol>
-        [[nodiscard]]
-        constexpr bool operator==(BasicUnitIdentifier<rhsSymbol> const&) const {
-            return symbol_ == rhsSymbol;
-        }
 
-        static_assert(std::same_as<Char, char>, "Only char strings are supported");
+    using ExpNum = std::int64_t;
+    using ExpDen = std::uint64_t;
+
+    template<ExpNum num_, ExpDen den_>
+    class Exponent;
+
+    template<typename T>
+    concept cExponent = std::same_as<T, Exponent<T::num(), T::den()>>;
+
+
+
+    template<cBasicUnitIdentifier auto basicUnit_, cExponent auto exponent_>
+    struct UnitTerm;
+
+    template<typename T>
+    concept cUnitTerm = std::same_as<T, UnitTerm<T::basicUnit(), T::exponent()>>;
+
+
+
+    template<UnitTerm... terms>
+    class UnitIdentifier;
+
+    namespace detail {
+        template<typename T>
+        struct IsUnitIdentifier : std::false_type {};
+
+        template<cUnitTerm auto... terms>
+        struct IsUnitIdentifier<UnitIdentifier<terms...>> : std::true_type {};
     };
+
+    template<typename T>
+    concept cUnitIdentifier = detail::IsUnitIdentifier<T>::value;
+
+
+
+    template<utils::SizedString symbol_, cUnitIdentifier auto unitId_>
+    class Unit;
+
+    template<typename T>
+    concept cUnit = std::same_as<T, Unit<T::symbol(), T::unitId()>>;
+
+
+
+    template<cUnit auto unit_, cfg::cRealRep Rep_>
+    class Real;
+
+    template<typename T>
+    concept cReal = std::same_as<T, Real<T::unit(), typename T::Rep>>;
 }

@@ -25,8 +25,9 @@
 
 #pragma once
 
-#include "Exponent.hpp"
-#include "Real.hpp"
+#include <gustave/units/lib/concepts.hpp>
+#include <gustave/units/lib/Exponent.hpp>
+#include <gustave/units/lib/Real.hpp>
 
 namespace gustave::units::lib {
     cReal auto sqrt(cReal auto real) {

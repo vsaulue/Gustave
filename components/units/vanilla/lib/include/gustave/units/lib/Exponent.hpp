@@ -31,19 +31,11 @@
 #include <numeric>
 #include <type_traits>
 
+#include <gustave/units/lib/concepts.hpp>
 #include <gustave/utils/NumberHyperscript.hpp>
 #include <gustave/utils/SizedString.hpp>
 
 namespace gustave::units::lib {
-    using ExpNum = std::int64_t;
-    using ExpDen = std::uint64_t;
-
-    template<ExpNum num_, ExpDen den_>
-    class Exponent;
-
-    template<typename T>
-    concept cExponent = std::same_as<T, Exponent<T::num(), T::den()>>;
-
     namespace detail {
         [[nodiscard]]
         constexpr auto makeSigned(std::unsigned_integral auto const v) {

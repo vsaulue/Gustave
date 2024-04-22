@@ -28,18 +28,13 @@
 #include <ostream>
 #include <type_traits>
 
+#include <gustave/cfg/cRealRep.hpp>
+#include <gustave/units/lib/concepts.hpp>
+#include <gustave/units/lib/Exponent.hpp>
+#include <gustave/units/lib/UnitIdentifier.hpp>
 #include <gustave/utils/SizedString.hpp>
 
-#include "Exponent.hpp"
-#include "UnitIdentifier.hpp"
-
 namespace gustave::units::lib {
-    template<utils::SizedString symbol_, cUnitIdentifier auto unitId_>
-    class Unit;
-    
-    template<typename T>
-    concept cUnit = std::same_as<T, Unit<T::symbol(), T::unitId()>>;
-
     // `cUnitidentifier auto unitId_` instead of `UnitIdentifier unitId_`, because of MSVC bug.
     // see https://developercommunity.visualstudio.com/t/CTAD-rule-on-default-constructible-type/10279590?sort=newest.
     template<utils::SizedString symbol_, cUnitIdentifier auto unitId_>
@@ -97,6 +92,16 @@ namespace gustave::units::lib {
         [[nodiscard]]
         static constexpr bool isAssignableFrom(cUnitIdentifier auto otherId) {
             return otherId == unitId();
+        }
+
+        [[nodiscard]]
+        friend constexpr cReal auto operator*(std::floating_point auto value, Unit unit) {
+            return Real{ value, unit };
+        }
+
+        [[nodiscard]]
+        friend constexpr cReal auto operator/(std::floating_point auto value, Unit invUnit) {
+            return Real{ value, invUnit.inverse() };
         }
     };
 
