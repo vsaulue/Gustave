@@ -38,6 +38,12 @@ namespace gustave::units::lib {
     using ExpNum = std::int64_t;
     using ExpDen = std::uint64_t;
 
+    template<ExpNum num_, ExpDen den_>
+    class Exponent;
+
+    template<typename T>
+    concept cExponent = std::same_as<T, Exponent<T::num(), T::den()>>;
+
     namespace detail {
         [[nodiscard]]
         constexpr auto makeSigned(std::unsigned_integral auto const v) {
@@ -58,6 +64,13 @@ namespace gustave::units::lib {
         constexpr bool isSimplified(ExpNum num, ExpDen den) {
             const auto simplified = simplify(num, den);
             return (num == simplified.first) && (den == simplified.second);
+        }
+
+        template<ExpNum num, ExpDen den>
+        [[nodiscard]]
+        constexpr auto makeExponent() {
+            constexpr auto simplified = simplify(num, den);
+            return Exponent<simplified.first, simplified.second>();
         }
 
         struct ExponentText {
@@ -106,41 +119,29 @@ namespace gustave::units::lib {
                 return utils::SizedString{ numText, detail::ExponentText::fractionText, denText };
             }
         }
-    };
 
-    template<typename T>
-    concept cExponent = std::same_as<T,Exponent<T::num(),T::den()>>;
-
-    namespace detail {
-        template<ExpNum num, ExpDen den>
         [[nodiscard]]
-        constexpr auto makeExponent() {
-            constexpr auto simplified = simplify(num, den);
-            return Exponent<simplified.first, simplified.second>();
+        constexpr auto operator+(cExponent auto rhs) const {
+            constexpr auto num = num_ * detail::makeSigned(rhs.den()) + rhs.num() * detail::makeSigned(den_);
+            constexpr auto den = den_ * rhs.den();
+            return detail::makeExponent<num, den>();
         }
-    }
 
-    [[nodiscard]]
-    constexpr auto operator+(cExponent auto lhs, cExponent auto rhs) {
-        constexpr auto num = lhs.num() * detail::makeSigned(rhs.den()) + rhs.num() * detail::makeSigned(lhs.den());
-        constexpr auto den = lhs.den() * rhs.den();
-        return detail::makeExponent<num, den>();
-    }
+        [[nodiscard]]
+        constexpr auto operator-(cExponent auto rhs) const {
+            return *this + (-rhs);
+        }
 
-    [[nodiscard]]
-    constexpr auto operator-(cExponent auto lhs, cExponent auto rhs) {
-        return lhs + (-rhs);
-    }
+        [[nodiscard]]
+        constexpr auto operator*(cExponent auto rhs) const {
+            constexpr auto num = num_ * rhs.num();
+            constexpr auto den = den_ * rhs.den();
+            return detail::makeExponent<num, den>();
+        }
 
-    [[nodiscard]]
-    constexpr auto operator*(cExponent auto lhs, cExponent auto rhs) {
-        constexpr auto num = lhs.num() * rhs.num();
-        constexpr auto den = lhs.den() * rhs.den();
-        return detail::makeExponent<num, den>();
-    }
-
-    [[nodiscard]]
-    constexpr bool operator==(cExponent auto lhs, cExponent auto rhs) {
-        return std::is_same_v<decltype(lhs), decltype(rhs)>;
-    }
+        [[nodiscard]]
+        constexpr bool operator==(cExponent auto rhs) const {
+            return std::is_same_v<Exponent, decltype(rhs)>;
+        }
+    };
 }
