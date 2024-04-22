@@ -50,33 +50,32 @@ namespace gustave::units::lib {
         }
 
         [[nodiscard]]
-        constexpr auto operator-() const {
+        constexpr cUnitTerm auto operator-() const {
             return UnitTerm<basicUnit(), -exponent()>{};
         }
+
+        [[nodiscard]]
+        constexpr cUnitTerm auto operator+(cUnitTerm auto rhs) const {
+            static_assert(basicUnit_ == rhs.basicUnit(), "Only terms of the same basic unit can be added.");
+            return UnitTerm<basicUnit_, exponent_ + rhs.exponent()>{};
+        }
+
+        [[nodiscard]]
+        constexpr cUnitTerm auto operator-(cUnitTerm auto rhs) const {
+            static_assert(basicUnit_ == rhs.basicUnit(), "Only terms of the same basic unit can be substracted.");
+            return UnitTerm<basicUnit_, exponent_ - rhs.exponent()>{};
+        }
+
+        [[nodiscard]]
+        constexpr cUnitTerm auto operator*(cExponent auto rhs) const {
+            return UnitTerm<basicUnit_, exponent_ * rhs>{};
+        }
+
+        [[nodiscard]]
+        constexpr auto operator<=>(cUnitTerm auto rhs) const {
+            using RhsChar = typename decltype(rhs)::Char;
+            static_assert(std::is_same_v<Char, RhsChar>, "Only terms using the same Char can be compared.");
+            return basicUnit_.symbol() <=> rhs.basicUnit().symbol();
+        }
     };
-
-    [[nodiscard]]
-    constexpr auto operator+(cUnitTerm auto lhs, cUnitTerm auto rhs) {
-        static_assert(lhs.basicUnit() == rhs.basicUnit(), "Only terms of the same basic unit can be added.");
-        return UnitTerm<lhs.basicUnit(), lhs.exponent() + rhs.exponent()>{};
-    }
-
-    [[nodiscard]]
-    constexpr auto operator-(cUnitTerm auto lhs, cUnitTerm auto rhs) {
-        static_assert(lhs.basicUnit() == rhs.basicUnit(), "Only terms of the same basic unit can be substracted.");
-        return UnitTerm<lhs.basicUnit(), lhs.exponent() - rhs.exponent()>{};
-    }
-
-    [[nodiscard]]
-    constexpr auto operator*(cUnitTerm auto lhs, cExponent auto rhs) {
-        return UnitTerm<lhs.basicUnit(), lhs.exponent()* rhs>{};
-    }
-
-    [[nodiscard]]
-    constexpr auto operator<=>(cUnitTerm auto lhs, cUnitTerm auto rhs) {
-        using LhsChar = typename decltype(lhs)::Char;
-        using RhsChar = typename decltype(rhs)::Char;
-        static_assert(std::is_same_v<LhsChar, RhsChar>, "Only terms using the same Char can be compared.");
-        return lhs.basicUnit().symbol() <=> rhs.basicUnit().symbol();
-    }
 }
