@@ -34,6 +34,34 @@
 #include <gustave/utils/SizedString.hpp>
 
 namespace gustave::units::lib {
+    namespace detail {
+        [[nodiscard]]
+        constexpr cUnitIdentifier auto multiplyUnits(cUnitIdentifier auto lhs, cUnitIdentifier auto rhs) {
+            if constexpr (lhs.isOne()) {
+                return rhs;
+            } else if constexpr (rhs.isOne()) {
+                return lhs;
+            } else {
+                constexpr cUnitTerm auto lHead = lhs.headTerm();
+                constexpr cUnitTerm auto rHead = rhs.headTerm();
+                constexpr auto cmp = lHead <=> rHead;
+                if constexpr (cmp == 0) {
+                    constexpr cUnitTerm auto headSum = lHead + rHead;
+                    constexpr cUnitIdentifier auto tails = lhs.tailUnit() * rhs.tailUnit();
+                    if constexpr (headSum.exponent().isZero()) {
+                        return tails;
+                    } else {
+                        return tails.template addHead<headSum>();
+                    }
+                } else if constexpr (cmp < 0) {
+                    return multiplyUnits(lhs.tailUnit(), rhs).template addHead<lHead>();
+                } else {
+                    return multiplyUnits(lhs, rhs.tailUnit()).template addHead<rHead>();
+                }
+            }
+        }
+    }
+
     template<UnitTerm headTerm_, UnitTerm... tailTerms_>
     class UnitIdentifier<headTerm_, tailTerms_...> {
     public:
@@ -91,6 +119,21 @@ namespace gustave::units::lib {
         [[nodiscard]]
         friend constexpr cReal auto operator/(cfg::cRealRep auto value, UnitIdentifier invUnitId) {
             return Real{ value, invUnitId.inverse() };
+        }
+
+        [[nodiscard]]
+        constexpr cUnitIdentifier auto operator*(cUnitIdentifier auto rhs) const {
+            return detail::multiplyUnits(*this, rhs);
+        }
+
+        [[nodiscard]]
+        constexpr cUnitIdentifier auto operator/(cUnitIdentifier auto rhs) const {
+            return detail::multiplyUnits(*this, rhs.inverse());
+        }
+
+        [[nodiscard]]
+        constexpr bool operator==(cUnitIdentifier auto rhs) const {
+            return std::is_same_v<UnitIdentifier, decltype(rhs)>;
         }
     private:
         [[nodiscard]]
@@ -158,6 +201,21 @@ namespace gustave::units::lib {
         friend constexpr cReal auto operator/(cfg::cRealRep auto value, UnitIdentifier invUnitId) {
             return Real{ value, invUnitId.inverse() };
         }
+
+        [[nodiscard]]
+        constexpr cUnitIdentifier auto operator*(cUnitIdentifier auto rhs) const {
+            return detail::multiplyUnits(*this, rhs);
+        }
+
+        [[nodiscard]]
+        constexpr cUnitIdentifier auto operator/(cUnitIdentifier auto rhs) const {
+            return detail::multiplyUnits(*this, rhs.inverse());
+        }
+
+        [[nodiscard]]
+        constexpr bool operator==(cUnitIdentifier auto rhs) const {
+            return std::is_same_v<UnitIdentifier, decltype(rhs)>;
+        }
     };
 
     template<UnitTerm headTerm_, UnitTerm... tailTerms_>
@@ -165,7 +223,7 @@ namespace gustave::units::lib {
         if constexpr (exp.isZero()) {
             return UnitIdentifier<>{};
         } else {
-            return UnitIdentifier<headTerm()* exp, tailTerms_* exp...>{};
+            return UnitIdentifier<headTerm() * exp, tailTerms_* exp...>{};
         }
     }
 
@@ -175,41 +233,5 @@ namespace gustave::units::lib {
         constexpr Exponent<1, 1> exp{};
         constexpr UnitTerm<BasicId{}, exp> term{};
         return UnitIdentifier<term>{};
-    }
-
-    [[nodiscard]]
-    constexpr bool operator==(cUnitIdentifier auto lhs, cUnitIdentifier auto rhs) {
-        return std::is_same_v<decltype(lhs), decltype(rhs)>;
-    }
-
-    [[nodiscard]]
-    constexpr auto operator*(cUnitIdentifier auto lhs, cUnitIdentifier auto rhs) {
-        if constexpr (lhs.isOne()) {
-            return rhs;
-        } else if constexpr (rhs.isOne()) {
-            return lhs;
-        } else {
-            constexpr cUnitTerm auto lHead = lhs.headTerm();
-            constexpr cUnitTerm auto rHead = rhs.headTerm();
-            constexpr auto cmp = lHead <=> rHead;
-            if constexpr (cmp == 0) {
-                constexpr cUnitTerm auto headSum = lHead + rHead;
-                constexpr cUnitIdentifier auto tails = lhs.tailUnit() * rhs.tailUnit();
-                if constexpr (headSum.exponent().isZero()) {
-                    return tails;
-                } else {
-                    return tails.template addHead<headSum>();
-                }
-            } else if constexpr (cmp < 0) {
-                return (lhs.tailUnit() * rhs).template addHead<lHead>();
-            } else {
-                return (lhs * rhs.tailUnit()).template addHead<rHead>();
-            }
-        }
-    }
-
-    [[nodiscard]]
-    constexpr auto operator/(cUnitIdentifier auto lhs, cUnitIdentifier auto rhs) {
-        return lhs * rhs.inverse();
     }
 }
