@@ -95,6 +95,27 @@ namespace gustave::units::lib {
         }
 
         [[nodiscard]]
+        constexpr bool operator==(cUnit auto rhs) const {
+            return std::is_same_v<Unit, decltype(rhs)>;
+        }
+
+        [[nodiscard]]
+        constexpr cUnit auto operator*(cUnit auto rhs) const {
+            using UnitId = decltype(unitId_ * rhs.unitId());
+            return Unit<UnitId::toString(), UnitId{}>{};
+        }
+
+        [[nodiscard]]
+        constexpr cUnit auto operator/(cUnit auto rhs) const {
+            using UnitId = decltype(unitId_ / rhs.unitId());
+            return Unit<UnitId::toString(), UnitId{}>{};
+        }
+
+        friend std::ostream& operator<<(std::ostream& stream, Unit unit) {
+            return stream << unit.symbol();
+        }
+
+        [[nodiscard]]
         friend constexpr cReal auto operator*(std::floating_point auto value, Unit unit) {
             return Real{ value, unit };
         }
@@ -109,24 +130,4 @@ namespace gustave::units::lib {
     Unit(UnitId) -> Unit<UnitId::toString(), UnitId{}>;
 
     inline constexpr Unit<"", UnitIdentifier<>{}> one{};
-
-    [[nodiscard]]
-    constexpr bool operator==(cUnit auto lhs, cUnit auto rhs) {
-        return std::is_same_v<decltype(lhs), decltype(rhs)>;
-    }
-
-    [[nodiscard]]
-    constexpr auto operator*(cUnit auto lhs, cUnit auto rhs) {
-        return Unit(lhs.unitId() * rhs.unitId());
-    }
-
-    [[nodiscard]]
-    constexpr auto operator/(cUnit auto lhs, cUnit auto rhs) {
-        return Unit(lhs.unitId() / rhs.unitId());
-    }
-
-    std::ostream& operator<<(std::ostream& stream, cUnit auto unit) {
-        return stream << unit.symbol();
-    }
-
 }
