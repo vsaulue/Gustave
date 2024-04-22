@@ -36,14 +36,14 @@ namespace matchers = gustave::testing::matchers;
 
 using Rep = double;
 
-using Rt = gustave::units::RealTraits<Rep>;
+using Rt = gustave::units::RealTraits;
 inline constexpr Rt rt;
 inline constexpr auto u = rt.units();
 
 template<cfg::cUnitOf<rt> auto unit>
-using Real = Rt::Type<unit>;
+using Real = Rt::Type<unit, Rep>;
 
 template<cfg::cUnitOf<rt> auto unit>
-using Vector3 = gustave::math3d::Vector3<rt, unit>;
+using Vector3 = gustave::math3d::Vector3<rt, unit, Rep>;
 
 inline constexpr cfg::cUnitOf<rt> auto l2 = u.length * u.length;

@@ -72,13 +72,13 @@ namespace gustave::units::lib {
             : value_(other.value())
         {
             using Other = decltype(other);
-            static_assert(Detail::template isNotNarrowingFrom<Other>(), "Invalid conversion: narrowing representation.");
+            static_assert(isNotNarrowingFrom<Other>(), "Invalid conversion: narrowing representation.");
             static_assert(isCompatible(other.unit()), "Invalid conversion: incompatible units.");
         }
 
         constexpr Real& operator=(cReal auto other) {
             using Other = decltype(other);
-            static_assert(Detail::template isNotNarrowingFrom<Other>(), "Invalid conversion: narrowing representation.");
+            static_assert(isNotNarrowingFrom<Other>(), "Invalid conversion: narrowing representation.");
             static_assert(isCompatible(other.unit()), "Invalid conversion: incompatible units.");
             value() = other.value();
             return *this;
@@ -112,14 +112,14 @@ namespace gustave::units::lib {
         constexpr Real& operator+=(cReal auto rhs) {
             using Rhs = decltype(rhs);
             static_assert(isCompatible(rhs.unit()), "Invalid addition: incompatible units.");
-            static_assert(Detail::template isNotNarrowingFrom<Rhs>(), "Invalid addition: narrowing conversion.");
+            static_assert(isNotNarrowingFrom<Rhs>(), "Invalid addition: narrowing conversion.");
             this->value() += rhs.value();
             return *this;
         }
 
         constexpr Real& operator+=(std::floating_point auto rhs) {
             using Rhs = decltype(rhs);
-            static_assert(Detail::template isNotNarrowingFrom<Rhs>(), "Invalid addition: narrowing conversion.");
+            static_assert(isNotNarrowingFrom<Rhs>(), "Invalid addition: narrowing conversion.");
             static_assert(unit().isOne(), "Invalid addition: raw float can only be added to a Real of dimension one.");
             this->value() += rhs;
             return *this;
@@ -128,14 +128,14 @@ namespace gustave::units::lib {
         constexpr Real& operator-=(cReal auto rhs) {
             using Rhs = decltype(rhs);
             static_assert(isCompatible(rhs.unit()), "Invalid substraction: incompatible units.");
-            static_assert(Detail::template isNotNarrowingFrom<Rhs>(), "Invalid substraction: narrowing conversion.");
+            static_assert(isNotNarrowingFrom<Rhs>(), "Invalid substraction: narrowing conversion.");
             this->value() -= rhs.value();
             return *this;
         }
 
         constexpr Real& operator-=(std::floating_point auto rhs) {
             using Rhs = decltype(rhs);
-            static_assert(Detail::template isNotNarrowingFrom<Rhs>(), "Invalid substraction: narrowing conversion.");
+            static_assert(isNotNarrowingFrom<Rhs>(), "Invalid substraction: narrowing conversion.");
             static_assert(unit().isOne(), "Invalid substraction: raw float can only be added to a Real of dimension one.");
             this->value() -= rhs;
             return *this;
@@ -143,7 +143,7 @@ namespace gustave::units::lib {
 
         constexpr Real& operator*=(cReal auto rhs) {
             using Rhs = decltype(rhs);
-            static_assert(Detail::template isNotNarrowingFrom<Rhs>(), "Invalid multiplication: narrowing conversion.");
+            static_assert(isNotNarrowingFrom<Rhs>(), "Invalid multiplication: narrowing conversion.");
             static_assert(rhs.unit().isOne(), "Invalid multiplication: right-hand side must be of dimension one.");
             this->value() *= rhs.value();
             return *this;
@@ -151,14 +151,14 @@ namespace gustave::units::lib {
 
         constexpr Real& operator*=(std::floating_point auto rhs) {
             using Rhs = decltype(rhs);
-            static_assert(Detail::template isNotNarrowingFrom<Rhs>(), "Invalid multiplication: narrowing conversion.");
+            static_assert(isNotNarrowingFrom<Rhs>(), "Invalid multiplication: narrowing conversion.");
             this->value() *= rhs;
             return *this;
         }
 
         constexpr Real& operator/=(cReal auto rhs) {
             using Rhs = decltype(rhs);
-            static_assert(Detail::template isNotNarrowingFrom<Rhs>(), "Invalid division: narrowing conversion.");
+            static_assert(isNotNarrowingFrom<Rhs>(), "Invalid division: narrowing conversion.");
             static_assert(rhs.unit().isOne(), "Invalid division: right-hand side must be of dimension one.");
             this->value() /= rhs.value();
             return *this;
@@ -166,29 +166,27 @@ namespace gustave::units::lib {
 
         constexpr Real& operator/=(std::floating_point auto rhs) {
             using Rhs = decltype(rhs);
-            static_assert(Detail::template isNotNarrowingFrom<Rhs>(), "Invalid division: narrowing conversion.");
+            static_assert(isNotNarrowingFrom<Rhs>(), "Invalid division: narrowing conversion.");
             this->value() /= rhs;
             return *this;
         }
 
-        struct Detail {
-            template<std::floating_point SourceRep>
-            static constexpr bool isNotNarrowingFrom() {
-                return sizeof(Rep) >= sizeof(SourceRep);
-            }
+        template<std::floating_point SourceRep>
+        [[nodiscard]]
+        static constexpr bool isNotNarrowingFrom() {
+            return sizeof(Rep) >= sizeof(SourceRep);
+        }
 
-            template<cReal Source>
-            static constexpr bool isNotNarrowingFrom() {
-                return isNotNarrowingFrom<typename Source::Rep>();
-            }
-        };
+        template<cReal Source>
+        [[nodiscard]]
+        static constexpr bool isNotNarrowingFrom() {
+            return isNotNarrowingFrom<typename Source::Rep>();
+        }
 
         [[nodiscard]]
         static constexpr bool isCompatible(cUnit auto otherUnit) {
             return unit().isAssignableFrom(otherUnit);
         }
-
-        static constexpr Detail detail{};
     private:
         Rep value_;
     };
@@ -335,6 +333,10 @@ namespace gustave::units::lib {
     // printing
 
     std::ostream& operator<<(std::ostream& stream, cReal auto real) {
-        return stream << real.value() << ' ' << real.unit();
+        stream << real.value();
+        if (!real.unit().isTrivialOne()) {
+            stream << ' ' << real.unit();
+        }
+        return stream;
     }
 }

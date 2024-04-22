@@ -45,7 +45,7 @@ int main() {
         14'000'000.f * u.pressure, // max shear pressure
         2'000'000.f * u.pressure, // max tensile pressure
     };
-    G::Real<u.mass> const blockMass = 2'400.f * u.mass;
+    auto const blockMass = 2'400.f * u.mass;
 
     auto world = newWorld();
     {

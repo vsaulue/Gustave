@@ -33,6 +33,7 @@
 namespace gustave::cfg {
     template<typename T>
     concept cLibConfig = requires {
+        requires cRealRep<typename T::RealRep>;
         requires cRealTraits<decltype(meta::value(T::realTraits))>;
         typename T::NormalizedVector3;
         typename T::template Vector3<T::realTraits.units().one>;

@@ -28,17 +28,18 @@
 #include <type_traits>
 
 #include <gustave/cfg/cRealOf.hpp>
+#include <gustave/cfg/cRealRep.hpp>
 #include <gustave/cfg/cRealTraits.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/math3d/cRealConstArg.hpp>
 #include <gustave/math3d/Vector3.hpp>
 
 namespace gustave::math3d {
-    template<cfg::cRealTraits auto rt>
+    template<cfg::cRealTraits auto rt, cfg::cRealRep Rep_>
     class NormalizedVector3;
 
     template<typename T>
-    concept cNormalizedVector3 = std::is_same_v<T, NormalizedVector3<T::realTraits()>>;
+    concept cNormalizedVector3 = std::is_same_v<T, NormalizedVector3<T::realTraits(), typename T::Coord::Rep>>;
 
     namespace detail {
         template<cNormalizedVector3 T>
@@ -50,13 +51,13 @@ namespace gustave::math3d {
         };
     }
 
-    template<cfg::cRealTraits auto rt>
+    template<cfg::cRealTraits auto rt, cfg::cRealRep Rep_>
     class NormalizedVector3 {
     public:
         static constexpr auto one = rt.units().one;
 
         using RealTraits = decltype(rt);
-        using Vector = Vector3<rt, one>;
+        using Vector = Vector3<rt, one, Rep_>;
         using Coord = typename Vector::Coord;
 
         [[nodiscard]]
@@ -120,12 +121,12 @@ namespace gustave::math3d {
         }
 
         [[nodiscard]]
-        constexpr Vector operator+(cVector3ConstArg auto const& rhs) const {
+        constexpr cVector3 auto operator+(cVector3ConstArg auto const& rhs) const {
             return value_ + rhs;
         }
 
         [[nodiscard]]
-        constexpr Vector operator-(cVector3ConstArg auto const& rhs) const {
+        constexpr cVector3 auto operator-(cVector3ConstArg auto const& rhs) const {
             return value_ - rhs;
         }
 

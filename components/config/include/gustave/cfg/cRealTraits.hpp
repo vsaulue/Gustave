@@ -76,7 +76,7 @@ namespace gustave::cfg {
         };
 
         template<typename RealTraits, auto unit>
-        using Real = typename RealTraits::template Type<unit>;
+        using Float = typename RealTraits::template Type<unit,float>;
     }
 
     template<typename T>
@@ -87,22 +87,21 @@ namespace gustave::cfg {
         { traits.units() } -> detail::cUnitSystem;
 
         // ::Type<unit> existence
-        requires cReal<detail::Real<T, T::units().mass>>;
+        requires cReal<detail::Float<T, T::units().mass>>;
 
-        // ::Type<unit> arithmetics rules
         requires requires (
-            detail::Real<T, T::units().acceleration> acceleration,
-            detail::Real<T, T::units().area> area,
-            detail::Real<T, T::units().density> density,
-            detail::Real<T, T::units().force> force,
-            detail::Real<T, T::units().length> length,
-            detail::Real<T, T::units().mass> mass,
-            detail::Real<T, T::units().one> one,
-            detail::Real<T, T::units().potential> potential,
-            detail::Real<T, T::units().pressure> pressure,
-            detail::Real<T, T::units().resistance> resistance,
-            detail::Real<T, T::units().time> time,
-            detail::Real<T, T::units().volume> volume
+            detail::Float<T, T::units().acceleration> acceleration,
+            detail::Float<T, T::units().area> area,
+            detail::Float<T, T::units().density> density,
+            detail::Float<T, T::units().force> force,
+            detail::Float<T, T::units().length> length,
+            detail::Float<T, T::units().mass> mass,
+            detail::Float<T, T::units().one> one,
+            detail::Float<T, T::units().potential> potential,
+            detail::Float<T, T::units().pressure> pressure,
+            detail::Float<T, T::units().resistance> resistance,
+            detail::Float<T, T::units().time> time,
+            detail::Float<T, T::units().volume> volume
         ) {
             { meta::value(acceleration) } -> cReal;
             { meta::value(area) } -> cReal;
@@ -117,6 +116,7 @@ namespace gustave::cfg {
             { meta::value(time) } -> cReal;
             { meta::value(volume) } -> cReal;
 
+            // Real arithmetics rules
             acceleration = length / time / time;
             area = length * length;
             density = mass / length / length / length;
@@ -139,11 +139,11 @@ namespace gustave::cfg {
             { 1.0f + one } -> cReal;
             { one - 1.0f } -> cReal;
             { 1.0f - one } -> cReal;
-        };
 
-        // ::sqrt(Real) -> Real
-        requires requires (detail::Real<T, T::units().length> length) {
-            { T::sqrt(length * length) } -> std::convertible_to<decltype(length)>;
+            // Realtraits functions
+            length = T::sqrt(length * length);
+            area = T::max(length * length, area);
+            area = T::min(area, length * length);
         };
     };
 }

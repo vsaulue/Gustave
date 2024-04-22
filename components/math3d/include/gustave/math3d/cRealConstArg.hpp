@@ -34,9 +34,9 @@ namespace gustave::math3d {
     namespace detail {
         template<cfg::cRealTraits Traits>
         [[nodiscard]]
-        constexpr cfg::cRealOf<Traits{}> auto asRealConstArg(Traits, std::floating_point auto const value) {
+        constexpr cfg::cRealOf<Traits{}> auto asRealConstArg(Traits, std::floating_point auto value) {
             constexpr auto one = Traits::units().one;
-            using Real = typename Traits::template Type<one>;
+            using Real = typename Traits::template Type<one, decltype(value)>;
             return Real{ value };
         }
 

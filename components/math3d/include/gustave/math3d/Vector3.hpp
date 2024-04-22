@@ -39,12 +39,12 @@
 
 namespace gustave::math3d {
     // concept moved to `requires` for MSVC (https://developercommunity.visualstudio.com/t/Template-parameters:-constraints-dependi/10312655).
-    template<cfg::cRealTraits auto rt, auto unit_>
+    template<cfg::cRealTraits auto rt, auto unit_, cfg::cRealRep Rep_>
         requires cfg::cUnitOf<decltype(unit_), rt>
     class Vector3;
 
     template<typename T>
-    concept cVector3 = std::same_as<T, Vector3<T::realTraits(), T::unit()>>;
+    concept cVector3 = std::same_as<T, Vector3<T::realTraits(), T::unit(), typename T::RealRep>>;
 
     namespace detail {
         template<typename T>
@@ -76,11 +76,11 @@ namespace gustave::math3d {
         template<cfg::cRealTraits Traits, cfg::cRealOf<Traits{}> Real>
         [[nodiscard]]
         constexpr cVector3 auto vector3(Traits, Real x, Real y, Real z) {
-            return Vector3<Traits{}, Real::unit()>{x, y, z};
+            return Vector3<Traits{}, Real::unit(), typename Real::Rep>{x, y, z};
         }
     }
 
-    template<cfg::cRealTraits auto rt, auto unit_>
+    template<cfg::cRealTraits auto rt, auto unit_, cfg::cRealRep Rep_>
         requires cfg::cUnitOf<decltype(unit_),rt>
     class Vector3 {
     private:
@@ -89,11 +89,11 @@ namespace gustave::math3d {
 
         static constexpr auto one = rt.units().one;
 
-        template<cfg::cUnitOf<rt> auto u>
-        using Real = typename RealTraits::template Type<u>;
+        template<cfg::cUnitOf<rt> auto u, cfg::cRealRep R>
+        using Real = typename RealTraits::template Type<u,R>;
     public:
-        using Coord = Real<unit_>;
-        using RealRep = typename Coord::Rep;
+        using RealRep = Rep_;
+        using Coord = Real<unit_, Rep_>;
 
         [[nodiscard]]
         static constexpr Unit unit() {
@@ -131,6 +131,7 @@ namespace gustave::math3d {
         {
             auto const& otherV3 = asVector3ConstArg(other);
             using OtherV3 = decltype(meta::value(otherV3));
+            static_assert(isNotNarrowingFrom<typename OtherV3::Coord>(), "Invalid conversion: narrowing conversion.");
             static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
             static_assert(isCompatible(OtherV3::unit()), "Invalid conversion: incompatible units.");
             std::ranges::copy(otherV3.coords(), coords_.begin());
@@ -141,6 +142,7 @@ namespace gustave::math3d {
         {
             auto const& otherV3 = asVector3ConstArg(other);
             using OtherV3 = decltype(meta::value(otherV3));
+            static_assert(isNotNarrowingFrom<typename OtherV3::Coord>(), "Invalid conversion: narrowing conversion.");
             static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
             static_assert(isCompatible(OtherV3::unit()), "Invalid conversion: incompatible units.");
             std::ranges::copy(otherV3.coords(), coords_.begin());
@@ -161,6 +163,7 @@ namespace gustave::math3d {
         constexpr Vector3& operator+=(cVector3ConstArg auto const& rhs) {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
             using RhsV3 = decltype(meta::value(rhsV3));
+            static_assert(isNotNarrowingFrom<typename RhsV3::Coord>(), "Invalid addition: narrowing conversion.");
             static_assert(rt == RhsV3::realTraits(), "Invalid addition: incompatible traits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid addition: incompatible units.");
             for (std::size_t i = 0; i < coords_.size(); ++i) {
@@ -170,12 +173,13 @@ namespace gustave::math3d {
         }
 
         [[nodiscard]]
-        constexpr Vector3 operator+(cVector3ConstArg auto const& rhs) const {
+        constexpr cVector3 auto operator+(cVector3ConstArg auto const& rhs) const {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
             using RhsV3 = decltype(meta::value(rhsV3));
             static_assert(rt == RhsV3::realTraits(), "Invalid addition: incompatible traits.");
             static_assert(isCompatible(RhsV3::unit()), "Invalid addition: incompatible units.");
-            Vector3 result = *this;
+            using ResRep = std::common_type_t<Rep_, typename RhsV3::Coord::Rep>;
+            Vector3<rt, unit_, ResRep> result = *this;
             for (std::size_t i = 0; i < coords_.size(); ++i) {
                 result.coords()[i] += rhsV3.coords()[i];
             }
@@ -185,8 +189,9 @@ namespace gustave::math3d {
         constexpr Vector3& operator-=(cVector3ConstArg auto const& rhs) {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
             using RhsV3 = decltype(meta::value(rhsV3));
-            static_assert(rt == RhsV3::realTraits(), "Invalid substraction: incompatible traits.");
-            static_assert(isCompatible(RhsV3::unit()), "Invalid substraction: incompatible units.");
+            static_assert(isNotNarrowingFrom<typename RhsV3::Coord>(), "Invalid subtraction: narrowing conversion.");
+            static_assert(rt == RhsV3::realTraits(), "Invalid subtraction: incompatible traits.");
+            static_assert(isCompatible(RhsV3::unit()), "Invalid subtraction: incompatible units.");
             for (std::size_t i = 0; i < coords_.size(); ++i) {
                 coords_[i] -= rhsV3.coords()[i];
             }
@@ -194,19 +199,23 @@ namespace gustave::math3d {
         }
 
         [[nodiscard]]
-        constexpr Vector3 operator-(cVector3ConstArg auto const& rhs) const {
+        constexpr cVector3 auto operator-(cVector3ConstArg auto const& rhs) const {
             cVector3 auto const& rhsV3 = asVector3ConstArg(rhs);
             using RhsV3 = decltype(meta::value(rhsV3));
-            static_assert(rt == RhsV3::realTraits(), "Invalid substraction: incompatible traits.");
-            static_assert(isCompatible(RhsV3::unit()), "Invalid substraction: incompatible units.");
-            Vector3 result = *this;
+            static_assert(rt == RhsV3::realTraits(), "Invalid subtraction: incompatible traits.");
+            static_assert(isCompatible(RhsV3::unit()), "Invalid subtraction: incompatible units.");
+            using ResUnit = std::common_type_t<Rep_, typename RhsV3::Coord::Rep>;
+            Vector3<rt, unit_, ResUnit> result = *this;
             for (std::size_t i = 0; i < coords_.size(); ++i) {
                 result.coords()[i] -= rhsV3.coords()[i];
             }
             return result;
         }
 
-        constexpr Vector3& operator*=(Real<one> rhs) {
+        constexpr Vector3& operator*=(cRealConstArg<rt> auto rhs) {
+            using Rhs = decltype(rhs);
+            static_assert(Rhs::unit().isOne(), "Invalid multiplication: second operand must be of dimension one.");
+            static_assert(isNotNarrowingFrom<Rhs>, "Invalid multiplication: narrowing conversion.");
             for (auto& coord : coords_) {
                 coord *= rhs;
             }
@@ -224,7 +233,10 @@ namespace gustave::math3d {
             return detail::vector3(rt, lhs * coords[0], lhs * coords[1], lhs * coords[2]);
         }
 
-        constexpr Vector3& operator/=(Real<one> rhs) {
+        constexpr Vector3& operator/=(cRealConstArg<rt> auto rhs) {
+            using Rhs = decltype(rhs);
+            static_assert(Rhs::unit().isOne(), "Invalid division: second operand must be of dimension one.");
+            static_assert(isNotNarrowingFrom<Rhs>, "Invalid division: narrowing conversion.");
             for (auto& coord : coords_) {
                 coord /= rhs;
             }
@@ -278,7 +290,7 @@ namespace gustave::math3d {
 
         [[nodiscard]]
         Coord norm() const {
-            using T2 = Real<unit()* unit()>;
+            using T2 = Real<unit() * unit(), RealRep>;
             auto result = T2::zero();
             for (auto const coord : coords_) {
                 result = result + coord * coord;
@@ -291,7 +303,8 @@ namespace gustave::math3d {
             cVector3 auto const& otherV3 = asVector3ConstArg(other);
             using OtherV3 = decltype(meta::value(otherV3));
             static_assert(rt == OtherV3::realTraits(), "Invalid conversion: incompatible traits.");
-            auto result = Real<unit() * OtherV3::unit()>::zero();
+            using ResRep = std::common_type_t<typename Coord::Rep, typename OtherV3::Coord::Rep>;
+            auto result = Real<unit() * OtherV3::unit(), ResRep>::zero();
             for (unsigned i = 0; i < coords_.size(); ++i) {
                 result += coords_[i] * otherV3.coords()[i];
             }
@@ -301,6 +314,12 @@ namespace gustave::math3d {
         [[nodiscard]]
         static constexpr bool isCompatible(cfg::cUnitOf<rt> auto otherUnit) {
             return unit().isAssignableFrom(otherUnit);
+        }
+
+        template<cRealConstArg<rt> Source>
+        [[nodiscard]]
+        static constexpr bool isNotNarrowingFrom() {
+            return Coord::template isNotNarrowingFrom<Source>();
         }
 
         friend std::ostream& operator<<(std::ostream& stream, Vector3 const& vector) {

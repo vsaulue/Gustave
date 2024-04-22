@@ -33,6 +33,6 @@ namespace gustave::cfg {
     template<typename T, auto realTraits>
     concept cRealOf = requires {
         requires cRealTraits<decltype(realTraits)>;
-        requires std::is_same_v<T, typename decltype(realTraits)::template Type<T::unit()>>;
+        requires std::is_same_v<T, typename decltype(realTraits)::template Type<T::unit(), typename T::Rep>>;
     };
 }

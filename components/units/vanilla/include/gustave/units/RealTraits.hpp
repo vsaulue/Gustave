@@ -34,14 +34,13 @@
 #include <gustave/units/UnitSystem.hpp>
 
 namespace gustave::units {
-    template<cfg::cRealRep Rep>
     struct RealTraits {
         [[nodiscard]]
         static constexpr UnitSystem units() {
             return {};
         }
 
-        template<lib::cUnit auto unit>
+        template<lib::cUnit auto unit, cfg::cRealRep Rep>
         using Type = lib::Real<unit, Rep>;
 
         [[nodiscard]]
@@ -63,22 +62,23 @@ namespace gustave::units {
             return (arg.value() > 0.f) ? arg : -arg;
         }
 
-        template<lib::cReal Arg>
         [[nodiscard]]
-        static constexpr Arg max(Arg const v1, Arg const v2) {
-            return (v1 > v2) ? v1 : v2;
+        static constexpr auto max(lib::cReal auto const lhs, lib::cReal auto const rhs) -> decltype(meta::value(lhs)) {
+            using Lhs = decltype(meta::value(lhs));
+            using Rhs = decltype(meta::value(rhs));
+            static_assert(Lhs::isCompatible(Rhs::unit()), "Invalid comparison: incompatible units.");
+            return (lhs > rhs) ? lhs : Lhs{ rhs };
         }
 
-        template<lib::cReal Arg>
         [[nodiscard]]
-        static constexpr Arg min(Arg const v1, Arg const v2) {
-            return (v1 < v2) ? v1 : v2;
+        static constexpr auto min(lib::cReal auto const lhs, lib::cReal auto const rhs) -> decltype(meta::value(lhs)) {
+            using Lhs = decltype(meta::value(lhs));
+            using Rhs = decltype(meta::value(rhs));
+            static_assert(Lhs::isCompatible(Rhs::unit()), "Invalid comparison: incompatible units.");
+            return (lhs < rhs) ? lhs : Lhs{ rhs };
         }
 
-        template<cfg::cRealRep ArgRep>
         [[nodiscard]]
-        constexpr bool operator==(RealTraits<ArgRep> const&) const {
-            return std::is_same_v<Rep, ArgRep>;
-        }
+        constexpr bool operator==(RealTraits const&) const = default;
     };
 }

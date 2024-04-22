@@ -31,19 +31,26 @@
 
 #include <catch2/matchers/catch_matchers_templated.hpp>
 
+#include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/cVector3.hpp>
 
 namespace gustave::testing::matchers {
     template<cfg::cVector3 TargetVector>
     class Vector3WithinRelMatcher : public Catch::Matchers::MatcherGenericBase {
+    private:
+        static constexpr auto rt = TargetVector::realTraits();
+        static constexpr auto u = rt.units();
     public:
         using Coord = typename TargetVector::Coord;
         using RealRep = typename TargetVector::RealRep;
 
+        template<cfg::cUnitOf<rt> auto unit>
+        using Real = typename decltype(rt)::template Type<unit, RealRep>;
+
         [[nodiscard]]
-        constexpr Vector3WithinRelMatcher(TargetVector const& target, RealRep epsilon)
-            : target_(target)
-            , epsilon_(epsilon)
+        constexpr Vector3WithinRelMatcher(TargetVector const& target, Real<u.one> epsilon)
+            : target_{ target }
+            , epsilon_{ epsilon }
         {
             if (epsilon < 0.0f || epsilon >= 1.0f) {
                 throw std::domain_error("epsilon must be in [0;1[.");
@@ -55,11 +62,11 @@ namespace gustave::testing::matchers {
         constexpr bool match(TestedVector tested) const {
             static_assert(TestedVector::realTraits() == TargetVector::realTraits(), "Invalid comparison: incompatible traits.");
             static_assert(TestedVector::unit().isAssignableFrom(TargetVector::unit()), "Invalid comparison: incompatible units.");
-            const Coord testedNorm = tested.norm();
-            const Coord targetNorm = target_.norm();
-            const Coord deltaNorm = (target_ - tested).norm();
-            const RealRep margin = epsilon_ * std::max(std::fabs(testedNorm.value()), std::fabs(targetNorm.value()));
-            return deltaNorm.value() <= margin;
+            auto const testedNorm = tested.norm();
+            auto const targetNorm = target_.norm();
+            auto const deltaNorm = (target_ - tested).norm();
+            auto const margin = epsilon_ * rt.max(rt.abs(testedNorm), rt.abs(targetNorm));
+            return deltaNorm <= margin;
         }
 
         [[nodiscard]]
@@ -70,7 +77,7 @@ namespace gustave::testing::matchers {
         }
     private:
         TargetVector target_;
-        RealRep epsilon_;
+        Real<u.one> epsilon_;
     };
 
     template<cfg::cVector3 TargetVector>

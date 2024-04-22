@@ -31,7 +31,7 @@
 #include <gustave/math3d/Vector3.hpp>
 #include <TestHelpers.hpp>
 
-using NormalizedVector3 = gustave::math3d::NormalizedVector3<rt>;
+using NormalizedVector3 = gustave::math3d::NormalizedVector3<rt, double>;
 
 namespace matchers = gustave::testing::matchers;
 
@@ -111,7 +111,7 @@ TEST_CASE("NormalizedVector3") {
         }
 
         SECTION("// Multiplication: Real & NormalizedVector3 (both ways).") {
-            Real<u.force> r = (-3.f * u.force);
+            auto r = -3.f * u.force;
             auto const matcher = matchers::WithinRel(vector3(-2.f, 1.f, 2.f, u.force), epsilon);
             CHECK_THAT(r * v, matcher);
             CHECK_THAT(v * r, matcher);
@@ -128,17 +128,17 @@ TEST_CASE("NormalizedVector3") {
         }
 
         SECTION("// Division: NormalizedVector3 & float") {
-            Real<u.one / u.area> const r = -1.f / (12.f * u.area);
+            auto const r = -1.f / (12.f * u.area);
             CHECK_THAT(v / r, matchers::WithinRel(vector3(-8.f, 4.f, 8.f, u.area), epsilon));
         }
 
         SECTION("// convertible to Vector3") {
-            Vector3<u.one> vec{ v };
+            Vector3<u.one, double> vec{ v };
             CHECK(vec == v);
         }
 
         SECTION("// assignable to Vector3") {
-            auto vec = Vector3<u.one>::zero();
+            auto vec = Vector3<u.one, double>::zero();
             vec = v;
             CHECK(vec == v);
         }

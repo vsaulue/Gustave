@@ -32,12 +32,14 @@
 
 namespace gustave::vanilla {
     struct LibConfig {
-        static constexpr units::RealTraits<double> realTraits{};
+        static constexpr units::RealTraits realTraits{};
+
+        using RealRep = double;
 
         template<units::lib::cUnit auto unit>
-        using Vector3 = ::gustave::math3d::Vector3<realTraits, unit>;
+        using Vector3 = ::gustave::math3d::Vector3<realTraits, unit, RealRep>;
 
-        using NormalizedVector3 = ::gustave::math3d::NormalizedVector3<realTraits>;
+        using NormalizedVector3 = ::gustave::math3d::NormalizedVector3<realTraits, RealRep>;
 
         using LinkIndex = std::size_t;
         using NodeIndex = std::size_t;

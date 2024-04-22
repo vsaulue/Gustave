@@ -33,15 +33,12 @@ inline constexpr RealTraits rt{};
 
 inline constexpr auto u = rt.units();
 
-template<gustave::cfg::cUnitOf<rt> auto unit>
-using Real = RealTraits::template Type<unit>;
+template<gustave::cfg::cUnitOf<rt> auto unit, gustave::cfg::cRealRep Rep>
+using Vector3 = gustave::math3d::Vector3<rt, unit, Rep>;
 
-template<gustave::cfg::cUnitOf<rt> auto unit>
-using Vector3 = gustave::math3d::Vector3<rt, unit>;
-
-template<gustave::cfg::cUnitOf<rt> Unit, std::floating_point Float>
+template<gustave::cfg::cUnitOf<rt> Unit, std::floating_point Rep>
 [[nodiscard]]
-constexpr auto vector3(Float x, Float y, Float z, Unit unit) -> Vector3 < Unit{} > {
+constexpr auto vector3(Rep x, Rep y, Rep z, Unit unit) -> Vector3<Unit{}, Rep> {
     return { x,y,z,unit };
 }
 

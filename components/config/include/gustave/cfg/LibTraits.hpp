@@ -49,5 +49,5 @@ namespace gustave::cfg {
     using Vector3 = typename decltype(cfg)::template Vector3<unit>;
 
     template<cLibConfig auto cfg, auto unit>
-    using Real = typename decltype(cfg.realTraits)::template Type<unit>;
+    using Real = typename decltype(cfg.realTraits)::template Type<unit, typename decltype(cfg)::RealRep>;
 }
