@@ -25,11 +25,11 @@
 
 #include <TestHelpers.hpp>
 
-#include <gustave/solvers/force1Solver/Config.hpp>
+#include <gustave/core/solvers/force1Solver/Config.hpp>
 
-using Config = gustave::solvers::force1Solver::Config<libCfg>;
+using Config = gustave::core::solvers::force1Solver::Config<libCfg>;
 
-TEST_CASE("force1Solver::Config") {
+TEST_CASE("core::force1Solver::Config") {
     Config config{ g, 0.01f, 1000 };
 
     SECTION("// constructor & getters") {

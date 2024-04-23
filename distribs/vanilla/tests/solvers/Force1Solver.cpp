@@ -27,13 +27,12 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
-#include <gustave/testing/Matchers.hpp>
 
-#include <gustave/solvers/Force1Solver.hpp>
+#include <gustave/core/solvers/Force1Solver.hpp>
 
 #include <TestHelpers.hpp>
 
-using Solver = gustave::solvers::Force1Solver<libCfg>;
+using Solver = gustave::core::solvers::Force1Solver<libCfg>;
 
 using Link = Solver::Structure::Link;
 using Node = Solver::Structure::Node;
@@ -41,7 +40,7 @@ using NodeIndex = Solver::Structure::NodeIndex;
 using Solution = Solver::Solution;
 using Structure = Solver::Structure;
 
-TEST_CASE("force1::Solver") {
+TEST_CASE("core::force1::Solver") {
     constexpr float precision = 0.001f;
     auto const solver = Solver{ Solver::Config{ g, precision } };
 

@@ -23,14 +23,14 @@
  * SOFTWARE.
  */
 
-#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
-#include <gustave/worlds/syncWorld/detail/WorldUpdater.hpp>
+#include <gustave/core/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/core/worlds/syncWorld/detail/WorldUpdater.hpp>
 
 #include <TestHelpers.hpp>
 
-using StructureData = gustave::worlds::syncWorld::detail::StructureData<libCfg>;
-using WorldData = gustave::worlds::syncWorld::detail::WorldData<libCfg>;
-using WorldUpdater = gustave::worlds::syncWorld::detail::WorldUpdater<libCfg>;
+using StructureData = gustave::core::worlds::syncWorld::detail::StructureData<libCfg>;
+using WorldData = gustave::core::worlds::syncWorld::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::core::worlds::syncWorld::detail::WorldUpdater<libCfg>;
 
 using Solver = WorldData::Solver;
 using Transaction = WorldUpdater::Transaction;
@@ -47,7 +47,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("worlds::syncWorld::detail::WorldUpdater") {
+TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
     WorldData world = makeWorld();
 
     auto runTransaction = [&](Transaction const& transaction) {

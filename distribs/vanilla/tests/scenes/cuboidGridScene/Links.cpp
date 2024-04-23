@@ -25,14 +25,14 @@
 
 #include <vector>
 
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGridScene/Links.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/Links.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 
 #include <TestHelpers.hpp>
 
-namespace cuboid = ::gustave::scenes::cuboidGridScene;
+namespace cuboid = ::gustave::core::scenes::cuboidGridScene;
 
 using Links = cuboid::Links<libCfg>;
 using SceneData = cuboid::detail::SceneData<libCfg>;
@@ -44,7 +44,7 @@ using ContactReference = Links::ContactReference;
 using Direction = ContactReference::Direction;
 using Transaction = SceneUpdater::Transaction;
 
-TEST_CASE("scenes::cuboidGridScene::Links") {
+TEST_CASE("core::scenes::cuboidGridScene::Links") {
     SceneData scene{ vector3(1.f, 2.f, 3.f, u.length) };
 
     Transaction t;

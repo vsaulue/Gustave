@@ -25,19 +25,19 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGridScene/Transaction.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 
 #include <TestHelpers.hpp>
 
-namespace cuboid = gustave::scenes::cuboidGridScene;
+namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
 using BlockConstructionInfo = cuboid::BlockConstructionInfo<libCfg>;
 using BlockIndex = cuboid::BlockIndex;
 using Transaction = cuboid::Transaction<libCfg>;
 
-TEST_CASE("scenes::cuboidGridScene::Transaction") {
+TEST_CASE("core::scenes::cuboidGridScene::Transaction") {
     Transaction transaction;
     auto const& newBlocks = transaction.newBlocks();
     auto const& deletedBlocks = transaction.deletedBlocks();

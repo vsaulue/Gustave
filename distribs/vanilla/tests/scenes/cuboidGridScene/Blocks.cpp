@@ -28,21 +28,21 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGridScene/BlockReference.hpp>
-#include <gustave/scenes/cuboidGridScene/Blocks.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/Blocks.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockIndex = gustave::scenes::cuboidGridScene::BlockIndex;
-using BlockReference = gustave::scenes::cuboidGridScene::BlockReference<libCfg>;
-using Blocks = gustave::scenes::cuboidGridScene::Blocks<libCfg>;
-using SceneData = gustave::scenes::cuboidGridScene::detail::SceneData<libCfg>;
+using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
+using BlockReference = gustave::core::scenes::cuboidGridScene::BlockReference<libCfg>;
+using Blocks = gustave::core::scenes::cuboidGridScene::Blocks<libCfg>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
 
 static_assert(std::ranges::forward_range<Blocks>);
 
-TEST_CASE("scenes::cuboidGridScene::Blocks") {
+TEST_CASE("core::scenes::cuboidGridScene::Blocks") {
     Vector3<u.length> const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     SceneData sceneData{ blockSize };
     Blocks const blocks{ sceneData };

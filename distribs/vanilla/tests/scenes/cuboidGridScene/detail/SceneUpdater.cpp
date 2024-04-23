@@ -28,17 +28,17 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/StructureData.hpp>
-#include <gustave/scenes/cuboidGridScene/Transaction.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 
 #include <TestHelpers.hpp>
 
-namespace cuboid = gustave::scenes::cuboidGridScene;
+namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
 using BlockIndex = cuboid::BlockIndex;
 using ConstBlockDataReference = cuboid::detail::BlockDataReference<libCfg, false>;
@@ -50,14 +50,14 @@ using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
 using StructureData = cuboid::detail::StructureData<libCfg>;
 using Transaction = cuboid::Transaction<libCfg>;
 
-using SolverStructure = gustave::solvers::Structure<libCfg>;
+using SolverStructure = gustave::core::solvers::Structure<libCfg>;
 using SolverLink = SolverStructure::Link;
 using SolverNode = SolverStructure::Node;
 
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
 static constexpr gustave::utils::PointerHash::Equals ptrEquals;
 
-TEST_CASE("scenes::cuboidGridScene::detail::SceneUpdater") {
+TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
     SceneData data{ blockSize };

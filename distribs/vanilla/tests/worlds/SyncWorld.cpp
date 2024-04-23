@@ -25,11 +25,11 @@
 
 #include <stdexcept>
 
-#include <gustave/worlds/SyncWorld.hpp>
+#include <gustave/core/worlds/SyncWorld.hpp>
 
 #include <TestHelpers.hpp>
 
-using SyncWorld = gustave::worlds::SyncWorld<libCfg>;
+using SyncWorld = gustave::core::worlds::SyncWorld<libCfg>;
 
 using BlockIndex = SyncWorld::BlockIndex;
 using ContactIndex = SyncWorld::ContactIndex;
@@ -47,7 +47,7 @@ static SyncWorld makeWorld() {
     return SyncWorld{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("worlds::SyncWorld") {
+TEST_CASE("core::worlds::SyncWorld") {
     SyncWorld world = makeWorld();
     {
         SyncWorld::Transaction transaction;

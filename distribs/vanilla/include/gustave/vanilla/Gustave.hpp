@@ -26,7 +26,7 @@
 #pragma once
 
 #include <gustave/vanilla/LibConfig.hpp>
-#include <gustave/worlds/SyncWorld.hpp>
+#include <gustave/core/worlds/SyncWorld.hpp>
 
 namespace gustave::vanilla {
     struct Gustave {
@@ -50,7 +50,7 @@ namespace gustave::vanilla {
         }
 
         struct Worlds {
-            using SyncWorld = gustave::worlds::SyncWorld<libConfig>;
+            using SyncWorld = gustave::core::worlds::SyncWorld<libConfig>;
         };
 
         template<gustave::cfg::cUnitOf<libConfig> Unit>

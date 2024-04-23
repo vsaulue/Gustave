@@ -27,11 +27,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/CuboidGridScene.hpp>
+#include <gustave/core/scenes/CuboidGridScene.hpp>
 
 #include <TestHelpers.hpp>
 
-using Scene = gustave::scenes::CuboidGridScene<libCfg>;
+using Scene = gustave::core::scenes::CuboidGridScene<libCfg>;
 
 using BlockIndex = Scene::BlockIndex;
 using Direction = Scene::Direction;
@@ -39,7 +39,7 @@ using Transaction = Scene::Transaction;
 
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
 
-TEST_CASE("scenes::CuboidGridScene") {
+TEST_CASE("core::scenes::CuboidGridScene") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
 

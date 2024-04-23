@@ -23,15 +23,15 @@
  * SOFTWARE.
  */
 
-#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
-#include <gustave/worlds/syncWorld/detail/WorldUpdater.hpp>
-#include <gustave/worlds/syncWorld/Blocks.hpp>
+#include <gustave/core/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/core/worlds/syncWorld/detail/WorldUpdater.hpp>
+#include <gustave/core/worlds/syncWorld/Blocks.hpp>
 
 #include <TestHelpers.hpp>
 
-using WorldData = gustave::worlds::syncWorld::detail::WorldData<libCfg>;
-using WorldUpdater = gustave::worlds::syncWorld::detail::WorldUpdater<libCfg>;
-using Blocks = gustave::worlds::syncWorld::Blocks<libCfg>;
+using WorldData = gustave::core::worlds::syncWorld::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::core::worlds::syncWorld::detail::WorldUpdater<libCfg>;
+using Blocks = gustave::core::worlds::syncWorld::Blocks<libCfg>;
 
 using BlockIndex = WorldData::Scene::BlockIndex;
 using BlockReference = Blocks::BlockReference;
@@ -49,7 +49,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("worlds::syncWorld::Blocks") {
+TEST_CASE("core::worlds::syncWorld::Blocks") {
     WorldData world = makeWorld();
     Blocks blocks{ world };
 

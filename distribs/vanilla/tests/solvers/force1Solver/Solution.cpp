@@ -29,12 +29,12 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include <gustave/solvers/force1Solver/Config.hpp>
-#include <gustave/solvers/force1Solver/Solution.hpp>
+#include <gustave/core/solvers/force1Solver/Config.hpp>
+#include <gustave/core/solvers/force1Solver/Solution.hpp>
 
 #include <TestHelpers.hpp>
 
-using Solution = gustave::solvers::force1Solver::Solution<libCfg>;
+using Solution = gustave::core::solvers::force1Solver::Solution<libCfg>;
 
 using Config = Solution::Basis::Config;
 using ContactIndex = Solution::ContactIndex;
@@ -42,7 +42,7 @@ using Link = Solution::Structure::Link;
 using Node = Solution::Structure::Node;
 using Structure = Solution::Structure;
 
-TEST_CASE("force1::Solution") {
+TEST_CASE("core::force1::Solution") {
     auto structure = std::make_shared<Structure>();
     for (unsigned i = 1; i <= 7; ++i) {
         structure->addNode(Node{ (i * 1'000.f) * u.mass, i == 1 });

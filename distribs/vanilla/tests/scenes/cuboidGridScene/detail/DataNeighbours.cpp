@@ -28,16 +28,16 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 
 #include <TestHelpers.hpp>
 
-namespace cuboid = gustave::scenes::cuboidGridScene;
+namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
 using BlockIndex = cuboid::BlockIndex;
 using BlockDataReference = cuboid::detail::BlockDataReference<libCfg,true>;
@@ -54,7 +54,7 @@ static constexpr Coord min{ Limits::min() };
 
 static_assert(std::ranges::forward_range<DataNeighbours>);
 
-TEST_CASE("scenes::cuboidGridScene::detail::DataNeighbours") {
+TEST_CASE("core::scenes::cuboidGridScene::detail::DataNeighbours") {
     SceneBlocks sceneBlocks{ vector3(2.f, 3.f, 1.f, u.length) };
 
     auto addBlock = [&](BlockIndex const& index) -> BlockDataReference {

@@ -27,26 +27,26 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/ContactReference.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
-#include <gustave/scenes/cuboidGridScene/StructureReference.hpp>
-#include <gustave/scenes/cuboidGridScene/Transaction.hpp>
+#include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 
 #include <TestHelpers.hpp>
 
-using ContactReference = gustave::scenes::cuboidGridScene::ContactReference<libCfg>;
-using SceneData = gustave::scenes::cuboidGridScene::detail::SceneData<libCfg>;
-using SceneUpdater = gustave::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
-using StructureReference = gustave::scenes::cuboidGridScene::StructureReference<libCfg>;
+using ContactReference = gustave::core::scenes::cuboidGridScene::ContactReference<libCfg>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
+using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg>;
 
 using BlockIndex = ContactReference::BlockIndex;
 using BlockReference = ContactReference::BlockReference;
 using ContactIndex = ContactReference::ContactIndex;
 using Direction = ContactIndex::Direction;
-using Transaction = gustave::scenes::cuboidGridScene::Transaction<libCfg>;
+using Transaction = gustave::core::scenes::cuboidGridScene::Transaction<libCfg>;
 
-TEST_CASE("scenes::cuboidGridScene::ContactReference") {
+TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
     SceneData scene{ blockSize };
 

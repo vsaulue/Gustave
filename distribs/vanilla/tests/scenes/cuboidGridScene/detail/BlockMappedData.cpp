@@ -27,15 +27,15 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/BlockMappedData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockMappedData.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockConstructionInfo = gustave::scenes::cuboidGridScene::BlockConstructionInfo<libCfg>;
-using BlockMappedData = gustave::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
+using BlockConstructionInfo = gustave::core::scenes::cuboidGridScene::BlockConstructionInfo<libCfg>;
+using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
 
-TEST_CASE("scenes::cuboidGridScene::detail::BlockMappedData") {
+TEST_CASE("core::scenes::cuboidGridScene::detail::BlockMappedData") {
     SECTION("// constructor & getters") {
         const BlockConstructionInfo info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
         BlockMappedData data{ info };

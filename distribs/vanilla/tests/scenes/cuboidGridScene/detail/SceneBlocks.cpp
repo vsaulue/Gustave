@@ -25,18 +25,18 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockDataReference = gustave::scenes::cuboidGridScene::detail::BlockDataReference<libCfg,true>;
-using BlockIndex = gustave::scenes::cuboidGridScene::BlockIndex;
+using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg,true>;
+using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
 using Direction = gustave::math3d::BasicDirection;
-using SceneBlocks = gustave::scenes::cuboidGridScene::detail::SceneBlocks<libCfg>;
+using SceneBlocks = gustave::core::scenes::cuboidGridScene::detail::SceneBlocks<libCfg>;
 
-TEST_CASE("scenes::cuboidGridScene::detail::SceneBlocks") {
+TEST_CASE("core::scenes::cuboidGridScene::detail::SceneBlocks") {
     SceneBlocks sceneBlocks{ vector3(1.f, 2.f, 3.f, u.length) };
     BlockDataReference b1 = sceneBlocks.insert({ {2,3,4}, concrete_20m, 10.f * u.mass, true });
     BlockDataReference b2 = sceneBlocks.insert({ {4,6,9}, concrete_20m, 25.f * u.mass, false });

@@ -25,25 +25,25 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/BlockData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockConstructionInfo = gustave::scenes::cuboidGridScene::BlockConstructionInfo<libCfg>;
-using BlockData = gustave::scenes::cuboidGridScene::detail::BlockData<libCfg>;
-using BlockIndex = gustave::scenes::cuboidGridScene::BlockIndex;
-using BlockMappedData = gustave::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
-using SceneData = gustave::scenes::cuboidGridScene::detail::SceneData<libCfg>;
-using StructureData = gustave::scenes::cuboidGridScene::detail::StructureData<libCfg>;
+using BlockConstructionInfo = gustave::core::scenes::cuboidGridScene::BlockConstructionInfo<libCfg>;
+using BlockData = gustave::core::scenes::cuboidGridScene::detail::BlockData<libCfg>;
+using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
+using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
+using StructureData = gustave::core::scenes::cuboidGridScene::detail::StructureData<libCfg>;
 
 template<bool isMutable>
-using BlockDataReference = gustave::scenes::cuboidGridScene::detail::BlockDataReference<libCfg, isMutable>;
+using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg, isMutable>;
 
-TEST_CASE("scenes::cuboidGridScene::detail::BlockDataReference") {
+TEST_CASE("core::scenes::cuboidGridScene::detail::BlockDataReference") {
     SceneData sceneData{ vector3(1.f, 1.f, 1.f, u.length) };
 
     BlockDataReference<true> b111 = sceneData.blocks.insert(BlockConstructionInfo{ {1,1,1}, concrete_20m, 5.f * u.mass, false });

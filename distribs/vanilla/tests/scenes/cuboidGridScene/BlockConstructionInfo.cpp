@@ -27,17 +27,17 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 
 #include <TestHelpers.hpp>
 
-namespace cuboid = ::gustave::scenes::cuboidGridScene;
+namespace cuboid = ::gustave::core::scenes::cuboidGridScene;
 
 using BlockConstructionInfo = cuboid::BlockConstructionInfo<libCfg>;
 using BlockIndex = cuboid::BlockIndex;
 
-TEST_CASE("scenes::cuboidGridScene::BlockConstructionInfo") {
+TEST_CASE("core::scenes::cuboidGridScene::BlockConstructionInfo") {
     SECTION("// constructor") {
         SECTION("// valid constructor & getters") {
             const BlockConstructionInfo obj{ {4,5,6}, concrete_20m, 5.f * u.mass, true };

@@ -25,14 +25,14 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/model/Stress.hpp>
+#include <gustave/core/model/Stress.hpp>
 
 #include <TestHelpers.hpp>
 
-using ForceStress = gustave::model::ForceStress<libCfg>;
-using StressRatio = gustave::model::StressRatio<libCfg>;
+using ForceStress = gustave::core::model::ForceStress<libCfg>;
+using StressRatio = gustave::core::model::StressRatio<libCfg>;
 
-TEST_CASE("model::Stress") {
+TEST_CASE("core::model::Stress") {
     SECTION("::minStress(PressureStress const&, PressureStress const&)") {
         PressureStress const m1{
             4.f * u.pressure, // compressive

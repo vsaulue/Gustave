@@ -25,22 +25,22 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/Contacts.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/core/scenes/cuboidGridScene/Contacts.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 
 #include <TestHelpers.hpp>
 
-using Contacts = gustave::scenes::cuboidGridScene::Contacts<libCfg>;
-using SceneData = gustave::scenes::cuboidGridScene::detail::SceneData<libCfg>;
-using SceneUpdater = gustave::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
+using Contacts = gustave::core::scenes::cuboidGridScene::Contacts<libCfg>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
 
 using ContactIndex = Contacts::ContactIndex;
 using ContactReference = Contacts::ContactReference;
 using Direction = ContactIndex::Direction;
 using Transaction = SceneUpdater::Transaction;
 
-TEST_CASE("scenes::cuboidGridScene::Contacts") {
+TEST_CASE("core::scenes::cuboidGridScene::Contacts") {
     SceneData scene{ vector3(2.f, 3.f, 1.f, u.length) };
 
     Transaction t;

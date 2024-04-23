@@ -25,16 +25,16 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 
 #include <TestConfig.hpp>
 
-using BlockIndex = gustave::scenes::cuboidGridScene::BlockIndex;
+using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
 
 using Coord = BlockIndex::Coord;
 using Direction = BlockIndex::Direction;
 
-TEST_CASE("scenes::cuboidGridScene::BlockIndex") {
+TEST_CASE("core::scenes::cuboidGridScene::BlockIndex") {
     static constexpr Coord maxCoord = std::numeric_limits<Coord>::max();
     static constexpr Coord minCoord = std::numeric_limits<Coord>::min();
 

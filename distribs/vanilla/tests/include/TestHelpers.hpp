@@ -31,7 +31,7 @@
 
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/model/Stress.hpp>
+#include <gustave/core/model/Stress.hpp>
 #include <gustave/testing/Matchers.hpp>
 
 #include <TestConfig.hpp>
@@ -41,7 +41,7 @@ namespace cfg = ::gustave::cfg;
 namespace matchers = ::gustave::testing::matchers;
 
 using LinkIndex = cfg::LinkIndex<libCfg>;
-using PressureStress = gustave::model::PressureStress<libCfg>;
+using PressureStress = gustave::core::model::PressureStress<libCfg>;
 using NodeIndex = cfg::NodeIndex<libCfg>;
 using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
 

@@ -28,13 +28,13 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
-#include <gustave/scenes/cuboidGridScene/BlockReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 
 #include <TestHelpers.hpp>
 
-namespace cuboidGrid = gustave::scenes::cuboidGridScene;
+namespace cuboidGrid = gustave::core::scenes::cuboidGridScene;
 
 using BlockReference = cuboidGrid::BlockReference<libCfg>;
 using SceneData = cuboidGrid::detail::SceneData<libCfg>;
@@ -50,7 +50,7 @@ using Transaction = SceneUpdater::Transaction;
 static_assert(std::ranges::forward_range<BlockReference::Contacts>);
 static_assert(std::ranges::forward_range<BlockReference::Structures>);
 
-TEST_CASE("scenes::cuboidGridScene::BlockReference") {
+TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
     SceneData sceneData{ blockSize };
 

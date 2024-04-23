@@ -28,24 +28,24 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
-#include <gustave/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockIndex = gustave::scenes::cuboidGridScene::BlockIndex;
+using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
 using Coord = BlockIndex::Coord;
 using Direction = gustave::math3d::BasicDirection;
 using Limits = std::numeric_limits<Coord>;
-using Neighbours = gustave::scenes::cuboidGridScene::detail::IndexNeighbours;
-using IndexNeighbour = gustave::scenes::cuboidGridScene::detail::IndexNeighbour;
+using Neighbours = gustave::core::scenes::cuboidGridScene::detail::IndexNeighbours;
+using IndexNeighbour = gustave::core::scenes::cuboidGridScene::detail::IndexNeighbour;
 
 static constexpr Coord max = Limits::max();
 static constexpr Coord min = Limits::min();
 
-TEST_CASE("scenes::cuboidGridScene::detail::IndexNeighbours") {
+TEST_CASE("core::scenes::cuboidGridScene::detail::IndexNeighbours") {
     auto runTest = [](BlockIndex const& source, std::vector<IndexNeighbour> const& expected) {
         CHECK_THAT(Neighbours{ source }, matchers::c2::RangeEquals(expected));
     };

@@ -27,13 +27,13 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/solvers/force1Solver/detail/SolutionData.hpp>
-#include <gustave/solvers/force1Solver/solution/NodeReference.hpp>
+#include <gustave/core/solvers/force1Solver/detail/SolutionData.hpp>
+#include <gustave/core/solvers/force1Solver/solution/NodeReference.hpp>
 
 #include <TestHelpers.hpp>
 
-using NodeReference = gustave::solvers::force1Solver::solution::NodeReference<libCfg>;
-using SolutionData = gustave::solvers::force1Solver::detail::SolutionData<libCfg>;
+using NodeReference = gustave::core::solvers::force1Solver::solution::NodeReference<libCfg>;
+using SolutionData = gustave::core::solvers::force1Solver::detail::SolutionData<libCfg>;
 
 using Structure = SolutionData::Basis::Structure;
 
@@ -45,7 +45,7 @@ using Node = Structure::Node;
 using SolutionBasis = SolutionData::Basis;
 using SolverConfig = SolutionData::Basis::Config;
 
-TEST_CASE("force1::solutionUtils::NodeReference") {
+TEST_CASE("core::force1Solver::solution::NodeReference") {
     static constexpr Real<u.one> precision = 0.001f;
     auto const solverConfig = std::make_shared<SolverConfig const>(g, precision);
 

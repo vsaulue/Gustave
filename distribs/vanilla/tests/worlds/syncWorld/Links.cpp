@@ -25,15 +25,15 @@
 
 #include <memory>
 
-#include <gustave/worlds/syncWorld/detail/WorldData.hpp>
-#include <gustave/worlds/syncWorld/detail/WorldUpdater.hpp>
-#include <gustave/worlds/syncWorld/Links.hpp>
+#include <gustave/core/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/core/worlds/syncWorld/detail/WorldUpdater.hpp>
+#include <gustave/core/worlds/syncWorld/Links.hpp>
 
 #include <TestHelpers.hpp>
 
-using Links = gustave::worlds::syncWorld::Links<libCfg>;
-using WorldData = gustave::worlds::syncWorld::detail::WorldData<libCfg>;
-using WorldUpdater = gustave::worlds::syncWorld::detail::WorldUpdater<libCfg>;
+using Links = gustave::core::worlds::syncWorld::Links<libCfg>;
+using WorldData = gustave::core::worlds::syncWorld::detail::WorldData<libCfg>;
+using WorldUpdater = gustave::core::worlds::syncWorld::detail::WorldUpdater<libCfg>;
 
 using ContactIndex = Links::ContactIndex;
 using ContactReference = Links::ContactReference;
@@ -52,7 +52,7 @@ static WorldData makeWorld() {
     return WorldData{ blockSize, std::move(solver) };
 }
 
-TEST_CASE("worlds::syncWorld::Links") {
+TEST_CASE("core::worlds::syncWorld::Links") {
     WorldData world = makeWorld();
 
     Transaction t;

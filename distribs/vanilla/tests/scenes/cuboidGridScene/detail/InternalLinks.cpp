@@ -23,13 +23,13 @@
  * SOFTWARE.
  */
 
-#include <gustave/scenes/cuboidGridScene/detail/InternalLinks.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 
 #include <TestHelpers.hpp>
 
-namespace cuboid = ::gustave::scenes::cuboidGridScene;
+namespace cuboid = ::gustave::core::scenes::cuboidGridScene;
 
 using InternalLinks = cuboid::detail::InternalLinks<libCfg>;
 using SceneData = cuboid::detail::SceneData<libCfg>;
@@ -41,7 +41,7 @@ using Direction = InternalLinks::Direction;
 using Transaction = SceneUpdater::Transaction;
 using Value = InternalLinks::Value;
 
-TEST_CASE("scenes::cuboidGridScene::detail::InternalLinks") {
+TEST_CASE("core::scenes::cuboidGridScene::detail::InternalLinks") {
     SceneData scene{ vector3(1.f, 2.f, 3.f, u.length) };
 
     Transaction t;

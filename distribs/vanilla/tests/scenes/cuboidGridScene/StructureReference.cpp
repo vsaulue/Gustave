@@ -28,15 +28,15 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
-#include <gustave/scenes/cuboidGridScene/StructureReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
 
 #include <TestHelpers.hpp>
 
-using StructureReference = gustave::scenes::cuboidGridScene::StructureReference<libCfg>;
-using SceneData = gustave::scenes::cuboidGridScene::detail::SceneData<libCfg>;
-using SceneUpdater = gustave::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
+using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
 
 using BlockIndex = StructureReference::BlockIndex;
 using BlockReference = StructureReference::BlockReference;
@@ -48,7 +48,7 @@ using Transaction = SceneUpdater::Transaction;
 static_assert(std::ranges::forward_range<StructureReference::Blocks>);
 static_assert(std::ranges::forward_range<StructureReference::Links>);
 
-TEST_CASE("scenes::cuboidGridScene::StructureReference") {
+TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     SceneData data{ blockSize };
 
