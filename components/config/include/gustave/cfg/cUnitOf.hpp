@@ -35,7 +35,10 @@ namespace gustave::cfg {
             static constexpr bool value = false;
         };
 
-        template<cRealTraits auto rt>
+        // concept moved into a require clause, due to a LLVM bug.
+        // See https://github.com/llvm/llvm-project/issues/77377
+        template<auto rt>
+            requires cRealTraits<decltype(rt)>
         struct HasUnitConcept<rt>
         {
             static constexpr bool value = true;
@@ -45,7 +48,10 @@ namespace gustave::cfg {
             }
         };
 
-        template<cLibConfig auto cfg>
+        // concept moved into a require clause, due to a LLVM bug.
+        // See https://github.com/llvm/llvm-project/issues/77377
+        template<auto cfg>
+            requires cLibConfig<decltype(cfg)>
         struct HasUnitConcept<cfg> {
             static constexpr bool value = true;
 
