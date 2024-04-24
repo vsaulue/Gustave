@@ -27,16 +27,16 @@
 
 #include <gustave/math3d/NormalizedVector3.hpp>
 #include <gustave/math3d/Vector3.hpp>
-#include <gustave/units/lib/Unit.hpp>
-#include <gustave/units/RealTraits.hpp>
+#include <gustave/units/stdStrict/lib/Unit.hpp>
+#include <gustave/units/stdStrict/RealTraits.hpp>
 
 namespace gustave::vanilla {
     struct LibConfig {
-        static constexpr units::RealTraits realTraits{};
+        static constexpr units::stdStrict::RealTraits realTraits{};
 
         using RealRep = double;
 
-        template<units::lib::cUnit auto unit>
+        template<cfg::cUnitOf<realTraits> auto unit>
         using Vector3 = ::gustave::math3d::Vector3<realTraits, unit, RealRep>;
 
         using NormalizedVector3 = ::gustave::math3d::NormalizedVector3<realTraits, RealRep>;

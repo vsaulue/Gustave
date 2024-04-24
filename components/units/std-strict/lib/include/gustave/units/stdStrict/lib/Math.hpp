@@ -25,11 +25,11 @@
 
 #pragma once
 
-#include <gustave/units/lib/concepts.hpp>
-#include <gustave/units/lib/Exponent.hpp>
-#include <gustave/units/lib/Real.hpp>
+#include <gustave/units/stdStrict/lib/concepts.hpp>
+#include <gustave/units/stdStrict/lib/Exponent.hpp>
+#include <gustave/units/stdStrict/lib/Real.hpp>
 
-namespace gustave::units::lib {
+namespace gustave::units::stdStrict::lib {
     cReal auto sqrt(cReal auto real) {
         constexpr auto resUnit = real.unit().pow(Exponent<1, 2>{});
         return std::sqrt(real.value()) * resUnit;

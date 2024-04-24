@@ -25,9 +25,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/units/lib/UnitIdentifier.hpp>
+#include <gustave/units/stdStrict/lib/UnitIdentifier.hpp>
 
-namespace u = gustave::units::lib;
+namespace u = gustave::units::stdStrict::lib;
 
 template<u::cBasicUnitIdentifier id, u::ExpNum num, u::ExpDen den = 1>
 using Term = u::UnitTerm<id{}, u::Exponent<num, den>{}> ;

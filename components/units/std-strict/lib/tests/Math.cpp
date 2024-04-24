@@ -25,11 +25,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/units/lib/Math.hpp>
-#include <gustave/units/lib/Real.hpp>
-#include <gustave/units/lib/Unit.hpp>
+#include <gustave/units/stdStrict/lib/Math.hpp>
+#include <gustave/units/stdStrict/lib/Real.hpp>
+#include <gustave/units/stdStrict/lib/Unit.hpp>
 
-namespace u = gustave::units::lib;
+namespace u = gustave::units::stdStrict::lib;
 
 TEST_CASE("Math/") {
     struct Kilogram : u::BasicUnitIdentifier<"kg"> {};

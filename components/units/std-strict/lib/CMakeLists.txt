@@ -22,13 +22,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory("lib")
-
-add_library(Comp-Units-Vanilla INTERFACE)
-target_include_directories(Comp-Units-Vanilla INTERFACE "include")
+add_library(Comp-Std-Strict-Unit-Lib INTERFACE)
+target_include_directories(Comp-Std-Strict-Unit-Lib INTERFACE "include")
 install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
 
-target_link_libraries(Comp-Units-Vanilla
+target_link_libraries(Comp-Std-Strict-Unit-Lib
     INTERFACE Comp-Config
-    INTERFACE Comp-Units-Vanilla-Lib
+    INTERFACE Comp-Utils
 )
+
+add_executable(Test-Comp-Std-Strict-Unit-Lib
+    "tests/BasicUnitIdentifier.cpp"
+    "tests/Exponent.cpp"
+    "tests/Math.cpp"
+    "tests/Real.cpp"
+    "tests/Unit.cpp"
+    "tests/UnitIdentifier.cpp"
+    "tests/UnitTerm.cpp"
+)
+target_link_libraries(Test-Comp-Std-Strict-Unit-Lib
+    PRIVATE Catch2::Catch2WithMain
+    PRIVATE Comp-Std-Strict-Unit-Lib
+)
+declare_unit_test(Test-Comp-Std-Strict-Unit-Lib)

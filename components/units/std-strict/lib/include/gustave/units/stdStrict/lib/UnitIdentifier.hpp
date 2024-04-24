@@ -28,12 +28,12 @@
 #include <type_traits>
 
 #include <gustave/cfg/cRealRep.hpp>
-#include <gustave/units/lib/concepts.hpp>
-#include <gustave/units/lib/Exponent.hpp>
-#include <gustave/units/lib/UnitTerm.hpp>
+#include <gustave/units/stdStrict/lib/concepts.hpp>
+#include <gustave/units/stdStrict/lib/Exponent.hpp>
+#include <gustave/units/stdStrict/lib/UnitTerm.hpp>
 #include <gustave/utils/SizedString.hpp>
 
-namespace gustave::units::lib {
+namespace gustave::units::stdStrict::lib {
     namespace detail {
         [[nodiscard]]
         constexpr cUnitIdentifier auto multiplyUnits(cUnitIdentifier auto lhs, cUnitIdentifier auto rhs) {

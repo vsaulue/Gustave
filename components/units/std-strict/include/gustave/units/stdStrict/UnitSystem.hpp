@@ -25,11 +25,11 @@
 
 #pragma once
 
-#include <gustave/units/lib/Exponent.hpp>
-#include <gustave/units/lib/UnitIdentifier.hpp>
-#include <gustave/units/lib/Unit.hpp>
+#include <gustave/units/stdStrict/lib/Exponent.hpp>
+#include <gustave/units/stdStrict/lib/UnitIdentifier.hpp>
+#include <gustave/units/stdStrict/lib/Unit.hpp>
 
-namespace gustave::units {
+namespace gustave::units::stdStrict {
     struct UnitSystem {
     private:
         struct Kilogram : lib::BasicUnitIdentifier<"kg"> {};

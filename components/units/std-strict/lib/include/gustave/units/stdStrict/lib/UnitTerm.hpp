@@ -27,11 +27,11 @@
 
 #include <type_traits>
 
-#include <gustave/units/lib/concepts.hpp>
-#include <gustave/units/lib/BasicUnitIdentifier.hpp>
-#include <gustave/units/lib/Exponent.hpp>
+#include <gustave/units/stdStrict/lib/concepts.hpp>
+#include <gustave/units/stdStrict/lib/BasicUnitIdentifier.hpp>
+#include <gustave/units/stdStrict/lib/Exponent.hpp>
 
-namespace gustave::units::lib {
+namespace gustave::units::stdStrict::lib {
     template<cBasicUnitIdentifier auto basicUnit_, cExponent auto exponent_>
     struct UnitTerm {
         using Char = typename decltype(basicUnit_)::Char;

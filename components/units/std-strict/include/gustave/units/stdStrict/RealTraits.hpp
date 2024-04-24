@@ -28,12 +28,12 @@
 #include <type_traits>
 
 #include <gustave/cfg/cRealRep.hpp>
-#include <gustave/units/lib/Math.hpp>
-#include <gustave/units/lib/Real.hpp>
-#include <gustave/units/lib/Unit.hpp>
-#include <gustave/units/UnitSystem.hpp>
+#include <gustave/units/stdStrict/lib/Math.hpp>
+#include <gustave/units/stdStrict/lib/Real.hpp>
+#include <gustave/units/stdStrict/lib/Unit.hpp>
+#include <gustave/units/stdStrict/UnitSystem.hpp>
 
-namespace gustave::units {
+namespace gustave::units::stdStrict {
     struct RealTraits {
         [[nodiscard]]
         static constexpr UnitSystem units() {

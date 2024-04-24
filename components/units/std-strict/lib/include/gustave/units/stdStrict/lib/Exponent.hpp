@@ -31,11 +31,11 @@
 #include <numeric>
 #include <type_traits>
 
-#include <gustave/units/lib/concepts.hpp>
+#include <gustave/units/stdStrict/lib/concepts.hpp>
 #include <gustave/utils/NumberHyperscript.hpp>
 #include <gustave/utils/SizedString.hpp>
 
-namespace gustave::units::lib {
+namespace gustave::units::stdStrict::lib {
     namespace detail {
         [[nodiscard]]
         constexpr auto makeSigned(std::unsigned_integral auto const v) {

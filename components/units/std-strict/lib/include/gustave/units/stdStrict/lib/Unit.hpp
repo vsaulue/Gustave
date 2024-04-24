@@ -29,12 +29,12 @@
 #include <type_traits>
 
 #include <gustave/cfg/cRealRep.hpp>
-#include <gustave/units/lib/concepts.hpp>
-#include <gustave/units/lib/Exponent.hpp>
-#include <gustave/units/lib/UnitIdentifier.hpp>
+#include <gustave/units/stdStrict/lib/concepts.hpp>
+#include <gustave/units/stdStrict/lib/Exponent.hpp>
+#include <gustave/units/stdStrict/lib/UnitIdentifier.hpp>
 #include <gustave/utils/SizedString.hpp>
 
-namespace gustave::units::lib {
+namespace gustave::units::stdStrict::lib {
     // `cUnitidentifier auto unitId_` instead of `UnitIdentifier unitId_`, because of MSVC bug.
     // see https://developercommunity.visualstudio.com/t/CTAD-rule-on-default-constructible-type/10279590?sort=newest.
     template<utils::SizedString symbol_, cUnitIdentifier auto unitId_>

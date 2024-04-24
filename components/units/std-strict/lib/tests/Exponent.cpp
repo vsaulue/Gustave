@@ -25,9 +25,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/units/lib/Exponent.hpp>
+#include <gustave/units/stdStrict/lib/Exponent.hpp>
 
-namespace u = gustave::units::lib;
+namespace u = gustave::units::stdStrict::lib;
 
 TEST_CASE("Exponent") {
     SECTION("::operator-()") {

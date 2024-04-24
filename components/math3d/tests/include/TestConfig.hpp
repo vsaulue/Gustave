@@ -25,6 +25,6 @@
 
 #pragma once
 
-#include <gustave/units/RealTraits.hpp>
+#include <gustave/units/stdStrict/RealTraits.hpp>
 
-using RealTraits = gustave::units::RealTraits;
+using RealTraits = gustave::units::stdStrict::RealTraits;

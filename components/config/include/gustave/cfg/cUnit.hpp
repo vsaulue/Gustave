@@ -27,13 +27,20 @@
 
 #include <concepts>
 
+#include <gustave/cfg/cPrintable.hpp>
+
 namespace gustave::cfg {
     template<typename T>
     concept cUnit = requires (T t) {
         { t.isAssignableFrom(t) } -> std::convertible_to<bool>;
-        t* t;
+        { t.isOne() } -> std::convertible_to<bool>;
+        { t.isTrivialOne() } -> std::convertible_to<bool>;
+        t * t;
         t / t;
-            requires T::isAssignableFrom(T{});
-            requires ((T{} *T{} / T{}).isAssignableFrom(T{}));
+        requires T::isAssignableFrom(T{});
+        requires ((T{} *T{} / T{}).isAssignableFrom(T{}));
+        requires cPrintable<T>;
+        1.f * t;
+        1.f / t;
     };
 }

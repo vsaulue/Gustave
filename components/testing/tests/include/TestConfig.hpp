@@ -29,14 +29,14 @@
 
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/math3d/Vector3.hpp>
-#include <gustave/units/RealTraits.hpp>
+#include <gustave/units/stdStrict/RealTraits.hpp>
 
 namespace cfg = gustave::cfg;
 namespace matchers = gustave::testing::matchers;
 
 using Rep = double;
 
-using Rt = gustave::units::RealTraits;
+using Rt = gustave::units::stdStrict::RealTraits;
 inline constexpr Rt rt;
 inline constexpr auto u = rt.units();
 

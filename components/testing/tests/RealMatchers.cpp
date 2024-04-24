@@ -28,7 +28,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/testing/matchers/RealMatchers.hpp>
-#include <gustave/units/RealTraits.hpp>
 
 #include <TestConfig.hpp>
 

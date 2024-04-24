@@ -31,7 +31,7 @@
 #include <gustave/cfg/cRealTraits.hpp>
 #include <gustave/utils/SizedString.hpp>
 
-namespace gustave::units::lib {
+namespace gustave::units::stdStrict::lib {
     template<utils::SizedString symbol_>
     struct BasicUnitIdentifier;
 

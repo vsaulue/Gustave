@@ -28,9 +28,9 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/units/lib/Unit.hpp>
+#include <gustave/units/stdStrict/lib/Unit.hpp>
 
-namespace u = gustave::units::lib;
+namespace u = gustave::units::stdStrict::lib;
 
 template<u::cUnitIdentifier Id>
 constexpr u::Unit<"", Id{}> makeUnit(Id) {

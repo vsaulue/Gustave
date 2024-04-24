@@ -27,10 +27,10 @@
 
 #include <concepts>
 
-#include <gustave/units/lib/concepts.hpp>
+#include <gustave/units/stdStrict/lib/concepts.hpp>
 #include <gustave/utils/SizedString.hpp>
 
-namespace gustave::units::lib {
+namespace gustave::units::stdStrict::lib {
     template<utils::SizedString symbol_>
     struct BasicUnitIdentifier {
         using Char = typename decltype(symbol_)::Char;

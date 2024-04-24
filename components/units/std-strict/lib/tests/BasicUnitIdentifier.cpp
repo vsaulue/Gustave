@@ -25,38 +25,20 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/units/lib/UnitTerm.hpp>
+#include <gustave/units/stdStrict/lib/BasicUnitIdentifier.hpp>
 
-namespace u = gustave::units::lib;
+namespace u = gustave::units::stdStrict::lib;
 
-TEST_CASE("UnitTerm") {
+TEST_CASE("BasicUnitIdentifier") {
+
     struct Metre : u::BasicUnitIdentifier<"m"> {};
-    constexpr Metre m{};
+    constexpr Metre metre{};
 
-    SECTION("operator+(cUnitTerm auto, cUnitTerm auto)") {
-        constexpr u::UnitTerm<m, u::Exponent<-1, 12>{}> lhs{};
-        constexpr u::UnitTerm<m, u::Exponent<1, 3>{}> rhs{};
-        constexpr auto res = lhs + rhs;
-        REQUIRE(res.basicUnit() == m);
-        REQUIRE(res.exponent().num() == 1);
-        REQUIRE(res.exponent().den() == 4);
-    }
+    struct Kilogram : u::BasicUnitIdentifier<"kg"> {};
+    constexpr Kilogram kilogram{};
 
-    SECTION("operator-(cUnitTerm auto, cUnitTerm auto)") {
-        constexpr u::UnitTerm<m, u::Exponent<-1, 2>{}> lhs{};
-        constexpr u::UnitTerm<m, u::Exponent<-3, 2>{}> rhs{};
-        constexpr auto res = lhs - rhs;
-        REQUIRE(res.basicUnit() == m);
-        REQUIRE(res.exponent().num() == 1);
-        REQUIRE(res.exponent().den() == 1);
-    }
-
-    SECTION("operator*(cUnitTerm auto, cExponent auto)") {
-        constexpr u::UnitTerm<m, u::Exponent<-1, 9>{}> lhs{};
-        constexpr u::Exponent<3,2> rhs{};
-        constexpr auto res = lhs * rhs;
-        REQUIRE(res.basicUnit() == m);
-        REQUIRE(res.exponent().num() == -1);
-        REQUIRE(res.exponent().den() == 6);
+    SECTION("BasicUnitIdentifier == BasicUnitIdentifier") {
+        CHECK((metre == Metre{}));
+        CHECK(metre != kilogram);
     }
 }

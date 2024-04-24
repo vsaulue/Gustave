@@ -28,12 +28,12 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <gustave/units/lib/BasicUnitIdentifier.hpp>
-#include <gustave/units/lib/Real.hpp>
-#include <gustave/units/lib/Unit.hpp>
-#include <gustave/units/lib/UnitIdentifier.hpp>
+#include <gustave/units/stdStrict/lib/BasicUnitIdentifier.hpp>
+#include <gustave/units/stdStrict/lib/Real.hpp>
+#include <gustave/units/stdStrict/lib/Unit.hpp>
+#include <gustave/units/stdStrict/lib/UnitIdentifier.hpp>
 
-namespace u = gustave::units::lib;
+namespace u = gustave::units::stdStrict::lib;
 
 static void testValue(u::cReal auto tested, std::floating_point auto expected) {
     using TestedRep = typename decltype(tested)::Rep;

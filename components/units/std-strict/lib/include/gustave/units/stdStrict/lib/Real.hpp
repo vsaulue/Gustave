@@ -31,11 +31,11 @@
 #include <type_traits>
 
 #include <gustave/cfg/cRealRep.hpp>
-#include <gustave/units/lib/concepts.hpp>
-#include <gustave/units/lib/Unit.hpp>
+#include <gustave/units/stdStrict/lib/concepts.hpp>
+#include <gustave/units/stdStrict/lib/Unit.hpp>
 #include <gustave/utils/NoInit.hpp>
 
-namespace gustave::units::lib {
+namespace gustave::units::stdStrict::lib {
     template<cUnit auto unit_, cfg::cRealRep Rep_>
     class Real {
     public:
