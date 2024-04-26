@@ -30,3 +30,5 @@ target_link_libraries(Comp-Core
     INTERFACE Comp-Config
     INTERFACE Comp-Utils
 )
+
+add_subdirectory("testing")
