@@ -22,7 +22,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory("testing")
+add_library(Comp-StdUnitless INTERFACE)
+target_include_directories(Comp-StdUnitless INTERFACE "include")
+install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
 
-add_subdirectory("std-strict")
-add_subdirectory("stdUnitless")
+target_link_libraries(Comp-StdUnitless
+    INTERFACE Comp-Config
+    INTERFACE Comp-Utils
+)
+
+add_library(Testconfig-Comp-StdUnitless-Realtraits INTERFACE)
+target_include_directories(Testconfig-Comp-StdUnitless-Realtraits INTERFACE "tests/include")
+target_link_libraries(Testconfig-Comp-StdUnitless-Realtraits
+    INTERFACE Comp-StdUnitless
+)
+
+add_test_real_traits(Test-Comp-StdUnitless-Realtraits Testconfig-Comp-StdUnitless-Realtraits)
