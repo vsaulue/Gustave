@@ -29,7 +29,7 @@ install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
 target_link_libraries(Gustave-Vanilla
     INTERFACE Comp-Core
     INTERFACE Comp-Math
-    INTERFACE Comp-Std-Strict-Unit
+    INTERFACE Comp-StdStrictUnit
 )
 
 add_executable(Test-Gustave-Vanilla

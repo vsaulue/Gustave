@@ -24,5 +24,5 @@
 
 add_subdirectory("testing")
 
-add_subdirectory("std-strict")
+add_subdirectory("stdStrict")
 add_subdirectory("stdUnitless")

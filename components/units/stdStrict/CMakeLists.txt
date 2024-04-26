@@ -24,19 +24,19 @@
 
 add_subdirectory("lib")
 
-add_library(Comp-Std-Strict-Unit INTERFACE)
-target_include_directories(Comp-Std-Strict-Unit INTERFACE "include")
+add_library(Comp-StdStrictUnit INTERFACE)
+target_include_directories(Comp-StdStrictUnit INTERFACE "include")
 install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
 
-target_link_libraries(Comp-Std-Strict-Unit
+target_link_libraries(Comp-StdStrictUnit
     INTERFACE Comp-Config
-    INTERFACE Comp-Std-Strict-Unit-Lib
+    INTERFACE Comp-StdStrictUnit-Lib
 )
 
 add_library(Testconfig-Comp-StdStrictUnit-Realtraits INTERFACE)
 target_include_directories(Testconfig-Comp-StdStrictUnit-Realtraits INTERFACE "tests/include")
 target_link_libraries(Testconfig-Comp-StdStrictUnit-Realtraits
-    INTERFACE Comp-Std-Strict-Unit
+    INTERFACE Comp-StdStrictUnit
 )
 
 add_test_real_traits(Test-Comp-StdStrictUnit-Realtraits Testconfig-Comp-StdStrictUnit-Realtraits)

@@ -39,7 +39,7 @@ target_include_directories(Test-Comp-Math PRIVATE "tests/include")
 target_link_libraries(Test-Comp-Math
     PRIVATE Catch2::Catch2WithMain
     PRIVATE Comp-Math
-    PRIVATE Comp-Std-Strict-Unit
+    PRIVATE Comp-StdStrictUnit
     PRIVATE Comp-Testing
 )
 declare_unit_test(Test-Comp-Math)
