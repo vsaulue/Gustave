@@ -25,21 +25,24 @@
 
 #pragma once
 
+#include <concepts>
+
 #include <gustave/math3d/NormalizedVector3.hpp>
 #include <gustave/math3d/Vector3.hpp>
 #include <gustave/units/stdStrict/lib/Unit.hpp>
 #include <gustave/units/stdStrict/RealTraits.hpp>
 
 namespace gustave::distribs::std::strictUnit {
+    template<::std::floating_point RealRep_>
     struct LibConfig {
         static constexpr units::stdStrict::RealTraits realTraits{};
 
-        using RealRep = double;
+        using RealRep = RealRep_;
 
         template<cfg::cUnitOf<realTraits> auto unit>
-        using Vector3 = ::gustave::math3d::Vector3<realTraits, unit, RealRep>;
+        using Vector3 = ::gustave::math3d::Vector3<realTraits, unit, RealRep_>;
 
-        using NormalizedVector3 = ::gustave::math3d::NormalizedVector3<realTraits, RealRep>;
+        using NormalizedVector3 = ::gustave::math3d::NormalizedVector3<realTraits, RealRep_>;
 
         using LinkIndex = ::std::size_t;
         using NodeIndex = ::std::size_t;

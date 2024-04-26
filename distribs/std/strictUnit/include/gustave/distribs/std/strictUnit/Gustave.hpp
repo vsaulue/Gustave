@@ -26,36 +26,9 @@
 #pragma once
 
 #include <gustave/distribs/std/strictUnit/LibConfig.hpp>
-#include <gustave/core/worlds/SyncWorld.hpp>
+#include <gustave/core/Gustave.hpp>
 
 namespace gustave::distribs::std::strictUnit {
-    struct Gustave {
-    public:
-        static constexpr LibConfig libConfig{};
-
-        using Rep = gustave::cfg::Real<libConfig, gustave::cfg::units(libConfig).one>::Rep;
-
-        using NormalizedVector3 = gustave::cfg::NormalizedVector3<libConfig>;
-
-        template<gustave::cfg::cUnitOf<libConfig> auto unit>
-        using Real = gustave::cfg::Real<libConfig, unit>;
-
-        template<gustave::cfg::cUnitOf<libConfig> auto unit>
-        using Vector3 = gustave::cfg::Vector3<libConfig, unit>;
-
-        [[nodiscard]]
-        static constexpr auto units() {
-            return gustave::cfg::units(libConfig);
-        }
-
-        struct Worlds {
-            using SyncWorld = gustave::core::worlds::SyncWorld<libConfig>;
-        };
-
-        template<gustave::cfg::cUnitOf<libConfig> Unit>
-        [[nodiscard]]
-        static constexpr auto vector3(Rep x, Rep y, Rep z, Unit unit) {
-            return Vector3<Unit{}>{ x, y, z, unit };
-        }
-    };
+    template<::std::floating_point RealRep_>
+    using Gustave = gustave::core::Gustave<LibConfig<RealRep_>{}>;
 }

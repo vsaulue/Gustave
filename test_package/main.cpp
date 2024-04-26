@@ -25,7 +25,7 @@
 
 #include <gustave/distribs/std/strictUnit/Gustave.hpp>
 
-using G = gustave::distribs::std::strictUnit::Gustave;
+using G = gustave::distribs::std::strictUnit::Gustave<double>;
 
 static constexpr auto u = G::units();
 
