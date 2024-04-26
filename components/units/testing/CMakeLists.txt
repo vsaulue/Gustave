@@ -22,21 +22,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory("lib")
-
-add_library(Comp-Std-Strict-Unit INTERFACE)
-target_include_directories(Comp-Std-Strict-Unit INTERFACE "include")
-install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
-
-target_link_libraries(Comp-Std-Strict-Unit
-    INTERFACE Comp-Config
-    INTERFACE Comp-Std-Strict-Unit-Lib
-)
-
-add_library(Testconfig-Comp-StdStrictUnit-Realtraits INTERFACE)
-target_include_directories(Testconfig-Comp-StdStrictUnit-Realtraits INTERFACE "tests/include")
-target_link_libraries(Testconfig-Comp-StdStrictUnit-Realtraits
-    INTERFACE Comp-Std-Strict-Unit
-)
-
-add_test_real_traits(Test-Comp-StdStrictUnit-Realtraits Testconfig-Comp-StdStrictUnit-Realtraits)
+function(add_test_real_traits test_target_name real_traits_lib)
+    add_executable("${test_target_name}"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Real.cpp"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/RealTraits.cpp"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/UnitSystem.cpp"
+    )
+    target_include_directories("${test_target_name}"
+        PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include"
+    )
+    target_link_libraries("${test_target_name}"
+        PRIVATE "${real_traits_lib}"
+        PRIVATE Catch2::Catch2WithMain
+    )
+    declare_unit_test("${test_target_name}")
+endfunction()

@@ -63,19 +63,21 @@ namespace gustave::units::stdStrict {
         }
 
         [[nodiscard]]
-        static constexpr auto max(lib::cReal auto const lhs, lib::cReal auto const rhs) -> decltype(meta::value(lhs)) {
-            using Lhs = decltype(meta::value(lhs));
-            using Rhs = decltype(meta::value(rhs));
-            static_assert(Lhs::isCompatible(Rhs::unit()), "Invalid comparison: incompatible units.");
-            return (lhs > rhs) ? lhs : Lhs{ rhs };
+        static constexpr auto max(lib::cReal auto const lhs, lib::cReal auto const rhs) -> decltype(lhs + rhs) {
+            if (lhs > rhs) {
+                return lhs;
+            } else {
+                return rhs;
+            }
         }
 
         [[nodiscard]]
-        static constexpr auto min(lib::cReal auto const lhs, lib::cReal auto const rhs) -> decltype(meta::value(lhs)) {
-            using Lhs = decltype(meta::value(lhs));
-            using Rhs = decltype(meta::value(rhs));
-            static_assert(Lhs::isCompatible(Rhs::unit()), "Invalid comparison: incompatible units.");
-            return (lhs < rhs) ? lhs : Lhs{ rhs };
+        static constexpr auto min(lib::cReal auto const lhs, lib::cReal auto const rhs) -> decltype(lhs + rhs) {
+            if (lhs < rhs) {
+                return lhs;
+            } else {
+                return rhs;
+            }
         }
 
         [[nodiscard]]
