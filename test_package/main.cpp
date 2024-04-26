@@ -23,9 +23,9 @@
  * SOFTWARE.
  */
 
-#include <gustave/vanilla/Gustave.hpp>
+#include <gustave/distribs/std/strictUnit/Gustave.hpp>
 
-using G = gustave::vanilla::Gustave;
+using G = gustave::distribs::std::strictUnit::Gustave;
 
 static constexpr auto u = G::units();
 

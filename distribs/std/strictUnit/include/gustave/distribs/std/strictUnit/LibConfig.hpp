@@ -30,7 +30,7 @@
 #include <gustave/units/stdStrict/lib/Unit.hpp>
 #include <gustave/units/stdStrict/RealTraits.hpp>
 
-namespace gustave::vanilla {
+namespace gustave::distribs::std::strictUnit {
     struct LibConfig {
         static constexpr units::stdStrict::RealTraits realTraits{};
 
@@ -41,7 +41,7 @@ namespace gustave::vanilla {
 
         using NormalizedVector3 = ::gustave::math3d::NormalizedVector3<realTraits, RealRep>;
 
-        using LinkIndex = std::size_t;
-        using NodeIndex = std::size_t;
+        using LinkIndex = ::std::size_t;
+        using NodeIndex = ::std::size_t;
     };
 }

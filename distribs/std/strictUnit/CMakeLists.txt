@@ -22,20 +22,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_library(Gustave-Vanilla INTERFACE)
-target_include_directories(Gustave-Vanilla INTERFACE "include")
+add_library(Distrib-Std-StrictUnit INTERFACE)
+target_include_directories(Distrib-Std-StrictUnit INTERFACE "include")
 install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
 
-target_link_libraries(Gustave-Vanilla
+target_link_libraries(Distrib-Std-StrictUnit
     INTERFACE Comp-Core
     INTERFACE Comp-Math
     INTERFACE Comp-StdStrictUnit
 )
 
-add_library(Testconfig-Core-Vanilla INTERFACE)
-target_include_directories(Testconfig-Core-Vanilla INTERFACE "tests/include")
-target_link_libraries(Testconfig-Core-Vanilla
-    INTERFACE Gustave-Vanilla
+add_library(Testconfig-Core-Std-StrictUnit INTERFACE)
+target_include_directories(Testconfig-Core-Std-StrictUnit INTERFACE "tests/include")
+target_link_libraries(Testconfig-Core-Std-StrictUnit
+    INTERFACE Distrib-Std-StrictUnit
 )
 
-add_test_core(Test-Core-Vanilla Testconfig-Core-Vanilla)
+add_test_core(Test-Core-Std-StrictUnit Testconfig-Core-Std-StrictUnit)
