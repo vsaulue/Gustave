@@ -63,6 +63,7 @@ namespace gustave::core::worlds {
         using BlockReference = typename Blocks::BlockReference;
         using ContactIndex = typename Contacts::ContactIndex;
         using ContactReference = typename Contacts::ContactReference;
+        using Scene = typename WorldData::Scene;
         using Solver = typename WorldData::Solver;
         using StructureReference = typename Structures::StructureReference;
         using Transaction = typename WorldData::Scene::Transaction;
@@ -89,6 +90,11 @@ namespace gustave::core::worlds {
 
         void modify(Transaction const& transaction) {
             WorldUpdater{ data_ }.runTransaction(transaction);
+        }
+
+        [[nodiscard]]
+        Scene const& scene() const {
+            return data_.scene;
         }
 
         [[nodiscard]]
