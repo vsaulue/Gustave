@@ -45,6 +45,7 @@ class GustaveRecipe(ConanFile):
     def build_requirements(self):
         self.tool_requires("cmake/3.29.0")
         self.test_requires("catch2/3.5.4")
+        self.test_requires("svgwrite/0.2.0")
 
     def validate(self):
         check_min_cppstd(self, 20)
