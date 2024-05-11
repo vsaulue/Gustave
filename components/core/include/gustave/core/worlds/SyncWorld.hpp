@@ -84,6 +84,11 @@ namespace gustave::core::worlds {
         }
 
         [[nodiscard]]
+        Vector3<u.acceleration> g() const {
+            return data_.solver.config().g();
+        }
+
+        [[nodiscard]]
         Links links() const {
             return Links{ data_ };
         }
