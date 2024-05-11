@@ -50,6 +50,9 @@ namespace gustave::core::worlds::syncWorld {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
 
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Vector3 = cfg::Vector3<libCfg, unit>;
+
         using StructureData = detail::StructureData<libCfg>;
         using WorldData = detail::WorldData<libCfg>;
         using Scene = typename WorldData::Scene;
@@ -260,6 +263,13 @@ namespace gustave::core::worlds::syncWorld {
             : world_{ nullptr }
             , index_{ NO_INIT }
         {}
+
+        [[nodiscard]]
+        Vector3<u.length> const& blockSize() const
+            requires requires (SceneBlock const& sb) { sb.blockSize(); }
+        {
+            return sceneBlock().blockSize();
+        }
 
         [[nodiscard]]
         Contacts contacts() const {
