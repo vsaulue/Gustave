@@ -33,6 +33,35 @@ using ForceStress = gustave::core::model::ForceStress<libCfg>;
 using StressRatio = gustave::core::model::StressRatio<libCfg>;
 
 TEST_CASE("core::model::Stress") {
+    SECTION(".maxCoord()") {
+        SECTION("// compression") {
+            PressureStress const stress{
+                8.f * u.pressure,
+                5.f * u.pressure,
+                2.f * u.pressure,
+            };
+            CHECK(stress.maxCoord() == 8.f * u.pressure);
+        }
+
+        SECTION("//shear") {
+            PressureStress const stress{
+                2.f * u.pressure,
+                7.f * u.pressure,
+                5.f * u.pressure,
+            };
+            CHECK(stress.maxCoord() == 7.f * u.pressure);
+        }
+
+        SECTION("// tensile") {
+            PressureStress const stress{
+                2.f * u.pressure,
+                4.f * u.pressure,
+                5.f * u.pressure,
+            };
+            CHECK(stress.maxCoord() == 5.f * u.pressure);
+        }
+    }
+
     SECTION("::minStress(PressureStress const&, PressureStress const&)") {
         PressureStress const m1{
             4.f * u.pressure, // compressive

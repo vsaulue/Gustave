@@ -65,6 +65,11 @@ namespace gustave::core::model {
         {}
 
         [[nodiscard]]
+        Coord maxCoord() const {
+            return rt.max(rt.max(compression_, shear_), tensile_);
+        }
+
+        [[nodiscard]]
         static Stress minStress(Stress const& m1, Stress const& m2) {
             return {
                 rt.min(m1.compression_, m2.compression_),
