@@ -26,9 +26,11 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
+#include <gustave/examples/jsonGustave/Json.hpp>
 
 namespace gustave::examples::jsonGustave::jsonWorld {
     template<core::cGustave G>
@@ -76,3 +78,27 @@ namespace gustave::examples::jsonGustave::jsonWorld {
         PressureStress maxStress_;
     };
 }
+
+template<gustave::core::cGustave G>
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::jsonWorld::BlockType<G>> {
+    using Float = typename G::RealRep;
+
+    static constexpr auto u = G::units();
+
+    template<auto unit>
+    using Real = typename G::template Real<unit>;
+
+    using PressureStress = typename G::Model::PressureStress;
+    using BlockType = gustave::examples::jsonGustave::jsonWorld::BlockType<G>;
+    using Color = gustave::examples::jsonGustave::Color<Float>;
+
+    [[nodiscard]]
+    static BlockType from_json(nlohmann::json const& json) {
+        static_assert(gustave::core::model::cStress<PressureStress>);
+        auto name = json.at("name").get<std::string>();
+        auto color = json.at("color").get<Color>();
+        auto mass = json.at("mass").get<Real<u.mass>>();
+        auto maxStress = json.at("maxStress").get<PressureStress>();
+        return BlockType{ std::move(name), color, mass, maxStress };
+    }
+};

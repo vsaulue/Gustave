@@ -28,8 +28,10 @@
 #include <cstddef>
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/jsonWorld/BlockConstructionInfo.hpp>
 #include <gustave/examples/jsonGustave/jsonWorld/BlockType.hpp>
 #include <gustave/examples/jsonGustave/jsonWorld/Transaction.hpp>
+#include <gustave/examples/jsonGustave/Json.hpp>
 
 namespace gustave::examples::jsonGustave {
     template<core::cGustave G>
@@ -40,6 +42,8 @@ namespace gustave::examples::jsonGustave {
         using SyncWorld = typename Transaction::SyncWorld;
         using BlockIndex = typename SyncWorld::BlockIndex;
     private:
+        using BlockConstructionInfo = jsonWorld::BlockConstructionInfo<G>;
+
         struct MatHasher {
             using is_transparent = void;
 
@@ -103,6 +107,36 @@ namespace gustave::examples::jsonGustave {
         [[nodiscard]]
         BlockTypeOf const& blockTypeOf() const {
             return blockTypeOf_;
+        }
+
+        [[nodiscard]]
+        static std::unique_ptr<JsonWorld> fromJson(Json const& json) {
+            auto const blockSize = json.at("blockSize").get<Vector3<u.length>>();
+            auto const g = json.at("g").get<Vector3<u.acceleration>>();
+            auto result = std::make_unique<JsonWorld>(blockSize, g);
+            {
+                auto const blockTypes = json.at("blockTypes").get<std::vector<BlockType>>();
+                for (auto const& blockType : blockTypes) {
+                    result->addBlockType(blockType);
+                }
+            }
+            {
+                auto const& bTypes = result->blockTypes();
+                auto const blockInfos = json.at("blocks").get<std::vector<BlockConstructionInfo>>();
+                auto transaction = Transaction{};
+                for (auto const& blockInfo : blockInfos) {
+                    auto const& bTypeIt = bTypes.find(blockInfo.blockTypeName());
+                    if (bTypeIt == bTypes.end()) {
+                        std::stringstream msg;
+                        msg << "blockTypeName '" << blockInfo.blockTypeName() << "' of block " << blockInfo.index();
+                        msg << " isn't present in 'blockTypes'.";
+                        throw std::invalid_argument(msg.str());
+                    }
+                    transaction.addBlock(blockInfo.index(), *bTypeIt, blockInfo.isFoundation());
+                }
+                result->update(transaction);
+            }
+            return std::move(result);
         }
 
         void update(Transaction const& transaction) {

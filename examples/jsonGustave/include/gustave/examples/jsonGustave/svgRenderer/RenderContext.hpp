@@ -115,6 +115,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         explicit RenderContext(JsonWorld const& world, std::ostream& output, Config const& config)
             : jsonWorld_{ world }
             , config_{ config }
+            , output_{ output }
             , limits_{ world.syncWorld() }
             , writer_{ output }
             , groupCount_{ 0 }
@@ -233,6 +234,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
             }
             finalized_ = true;
             writer_.end_svg();
+            output_ << '\n';
         }
 
         void hatchBlock(SyncWorld::BlockReference const& block, svgw::attr_list attrs = { {} }) {
@@ -286,6 +288,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
 
         JsonWorld const& jsonWorld_;
         Config const& config_;
+        std::ostream& output_;
         WorldLimits limits_;
         svgw::writer writer_;
         unsigned groupCount_;

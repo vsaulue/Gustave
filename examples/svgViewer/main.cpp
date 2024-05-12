@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -35,30 +36,54 @@ using G = gustave::distribs::std::strictUnit::Gustave<Float>;
 using JG = gustave::examples::JsonGustave<G>;
 inline constexpr auto u = G::units();
 
-int main() {
-    JG::JsonWorld world{ G::vector3(1.f, 1.f, 1.f, u.length), G::vector3(0.f, -1000.f, 0.f, u.acceleration) };
-    auto const grey = JG::Color{ 0.5f, 0.5f, 0.5f };
-    auto const maxConcreteStress = G::Model::PressureStress{ 20'000'000.f * u.pressure, 14'000'000.f * u.pressure, 2'000'000.f * u.pressure };
-    auto const concrete20m = JG::JsonWorld::BlockType{ "Concrete 20MPa", grey, 2400.f * u.mass, maxConcreteStress };
-    world.addBlockType(concrete20m);
-    {
-        JG::JsonWorld::Transaction transaction;
-        transaction.addBlock({ 0,0,0 }, concrete20m, true);
-        transaction.addBlock({ 0,1,0 }, concrete20m, false);
-        transaction.addBlock({ -1,2,0 }, concrete20m, false);
-        transaction.addBlock({ 0,2,0 }, concrete20m, false);
-        transaction.addBlock({ 1,2,0 }, concrete20m, false);
-        transaction.addBlock({ 2,2,0 }, concrete20m, false);
-        transaction.addBlock({ 2,1,0 }, concrete20m, false);
-        world.update(transaction);
+[[nodiscard]]
+static std::ifstream openFIle(char const* filename) {
+    std::ifstream result;
+    result.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try {
+        result.open(filename);
     }
-    {
-        using Phases = JG::SvgRenderer::Phases;
-        JG::SvgRenderer renderer;
-        renderer.addPhase(Phases::WorldFramePhase{});
-        renderer.addPhase(Phases::BlockTypePhase{});
-        renderer.addPhase(Phases::ContactStressPhase{});
-        renderer.run(world, std::cout);
+    catch (std::system_error const&) {
+        std::stringstream msg;
+        msg << "Could not open '" << filename << "': " << std::error_code{ errno, std::generic_category() }.message() << '.';
+        throw std::invalid_argument(msg.str());
+    }
+    return result;
+}
+
+[[nodiscard]]
+static std::unique_ptr<JG::JsonWorld> parseWorldFile(char const* filename) {
+    std::ifstream inputFile = openFIle(filename);
+    try {
+        auto const json = JG::Json::parse(inputFile);
+        return JG::JsonWorld::fromJson(json);
+    } catch (std::exception const& e) {
+        std::stringstream msg;
+        msg << "Could not parse '" << filename << "': " << e.what();
+        throw std::invalid_argument(msg.str());
+    }
+}
+
+static void doRender(JG::JsonWorld const& world, std::ostream& output) {
+    using Phases = JG::SvgRenderer::Phases;
+    JG::SvgRenderer renderer;
+    renderer.addPhase(Phases::WorldFramePhase{});
+    renderer.addPhase(Phases::BlockTypePhase{});
+    renderer.addPhase(Phases::ContactStressPhase{});
+    renderer.run(world, output);
+}
+
+int main(int argc, char* argv[]) {
+    try {
+        if (argc <= 1) {
+            std::cerr << "[ERROR] Missing <path> to Json file as argument";
+            return 1;
+        }
+        auto const world = parseWorldFile(argv[1]);
+        doRender(*world, std::cout);
+    } catch (std::exception const& e) {
+        std::cerr << "\n[ERROR] " << e.what() << '\n';
+        return 1;
     }
     return 0;
 }

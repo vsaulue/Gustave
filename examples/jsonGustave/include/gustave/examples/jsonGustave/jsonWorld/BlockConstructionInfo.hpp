@@ -25,39 +25,57 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <string>
+#include <utility>
 
 #include <gustave/core/cGustave.hpp>
-#include <gustave/examples/jsonGustave/jsonWorld/BlockType.hpp>
+#include <gustave/examples/jsonGustave/Json.hpp>
 
 namespace gustave::examples::jsonGustave::jsonWorld {
     template<core::cGustave G>
-    class Transaction {
+    class BlockConstructionInfo {
     public:
-        using SyncWorld = typename G::Worlds::SyncWorld;
+        using BlockIndex = typename G::Worlds::SyncWorld::BlockIndex;
 
-        using BlockIndex = typename SyncWorld::BlockIndex;
-        using BlockType = jsonWorld::BlockType<G>;
-        using SyncTransaction = typename SyncWorld::Transaction;
+        [[nodiscard]]
+        explicit BlockConstructionInfo(BlockIndex const& index, std::string blockTypeName, bool isFoundation)
+            : blockTypeName_{ std::move(blockTypeName) }
+            , index_{ index }
+            , isFoundation_{ isFoundation }
+        {}
 
-        using BlockTypeOf = std::unordered_map<BlockIndex, std::string>;
-
-        void addBlock(BlockIndex const& index, BlockType const& blockType, bool isFoundation) {
-            syncTransaction_.addBlock({ index, blockType.maxStress(), blockType.mass(), isFoundation });
-            blockTypeOf_.insert({ index, blockType.name() });
+        [[nodiscard]]
+        std::string const& blockTypeName() const {
+            return blockTypeName_;
         }
 
         [[nodiscard]]
-        SyncTransaction const& syncTransaction() const {
-            return syncTransaction_;
+        BlockIndex const& index() const {
+            return index_;
         }
 
         [[nodiscard]]
-        BlockTypeOf const& blockTypeOf() const {
-            return blockTypeOf_;
+        bool isFoundation() const {
+            return isFoundation_;
         }
     private:
-        SyncTransaction syncTransaction_;
-        BlockTypeOf blockTypeOf_;
+        std::string blockTypeName_;
+        BlockIndex index_;
+        bool isFoundation_;
     };
 }
+
+template<gustave::core::cGustave G>
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::jsonWorld::BlockConstructionInfo<G>> {
+    using BlockConstructionInfo = gustave::examples::jsonGustave::jsonWorld::BlockConstructionInfo<G>;
+
+    using BlockIndex = typename BlockConstructionInfo::BlockIndex;
+
+    [[nodiscard]]
+    static BlockConstructionInfo from_json(nlohmann::json const& json) {
+        auto index = json.at("index").get<BlockIndex>();
+        auto blockTypeName = json.at("blockTypeName").get<std::string>();
+        bool isFoundation = json.at("isFoundation").get<bool>();
+        return BlockConstructionInfo{ index, std::move(blockTypeName), isFoundation };
+    }
+};

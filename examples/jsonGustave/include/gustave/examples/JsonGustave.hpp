@@ -27,6 +27,7 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
+#include <gustave/examples/jsonGustave/Json.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 #include <gustave/examples/jsonGustave/SvgRenderer.hpp>
 
@@ -37,6 +38,7 @@ namespace gustave::examples {
         using Float = typename G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
+        using Json = jsonGustave::Json;
         using JsonWorld = jsonGustave::JsonWorld<G>;
 
         using SvgRenderer = jsonGustave::SvgRenderer<G>;

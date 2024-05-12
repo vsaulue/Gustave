@@ -1,0 +1,174 @@
+{
+    "blockSize": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+    },
+    "g": {
+        "x": 0.0,
+        "y": -10.0,
+        "z": 0.0
+    },
+    "blockTypes": [
+        {
+            "name": "Concrete 20MPa",
+            "color": {
+                "r": 0.5,
+                "g": 0.5,
+                "b": 0.5
+            },
+            "mass": 2400.0,
+            "maxStress": {
+                "compression": 20000000.0,
+                "shear": 14000000.0,
+                "tensile": 2000000.0
+            }
+        }
+    ],
+    "blocks": [
+        {
+            "index": {
+                "x": 0,
+                "y": 3,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": -1,
+                "y": 2,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": 0,
+                "y": 2,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": 1,
+                "y": 2,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": -2,
+                "y": 1,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": -1,
+                "y": 1,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": 1,
+                "y": 1,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": 2,
+                "y": 1,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": false
+        },
+        {
+            "index": {
+                "x": -3,
+                "y": 0,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": true
+        },
+        {
+            "index": {
+                "x": -2,
+                "y": 0,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": true
+        },
+        {
+            "index": {
+                "x": -1,
+                "y": 0,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": true
+        },
+        {
+            "index": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": true
+        },
+        {
+            "index": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": true
+        },
+        {
+            "index": {
+                "x": 2,
+                "y": 0,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": true
+        },
+        {
+            "index": {
+                "x": 3,
+                "y": 0,
+                "z": 0
+            },
+            "blockTypeName": "Concrete 20MPa",
+            "isFoundation": true
+        }
+    ]
+}

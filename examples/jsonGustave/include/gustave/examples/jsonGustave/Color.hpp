@@ -30,14 +30,17 @@
 #include <format>
 #include <string>
 
+#include <gustave/cfg/cRealRep.hpp>
+#include <gustave/examples/jsonGustave/Json.hpp>
+
 namespace gustave::examples::jsonGustave {
-    template<std::floating_point Coord_>
+    template<cfg::cRealRep Coord_>
     class Color;
 
     template<typename T>
     concept cColor = std::same_as<T, Color<typename T::Coord>>;
 
-    template<std::floating_point Coord_>
+    template<cfg::cRealRep Coord_>
     class Color {
     public:
         using Coord = Coord_;
@@ -90,7 +93,7 @@ namespace gustave::examples::jsonGustave {
     private:
         [[nodiscard]]
         static Coord clampCoord(Coord value) {
-            return std::clamp(value, 0.f, 1.f);
+            return std::clamp<Coord>(value, 0.f, 1.f);
         }
 
         [[nodiscard]]
@@ -103,3 +106,16 @@ namespace gustave::examples::jsonGustave {
         Coord b_;
     };
 }
+
+template<gustave::cfg::cRealRep Coord>
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::Color<Coord>> {
+    using Color = gustave::examples::jsonGustave::Color<Coord>;
+
+    [[nodiscard]]
+    static Color from_json(nlohmann::json const& json) {
+        auto const r = json.at("r").get<Coord>();
+        auto const g = json.at("g").get<Coord>();
+        auto const b = json.at("b").get<Coord>();
+        return Color{ r, g, b };
+    }
+};

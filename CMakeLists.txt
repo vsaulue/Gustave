@@ -28,6 +28,7 @@ project ("Gustave" VERSION 0.0.1 LANGUAGES "CXX")
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(Catch2 CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 find_package(svgwrite CONFIG REQUIRED)
 
 add_custom_target(build-tests)
