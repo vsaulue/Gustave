@@ -57,6 +57,9 @@ namespace gustave::core {
             using ForceStress = gustave::core::model::ForceStress<libCfg_>;
             using PressureStress = gustave::core::model::PressureStress<libCfg_>;
             using StressRatio = gustave::core::model::StressRatio<libCfg_>;
+
+            template<cfg::cUnitOf<libCfg_> auto unit>
+            using Stress = gustave::core::model::Stress<libCfg_, unit>;
         };
 
         struct Worlds {
