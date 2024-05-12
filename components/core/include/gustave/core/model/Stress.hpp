@@ -26,6 +26,7 @@
 #pragma once
 
 #include <cassert>
+#include <concepts>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
@@ -34,13 +35,20 @@
 #include <gustave/meta/Meta.hpp>
 
 namespace gustave::core::model {
-    template<cfg::cLibConfig auto libCfg, cfg::cUnitOf<libCfg> auto unit_>
+    template<cfg::cLibConfig auto libCfg_, cfg::cUnitOf<libCfg_> auto unit_>
+    struct Stress;
+
+    template<typename T>
+    concept cStress = std::same_as<T, Stress<T::libCfg(), T::unit()>>;
+
+
+    template<cfg::cLibConfig auto libCfg_, cfg::cUnitOf<libCfg_> auto unit_>
     struct Stress {
     private:
-        static constexpr auto rt = libCfg.realTraits;
+        static constexpr auto rt = libCfg_.realTraits;
 
-        template<cfg::cUnitOf<libCfg> auto rUnit>
-        using Real = cfg::Real<libCfg, rUnit>;
+        template<cfg::cUnitOf<libCfg_> auto rUnit>
+        using Real = cfg::Real<libCfg_, rUnit>;
     public:
         using Coord = Real<unit_>;
         using Unit = decltype(unit_);
@@ -56,13 +64,18 @@ namespace gustave::core::model {
             assert(tensile >= 0.f * unit_);
         }
 
-        template<cfg::cUnitOf<libCfg> auto otherUnit>
+        template<cfg::cUnitOf<libCfg_> auto otherUnit>
         [[nodiscard]]
-        Stress(Stress<libCfg, otherUnit> const& other)
+        Stress(Stress<libCfg_, otherUnit> const& other)
             : compression_{ other.compression() }
             , shear_{ other.shear() }
             , tensile_{ other.tensile() }
         {}
+
+        [[nodiscard]]
+        static constexpr auto libCfg() {
+            return libCfg_;
+        }
 
         [[nodiscard]]
         Coord maxCoord() const {
@@ -78,8 +91,8 @@ namespace gustave::core::model {
             };
         }
 
-        template<cfg::cUnitOf<libCfg> auto otherUnit_>
-        void mergeMax(Stress<libCfg, otherUnit_> const& other) {
+        template<cfg::cUnitOf<libCfg_> auto otherUnit_>
+        void mergeMax(Stress<libCfg_, otherUnit_> const& other) {
             compression_ = rt.max(compression_, other.compression());
             shear_ = rt.max(shear_, other.shear());
             tensile_ = rt.max(tensile_, other.tensile());
@@ -101,36 +114,36 @@ namespace gustave::core::model {
         }
 
         [[nodiscard]]
-        static Unit unit() {
+        static constexpr Unit unit() {
             return unit_;
         }
 
         [[nodiscard]]
         auto operator*(cfg::cReal auto rhs) const {
             constexpr auto rhsUnit = decltype(rhs)::unit();
-            return Stress<libCfg, unit_* rhsUnit>{ compression_ * rhs, shear_ * rhs, tensile_ * rhs };
+            return Stress<libCfg_, unit_* rhsUnit>{ compression_ * rhs, shear_ * rhs, tensile_ * rhs };
         }
 
         [[nodiscard]]
         friend auto operator*(cfg::cReal auto lhs, Stress const& rhs) {
             constexpr auto lhsUnit = decltype(lhs)::unit();
-            return Stress<libCfg, lhsUnit* unit_>{ lhs* rhs.compression_, lhs* rhs.shear_, lhs* rhs.tensile_ };
+            return Stress<libCfg_, lhsUnit* unit_>{ lhs* rhs.compression_, lhs* rhs.shear_, lhs* rhs.tensile_ };
         }
 
-        template<cfg::cUnitOf<libCfg> auto rhsUnit_>
+        template<cfg::cUnitOf<libCfg_> auto rhsUnit_>
         [[nodiscard]]
-        auto operator/(Stress<libCfg, rhsUnit_> const& rhs) const -> Stress<libCfg, unit_ / rhsUnit_> {
+        auto operator/(Stress<libCfg_, rhsUnit_> const& rhs) const -> Stress<libCfg_, unit_ / rhsUnit_> {
             return { compression_ / rhs.compression(), shear_ / rhs.shear(), tensile_ / rhs.tensile() };
         }
 
         [[nodiscard]]
         auto operator/(cfg::cReal auto rhs) const {
-            return Stress<libCfg, unit_ / decltype(rhs)::unit()>{ compression_ / rhs, shear_ / rhs, tensile_ / rhs };
+            return Stress<libCfg_, unit_ / decltype(rhs)::unit()>{ compression_ / rhs, shear_ / rhs, tensile_ / rhs };
         }
 
-        template<cfg::cUnitOf<libCfg> auto otherUnit>
+        template<cfg::cUnitOf<libCfg_> auto otherUnit>
         [[nodiscard]]
-        bool operator==(Stress<libCfg, otherUnit> const& other) const {
+        bool operator==(Stress<libCfg_, otherUnit> const& other) const {
             return compression_ == other.compression()
                 && shear_ == other.shear()
                 && tensile_ == other.tensile();
