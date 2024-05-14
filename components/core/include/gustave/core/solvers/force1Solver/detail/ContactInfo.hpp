@@ -43,6 +43,22 @@ namespace gustave::core::solvers::force1Solver::detail {
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
+        struct ForceStats {
+        public:
+            Real<u.potential> potDelta;
+            Real<u.conductivity> conductivity;
+
+            [[nodiscard]]
+            Real<u.force> force() const {
+                return potDelta * conductivity;
+            }
+
+            [[nodiscard]]
+            Real<u.conductivity> derivative() const {
+                return -conductivity;
+            }
+        };
+
         [[nodiscard]]
         explicit ContactInfo(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.conductivity> cPlus, Real<u.conductivity> cMinus)
             : otherIndex_{ otherIndex }
@@ -55,16 +71,6 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        LinkIndex linkIndex() const {
-            return linkIndex_;
-        }
-
-        [[nodiscard]]
-        NodeIndex otherIndex() const {
-            return otherIndex_;
-        }
-
-        [[nodiscard]]
         Real<u.conductivity> cMinus() const {
             return cMinus_;
         }
@@ -72,6 +78,23 @@ namespace gustave::core::solvers::force1Solver::detail {
         [[nodiscard]]
         Real<u.conductivity> cPlus() const {
             return cPlus_;
+        }
+
+        [[nodiscard]]
+        ForceStats forceStats(Real<u.potential> sourcePotential, Real<u.potential> otherPotential) const {
+            Real<u.potential> const pDelta = otherPotential - sourcePotential;
+            Real<u.conductivity> const conductivity = (pDelta >= 0.f * u.potential) ? cPlus_ : cMinus_;
+            return { pDelta, conductivity };
+        }
+
+        [[nodiscard]]
+        LinkIndex linkIndex() const {
+            return linkIndex_;
+        }
+
+        [[nodiscard]]
+        NodeIndex otherIndex() const {
+            return otherIndex_;
         }
     private:
         NodeIndex otherIndex_;

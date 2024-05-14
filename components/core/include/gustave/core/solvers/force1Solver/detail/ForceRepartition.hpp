@@ -54,6 +54,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         using ContactIndex = typename Structure::ContactIndex;
         using ContactInfo = typename ForceBalancer::ContactInfo;
+        using ContactStats = typename ContactInfo::ForceStats;
         using Link = typename Structure::Link;
         using LinkInfo = typename ForceBalancer::LinkInfo;
         using LocalContactIndex = typename LinkInfo::LocalContactIndex;
@@ -148,22 +149,6 @@ namespace gustave::core::solvers::force1Solver::detail {
         ForceBalancer const& balancer_;
         std::span<Real<u.potential> const> potentials_;
 
-        struct ContactStats {
-        public:
-            Real<u.potential> potDelta;
-            Real<u.conductivity> conductivity;
-
-            [[nodiscard]]
-            Real<u.force> force() const {
-                return potDelta * conductivity;
-            }
-
-            [[nodiscard]]
-            Real<u.conductivity> derivative() const {
-                return -conductivity;
-            }
-        };
-
         [[nodiscard]]
         std::vector<Node> const& nodes() const {
             return balancer_.structure().nodes();
@@ -176,9 +161,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         [[nodiscard]]
         ContactStats contactStatsOf(ContactInfo const& contact, Real<u.potential> const localPotential) const {
-            Real<u.potential> const pDelta = potentials_[contact.otherIndex()] - localPotential;
-            Real<u.conductivity> const conductivity = (pDelta >= 0.f * u.potential) ? contact.cPlus() : contact.cMinus();
-            return { pDelta, conductivity };
+            return contact.forceStats(localPotential, potentials_[contact.otherIndex()]);
         }
     };
 }
