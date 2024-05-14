@@ -162,7 +162,7 @@ namespace gustave::examples::jsonGustave {
         static SyncWorld newWorld(Vector3<u.length> const& blockSize, Vector3<u.acceleration> const& g) {
             using Solver = typename SyncWorld::Solver;
             using Config = typename Solver::Config;
-            auto solverConfig = Config{ g, 0.001f };
+            auto solverConfig = Config{ g, 0.001f, 100000 };
             return SyncWorld{ blockSize, Solver{ solverConfig } };
         }
 
