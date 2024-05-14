@@ -56,10 +56,10 @@ namespace gustave::core::solvers::force1Solver::detail {
             assert(weight > 0.f * u.force);
         }
 
-        LocalContactIndex addContact(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus) {
+        LocalContactIndex addContact(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.conductivity> cPlus, Real<u.conductivity> cMinus) {
             auto const result = contacts.size();
             assert(utils::canNarrow<LocalContactIndex>(result));
-            contacts.emplace_back(otherIndex, linkIndex, rPlus, rMinus);
+            contacts.emplace_back(otherIndex, linkIndex, cPlus, cMinus);
             return result;
         }
 

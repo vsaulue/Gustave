@@ -44,14 +44,14 @@ namespace gustave::core::solvers::force1Solver::detail {
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
         [[nodiscard]]
-        explicit ContactInfo(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.resistance> rPlus, Real<u.resistance> rMinus)
+        explicit ContactInfo(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.conductivity> cPlus, Real<u.conductivity> cMinus)
             : otherIndex_{ otherIndex }
             , linkIndex_{ linkIndex }
-            , rMinus_{ rMinus }
-            , rPlus_{ rPlus }
+            , cMinus_{ cMinus }
+            , cPlus_{ cPlus }
         {
-            assert(rMinus > 0.f * u.resistance);
-            assert(rPlus > 0.f * u.resistance);
+            assert(cMinus > 0.f * u.conductivity);
+            assert(cPlus > 0.f * u.conductivity);
         }
 
         [[nodiscard]]
@@ -65,18 +65,18 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        Real<u.resistance> rMinus() const {
-            return rMinus_;
+        Real<u.conductivity> cMinus() const {
+            return cMinus_;
         }
 
         [[nodiscard]]
-        Real<u.resistance> rPlus() const {
-            return rPlus_;
+        Real<u.conductivity> cPlus() const {
+            return cPlus_;
         }
     private:
         NodeIndex otherIndex_;
         LinkIndex linkIndex_;
-        Real<u.resistance> rMinus_;
-        Real<u.resistance> rPlus_;
+        Real<u.conductivity> cMinus_;
+        Real<u.conductivity> cPlus_;
     };
 }

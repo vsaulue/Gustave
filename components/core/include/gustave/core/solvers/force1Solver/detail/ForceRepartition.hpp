@@ -177,7 +177,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         [[nodiscard]]
         ContactStats contactStatsOf(ContactInfo const& contact, Real<u.potential> const localPotential) const {
             Real<u.potential> const pDelta = potentials_[contact.otherIndex()] - localPotential;
-            Real<u.conductivity> const conductivity = 1.f / ((pDelta >= 0.f * u.potential) ? contact.rPlus() : contact.rMinus());
+            Real<u.conductivity> const conductivity = (pDelta >= 0.f * u.potential) ? contact.cPlus() : contact.cMinus();
             return { pDelta, conductivity };
         }
     };

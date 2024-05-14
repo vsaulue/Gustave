@@ -53,6 +53,14 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         static constexpr auto u = cfg::units(libCfg);
         static constexpr auto rt = libCfg.realTraits;
+
+        using Rep = typename Real<u.one>::Rep;
+        static constexpr auto infConductivity = std::numeric_limits<Rep>::infinity() * u.conductivity;
+
+        struct ConductivityPair {
+            Real<u.conductivity> minus;
+            Real<u.conductivity> plus;
+        };
     public:
         using Structure = solvers::Structure<libCfg>;
 
@@ -84,21 +92,14 @@ namespace gustave::core::solvers::force1Solver::detail {
 
                 NormalizedVector3 const& normal = link.normal();
                 Real<u.one> const nComp = normal.dot(normalizedG_);
-                Real<u.resistance> const tangentResist = rt.sqrt(1.f - nComp * nComp) / link.conductivity().shear();
-                Real<u.resistance> pNormalResist{ utils::NO_INIT };
-                Real<u.resistance> nNormalResist{ utils::NO_INIT };
-                if (nComp <= 0.f) {
-                    pNormalResist = -nComp / link.conductivity().compression();
-                    nNormalResist = -nComp / link.conductivity().tensile();
-                } else {
-                    pNormalResist = nComp / link.conductivity().tensile();
-                    nNormalResist = nComp / link.conductivity().compression();
-                }
-                Real<u.resistance> const pResist = std::max(pNormalResist, tangentResist);
-                Real<u.resistance> const nResist = std::max(nNormalResist, tangentResist);
+                Real<u.conductivity> const tangentCond = tangentConductivity(nComp, link);
+                ConductivityPair const normalCond = normalConductivities(nComp, link);
 
-                LocalContactIndex contact1 = nodeInfos_[id1].addContact(id2, linkId, pResist, nResist);
-                LocalContactIndex contact2 = nodeInfos_[id2].addContact(id1, linkId, nResist, pResist);
+                Real<u.conductivity> const pCond = rt.min(normalCond.plus, tangentCond);
+                Real<u.conductivity> const nCond = rt.min(normalCond.minus, tangentCond);
+
+                LocalContactIndex contact1 = nodeInfos_[id1].addContact(id2, linkId, pCond, nCond);
+                LocalContactIndex contact2 = nodeInfos_[id2].addContact(id1, linkId, nCond, pCond);
                 linkInfos_.push_back(LinkInfo{ contact1, contact2 });
             }
         }
@@ -133,6 +134,30 @@ namespace gustave::core::solvers::force1Solver::detail {
             return nodeInfos_;
         }
     private:
+        [[nodiscard]]
+        static ConductivityPair normalConductivities(Real<u.one> const normalComponent, Link const& link) {
+            if (normalComponent == 0.f) {
+                return { infConductivity, infConductivity };
+            }
+            Real<u.conductivity> const compression = link.conductivity().compression() / normalComponent;
+            Real<u.conductivity> const tensile = link.conductivity().tensile() / normalComponent;
+            if (normalComponent < 0.f) {
+                return { -tensile, -compression };
+            } else {
+                return { compression, tensile };
+            }
+        }
+
+        [[nodiscard]]
+        static Real<u.conductivity> tangentConductivity(Real<u.one> normalComponent, Link const& link) {
+            Real<u.one> const tComp = rt.sqrt(1.f - normalComponent * normalComponent);
+            if (tComp == 0.f) {
+                return infConductivity;
+            } else {
+                return link.conductivity().shear() / tComp;
+            }
+        }
+
         Config const* config_;
         Structure const* structure_;
         std::vector<LinkInfo> linkInfos_;
