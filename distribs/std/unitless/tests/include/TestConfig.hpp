@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <gustave/distribs/std/unitless/Gustave.hpp>
+#include <gustave/distribs/std/unitless/LibConfig.hpp>
 
 // Config
 

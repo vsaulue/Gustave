@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <gustave/distribs/std/strictUnit/Gustave.hpp>
+#include <gustave/distribs/std/strictUnit/LibConfig.hpp>
 
 // Config
 
