@@ -53,11 +53,11 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Structure = typename F1Structure::Structure;
 
         using ContactIndex = typename Structure::ContactIndex;
+        using ContactStats = typename F1Structure::F1Contact::ForceStats;
         using F1Contact = typename F1Structure::F1Contact;
-        using ContactStats = typename F1Contact::ForceStats;
+        using F1Link = typename F1Structure::F1Link;
         using Link = typename Structure::Link;
-        using LinkInfo = typename F1Structure::LinkInfo;
-        using LocalContactIndex = typename LinkInfo::LocalContactIndex;
+        using LocalContactIndex = typename F1Link::LocalContactIndex;
         using Node = typename Structure::Node;
         using NodeInfo = typename F1Structure::NodeInfo;
         using NodeStats = detail::NodeStats<libCfg>;
@@ -128,9 +128,9 @@ namespace gustave::core::solvers::force1Solver::detail {
         [[nodiscard]]
         Real<u.force> forceCoordOnContact(ContactIndex const& index) const {
             Link const& link = fStructure_.structure().links()[index.linkIndex];
-            LinkInfo const& linkInfo = fStructure_.linkInfos()[index.linkIndex];
+            F1Link const& fLink = fStructure_.fLinks()[index.linkIndex];
             NodeIndex const nodeId = index.isOnLocalNode ? link.localNodeId() : link.otherNodeId();
-            LocalContactIndex const localContactId = index.isOnLocalNode ? linkInfo.localContactId : linkInfo.otherContactId;
+            LocalContactIndex const localContactId = index.isOnLocalNode ? fLink.localContactId : fLink.otherContactId;
             F1Contact const& fContact = fStructure_.nodeInfos()[nodeId].contacts[localContactId];
             ContactStats const stats = contactStatsOf(fContact, potentials_[nodeId]);
             return stats.force();

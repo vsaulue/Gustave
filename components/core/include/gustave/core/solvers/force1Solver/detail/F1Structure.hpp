@@ -33,7 +33,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/solvers/Structure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Contact.hpp>
-#include <gustave/core/solvers/force1Solver/detail/LinkInfo.hpp>
+#include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Link.hpp>
 #include <gustave/core/solvers/force1Solver/detail/NodeInfo.hpp>
 #include <gustave/core/solvers/force1Solver/Config.hpp>
 
@@ -66,9 +66,9 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         using Config = force1Solver::Config<libCfg>;
         using F1Contact = f1Structure::F1Contact<libCfg>;
+        using F1Link = f1Structure::F1Link<libCfg>;
         using Link = typename Structure::Link;
-        using LinkInfo = detail::LinkInfo<libCfg>;
-        using LocalContactIndex = typename LinkInfo::LocalContactIndex;
+        using LocalContactIndex = typename F1Link::LocalContactIndex;
         using Node = typename Structure::Node;
         using NodeInfo = detail::NodeInfo<libCfg>;
 
@@ -84,7 +84,7 @@ namespace gustave::core::solvers::force1Solver::detail {
                 nodeInfos_.emplace_back(gNorm * node.mass());
             }
             auto const& links = structure.links();
-            linkInfos_.reserve(links.size());
+            fLinks_.reserve(links.size());
             for (LinkIndex linkId = 0; linkId < links.size(); ++linkId) {
                 Link const& link = links[linkId];
                 NodeIndex const id1 = link.localNodeId();
@@ -100,7 +100,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
                 LocalContactIndex contact1 = nodeInfos_[id1].addContact(id2, linkId, pCond, nCond);
                 LocalContactIndex contact2 = nodeInfos_[id2].addContact(id1, linkId, nCond, pCond);
-                linkInfos_.push_back(LinkInfo{ contact1, contact2 });
+                fLinks_.push_back(F1Link{ contact1, contact2 });
             }
         }
 
@@ -115,8 +115,8 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        std::vector<LinkInfo> const& linkInfos() const {
-            return linkInfos_;
+        std::vector<F1Link> const& fLinks() const {
+            return fLinks_;
         }
 
         [[nodiscard]]
@@ -160,7 +160,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         Config const* config_;
         Structure const* structure_;
-        std::vector<LinkInfo> linkInfos_;
+        std::vector<F1Link> fLinks_;
         std::vector<NodeInfo> nodeInfos_;
         NormalizedVector3 normalizedG_;
 

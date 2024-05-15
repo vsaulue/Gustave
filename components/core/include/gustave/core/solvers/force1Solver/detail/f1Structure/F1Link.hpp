@@ -28,9 +28,9 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace gustave::core::solvers::force1Solver::detail {
+namespace gustave::core::solvers::force1Solver::detail::f1Structure {
     template<cfg::cLibConfig auto libCfg>
-    struct LinkInfo {
+    struct F1Link {
     public:
         using LocalContactIndex = cfg::LinkIndex<libCfg>;
 
