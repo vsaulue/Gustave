@@ -30,7 +30,7 @@
 #include <utility>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/core/solvers/force1Solver/detail/ForceBalancer.hpp>
+#include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/ForceRepartition.hpp>
 #include <gustave/core/solvers/force1Solver/SolutionBasis.hpp>
 
@@ -39,22 +39,22 @@ namespace gustave::core::solvers::force1Solver::detail {
     class SolutionData {
     public:
         using Basis = SolutionBasis<libCfg>;
-        using ForceBalancer = detail::ForceBalancer<libCfg>;
+        using F1Structure = detail::F1Structure<libCfg>;
         using ForceRepartition = detail::ForceRepartition<libCfg>;
 
         [[nodiscard]]
         explicit SolutionData(std::shared_ptr<const Basis>&& basis)
             : basis_{ std::move(basis) }
-            , forceBalancer_{ basis_->structure(), basis_->config() }
+            , fStructure_{ basis_->structure(), basis_->config() }
         {}
 
         [[nodiscard]]
-        explicit SolutionData(std::shared_ptr<const Basis>&& basis, ForceBalancer&& balancer)
+        explicit SolutionData(std::shared_ptr<const Basis>&& basis, F1Structure&& balancer)
             : basis_{ std::move(basis) }
-            , forceBalancer_{ std::move(balancer) }
+            , fStructure_{ std::move(balancer) }
         {
-            assert(&basis_->structure() == &forceBalancer_.structure());
-            assert(&basis_->config() == &forceBalancer_.config());
+            assert(&basis_->structure() == &fStructure_.structure());
+            assert(&basis_->config() == &fStructure_.config());
         }
 
         [[nodiscard]]
@@ -63,16 +63,16 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        ForceBalancer const& forceBalancer() const {
-            return forceBalancer_;
+        F1Structure const& fStructure() const {
+            return fStructure_;
         }
 
         [[nodiscard]]
         ForceRepartition forceRepartition() const {
-            return ForceRepartition{ forceBalancer_, basis_->potentials() };
+            return ForceRepartition{ fStructure_, basis_->potentials() };
         }
     private:
         std::shared_ptr<Basis const> basis_;
-        ForceBalancer forceBalancer_;
+        F1Structure fStructure_;
     };
 }

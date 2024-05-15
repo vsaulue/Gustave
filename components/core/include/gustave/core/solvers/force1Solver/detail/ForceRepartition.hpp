@@ -31,7 +31,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/ForceBalancer.hpp>
+#include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/NodeStats.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
@@ -49,25 +49,25 @@ namespace gustave::core::solvers::force1Solver::detail {
         static constexpr auto u = cfg::units(libCfg);
         static constexpr auto rt = libCfg.realTraits;
     public:
-        using ForceBalancer = detail::ForceBalancer<libCfg>;
-        using Structure = typename ForceBalancer::Structure;
+        using F1Structure = detail::F1Structure<libCfg>;
+        using Structure = typename F1Structure::Structure;
 
         using ContactIndex = typename Structure::ContactIndex;
-        using ContactInfo = typename ForceBalancer::ContactInfo;
+        using ContactInfo = typename F1Structure::ContactInfo;
         using ContactStats = typename ContactInfo::ForceStats;
         using Link = typename Structure::Link;
-        using LinkInfo = typename ForceBalancer::LinkInfo;
+        using LinkInfo = typename F1Structure::LinkInfo;
         using LocalContactIndex = typename LinkInfo::LocalContactIndex;
         using Node = typename Structure::Node;
-        using NodeInfo = typename ForceBalancer::NodeInfo;
+        using NodeInfo = typename F1Structure::NodeInfo;
         using NodeStats = detail::NodeStats<libCfg>;
 
         [[nodiscard]]
-        explicit ForceRepartition(ForceBalancer const& balancer, std::span<Real<u.potential> const> potentials)
-            : balancer_{ balancer }
+        explicit ForceRepartition(F1Structure const& fStructure, std::span<Real<u.potential> const> potentials)
+            : fStructure_{ fStructure }
             , potentials_{ potentials }
         {
-            assert(potentials_.size() == balancer.structure().nodes().size());
+            assert(potentials_.size() == fStructure.structure().nodes().size());
         }
 
         [[nodiscard]]
@@ -127,36 +127,36 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         [[nodiscard]]
         Real<u.force> forceCoordOnContact(ContactIndex const& index) const {
-            Link const& link = balancer_.structure().links()[index.linkIndex];
-            LinkInfo const& linkInfo = balancer_.linkInfos()[index.linkIndex];
+            Link const& link = fStructure_.structure().links()[index.linkIndex];
+            LinkInfo const& linkInfo = fStructure_.linkInfos()[index.linkIndex];
             NodeIndex const nodeId = index.isOnLocalNode ? link.localNodeId() : link.otherNodeId();
             LocalContactIndex const localContactId = index.isOnLocalNode ? linkInfo.localContactId : linkInfo.otherContactId;
-            ContactInfo const& contactInfo = balancer_.nodeInfos()[nodeId].contacts[localContactId];
+            ContactInfo const& contactInfo = fStructure_.nodeInfos()[nodeId].contacts[localContactId];
             ContactStats const stats = contactStatsOf(contactInfo, potentials_[nodeId]);
             return stats.force();
         }
 
         [[nodiscard]]
         Vector3<u.force> forceVector(NodeIndex to, NodeIndex from) const {
-            return forceCoord(to, from) * balancer_.normalizedG();
+            return forceCoord(to, from) * fStructure_.normalizedG();
         }
 
         [[nodiscard]]
         Vector3<u.force> forceVectorOnContact(ContactIndex const& index) const {
-            return forceCoordOnContact(index) * balancer_.normalizedG();
+            return forceCoordOnContact(index) * fStructure_.normalizedG();
         }
     private:
-        ForceBalancer const& balancer_;
+        F1Structure const& fStructure_;
         std::span<Real<u.potential> const> potentials_;
 
         [[nodiscard]]
         std::vector<Node> const& nodes() const {
-            return balancer_.structure().nodes();
+            return fStructure_.structure().nodes();
         }
 
         [[nodiscard]]
         std::vector<NodeInfo> const& nodeInfos() const {
-            return balancer_.nodeInfos();
+            return fStructure_.nodeInfos();
         }
 
         [[nodiscard]]

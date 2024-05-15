@@ -211,7 +211,7 @@ namespace gustave::core::solvers::force1Solver::solution {
 
         [[nodiscard]]
         Vector3<u.force> netForceVector() const {
-            return stats().force() * solution_->forceBalancer().normalizedG();
+            return stats().force() * solution_->fStructure().normalizedG();
         }
 
         [[nodiscard]]
@@ -231,7 +231,7 @@ namespace gustave::core::solvers::force1Solver::solution {
 
         [[nodiscard]]
         Vector3<u.force> weightVector() const {
-            return info().weight * solution_->forceBalancer().normalizedG();
+            return info().weight * solution_->fStructure().normalizedG();
         }
 
         [[nodiscard]]
@@ -239,7 +239,7 @@ namespace gustave::core::solvers::force1Solver::solution {
     private:
         [[nodiscard]]
         NodeInfo const& info() const {
-            return solution_->forceBalancer().nodeInfos()[index_];
+            return solution_->fStructure().nodeInfos()[index_];
         }
 
         [[nodiscard]]

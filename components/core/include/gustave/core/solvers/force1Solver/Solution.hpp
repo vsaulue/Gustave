@@ -30,7 +30,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/ForceBalancer.hpp>
+#include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolutionData.hpp>
 #include <gustave/core/solvers/force1Solver/solution/Contacts.hpp>
 #include <gustave/core/solvers/force1Solver/solution/Nodes.hpp>
@@ -49,7 +49,7 @@ namespace gustave::core::solvers::force1Solver {
 
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
 
-        using ForceBalancer = detail::ForceBalancer<libCfg>;
+        using F1Structure = detail::F1Structure<libCfg>;
         using SolutionData = detail::SolutionData<libCfg>;
 
         static constexpr auto u = cfg::units(libCfg);
@@ -72,8 +72,8 @@ namespace gustave::core::solvers::force1Solver {
         {}
 
         [[nodiscard]]
-        explicit Solution(std::shared_ptr<const Basis> basis, ForceBalancer balancer)
-            : data_{ std::move(basis), std::move(balancer) }
+        explicit Solution(std::shared_ptr<const Basis> basis, F1Structure fStructure)
+            : data_{ std::move(basis), std::move(fStructure) }
         {}
 
         [[nodiscard]]

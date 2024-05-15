@@ -39,7 +39,7 @@
 
 namespace gustave::core::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
-    class ForceBalancer {
+    class F1Structure {
     private:
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -73,7 +73,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         using NodeInfo = detail::NodeInfo<libCfg>;
 
         [[nodiscard]]
-        explicit ForceBalancer(Structure const& structure, Config const& config)
+        explicit F1Structure(Structure const& structure, Config const& config)
             : config_{ &config }
             , structure_{ &structure }
             , normalizedG_{ config_->g() }
