@@ -53,8 +53,8 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Structure = typename F1Structure::Structure;
 
         using ContactIndex = typename Structure::ContactIndex;
-        using ContactInfo = typename F1Structure::ContactInfo;
-        using ContactStats = typename ContactInfo::ForceStats;
+        using F1Contact = typename F1Structure::F1Contact;
+        using ContactStats = typename F1Contact::ForceStats;
         using Link = typename Structure::Link;
         using LinkInfo = typename F1Structure::LinkInfo;
         using LocalContactIndex = typename LinkInfo::LocalContactIndex;
@@ -104,8 +104,8 @@ namespace gustave::core::solvers::force1Solver::detail {
             Real<u.conductivity> derivative = 0.f * u.conductivity;
 
             Real<u.potential> const potential = potentials_[id];
-            for (ContactInfo const& contactInfo : info.contacts) {
-                ContactStats const contactStats = contactStatsOf(contactInfo, potential);
+            for (F1Contact const& fContact : info.contacts) {
+                ContactStats const contactStats = contactStatsOf(fContact, potential);
                 derivative += contactStats.derivative();
                 force += contactStats.force();
             }
@@ -117,9 +117,9 @@ namespace gustave::core::solvers::force1Solver::detail {
             Real<u.force> result = Real<u.force>::zero();
             NodeInfo const& toInfo = nodeInfos()[to];
             Real<u.potential> const toPotential = potentials_[to];
-            for (ContactInfo const& contactInfo : toInfo.contacts) {
-                if (contactInfo.otherIndex() == from) {
-                    result += contactStatsOf(contactInfo, toPotential).force();
+            for (F1Contact const& fContact : toInfo.contacts) {
+                if (fContact.otherIndex() == from) {
+                    result += contactStatsOf(fContact, toPotential).force();
                 }
             }
             return result;
@@ -131,8 +131,8 @@ namespace gustave::core::solvers::force1Solver::detail {
             LinkInfo const& linkInfo = fStructure_.linkInfos()[index.linkIndex];
             NodeIndex const nodeId = index.isOnLocalNode ? link.localNodeId() : link.otherNodeId();
             LocalContactIndex const localContactId = index.isOnLocalNode ? linkInfo.localContactId : linkInfo.otherContactId;
-            ContactInfo const& contactInfo = fStructure_.nodeInfos()[nodeId].contacts[localContactId];
-            ContactStats const stats = contactStatsOf(contactInfo, potentials_[nodeId]);
+            F1Contact const& fContact = fStructure_.nodeInfos()[nodeId].contacts[localContactId];
+            ContactStats const stats = contactStatsOf(fContact, potentials_[nodeId]);
             return stats.force();
         }
 
@@ -160,8 +160,8 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        ContactStats contactStatsOf(ContactInfo const& contact, Real<u.potential> const localPotential) const {
-            return contact.forceStats(localPotential, potentials_[contact.otherIndex()]);
+        ContactStats contactStatsOf(F1Contact const& fContact, Real<u.potential> const localPotential) const {
+            return fContact.forceStats(localPotential, potentials_[fContact.otherIndex()]);
         }
     };
 }

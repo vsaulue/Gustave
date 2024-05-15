@@ -32,7 +32,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/solvers/Structure.hpp>
-#include <gustave/core/solvers/force1Solver/detail/ContactInfo.hpp>
+#include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Contact.hpp>
 #include <gustave/core/solvers/force1Solver/detail/LinkInfo.hpp>
 #include <gustave/core/solvers/force1Solver/detail/NodeInfo.hpp>
 #include <gustave/core/solvers/force1Solver/Config.hpp>
@@ -65,7 +65,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Structure = solvers::Structure<libCfg>;
 
         using Config = force1Solver::Config<libCfg>;
-        using ContactInfo = detail::ContactInfo<libCfg>;
+        using F1Contact = f1Structure::F1Contact<libCfg>;
         using Link = typename Structure::Link;
         using LinkInfo = detail::LinkInfo<libCfg>;
         using LocalContactIndex = typename LinkInfo::LocalContactIndex;

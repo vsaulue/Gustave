@@ -31,9 +31,9 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-namespace gustave::core::solvers::force1Solver::detail {
+namespace gustave::core::solvers::force1Solver::detail::f1Structure {
     template<cfg::cLibConfig auto libCfg>
-    class ContactInfo {
+    class F1Contact {
     private:
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -60,7 +60,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         };
 
         [[nodiscard]]
-        explicit ContactInfo(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.conductivity> cPlus, Real<u.conductivity> cMinus)
+        explicit F1Contact(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.conductivity> cPlus, Real<u.conductivity> cMinus)
             : otherIndex_{ otherIndex }
             , linkIndex_{ linkIndex }
             , cMinus_{ cMinus }

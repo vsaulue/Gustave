@@ -32,7 +32,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/ContactInfo.hpp>
+#include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Contact.hpp>
 #include <gustave/utils/canNarrow.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
@@ -44,10 +44,12 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         static constexpr auto u = cfg::units(libCfg);
     public:
-        using Contacts = std::vector<ContactInfo<libCfg>>;
+        using F1Contact = f1Structure::F1Contact<libCfg>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using LocalContactIndex = LinkIndex;
         using NodeIndex = cfg::NodeIndex<libCfg>;
+
+        using Contacts = std::vector<F1Contact>;
 
         [[nodiscard]]
         explicit NodeInfo(Real<u.force> weight)
