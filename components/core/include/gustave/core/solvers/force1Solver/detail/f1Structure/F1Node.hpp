@@ -35,9 +35,9 @@
 #include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Contact.hpp>
 #include <gustave/utils/canNarrow.hpp>
 
-namespace gustave::core::solvers::force1Solver::detail {
+namespace gustave::core::solvers::force1Solver::detail::f1Structure {
     template<cfg::cLibConfig auto libCfg>
-    class NodeInfo {
+    class F1Node {
     private:
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -52,7 +52,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Contacts = std::vector<F1Contact>;
 
         [[nodiscard]]
-        explicit NodeInfo(Real<u.force> weight)
+        explicit F1Node(Real<u.force> weight)
             : weight{ weight }
         {
             assert(weight > 0.f * u.force);

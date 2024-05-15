@@ -28,7 +28,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/NodeInfo.hpp>
+#include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Node.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
@@ -40,23 +40,23 @@ namespace gustave::core::solvers::force1Solver::detail {
         static constexpr auto u = cfg::units(libCfg);
         static constexpr auto rt = libCfg.realTraits;
     public:
-        using NodeInfo = detail::NodeInfo<libCfg>;
+        using F1Node = f1Structure::F1Node<libCfg>;
 
         [[nodiscard]]
-        explicit NodeStats(NodeInfo const& info, Real<u.force> force, Real<u.conductivity> derivative)
-            : info_{ info }
+        explicit NodeStats(F1Node const& fNode, Real<u.force> force, Real<u.conductivity> derivative)
+            : fNode_{ fNode }
             , force_{ force }
             , derivative_{ derivative }
         {}
 
         [[nodiscard]]
         Real<u.one> relativeError() const {
-            return rt.abs(force_ / info_.weight);
+            return rt.abs(force_ / fNode_.weight);
         }
 
         [[nodiscard]]
-        NodeInfo const& info() const {
-            return info_;
+        F1Node const& fNode() const {
+            return fNode_;
         }
 
         [[nodiscard]]
@@ -69,7 +69,7 @@ namespace gustave::core::solvers::force1Solver::detail {
             return derivative_;
         }
     private:
-        NodeInfo const& info_;
+        F1Node const& fNode_;
         Real<u.force> force_;
         Real<u.conductivity> derivative_;
     };

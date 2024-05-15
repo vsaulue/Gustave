@@ -30,8 +30,6 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/NodeInfo.hpp>
-#include <gustave/core/solvers/force1Solver/detail/NodeStats.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolutionData.hpp>
 #include <gustave/core/solvers/force1Solver/solution/ContactReference.hpp>
 #include <gustave/core/solvers/Structure.hpp>

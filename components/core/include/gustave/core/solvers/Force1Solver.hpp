@@ -167,7 +167,7 @@ namespace gustave::core::solvers {
     private:
         [[nodiscard]]
         static bool isSolvable(F1Structure const& fStructure) {
-            std::vector<bool> reached(fStructure.nodeInfos().size(), false);
+            std::vector<bool> reached(fStructure.fNodes().size(), false);
             std::stack<NodeIndex> remainingIndices;
             std::size_t reachedCount = 0;
             for (std::size_t nodeId = 0; nodeId < reached.size(); ++nodeId) {
@@ -181,7 +181,7 @@ namespace gustave::core::solvers {
             while (!remainingIndices.empty()) {
                 NodeIndex const nodeId = remainingIndices.top();
                 remainingIndices.pop();
-                for (auto const& contactInfo : fStructure.nodeInfos()[nodeId].contacts) {
+                for (auto const& contactInfo : fStructure.fNodes()[nodeId].contacts) {
                     NodeIndex const otherNodeId = contactInfo.otherIndex();
                     if (!reached[otherNodeId]) {
                         reached[otherNodeId] = true;
@@ -190,7 +190,7 @@ namespace gustave::core::solvers {
                     }
                 }
             }
-            return reachedCount == fStructure.nodeInfos().size();
+            return reachedCount == fStructure.fNodes().size();
         }
 
         [[nodiscard]]

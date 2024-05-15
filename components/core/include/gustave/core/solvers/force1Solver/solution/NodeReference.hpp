@@ -30,7 +30,6 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/NodeInfo.hpp>
 #include <gustave/core/solvers/force1Solver/detail/NodeStats.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolutionData.hpp>
 #include <gustave/core/solvers/force1Solver/solution/ContactReference.hpp>
@@ -49,8 +48,8 @@ namespace gustave::core::solvers::force1Solver::solution {
         using SolutionData = detail::SolutionData<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
+        using F1Node = typename SolutionData::F1Structure::F1Node;
         using LinkIndex = cfg::LinkIndex<libCfg>;
-        using NodeInfo = detail::NodeInfo<libCfg>;
         using NodeStats = detail::NodeStats<libCfg>;
         using StructureNode = typename Structure::Node;
         using StructureLink = typename Structure::Link;
@@ -72,7 +71,7 @@ namespace gustave::core::solvers::force1Solver::solution {
         private:
             class Enumerator {
             private:
-                using DataIterator = typename NodeInfo::Contacts::const_iterator;
+                using DataIterator = typename F1Node::Contacts::const_iterator;
             public:
                 [[nodiscard]]
                 Enumerator()
@@ -84,7 +83,7 @@ namespace gustave::core::solvers::force1Solver::solution {
                 [[nodiscard]]
                 explicit Enumerator(NodeReference const& node)
                     : node_{ node }
-                    , dataIterator_{ node.info().contacts.begin() }
+                    , dataIterator_{ node.fNode().contacts.begin() }
                     , value_{ utils::NO_INIT }
                 {
                     updateValue();
@@ -92,7 +91,7 @@ namespace gustave::core::solvers::force1Solver::solution {
 
                 [[nodiscard]]
                 bool isEnd() const {
-                    return dataIterator_ == node_.info().contacts.end();
+                    return dataIterator_ == node_.fNode().contacts.end();
                 }
 
                 void operator++() {
@@ -161,7 +160,7 @@ namespace gustave::core::solvers::force1Solver::solution {
 
             [[nodiscard]]
             std::size_t size() const {
-                return node_.info().contacts.size();
+                return node_.fNode().contacts.size();
             }
         private:
             NodeReference node_;
@@ -226,20 +225,20 @@ namespace gustave::core::solvers::force1Solver::solution {
 
         [[nodiscard]]
         Real<u.force> weight() const {
-            return info().weight;
+            return fNode().weight;
         }
 
         [[nodiscard]]
         Vector3<u.force> weightVector() const {
-            return info().weight * solution_->fStructure().normalizedG();
+            return fNode().weight * solution_->fStructure().normalizedG();
         }
 
         [[nodiscard]]
         bool operator==(NodeReference const&) const = default;
     private:
         [[nodiscard]]
-        NodeInfo const& info() const {
-            return solution_->fStructure().nodeInfos()[index_];
+        F1Node const& fNode() const {
+            return solution_->fStructure().fNodes()[index_];
         }
 
         [[nodiscard]]

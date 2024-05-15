@@ -34,7 +34,7 @@
 #include <gustave/core/solvers/Structure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Contact.hpp>
 #include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Link.hpp>
-#include <gustave/core/solvers/force1Solver/detail/NodeInfo.hpp>
+#include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Node.hpp>
 #include <gustave/core/solvers/force1Solver/Config.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
@@ -67,10 +67,10 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Config = force1Solver::Config<libCfg>;
         using F1Contact = f1Structure::F1Contact<libCfg>;
         using F1Link = f1Structure::F1Link<libCfg>;
+        using F1Node = f1Structure::F1Node<libCfg>;
         using Link = typename Structure::Link;
         using LocalContactIndex = typename F1Link::LocalContactIndex;
         using Node = typename Structure::Node;
-        using NodeInfo = detail::NodeInfo<libCfg>;
 
         [[nodiscard]]
         explicit F1Structure(Structure const& structure, Config const& config)
@@ -79,9 +79,9 @@ namespace gustave::core::solvers::force1Solver::detail {
             , normalizedG_{ config_->g() }
         {
             Real<u.acceleration> const gNorm = g().norm();
-            nodeInfos_.reserve(nodes().size());
+            fNodes_.reserve(nodes().size());
             for (Node const& node : nodes()) {
-                nodeInfos_.emplace_back(gNorm * node.mass());
+                fNodes_.emplace_back(gNorm * node.mass());
             }
             auto const& links = structure.links();
             fLinks_.reserve(links.size());
@@ -98,8 +98,8 @@ namespace gustave::core::solvers::force1Solver::detail {
                 Real<u.conductivity> const pCond = rt.min(normalCond.plus, tangentCond);
                 Real<u.conductivity> const nCond = rt.min(normalCond.minus, tangentCond);
 
-                LocalContactIndex contact1 = nodeInfos_[id1].addContact(id2, linkId, pCond, nCond);
-                LocalContactIndex contact2 = nodeInfos_[id2].addContact(id1, linkId, nCond, pCond);
+                LocalContactIndex contact1 = fNodes_[id1].addContact(id2, linkId, pCond, nCond);
+                LocalContactIndex contact2 = fNodes_[id2].addContact(id1, linkId, nCond, pCond);
                 fLinks_.push_back(F1Link{ contact1, contact2 });
             }
         }
@@ -130,8 +130,8 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        std::vector<NodeInfo> const& nodeInfos() const {
-            return nodeInfos_;
+        std::vector<F1Node> const& fNodes() const {
+            return fNodes_;
         }
     private:
         [[nodiscard]]
@@ -161,7 +161,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         Config const* config_;
         Structure const* structure_;
         std::vector<F1Link> fLinks_;
-        std::vector<NodeInfo> nodeInfos_;
+        std::vector<F1Node> fNodes_;
         NormalizedVector3 normalizedG_;
 
         [[nodiscard]]
