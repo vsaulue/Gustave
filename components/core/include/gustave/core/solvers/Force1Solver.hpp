@@ -61,6 +61,8 @@ namespace gustave::core::solvers {
 
         using F1Structure = force1Solver::detail::F1Structure<libCfg>;
         using ForceRepartition = force1Solver::detail::ForceRepartition<libCfg>;
+
+        using NodeStats = typename ForceRepartition::NodeStats;
     public:
         using Structure = solvers::Structure<libCfg>;
 
@@ -206,18 +208,78 @@ namespace gustave::core::solvers {
 
         [[nodiscard]]
         StepResult runStep(SolvingContext& ctx) const {
-            static constexpr Real<u.one> convergenceFactor = 0.5f;
-            ForceRepartition repartition{ ctx.fStructure, ctx.potentials };
+            Real<u.one> const stepTargetError = 0.75f * config_->targetMaxError();
             Real<u.one> currentMaxError = 0.f;
             for (NodeIndex id = 0; id < ctx.nodes().size(); ++id) {
                 Node const& node = ctx.nodes()[id];
                 if (!node.isFoundation) {
-                    auto const nodeStats = repartition.statsOf(id);
-                    ctx.nextPotentials[id] = ctx.potentials[id] - nodeStats.force() / nodeStats.derivative() * convergenceFactor;
-                    currentMaxError = rt.max(currentMaxError, nodeStats.relativeError());
+                    auto const& fNode = ctx.fStructure.fNodes()[id];
+                    Real<u.force> const nodeForceError = stepTargetError * fNode.weight;
+                    auto const nodeStepResult = runNodeStep(ctx, id, nodeForceError);
+                    ctx.nextPotentials[id] = nodeStepResult.nextPotential;
+                    currentMaxError = rt.max(currentMaxError, nodeStepResult.currentNodeError);
                 }
             }
             return StepResult{ currentMaxError };
+        }
+
+        struct NodeStepResult {
+            Real<u.one> currentNodeError;
+            Real<u.potential> nextPotential;
+        };
+
+        struct NodeStepPoint {
+            Real<u.potential> potential;
+            NodeStats stats;
+
+            [[nodiscard]]
+            Real<u.force> force() const {
+                return stats.force();
+            }
+
+            [[nodiscard]]
+            Real<u.potential> nextPotential() const {
+                return potential - stats.force() / stats.derivative();
+            }
+        };
+
+        NodeStepResult runNodeStep(SolvingContext const& ctx, NodeIndex const nodeId, Real<u.force> maxForceError) const {
+            ForceRepartition const repartition{ ctx.fStructure, ctx.potentials };
+            auto pointAt = [&](Real<u.potential> potential) -> NodeStepPoint {
+                return { potential, repartition.statsOf(nodeId, potential) };
+            };
+            NodeStepPoint curPoint = pointAt(ctx.potentials[nodeId]);
+            Real<u.one> const curMaxError = curPoint.stats.relativeError();
+            if (rt.abs(curPoint.force()) <= maxForceError) {
+                return { curMaxError, curPoint.potential };
+            }
+            NodeStepPoint nextPoint = pointAt(curPoint.nextPotential());
+            if (rt.abs(nextPoint.force()) <= maxForceError) {
+                return { curMaxError, nextPoint.potential };
+            }
+            auto const startSignBit = rt.signBit(curPoint.force());
+            while (rt.signBit(nextPoint.force()) == startSignBit) {
+                curPoint = nextPoint;
+                nextPoint = pointAt(curPoint.nextPotential());
+                assert(curPoint.potential != nextPoint.potential); // float resolution too low ?
+                if (rt.abs(nextPoint.force()) <= maxForceError) {
+                    return { curMaxError, nextPoint.potential };
+                }
+            }
+            do {
+                auto const invDerivative = (nextPoint.potential - curPoint.potential) / (nextPoint.force() - curPoint.force());
+                NodeStepPoint const midPoint = pointAt(curPoint.potential - invDerivative * curPoint.force());
+                assert(midPoint.potential != curPoint.potential);  // float resolution too low ?
+                assert(midPoint.potential != nextPoint.potential); // float resolution too low ?
+                if (rt.abs(midPoint.force()) <= maxForceError) {
+                    return { curMaxError, midPoint.potential };
+                }
+                if (rt.signBit(midPoint.force()) == startSignBit) {
+                    curPoint = midPoint;
+                } else {
+                    nextPoint = midPoint;
+                }
+            } while (true);
         }
 
         std::shared_ptr<Config const> config_;
