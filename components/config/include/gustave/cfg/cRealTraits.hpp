@@ -144,6 +144,7 @@ namespace gustave::cfg {
             length = T::sqrt(length * length);
             area = T::max(length * length, area);
             area = T::min(area, length * length);
+            { T::signBit(area) } -> std::convertible_to<bool>;
         };
     };
 }

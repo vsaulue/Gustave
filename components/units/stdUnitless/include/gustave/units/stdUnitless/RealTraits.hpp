@@ -79,6 +79,11 @@ namespace gustave::units::stdUnitless {
         }
 
         [[nodiscard]]
+        static bool signBit(lib::cReal auto const real) {
+            return std::signbit(real.value());
+        }
+
+        [[nodiscard]]
         constexpr bool operator==(RealTraits const&) const = default;
     };
 }

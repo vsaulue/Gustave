@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <type_traits>
 
 #include <gustave/cfg/cRealRep.hpp>
@@ -78,6 +79,11 @@ namespace gustave::units::stdStrict {
             } else {
                 return rhs;
             }
+        }
+
+        [[nodiscard]]
+        static bool signBit(lib::cReal auto const real) {
+            return std::signbit(real.value());
         }
 
         [[nodiscard]]

@@ -107,6 +107,16 @@ TEST_CASE("RealTraits") {
         }
     }
 
+    SECTION(".signBit()") {
+        SECTION("// negative") {
+            CHECK(rt.signBit(-1.f * u.area));
+        }
+
+        SECTION("// positive") {
+            CHECK_FALSE(rt.signBit(0.5 * u.length));
+        }
+    }
+
     SECTION(".sqrt()") {
         SECTION("// Real<float>") {
             auto value = rt.sqrt(100.f * u.area);
