@@ -57,7 +57,7 @@ namespace gustave::units::stdUnitless {
 
         [[nodiscard]]
         static constexpr auto abs(lib::cReal auto const arg) -> decltype(meta::value(arg)) {
-            return (arg.value() > 0.f) ? arg : -arg;
+            return std::abs(arg.value());
         }
 
         [[nodiscard]]

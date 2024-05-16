@@ -60,7 +60,7 @@ namespace gustave::units::stdStrict {
         template<lib::cReal Arg>
         [[nodiscard]]
         static constexpr Arg abs(Arg const arg) {
-            return (arg.value() > 0.f) ? arg : -arg;
+            return std::abs(arg.value()) * arg.unit();
         }
 
         [[nodiscard]]
