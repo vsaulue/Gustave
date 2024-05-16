@@ -44,19 +44,19 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         [[nodiscard]]
         explicit NodeStats(F1Node const& fNode, Real<u.force> force, Real<u.conductivity> derivative)
-            : fNode_{ fNode }
+            : fNode_{ &fNode }
             , force_{ force }
             , derivative_{ derivative }
         {}
 
         [[nodiscard]]
         Real<u.one> relativeError() const {
-            return rt.abs(force_ / fNode_.weight);
+            return rt.abs(force_ / fNode_->weight);
         }
 
         [[nodiscard]]
         F1Node const& fNode() const {
-            return fNode_;
+            return *fNode_;
         }
 
         [[nodiscard]]
@@ -69,7 +69,7 @@ namespace gustave::core::solvers::force1Solver::detail {
             return derivative_;
         }
     private:
-        F1Node const& fNode_;
+        F1Node const* fNode_;
         Real<u.force> force_;
         Real<u.conductivity> derivative_;
     };
