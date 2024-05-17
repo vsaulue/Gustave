@@ -57,6 +57,11 @@ namespace gustave::core::solvers::force1Solver::detail {
             , nextPotentials(structure.nodes().size(), 0.f * u.potential)
         {}
 
+        [[nodiscard]]
+        Config const& config() const {
+            return fStructure.config();
+        }
+
         F1Structure fStructure;
         IterationIndex iterationIndex;
         std::vector<Real<u.potential>> potentials;

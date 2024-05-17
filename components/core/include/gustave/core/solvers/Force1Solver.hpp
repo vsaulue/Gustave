@@ -36,7 +36,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/ForceRepartition.hpp>
+#include <gustave/core/solvers/force1Solver/detail/BasicStepRunner.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolverRunContext.hpp>
 #include <gustave/core/solvers/force1Solver/Config.hpp>
 #include <gustave/core/solvers/force1Solver/Solution.hpp>
@@ -58,16 +58,15 @@ namespace gustave::core::solvers {
         using NodeIndex = typename cfg::NodeIndex<libCfg>;
         using NormalizedVector3 = typename cfg::NormalizedVector3<libCfg>;
 
-        using ForceRepartition = force1Solver::detail::ForceRepartition<libCfg>;
+        using BasicStepRunner = force1Solver::detail::BasicStepRunner<libCfg>;
         using SolverRunContext = force1Solver::detail::SolverRunContext<libCfg>;
 
+        using BasicStepResult = typename BasicStepRunner::StepResult;
         using F1Structure = typename SolverRunContext::F1Structure;
-        using NodeStats = typename ForceRepartition::NodeStats;
     public:
         using Config = force1Solver::Config<libCfg>;
         using Solution = force1Solver::Solution<libCfg>;
         using Structure = solvers::Structure<libCfg>;
-
 
         using Basis = typename Solution::Basis;
         using IterationIndex = typename SolverRunContext::IterationIndex;
@@ -108,12 +107,6 @@ namespace gustave::core::solvers {
             std::shared_ptr<Solution const> solution_;
         };
 
-    private:
-        struct StepResult {
-            Real<u.one> currentMaxError;
-        };
-    public:
-
         [[nodiscard]]
         explicit Force1Solver(Config const& config)
             : config_{ std::make_shared<Config const>(config) }
@@ -135,9 +128,9 @@ namespace gustave::core::solvers {
             if (!isSolvable(ctx.fStructure)) {
                 return makeInvalidResult(std::move(ctx));
             }
-
+            BasicStepRunner basicRunner{ ctx };
             do {
-                StepResult const stepResult = runStep(ctx);
+                BasicStepResult const stepResult = basicRunner.runStep();
                 if (stepResult.currentMaxError >= config_->targetMaxError()) {
                     ctx.potentials.swap(ctx.nextPotentials);
                     ++ctx.iterationIndex;
@@ -185,83 +178,6 @@ namespace gustave::core::solvers {
         Result makeValidResult(SolverRunContext&& ctx, std::shared_ptr<Structure const>&& structure) const {
             auto basis = std::make_shared<Basis const>(std::move(structure), config_, std::move(ctx.potentials));
             return Result{ ctx.iterationIndex, std::make_shared<Solution const>(std::move(basis), std::move(ctx.fStructure)) };
-        }
-
-        [[nodiscard]]
-        StepResult runStep(SolverRunContext& ctx) const {
-            Real<u.one> const stepTargetError = 0.75f * config_->targetMaxError();
-            Real<u.one> currentMaxError = 0.f;
-            auto const nodes = ctx.fStructure.structure().nodes();
-            for (NodeIndex id = 0; id < nodes.size(); ++id) {
-                Node const& node = nodes[id];
-                if (!node.isFoundation) {
-                    auto const& fNode = ctx.fStructure.fNodes()[id];
-                    Real<u.force> const nodeForceError = stepTargetError * fNode.weight;
-                    auto const nodeStepResult = runNodeStep(ctx, id, nodeForceError);
-                    ctx.nextPotentials[id] = nodeStepResult.nextPotential;
-                    currentMaxError = rt.max(currentMaxError, nodeStepResult.currentNodeError);
-                }
-            }
-            return StepResult{ currentMaxError };
-        }
-
-        struct NodeStepResult {
-            Real<u.one> currentNodeError;
-            Real<u.potential> nextPotential;
-        };
-
-        struct NodeStepPoint {
-            Real<u.potential> potential;
-            NodeStats stats;
-
-            [[nodiscard]]
-            Real<u.force> force() const {
-                return stats.force();
-            }
-
-            [[nodiscard]]
-            Real<u.potential> nextPotential() const {
-                return potential - stats.force() / stats.derivative();
-            }
-        };
-
-        NodeStepResult runNodeStep(SolverRunContext const& ctx, NodeIndex const nodeId, Real<u.force> maxForceError) const {
-            ForceRepartition const repartition{ ctx.fStructure, ctx.potentials };
-            auto pointAt = [&](Real<u.potential> potential) -> NodeStepPoint {
-                return { potential, repartition.statsOf(nodeId, potential) };
-            };
-            NodeStepPoint curPoint = pointAt(ctx.potentials[nodeId]);
-            Real<u.one> const curMaxError = curPoint.stats.relativeError();
-            if (rt.abs(curPoint.force()) <= maxForceError) {
-                return { curMaxError, curPoint.potential };
-            }
-            NodeStepPoint nextPoint = pointAt(curPoint.nextPotential());
-            if (rt.abs(nextPoint.force()) <= maxForceError) {
-                return { curMaxError, nextPoint.potential };
-            }
-            auto const startSignBit = rt.signBit(curPoint.force());
-            while (rt.signBit(nextPoint.force()) == startSignBit) {
-                curPoint = nextPoint;
-                nextPoint = pointAt(curPoint.nextPotential());
-                assert(curPoint.potential != nextPoint.potential); // float resolution too low ?
-                if (rt.abs(nextPoint.force()) <= maxForceError) {
-                    return { curMaxError, nextPoint.potential };
-                }
-            }
-            do {
-                auto const invDerivative = (nextPoint.potential - curPoint.potential) / (nextPoint.force() - curPoint.force());
-                NodeStepPoint const midPoint = pointAt(curPoint.potential - invDerivative * curPoint.force());
-                assert(midPoint.potential != curPoint.potential);  // float resolution too low ?
-                assert(midPoint.potential != nextPoint.potential); // float resolution too low ?
-                if (rt.abs(midPoint.force()) <= maxForceError) {
-                    return { curMaxError, midPoint.potential };
-                }
-                if (rt.signBit(midPoint.force()) == startSignBit) {
-                    curPoint = midPoint;
-                } else {
-                    nextPoint = midPoint;
-                }
-            } while (true);
         }
 
         std::shared_ptr<Config const> config_;
