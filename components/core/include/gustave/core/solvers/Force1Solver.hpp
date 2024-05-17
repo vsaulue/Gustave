@@ -36,11 +36,10 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/ForceRepartition.hpp>
+#include <gustave/core/solvers/force1Solver/detail/SolverRunContext.hpp>
 #include <gustave/core/solvers/force1Solver/Config.hpp>
 #include <gustave/core/solvers/force1Solver/Solution.hpp>
-#include <gustave/core/solvers/force1Solver/SolutionBasis.hpp>
 #include <gustave/core/solvers/Structure.hpp>
 
 namespace gustave::core::solvers {
@@ -59,18 +58,20 @@ namespace gustave::core::solvers {
         using NodeIndex = typename cfg::NodeIndex<libCfg>;
         using NormalizedVector3 = typename cfg::NormalizedVector3<libCfg>;
 
-        using F1Structure = force1Solver::detail::F1Structure<libCfg>;
         using ForceRepartition = force1Solver::detail::ForceRepartition<libCfg>;
+        using SolverRunContext = force1Solver::detail::SolverRunContext<libCfg>;
 
+        using F1Structure = typename SolverRunContext::F1Structure;
         using NodeStats = typename ForceRepartition::NodeStats;
     public:
+        using Config = force1Solver::Config<libCfg>;
+        using Solution = force1Solver::Solution<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
-        using Basis = force1Solver::SolutionBasis<libCfg>;
-        using Config = force1Solver::Config<libCfg>;
-        using IterationIndex = std::uint64_t;
+
+        using Basis = typename Solution::Basis;
+        using IterationIndex = typename SolverRunContext::IterationIndex;
         using Node = typename Structure::Node;
-        using Solution = force1Solver::Solution<libCfg>;
 
         class Result {
         public:
@@ -108,26 +109,6 @@ namespace gustave::core::solvers {
         };
 
     private:
-        struct SolvingContext {
-            [[nodiscard]]
-            explicit SolvingContext(Structure const& structure, Config const& config)
-                : fStructure{ structure, config }
-                , iterationIndex{ 0 }
-                , potentials(structure.nodes().size(), 0.f * u.potential)
-                , nextPotentials(structure.nodes().size(), 0.f * u.potential)
-            {}
-
-            [[nodiscard]]
-            std::vector<Node> const& nodes() const {
-                return fStructure.structure().nodes();
-            }
-
-            F1Structure fStructure;
-            IterationIndex iterationIndex;
-            std::vector<Real<u.potential>> potentials;
-            std::vector<Real<u.potential>> nextPotentials;
-        };
-
         struct StepResult {
             Real<u.one> currentMaxError;
         };
@@ -150,7 +131,7 @@ namespace gustave::core::solvers {
             if (structure == nullptr) {
                 throw std::logic_error("Unexpected null pointer for argument 'structure'.");
             }
-            SolvingContext ctx{ *structure, *config_ };
+            SolverRunContext ctx{ *structure, *config_ };
             if (!isSolvable(ctx.fStructure)) {
                 return makeInvalidResult(std::move(ctx));
             }
@@ -196,22 +177,23 @@ namespace gustave::core::solvers {
         }
 
         [[nodiscard]]
-        Result makeInvalidResult(SolvingContext&& ctx) const {
+        Result makeInvalidResult(SolverRunContext&& ctx) const {
             return Result{ ctx.iterationIndex, nullptr };
         }
 
         [[nodiscard]]
-        Result makeValidResult(SolvingContext&& ctx, std::shared_ptr<Structure const>&& structure) const {
+        Result makeValidResult(SolverRunContext&& ctx, std::shared_ptr<Structure const>&& structure) const {
             auto basis = std::make_shared<Basis const>(std::move(structure), config_, std::move(ctx.potentials));
             return Result{ ctx.iterationIndex, std::make_shared<Solution const>(std::move(basis), std::move(ctx.fStructure)) };
         }
 
         [[nodiscard]]
-        StepResult runStep(SolvingContext& ctx) const {
+        StepResult runStep(SolverRunContext& ctx) const {
             Real<u.one> const stepTargetError = 0.75f * config_->targetMaxError();
             Real<u.one> currentMaxError = 0.f;
-            for (NodeIndex id = 0; id < ctx.nodes().size(); ++id) {
-                Node const& node = ctx.nodes()[id];
+            auto const nodes = ctx.fStructure.structure().nodes();
+            for (NodeIndex id = 0; id < nodes.size(); ++id) {
+                Node const& node = nodes[id];
                 if (!node.isFoundation) {
                     auto const& fNode = ctx.fStructure.fNodes()[id];
                     Real<u.force> const nodeForceError = stepTargetError * fNode.weight;
@@ -243,7 +225,7 @@ namespace gustave::core::solvers {
             }
         };
 
-        NodeStepResult runNodeStep(SolvingContext const& ctx, NodeIndex const nodeId, Real<u.force> maxForceError) const {
+        NodeStepResult runNodeStep(SolverRunContext const& ctx, NodeIndex const nodeId, Real<u.force> maxForceError) const {
             ForceRepartition const repartition{ ctx.fStructure, ctx.potentials };
             auto pointAt = [&](Real<u.potential> potential) -> NodeStepPoint {
                 return { potential, repartition.statsOf(nodeId, potential) };
