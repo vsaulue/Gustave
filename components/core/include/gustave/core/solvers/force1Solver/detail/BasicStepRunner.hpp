@@ -104,9 +104,6 @@ namespace gustave::core::solvers::force1Solver::detail {
             };
             NodeStepPoint curPoint = pointAt(ctx_.potentials[nodeId]);
             Real<u.one> const curMaxError = curPoint.stats.relativeError();
-            if (rt.abs(curPoint.force()) <= maxForceError) {
-                return { curMaxError, curPoint.potential };
-            }
             NodeStepPoint nextPoint = pointAt(curPoint.nextPotential());
             if (rt.abs(nextPoint.force()) <= maxForceError) {
                 return { curMaxError, nextPoint.potential };
