@@ -31,7 +31,7 @@
 #include <gustave/distribs/std/strictUnit/Gustave.hpp>
 #include <gustave/examples/JsonGustave.hpp>
 
-using Float = float;
+using Float = double;
 using G = gustave::distribs::std::strictUnit::Gustave<Float>;
 using JG = gustave::examples::JsonGustave<G>;
 inline constexpr auto u = G::units();
