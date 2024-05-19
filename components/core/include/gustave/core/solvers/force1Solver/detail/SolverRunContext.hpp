@@ -32,6 +32,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
+#include <gustave/core/solvers/force1Solver/detail/LayerStructure.hpp>
 #include <gustave/core/solvers/force1Solver/Config.hpp>
 #include <gustave/core/solvers/Structure.hpp>
 
@@ -47,11 +48,13 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Config = force1Solver::Config<libCfg>;
         using F1Structure = detail::F1Structure<libCfg>;
         using IterationIndex = std::uint64_t;
+        using LayerStructure = detail::LayerStructure<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
         [[nodiscard]]
         explicit SolverRunContext(Structure const& structure, Config const& config)
             : fStructure{ structure, config }
+            , lStructure{ fStructure }
             , iterationIndex{ 0 }
             , potentials(structure.nodes().size(), 0.f * u.potential)
             , nextPotentials(structure.nodes().size(), 0.f * u.potential)
@@ -63,6 +66,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         F1Structure fStructure;
+        LayerStructure lStructure;
         IterationIndex iterationIndex;
         std::vector<Real<u.potential>> potentials;
         std::vector<Real<u.potential>> nextPotentials;
