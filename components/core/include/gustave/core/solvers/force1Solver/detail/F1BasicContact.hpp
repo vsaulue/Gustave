@@ -31,63 +31,70 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 
-#include <gustave/core/solvers/force1Solver/detail/F1BasicContact.hpp>
-
-namespace gustave::core::solvers::force1Solver::detail::f1Structure {
+namespace gustave::core::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
-    class F1Contact {
+    class F1BasicContact {
     private:
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
 
         static constexpr auto u = cfg::units(libCfg);
     public:
-        using F1BasicContact = detail::F1BasicContact<libCfg>;
-
-        using ForceStats = typename F1BasicContact::ForceStats;
-        using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
-        [[nodiscard]]
-        explicit F1Contact(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.conductivity> cPlus, Real<u.conductivity> cMinus)
-            : basicContact_{ otherIndex, cPlus, cMinus }
-            , linkIndex_{ linkIndex }
-        {}
+        struct ForceStats {
+        public:
+            Real<u.potential> potDelta;
+            Real<u.conductivity> conductivity;
+
+            [[nodiscard]]
+            Real<u.force> force() const {
+                return potDelta * conductivity;
+            }
+
+            [[nodiscard]]
+            Real<u.conductivity> derivative() const {
+                return -conductivity;
+            }
+        };
 
         [[nodiscard]]
-        F1BasicContact const& basicContact() const {
-            return basicContact_;
+        explicit F1BasicContact(NodeIndex otherIndex, Real<u.conductivity> cPlus, Real<u.conductivity> cMinus)
+            : cMinus_{ cMinus }
+            , cPlus_{ cPlus }
+            , otherIndex_{ otherIndex }
+        {
+            assert(cMinus > 0.f * u.conductivity);
+            assert(cPlus > 0.f * u.conductivity);
         }
 
         [[nodiscard]]
         Real<u.conductivity> cMinus() const {
-            return basicContact_.cMinus();
+            return cMinus_;
         }
 
         [[nodiscard]]
         Real<u.conductivity> cPlus() const {
-            return basicContact_.cPlus();
+            return cPlus_;
         }
 
         [[nodiscard]]
         ForceStats forceStats(Real<u.potential> sourcePotential, Real<u.potential> otherPotential) const {
-            return basicContact_.forceStats(sourcePotential, otherPotential);
-        }
-
-        [[nodiscard]]
-        LinkIndex linkIndex() const {
-            return linkIndex_;
+            Real<u.potential> const pDelta = otherPotential - sourcePotential;
+            Real<u.conductivity> const conductivity = (pDelta >= 0.f * u.potential) ? cPlus_ : cMinus_;
+            return { pDelta, conductivity };
         }
 
         [[nodiscard]]
         NodeIndex otherIndex() const {
-            return basicContact_.otherIndex();
+            return otherIndex_;
         }
 
         [[nodiscard]]
-        bool operator==(F1Contact const&) const = default;
+        bool operator==(F1BasicContact const&) const = default;
     private:
-        F1BasicContact basicContact_;
-        LinkIndex linkIndex_;
+        Real<u.conductivity> cMinus_;
+        Real<u.conductivity> cPlus_;
+        NodeIndex otherIndex_;
     };
 }
