@@ -29,7 +29,6 @@
 #include <cassert>
 #include <cstdint>
 #include <memory>
-#include <stack>
 #include <utility>
 #include <vector>
 
@@ -127,7 +126,7 @@ namespace gustave::core::solvers {
                 throw std::logic_error("Unexpected null pointer for argument 'structure'.");
             }
             SolverRunContext ctx{ *structure, *config_ };
-            if (!isSolvable(ctx.fStructure)) {
+            if (!isSolvable(ctx)) {
                 return makeInvalidResult(std::move(ctx));
             }
             BasicStepRunner basicRunner{ ctx };
@@ -147,31 +146,8 @@ namespace gustave::core::solvers {
         }
     private:
         [[nodiscard]]
-        static bool isSolvable(F1Structure const& fStructure) {
-            std::vector<bool> reached(fStructure.fNodes().size(), false);
-            std::stack<NodeIndex> remainingIndices;
-            std::size_t reachedCount = 0;
-            for (std::size_t nodeId = 0; nodeId < reached.size(); ++nodeId) {
-                Node const& node = fStructure.structure().nodes()[nodeId];
-                if (node.isFoundation) {
-                    ++reachedCount;
-                    reached[nodeId] = true;
-                    remainingIndices.push(nodeId);
-                }
-            }
-            while (!remainingIndices.empty()) {
-                NodeIndex const nodeId = remainingIndices.top();
-                remainingIndices.pop();
-                for (auto const& contactInfo : fStructure.fNodes()[nodeId].contacts) {
-                    NodeIndex const otherNodeId = contactInfo.otherIndex();
-                    if (!reached[otherNodeId]) {
-                        reached[otherNodeId] = true;
-                        ++reachedCount;
-                        remainingIndices.push(otherNodeId);
-                    }
-                }
-            }
-            return reachedCount == fStructure.fNodes().size();
+        static bool isSolvable(SolverRunContext const& ctx) {
+            return ctx.lStructure.reachedCount() == ctx.fStructure.fNodes().size();
         }
 
         [[nodiscard]]
