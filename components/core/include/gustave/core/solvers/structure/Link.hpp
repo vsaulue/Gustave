@@ -49,10 +49,15 @@ namespace gustave::core::solvers::structure {
 
         [[nodiscard]]
         explicit Link(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Real<u.area> area, Real<u.length> thickness, PressureStress const& maxPressureStress)
+            : Link{ id1, id2, normal, (area / thickness) * maxPressureStress }
+        {}
+
+        [[nodiscard]]
+        explicit Link(NodeIndex id1, NodeIndex id2, NormalizedVector3 const& normal, Conductivity const& conductivity)
             : localNodeId_{ id1 }
             , otherNodeId_{ id2 }
             , normal_{ normal }
-            , conductivity_{ (area / thickness) * maxPressureStress }
+            , conductivity_{ conductivity }
         {
             assert(id1 != id2);
             assert(conductivity_.compression() > 0.f * u.conductivity);
