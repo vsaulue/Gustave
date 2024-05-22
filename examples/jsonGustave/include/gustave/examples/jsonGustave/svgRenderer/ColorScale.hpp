@@ -64,6 +64,21 @@ namespace gustave::examples::jsonGustave::svgRenderer {
             }
             return pointIt->colorAfter;
         }
+
+        [[nodiscard]]
+        static ColorScale defaultStressScale() {
+            auto const green = Color{ 0.f, 1.f, 0.f };
+            auto const yellow = Color{ 1.f, 1.f, 0.f };
+            auto const orange = Color{ 1.f, 0.5f, 0.f };
+            auto const red = Color{ 1.f, 0.f, 0.f };
+            auto const brown = Color{ 0.1f, 0.f, 0.f };
+            return ColorScale{ std::vector<ColorPoint>{
+                { 0.f, green, green },
+                { 0.5f, yellow, yellow },
+                { 1.f, orange, red },
+                { 4.f, brown, brown },
+            } };
+        }
     private:
         void throwIfIndicesInvalid() const {
             if (colorPoints_.size() == 0) {

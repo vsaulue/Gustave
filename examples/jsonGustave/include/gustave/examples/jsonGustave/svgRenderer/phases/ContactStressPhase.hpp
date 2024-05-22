@@ -55,7 +55,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         ContactStressPhase()
             : strokeWidth_{ 1.f }
             , strokeColor_{ 1.f, 1.f , 1.f }
-            , colorScale_{ defaultColors() }
+            , colorScale_{ ColorScale::defaultStressScale() }
         {}
 
         [[nodiscard]]
@@ -84,21 +84,6 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             ctx.endGroup();
         }
     private:
-        [[nodiscard]]
-        static std::vector<ColorPoint> defaultColors() {
-            auto const green = Color{ 0.f, 1.f, 0.f };
-            auto const yellow = Color{ 1.f, 1.f, 0.f };
-            auto const orange = Color{ 1.f, 0.5f, 0.f };
-            auto const red = Color{ 1.f, 0.f, 0.f };
-            auto const brown = Color{ 0.1f, 0.f, 0.f };
-            return {
-                { 0.f, green, green },
-                { 0.5f, yellow, yellow },
-                { 1.f, orange, red },
-                { 4.f, brown, brown },
-            };
-        }
-
         [[nodiscard]]
         static Real<u.force> maxForce(RenderContext& ctx) {
             auto result = Real<u.force>::zero();
