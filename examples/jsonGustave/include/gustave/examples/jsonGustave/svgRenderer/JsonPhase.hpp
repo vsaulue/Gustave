@@ -27,6 +27,7 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockTypePhase.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/phases/BlockStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/ContactStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/WorldFramePhase.hpp>
@@ -45,6 +46,7 @@ template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::JsonPhase<G>> {
     using JsonPhase = gustave::examples::jsonGustave::svgRenderer::JsonPhase<G>;
 
+    using BlockStressPhase = gustave::examples::jsonGustave::svgRenderer::phases::BlockStressPhase<G>;
     using BlockTypePhase = gustave::examples::jsonGustave::svgRenderer::phases::BlockTypePhase<G>;
     using ContactStressPhase = gustave::examples::jsonGustave::svgRenderer::phases::ContactStressPhase<G>;
     using WorldFramePhase = gustave::examples::jsonGustave::svgRenderer::phases::WorldFramePhase<G>;
@@ -74,6 +76,7 @@ private:
     static std::unordered_map<std::string, PhaseMaker> initNameToFactory() {
         std::unordered_map<std::string, PhaseMaker> result;
         result["blockType"] = makePhase<BlockTypePhase>;
+        result["blockStress"] = makePhase<BlockStressPhase>;
         result["contactStress"] = makePhase<ContactStressPhase>;
         result["worldFrame"] = makePhase<WorldFramePhase>;
         return result;

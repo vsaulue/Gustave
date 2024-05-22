@@ -31,6 +31,7 @@
 #include <utility>
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/phases/BlockStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockTypePhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/ContactStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
@@ -62,6 +63,7 @@ namespace gustave::examples::jsonGustave {
         {}
 
         struct Phases {
+            using BlockStressPhase = gustave::examples::jsonGustave::svgRenderer::phases::BlockStressPhase<G>;
             using BlockTypePhase = svgRenderer::phases::BlockTypePhase<G>;
             using ContactStressPhase = svgRenderer::phases::ContactStressPhase<G>;
             using WorldFramePhase = svgRenderer::phases::WorldFramePhase<G>;
