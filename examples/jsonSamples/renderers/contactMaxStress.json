@@ -21,7 +21,7 @@
             "type": "contactStress",
             "arrowBorderWidth": 1.0,
             "arrowBorderColor": { "r": 1.0, "g":  1.0, "b":  1.0 },
-            "colorScale": [
+            "stressColorScale": [
                 {
                     "index": 0.0,
                     "colorBefore": { "r": 0.0, "g":  1.0, "b":  0.0 },

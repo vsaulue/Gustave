@@ -55,14 +55,14 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         ContactStressPhase()
             : strokeWidth_{ 1.f }
             , strokeColor_{ 1.f, 1.f , 1.f }
-            , colorScale_{ ColorScale::defaultStressScale() }
+            , stressColors_{ ColorScale::defaultStressScale() }
         {}
 
         [[nodiscard]]
-        explicit ContactStressPhase(Float strokeWidth, Color const& strokeColor, ColorScale colorScale)
+        explicit ContactStressPhase(Float strokeWidth, Color const& strokeColor, ColorScale stressColors)
             : strokeWidth_{ strokeWidth }
             , strokeColor_{ strokeColor }
-            , colorScale_{ std::move(colorScale) }
+            , stressColors_{ std::move(stressColors) }
         {}
 
         virtual void run(RenderContext& ctx) const override {
@@ -72,7 +72,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             for (auto const& contact : ctx.world().syncWorld().links()) {
                 auto const stressRatio = contact.stressRatio();
                 auto const stressFactor = stressRatio.maxCoord();
-                auto const color = colorScale_.colorAt(stressFactor.value()).svgCode();
+                auto const color = stressColors_.colorAt(stressFactor.value()).svgCode();
                 auto const forceVector = contact.forceVector();
                 auto const lengthFactor = (forceVector.norm() / mForce).value();
                 if (forceVector.dot(g) > 0.f * u.force) {
@@ -95,7 +95,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
 
         Float strokeWidth_;
         Color strokeColor_;
-        ColorScale colorScale_;
+        ColorScale stressColors_;
     };
 }
 
@@ -111,7 +111,7 @@ struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::pha
     static ContactStressPhase from_json(nlohmann::json const& json) {
         Float const strokeWidth = json.at("arrowBorderWidth").get<Float>();
         Color const strokeColor = json.at("arrowBorderColor").get<Color>();
-        auto colorScale = json.at("colorScale").get<ColorScale>();
+        auto colorScale = json.at("stressColorScale").get<ColorScale>();
         return ContactStressPhase{ strokeWidth, strokeColor, std::move(colorScale) };
     }
 };
