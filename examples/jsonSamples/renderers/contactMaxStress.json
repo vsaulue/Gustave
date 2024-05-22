@@ -1,0 +1,48 @@
+{
+    "config": {
+        "arrowLineFactor": 0.5,
+        "arrowTriangleFactor": 0.1875,
+        "spaceResolution": 32.0
+    },
+    "phases": [
+        {
+            "type": "worldFrame",
+            "frameColor": { "r": 0.0, "g":  0.0, "b":  0.0 },
+            "frameWidth": 1.0
+        },
+        {
+            "type": "blockType",
+            "blockBorderColor": { "r": 0.0, "g":  0.0, "b":  0.0 },
+            "blockBorderWidth": 1.0,
+            "foundationHatchColor": { "r": 0.0, "g":  0.0, "b":  0.0 },
+            "foundationHatchWidth": 2.0
+        },
+        {
+            "type": "contactStress",
+            "arrowBorderWidth": 1.0,
+            "arrowBorderColor": { "r": 1.0, "g":  1.0, "b":  1.0 },
+            "colorScale": [
+                {
+                    "index": 0.0,
+                    "colorBefore": { "r": 0.0, "g":  1.0, "b":  0.0 },
+                    "colorAfter": { "r": 0.0, "g":  1.0, "b":  0.0 }
+                },
+                {
+                    "index": 0.5,
+                    "colorBefore": { "r": 1.0, "g":  1.0, "b":  0.0 },
+                    "colorAfter": { "r": 1.0, "g":  1.0, "b":  0.0 }
+                },
+                {
+                    "index": 1.0,
+                    "colorBefore": { "r": 1.0, "g":  0.4, "b":  0.0 },
+                    "colorAfter": { "r": 1.0, "g":  0.0, "b":  0.0 }
+                },
+                {
+                    "index": 4.0,
+                    "colorBefore": { "r": 0.0, "g":  0.0, "b":  0.0 },
+                    "colorAfter": { "r": 0.0, "g":  0.0, "b":  0.0 }
+                }
+            ]
+        }
+    ]
+}

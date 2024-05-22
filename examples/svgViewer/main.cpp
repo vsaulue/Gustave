@@ -23,10 +23,13 @@
  * SOFTWARE.
  */
 
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <string_view>
+
+#include <CLI/CLI.hpp>
 
 #include <gustave/distribs/std/strictUnit/Gustave.hpp>
 #include <gustave/examples/JsonGustave.hpp>
@@ -36,12 +39,26 @@ using G = gustave::distribs::std::strictUnit::Gustave<Float>;
 using JG = gustave::examples::JsonGustave<G>;
 inline constexpr auto u = G::units();
 
+struct Arguments {
+    std::string inputWorldFileName;
+    std::optional<std::string> rendererFileName;
+};
+
+static void initArgumentsParser(CLI::App& parser, Arguments& output) {
+    CLI::Option* input = parser.add_option("-i,--input-world,input-world", output.inputWorldFileName, "Input file containing the JSON world");
+    input->required();
+
+    parser.add_option("-r,--renderer", output.rendererFileName, "Input file describing the SVG renderer");
+
+    parser.validate_positionals();
+}
+
 [[nodiscard]]
-static std::ifstream openFIle(char const* filename) {
+static std::ifstream openFile(std::string_view filename) {
     std::ifstream result;
     result.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
-        result.open(filename);
+        result.open(filename.data());
     }
     catch (std::system_error const&) {
         std::stringstream msg;
@@ -52,38 +69,64 @@ static std::ifstream openFIle(char const* filename) {
 }
 
 [[nodiscard]]
-static std::unique_ptr<JG::JsonWorld> parseWorldFile(char const* filename) {
-    std::ifstream inputFile = openFIle(filename);
+static std::unique_ptr<JG::JsonWorld> parseWorldFile(std::string_view fileName) {
+    std::ifstream inputFile = openFile(fileName);
     try {
         auto const json = JG::Json::parse(inputFile);
         return JG::JsonWorld::fromJson(json);
     } catch (std::exception const& e) {
         std::stringstream msg;
-        msg << "Could not parse '" << filename << "': " << e.what();
+        msg << "Could not parse '" << fileName << "': " << e.what();
         throw std::invalid_argument(msg.str());
     }
 }
 
-static void doRender(JG::JsonWorld const& world, std::ostream& output) {
-    using Phases = JG::SvgRenderer::Phases;
-    JG::SvgRenderer renderer;
-    renderer.addPhase(Phases::WorldFramePhase{});
-    renderer.addPhase(Phases::BlockTypePhase{});
-    renderer.addPhase(Phases::ContactStressPhase{});
-    renderer.run(world, output);
+[[nodiscard]]
+static JG::SvgRenderer makeRenderer(std::optional<std::string> const& fileName) {
+    if (fileName) {
+        std::ifstream inputFile = openFile(*fileName);
+        try {
+            auto const json = JG::Json::parse(inputFile);
+            return json.get<JG::SvgRenderer>();
+        } catch (std::exception const& e) {
+            std::stringstream msg;
+            msg << "Could not parse '" << *fileName << "': " << e.what();
+            throw std::invalid_argument(msg.str());
+        }
+    } else {
+        // default renderer
+        using Phases = JG::SvgRenderer::Phases;
+        JG::SvgRenderer result;
+        result.addPhase(Phases::WorldFramePhase{});
+        result.addPhase(Phases::BlockTypePhase{});
+        result.addPhase(Phases::ContactStressPhase{});
+        return result;
+    }
 }
 
 int main(int argc, char* argv[]) {
+    CLI::App argsParser{ "Gustave's SVG viewer." };
     try {
-        if (argc <= 1) {
-            std::cerr << "[ERROR] Missing <path> to Json file as argument";
-            return 1;
+        Arguments args;
+        initArgumentsParser(argsParser, args);
+        argsParser.parse(argc, argv);
+        auto const world = parseWorldFile(args.inputWorldFileName);
+        auto const renderer = makeRenderer(args.rendererFileName);
+        renderer.run(*world, std::cout);
+        return EXIT_SUCCESS;
+    } catch (CLI::ParseError const& e) {
+        if (e.get_name() == "CallForHelp") {
+            std::cout << argsParser.help();
+            return EXIT_SUCCESS;
         }
-        auto const world = parseWorldFile(argv[1]);
-        doRender(*world, std::cout);
+        if (e.get_name() == "CallForAllHelp") {
+            std::cout << argsParser.help("", CLI::AppFormatMode::All);
+            return EXIT_SUCCESS;
+        }
+        std::cerr << "[ERROR] " << e.what() << '\n';
+        return EXIT_FAILURE;
     } catch (std::exception const& e) {
-        std::cerr << "\n[ERROR] " << e.what() << '\n';
-        return 1;
+        std::cerr << "[ERROR] " << e.what() << '\n';
+        return EXIT_FAILURE;
     }
-    return 0;
 }

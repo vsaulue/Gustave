@@ -29,6 +29,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
+#include <gustave/examples/jsonGustave/Json.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::phases {
     template<core::cGustave G>
@@ -50,7 +51,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             , frameWidth_{ frameWidth }
         {
             if (frameWidth_ < 0.f) {
-                throw invalidWidthError("frameWidth", frameWidth_);
+                throw Phase<G>::invalidWidthError("frameWidth", frameWidth_);
             }
         }
 
@@ -62,3 +63,18 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         Float frameWidth_;
     };
 }
+
+template<gustave::core::cGustave G>
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::phases::WorldFramePhase<G>> {
+    using WorldFramePhase = gustave::examples::jsonGustave::svgRenderer::phases::WorldFramePhase<G>;
+
+    using Color = typename WorldFramePhase::Color;
+    using Float = typename WorldFramePhase::Float;
+
+    [[nodiscard]]
+    static WorldFramePhase from_json(nlohmann::json const& json) {
+        Color const frameColor = json.at("frameColor").get<Color>();
+        Float const frameWidth = json.at("frameWidth").get<Float>();
+        return WorldFramePhase{ frameColor, frameWidth };
+    }
+};

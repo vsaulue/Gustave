@@ -26,9 +26,9 @@ add_executable(svgViewer
     "main.cpp"
 )
 target_link_libraries(svgViewer
+    PRIVATE CLI11::CLI11
     PRIVATE Distrib-Std-StrictUnit
     PRIVATE Examples-JsonWorld
-    PRIVATE svgwrite::svgwrite
 )
 target_compile_options(svgViewer
     PUBLIC ${test_compile_options}

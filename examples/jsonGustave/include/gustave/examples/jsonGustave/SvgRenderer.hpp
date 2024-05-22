@@ -35,6 +35,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/phases/ContactStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/WorldFramePhase.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/JsonPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 #include <gustave/meta/Meta.hpp>
@@ -47,6 +48,7 @@ namespace gustave::examples::jsonGustave {
         using RenderContext = svgRenderer::RenderContext<G>;
     public:
         using Config = svgRenderer::Config<Float>;
+        using JsonPhase = svgRenderer::JsonPhase<G>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
         using Phase = svgRenderer::phases::Phase<G>;
 
@@ -70,6 +72,10 @@ namespace gustave::examples::jsonGustave {
             phases_.push_back(std::make_unique<DerivedPhase>(phase));
         }
 
+        void addPhase(std::unique_ptr<Phase> phase) {
+            phases_.push_back(std::move(phase));
+        }
+
         void run(JsonWorld const& world, std::ostream& output) const {
             RenderContext ctx{ world, output, config_ };
             for (auto const& phase : phases_) {
@@ -82,3 +88,22 @@ namespace gustave::examples::jsonGustave {
         std::vector<std::unique_ptr<Phase>> phases_;
     };
 }
+
+template<gustave::core::cGustave G>
+struct nlohmann::adl_serializer<typename gustave::examples::jsonGustave::SvgRenderer<G>> {
+    using SvgRenderer = gustave::examples::jsonGustave::SvgRenderer<G>;
+
+    using Config = typename SvgRenderer::Config;
+    using JsonPhase = typename SvgRenderer::JsonPhase;
+
+    [[nodiscard]]
+    static SvgRenderer from_json(nlohmann::json const& json) {
+        auto const config = json.at("config").get<Config>();
+        auto jsonPhases = json.at("phases").get<std::vector<JsonPhase>>();
+        SvgRenderer result{ config };
+        for (auto& jsonPhase : jsonPhases) {
+            result.addPhase(std::move(jsonPhase.ptr));
+        }
+        return result;
+    }
+};

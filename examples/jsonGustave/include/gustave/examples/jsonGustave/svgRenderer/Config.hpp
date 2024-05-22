@@ -25,13 +25,14 @@
 
 #pragma once
 
-#include <concepts>
 #include <stdexcept>
 #include <sstream>
 #include <string_view>
 
+#include <gustave/cfg/cRealRep.hpp>
+
 namespace gustave::examples::jsonGustave::svgRenderer {
-    template<std::floating_point Float_>
+    template<cfg::cRealRep Float_>
     class Config {
     public:
         using Float = Float_;
@@ -96,3 +97,14 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         Float spaceRes_;
     };
 }
+
+template<gustave::cfg::cRealRep Float>
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::Config<Float>> {
+    using Config = gustave::examples::jsonGustave::svgRenderer::Config<Float>;
+
+    static void from_json(nlohmann::json const& json, Config& config) {
+        config.setArrowLineFactor(json.at("arrowLineFactor").get<Float>());
+        config.setArrowTriangleFactor(json.at("arrowTriangleFactor").get<Float>());
+        config.setSpaceRes(json.at("spaceResolution").get<Float>());
+    }
+};

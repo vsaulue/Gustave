@@ -27,8 +27,11 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/ColorPoint.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
+#include <gustave/examples/jsonGustave/Json.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::phases {
     template<core::cGustave G>
@@ -44,29 +47,23 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     public:
         using Float = typename G::RealRep;
         using Color = jsonGustave::Color<Float>;
+        using ColorPoint = svgRenderer::ColorPoint<Float>;
+        using ColorScale = svgRenderer::ColorScale<Float>;
         using RenderContext = svgRenderer::RenderContext<G>;
-
-        struct ColorPoint {
-            Float stressValue;
-            Color colorBefore;
-            Color colorAfter;
-        };
 
         [[nodiscard]]
         ContactStressPhase()
             : strokeWidth_{ 1.f }
             , strokeColor_{ 1.f, 1.f , 1.f }
-            , colors_{ defaultColors() }
+            , colorScale_{ defaultColors() }
         {}
 
         [[nodiscard]]
-        explicit ContactStressPhase(Float strokeWidth, Color const& strokeColor, std::vector<ColorPoint> colorPalette)
+        explicit ContactStressPhase(Float strokeWidth, Color const& strokeColor, ColorScale colorScale)
             : strokeWidth_{ strokeWidth }
             , strokeColor_{ strokeColor }
-            , colors_{ std::move(colorPalette) }
-        {
-            throwIfColorsInvalid();
-        }
+            , colorScale_{ std::move(colorScale) }
+        {}
 
         virtual void run(RenderContext& ctx) const override {
             auto const mForce = maxForce(ctx);
@@ -75,13 +72,12 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             for (auto const& contact : ctx.world().syncWorld().links()) {
                 auto const stressRatio = contact.stressRatio();
                 auto const stressFactor = stressRatio.maxCoord();
-                auto const color = colorOfStress(stressFactor.value());
+                auto const color = colorScale_.colorAt(stressFactor.value()).svgCode();
                 auto const forceVector = contact.forceVector();
                 auto const lengthFactor = (forceVector.norm() / mForce).value();
                 if (forceVector.dot(g) > 0.f * u.force) {
                     ctx.drawContactArrow(contact, lengthFactor, { {"fill",color} });
-                }
-                else {
+                } else {
                     ctx.drawContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
                 }
             }
@@ -104,25 +100,6 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         }
 
         [[nodiscard]]
-        std::string colorOfStress(Float stress) const {
-            auto pointIt = colors_.begin();
-            if (stress <= pointIt->stressValue) {
-                return pointIt->colorBefore.svgCode();
-            }
-            auto nextIt = pointIt + 1;
-            while (nextIt != colors_.end()) {
-                if (stress <= nextIt->stressValue) {
-                    auto relDelta = (stress - pointIt->stressValue) / (nextIt->stressValue - pointIt->stressValue);
-                    auto color = (1.f - relDelta) * pointIt->colorAfter + relDelta * nextIt->colorBefore;
-                    return color.svgCode();
-                }
-                ++pointIt;
-                ++nextIt;
-            }
-            return pointIt->colorAfter.svgCode();
-        }
-
-        [[nodiscard]]
         static Real<u.force> maxForce(RenderContext& ctx) {
             auto result = Real<u.force>::zero();
             for (auto const& contact : ctx.world().syncWorld().links()) {
@@ -131,24 +108,25 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             return result;
         }
 
-        void throwIfColorsInvalid() const {
-            if (colors_.size() == 0) {
-                throw std::invalid_argument("Invalid colorPalette: cannot be empty.");
-            }
-            for (std::size_t i = 0; 1 + i < colors_.size(); ++i) {
-                auto const stress1 = colors_[i].stressValue;
-                auto const stress2 = colors_[i + 1].stressValue;
-                if (stress1 >= stress2) {
-                    std::stringstream msg;
-                    msg << "Invalid colorPalette: must be in sorted in strictly increasing values of '.stressValue' ( colors[";
-                    msg << i << "] = " << stress1 << "; colors[" << i + 1 << "] = " << stress2 << ").";
-                    throw std::invalid_argument(msg.str());
-                }
-            }
-        }
-
         Float strokeWidth_;
         Color strokeColor_;
-        std::vector<ColorPoint> colors_;
+        ColorScale colorScale_;
     };
 }
+
+template<gustave::core::cGustave G>
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::phases::ContactStressPhase<G>> {
+    using ContactStressPhase = gustave::examples::jsonGustave::svgRenderer::phases::ContactStressPhase<G>;
+
+    using Color = typename ContactStressPhase::Color;
+    using ColorScale = typename ContactStressPhase::ColorScale;
+    using Float = typename ContactStressPhase::Float;
+
+    [[nodiscard]]
+    static ContactStressPhase from_json(nlohmann::json const& json) {
+        Float const strokeWidth = json.at("arrowBorderWidth").get<Float>();
+        Color const strokeColor = json.at("arrowBorderColor").get<Color>();
+        auto colorScale = json.at("colorScale").get<ColorScale>();
+        return ContactStressPhase{ strokeWidth, strokeColor, std::move(colorScale) };
+    }
+};

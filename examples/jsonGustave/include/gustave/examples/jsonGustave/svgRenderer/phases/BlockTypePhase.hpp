@@ -28,6 +28,7 @@
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
+#include <gustave/examples/jsonGustave/Json.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::phases {
     template<core::cGustave G>
@@ -54,10 +55,10 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             , foundationHatchWidth_{ foundationHatchWidth }
         {
             if (blockBorderWidth_ < 0.f) {
-                throw invalidWidthError("blockBorderWidth", blockBorderWidth_);
+                throw Phase<G>::invalidWidthError("blockBorderWidth", blockBorderWidth_);
             }
             if (foundationHatchWidth_ < 0.f) {
-                throw invalidWidthError("foundationHatchWidth", foundationHatchWidth_);
+                throw Phase<G>::invalidWidthError("foundationHatchWidth", foundationHatchWidth_);
             }
         }
 
@@ -80,3 +81,20 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         Float foundationHatchWidth_;
     };
 }
+
+template<gustave::core::cGustave G>
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::phases::BlockTypePhase<G>> {
+    using BlockTypePhase = gustave::examples::jsonGustave::svgRenderer::phases::BlockTypePhase<G>;
+
+    using Color = typename BlockTypePhase::Color;
+    using Float = typename BlockTypePhase::Float;
+
+    [[nodiscard]]
+    static BlockTypePhase from_json(nlohmann::json const& json) {
+        Color const blockBorderColor = json.at("blockBorderColor").get<Color>();
+        Float const blockBorderWidth = json.at("blockBorderWidth").get<Float>();
+        Color const foundationHatchColor = json.at("foundationHatchColor").get<Color>();
+        Float const foundationHatchWidth = json.at("foundationHatchWidth").get<Float>();
+        return BlockTypePhase{ blockBorderColor, blockBorderWidth, foundationHatchColor, foundationHatchWidth };
+    }
+};
