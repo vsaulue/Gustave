@@ -29,6 +29,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
+#include <gustave/examples/jsonGustave/StressCoord.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
 
@@ -38,6 +39,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     public:
         using Float = typename G::RealRep;
         using RenderContext = svgRenderer::RenderContext<G>;
+        using StressCoord = jsonGustave::StressCoord;
 
         using Color = jsonGustave::Color<Float>;
         using ColorScale = svgRenderer::ColorScale<Float>;
@@ -48,6 +50,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             , foundationHatchColor_{ 0.f, 0.f, 0.f }
             , blockBorderWidth_{ 1.f }
             , foundationHatchWidth_{ 2.f }
+            , stressCoord_{ StressCoord::Id::max }
             , stressColors_{ ColorScale::defaultStressScale() }
         {}
 
@@ -57,12 +60,14 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             Float blockBorderWidth,
             Color const& foundationHatchColor,
             Float foundationHatchWidth,
+            StressCoord stressCoord,
             ColorScale stressColors
         )
             : blockBorderColor_{ blockBorderColor }
             , foundationHatchColor_{ foundationHatchColor }
             , blockBorderWidth_{ blockBorderWidth }
             , foundationHatchWidth_{ foundationHatchWidth }
+            , stressCoord_{ stressCoord }
             , stressColors_{ std::move(stressColors) }
         {}
 
@@ -70,8 +75,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             ctx.startGroup({ {"stroke", blockBorderColor_.svgCode()}, {"stroke-width", blockBorderWidth_} });
             auto const hatchColorCode = foundationHatchColor_.svgCode();
             for (auto const& block : ctx.world().syncWorld().blocks()) {
-                auto const maxStress = block.stressRatio().maxCoord().value();
-                auto const svgColor = stressColors_.colorAt(maxStress).svgCode();
+                auto const stress = stressCoord_.extract(block.stressRatio()).value();
+                auto const svgColor = stressColors_.colorAt(stress).svgCode();
                 ctx.drawBlock(block, { {"fill", svgColor } });
                 if (block.isFoundation()) {
                     ctx.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", foundationHatchWidth_} });
@@ -84,6 +89,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         Color foundationHatchColor_;
         Float blockBorderWidth_;
         Float foundationHatchWidth_;
+        StressCoord stressCoord_;
         ColorScale stressColors_;
     };
 }
@@ -95,6 +101,7 @@ struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::pha
     using Color = typename BlockStressPhase::Color;
     using ColorScale = typename BlockStressPhase::ColorScale;
     using Float = typename BlockStressPhase::Float;
+    using StressCoord = typename BlockStressPhase::StressCoord;
 
     [[nodiscard]]
     static BlockStressPhase from_json(nlohmann::json const& json) {
@@ -102,7 +109,8 @@ struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::pha
         Float const borderWidth = json.at("blockBorderWidth").get<Float>();
         Color const hatchColor = json.at("foundationHatchColor").get<Color>();
         Float const hatchWidth = json.at("foundationHatchWidth").get<Float>();
+        StressCoord const stressCoord = json.at("stressCoord").get<StressCoord>();
         auto colorScale = json.at("stressColorScale").get<ColorScale>();
-        return BlockStressPhase{ borderColor, borderWidth, hatchColor, hatchWidth, std::move(colorScale) };
+        return BlockStressPhase{ borderColor, borderWidth, hatchColor, hatchWidth, stressCoord, std::move(colorScale) };
     }
 };

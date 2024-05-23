@@ -16,7 +16,7 @@
             "blockBorderWidth": 1.0,
             "foundationHatchColor": { "r": 0.0, "g":  0.0, "b":  0.0 },
             "foundationHatchWidth": 2.0,
-            "stressCoord": "max",
+            "stressCoord": "tensile",
             "stressColorScale": [
                 {
                     "index": 0.0,
