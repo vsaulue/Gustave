@@ -66,7 +66,7 @@ namespace gustave::math3d {
             std::string msg = "Invalid BasicDirection : ";
             msg += static_cast<int>(id_);
             msg += '.';
-            throw msg;
+            return msg;
         }
 
         [[nodiscard]]
