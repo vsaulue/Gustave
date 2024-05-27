@@ -27,7 +27,7 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
 
@@ -40,7 +40,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Color = jsonGustave::Color<Float>;
         using Config = typename Phase<G>::Config;
         using JsonWorld = typename Phase<G>::JsonWorld;
-        using RenderContext = svgRenderer::RenderContext<G>;
+        using SvgCanvas = svgRenderer::SvgCanvas<G>;
         using PhaseContext = typename Phase<G>::PhaseContext;
 
         class WorldFramePhaseContext : public PhaseContext {
@@ -51,8 +51,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 , phase_{ phase }
             {}
 
-            void render(RenderContext& ctx) const override {
-                ctx.drawWorldFrame({ {"fill-opacity",0.f}, {"stroke", phase_.frameColor_.svgCode()},{"stroke-width", phase_.frameWidth_} });
+            void render(SvgCanvas& canvas) const override {
+                canvas.drawWorldFrame({ {"fill-opacity",0.f}, {"stroke", phase_.frameColor_.svgCode()},{"stroke-width", phase_.frameWidth_} });
             }
         private:
             WorldFramePhase const& phase_;

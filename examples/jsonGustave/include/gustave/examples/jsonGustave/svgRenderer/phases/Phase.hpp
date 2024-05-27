@@ -30,7 +30,7 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::phases {
@@ -41,7 +41,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
 
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
-        using RenderContext = svgRenderer::RenderContext<G>;
+        using SvgCanvas = svgRenderer::SvgCanvas<G>;
 
         class PhaseContext {
         public:
@@ -52,7 +52,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             {}
 
             virtual ~PhaseContext() = default;
-            virtual void render(RenderContext& ctx) const = 0;
+            virtual void render(SvgCanvas& canvas) const = 0;
         protected:
             Config const& config_;
             JsonWorld const& world_;

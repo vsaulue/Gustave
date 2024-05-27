@@ -33,7 +33,7 @@
 
 namespace gustave::examples::jsonGustave::svgRenderer {
     template<core::cGustave G>
-    class RenderContext {
+    class SvgCanvas {
     public:
         using Float = typename G::RealRep;
 
@@ -112,7 +112,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         };
     public:
         [[nodiscard]]
-        explicit RenderContext(JsonWorld const& world, std::ostream& output, Config const& config)
+        explicit SvgCanvas(JsonWorld const& world, std::ostream& output, Config const& config)
             : jsonWorld_{ world }
             , config_{ config }
             , output_{ output }
@@ -131,8 +131,8 @@ namespace gustave::examples::jsonGustave::svgRenderer {
             writer_.start_svg(worldFrameWidth(), worldFrameHeight());
         }
 
-        RenderContext(RenderContext const&) = delete;
-        RenderContext(RenderContext&&) = delete;
+        SvgCanvas(SvgCanvas const&) = delete;
+        SvgCanvas(SvgCanvas&&) = delete;
 
         void drawBlock(SyncWorld::BlockReference const& block, svgw::attr_list attrs = { {} }) {
             throwIfFinalized();
@@ -270,7 +270,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
 
         void throwIfFinalized() const {
             if (finalized_) {
-                throw std::logic_error("SvgRenderContext finalized twice.");
+                throw std::logic_error("SvgCanvas finalized twice.");
             }
         }
 

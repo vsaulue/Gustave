@@ -29,7 +29,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorPoint.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
 
@@ -53,7 +53,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Config = typename Phase<G>::Config;
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
-        using RenderContext = svgRenderer::RenderContext<G>;
+        using SvgCanvas = svgRenderer::SvgCanvas<G>;
 
         class ContactStressPhaseContext : public PhaseContext {
         public:
@@ -63,23 +63,23 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 , phase_{ phase }
             {}
 
-            void render(RenderContext& ctx) const override {
-                auto const mForce = maxForce(ctx);
-                auto const g = NormalizedVector3{ ctx.world().syncWorld().g() };
-                ctx.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
-                for (auto const& contact : ctx.world().syncWorld().links()) {
+            void render(SvgCanvas& canvas) const override {
+                auto const mForce = maxForce(canvas);
+                auto const g = NormalizedVector3{ canvas.world().syncWorld().g() };
+                canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
+                for (auto const& contact : canvas.world().syncWorld().links()) {
                     auto const stressFactor = contact.stressRatio().maxCoord();
                     auto const color = phase_.stressColors_.colorAt(stressFactor.value()).svgCode();
                     auto const forceVector = contact.forceVector();
                     auto const lengthFactor = (forceVector.norm() / mForce).value();
                     if (forceVector.dot(g) > 0.f * u.force) {
-                        ctx.drawContactArrow(contact, lengthFactor, { {"fill",color} });
+                        canvas.drawContactArrow(contact, lengthFactor, { {"fill",color} });
                     }
                     else {
-                        ctx.drawContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
+                        canvas.drawContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
                     }
                 }
-                ctx.endGroup();
+                canvas.endGroup();
             }
         private:
             ContactStressPhase const& phase_;
@@ -105,9 +105,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         }
     private:
         [[nodiscard]]
-        static Real<u.force> maxForce(RenderContext& ctx) {
+        static Real<u.force> maxForce(SvgCanvas& canvas) {
             auto result = Real<u.force>::zero();
-            for (auto const& contact : ctx.world().syncWorld().links()) {
+            for (auto const& contact : canvas.world().syncWorld().links()) {
                 result = rt.max(result, contact.forceVector().norm());
             }
             return result;

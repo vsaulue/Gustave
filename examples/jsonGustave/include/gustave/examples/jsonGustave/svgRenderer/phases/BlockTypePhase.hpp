@@ -27,6 +27,7 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
 
@@ -39,7 +40,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Color = jsonGustave::Color<Float>;
         using Config = typename Phase<G>::Config;
         using JsonWorld = typename Phase<G>::JsonWorld;
-        using RenderContext = svgRenderer::RenderContext<G>;
+        using SvgCanvas = svgRenderer::SvgCanvas<G>;
         using PhaseContext = typename Phase<G>::PhaseContext;
 
         class BlockTypePhaseContext : public PhaseContext {
@@ -50,17 +51,17 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 , phase_{ phase }
             {}
 
-            void render(RenderContext& ctx) const override {
-                ctx.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
+            void render(SvgCanvas& canvas) const override {
+                canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
                 auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
-                for (auto const& block : ctx.world().syncWorld().blocks()) {
-                    auto const svgColor = ctx.world().blockTypeOf().at(block.index())->color().svgCode();
-                    ctx.drawBlock(block, { {"fill", svgColor } });
+                for (auto const& block : this->world_.syncWorld().blocks()) {
+                    auto const svgColor = this->world_.blockTypeOf().at(block.index())->color().svgCode();
+                    canvas.drawBlock(block, { {"fill", svgColor } });
                     if (block.isFoundation()) {
-                        ctx.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_} });
+                        canvas.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_} });
                     }
                 }
-                ctx.endGroup();
+                canvas.endGroup();
             }
         private:
             BlockTypePhase const& phase_;

@@ -37,7 +37,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/WorldFramePhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/JsonPhase.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 #include <gustave/meta/Meta.hpp>
 
@@ -46,7 +46,7 @@ namespace gustave::examples::jsonGustave {
     class SvgRenderer {
     private:
         using Float = typename G::RealRep;
-        using RenderContext = svgRenderer::RenderContext<G>;
+        using SvgCanvas = svgRenderer::SvgCanvas<G>;
     public:
         using Config = svgRenderer::Config<Float>;
         using JsonPhase = svgRenderer::JsonPhase<G>;
@@ -85,11 +85,11 @@ namespace gustave::examples::jsonGustave {
             for (auto const& phase : phases_) {
                 phaseContexts.emplace_back(phase->makeContext(config_, world));
             }
-            RenderContext ctx{ world, output, config_ };
+            SvgCanvas canvas{ world, output, config_ };
             for (auto const& phaseCtx : phaseContexts) {
-                phaseCtx->render(ctx);
+                phaseCtx->render(canvas);
             }
-            ctx.finalize();
+            canvas.finalize();
         }
     private:
         Config config_;

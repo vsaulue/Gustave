@@ -28,7 +28,7 @@
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/StressCoord.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
@@ -44,7 +44,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using ColorScale = svgRenderer::ColorScale<Float>;
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
-        using RenderContext = svgRenderer::RenderContext<G>;
+        using SvgCanvas = svgRenderer::SvgCanvas<G>;
         using StressCoord = jsonGustave::StressCoord;
 
         class BlockStressPhaseContext : public PhaseContext {
@@ -55,18 +55,18 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 , phase_{ phase }
             {}
 
-            void render(RenderContext& ctx) const override {
-                ctx.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
+            void render(SvgCanvas& canvas) const override {
+                canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
                 auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
-                for (auto const& block : ctx.world().syncWorld().blocks()) {
+                for (auto const& block : this->world_.syncWorld().blocks()) {
                     auto const stress = phase_.stressCoord_.extract(block.stressRatio()).value();
                     auto const svgColor = phase_.stressColors_.colorAt(stress).svgCode();
-                    ctx.drawBlock(block, { {"fill", svgColor } });
+                    canvas.drawBlock(block, { {"fill", svgColor } });
                     if (block.isFoundation()) {
-                        ctx.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_}});
+                        canvas.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_}});
                     }
                 }
-                ctx.endGroup();
+                canvas.endGroup();
             }
         private:
             BlockStressPhase const& phase_;
