@@ -29,17 +29,39 @@
 #include <string_view>
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/RenderContext.hpp>
+#include <gustave/examples/jsonGustave/JsonWorld.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::phases {
     template<core::cGustave G>
     class Phase {
     public:
         using Float = typename G::RealRep;
+
+        using Config = svgRenderer::Config<Float>;
+        using JsonWorld = jsonGustave::JsonWorld<G>;
         using RenderContext = svgRenderer::RenderContext<G>;
 
+        class PhaseContext {
+        public:
+            [[nodiscard]]
+            explicit PhaseContext(Config const& config, JsonWorld const& world)
+                : config_{ config }
+                , world_{ world }
+            {}
+
+            virtual ~PhaseContext() = default;
+            virtual void render(RenderContext& ctx) const = 0;
+        protected:
+            Config const& config_;
+            JsonWorld const& world_;
+        };
+
         virtual ~Phase() = default;
-        virtual void run(RenderContext& ctx) const = 0;
+
+        [[nodiscard]]
+        virtual std::unique_ptr<PhaseContext> makeContext(Config const& config, JsonWorld const& world) const = 0;
     protected:
         [[nodiscard]]
         static std::invalid_argument invalidWidthError(std::string_view fieldName, Float value) {

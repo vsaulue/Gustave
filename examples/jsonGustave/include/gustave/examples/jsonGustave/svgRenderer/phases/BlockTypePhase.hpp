@@ -37,7 +37,34 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Float = typename G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
+        using Config = typename Phase<G>::Config;
+        using JsonWorld = typename Phase<G>::JsonWorld;
         using RenderContext = svgRenderer::RenderContext<G>;
+        using PhaseContext = typename Phase<G>::PhaseContext;
+
+        class BlockTypePhaseContext : public PhaseContext {
+        public:
+            [[nodiscard]]
+            explicit BlockTypePhaseContext(Config const& config, JsonWorld const& world, BlockTypePhase const& phase)
+                : PhaseContext{ config, world }
+                , phase_{ phase }
+            {}
+
+            void render(RenderContext& ctx) const override {
+                ctx.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
+                auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
+                for (auto const& block : ctx.world().syncWorld().blocks()) {
+                    auto const svgColor = ctx.world().blockTypeOf().at(block.index())->color().svgCode();
+                    ctx.drawBlock(block, { {"fill", svgColor } });
+                    if (block.isFoundation()) {
+                        ctx.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_} });
+                    }
+                }
+                ctx.endGroup();
+            }
+        private:
+            BlockTypePhase const& phase_;
+        };
 
         [[nodiscard]]
         BlockTypePhase()
@@ -62,17 +89,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             }
         }
 
-        virtual void run(RenderContext& ctx) const override {
-            ctx.startGroup({ {"stroke",blockBorderColor_.svgCode()}, {"stroke-width", blockBorderWidth_} });
-            auto const hatchColorCode = foundationHatchColor_.svgCode();
-            for (auto const& block : ctx.world().syncWorld().blocks()) {
-                auto const svgColor = ctx.world().blockTypeOf().at(block.index())->color().svgCode();
-                ctx.drawBlock(block, { {"fill", svgColor } });
-                if (block.isFoundation()) {
-                    ctx.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", foundationHatchWidth_} });
-                }
-            }
-            ctx.endGroup();
+        [[nodiscard]]
+        std::unique_ptr<PhaseContext> makeContext(Config const& config, JsonWorld const& world) const override {
+            return std::make_unique<BlockTypePhaseContext>(config, world, *this);
         }
     private:
         Color blockBorderColor_;

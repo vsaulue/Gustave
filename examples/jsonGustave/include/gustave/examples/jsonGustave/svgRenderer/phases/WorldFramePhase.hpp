@@ -36,8 +36,27 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     class WorldFramePhase : public Phase<G> {
     public:
         using Float = typename G::RealRep;
+
         using Color = jsonGustave::Color<Float>;
+        using Config = typename Phase<G>::Config;
+        using JsonWorld = typename Phase<G>::JsonWorld;
         using RenderContext = svgRenderer::RenderContext<G>;
+        using PhaseContext = typename Phase<G>::PhaseContext;
+
+        class WorldFramePhaseContext : public PhaseContext {
+        public:
+            [[nodiscard]]
+            explicit WorldFramePhaseContext(Config const& config, JsonWorld const& world, WorldFramePhase const& phase)
+                : PhaseContext{ config, world }
+                , phase_{ phase }
+            {}
+
+            void render(RenderContext& ctx) const override {
+                ctx.drawWorldFrame({ {"fill-opacity",0.f}, {"stroke", phase_.frameColor_.svgCode()},{"stroke-width", phase_.frameWidth_} });
+            }
+        private:
+            WorldFramePhase const& phase_;
+        };
 
         [[nodiscard]]
         WorldFramePhase()
@@ -55,8 +74,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             }
         }
 
-        virtual void run(RenderContext& ctx) const override {
-            ctx.drawWorldFrame({ {"fill-opacity",0.f}, {"stroke", frameColor_.svgCode()},{"stroke-width",frameWidth_} });
+        [[nodiscard]]
+        std::unique_ptr<PhaseContext> makeContext(Config const& config, JsonWorld const& world) const override {
+            return std::make_unique<WorldFramePhaseContext>(config, world, *this);
         }
     private:
         Color frameColor_;

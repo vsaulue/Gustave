@@ -52,6 +52,7 @@ namespace gustave::examples::jsonGustave {
         using JsonPhase = svgRenderer::JsonPhase<G>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
         using Phase = svgRenderer::phases::Phase<G>;
+        using PhaseContext = typename Phase::PhaseContext;
 
         [[nodiscard]]
         SvgRenderer() = default;
@@ -79,9 +80,14 @@ namespace gustave::examples::jsonGustave {
         }
 
         void run(JsonWorld const& world, std::ostream& output) const {
-            RenderContext ctx{ world, output, config_ };
+            std::vector<std::unique_ptr<PhaseContext>> phaseContexts;
+            phaseContexts.reserve(phases_.size());
             for (auto const& phase : phases_) {
-                phase->run(ctx);
+                phaseContexts.emplace_back(phase->makeContext(config_, world));
+            }
+            RenderContext ctx{ world, output, config_ };
+            for (auto const& phaseCtx : phaseContexts) {
+                phaseCtx->render(ctx);
             }
             ctx.finalize();
         }

@@ -38,11 +38,39 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     class BlockStressPhase : public Phase<G> {
     public:
         using Float = typename G::RealRep;
+
+        using Color = jsonGustave::Color<Float>;
+        using Config = typename Phase<G>::Config;
+        using ColorScale = svgRenderer::ColorScale<Float>;
+        using JsonWorld = typename Phase<G>::JsonWorld;
+        using PhaseContext = typename Phase<G>::PhaseContext;
         using RenderContext = svgRenderer::RenderContext<G>;
         using StressCoord = jsonGustave::StressCoord;
 
-        using Color = jsonGustave::Color<Float>;
-        using ColorScale = svgRenderer::ColorScale<Float>;
+        class BlockStressPhaseContext : public PhaseContext {
+        public:
+            [[nodiscard]]
+            explicit BlockStressPhaseContext(Config const& config, JsonWorld const& world, BlockStressPhase const& phase)
+                : PhaseContext{ config, world }
+                , phase_{ phase }
+            {}
+
+            void render(RenderContext& ctx) const override {
+                ctx.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
+                auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
+                for (auto const& block : ctx.world().syncWorld().blocks()) {
+                    auto const stress = phase_.stressCoord_.extract(block.stressRatio()).value();
+                    auto const svgColor = phase_.stressColors_.colorAt(stress).svgCode();
+                    ctx.drawBlock(block, { {"fill", svgColor } });
+                    if (block.isFoundation()) {
+                        ctx.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_}});
+                    }
+                }
+                ctx.endGroup();
+            }
+        private:
+            BlockStressPhase const& phase_;
+        };
 
         [[nodiscard]]
         BlockStressPhase()
@@ -71,18 +99,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             , stressColors_{ std::move(stressColors) }
         {}
 
-        virtual void run(RenderContext& ctx) const override {
-            ctx.startGroup({ {"stroke", blockBorderColor_.svgCode()}, {"stroke-width", blockBorderWidth_} });
-            auto const hatchColorCode = foundationHatchColor_.svgCode();
-            for (auto const& block : ctx.world().syncWorld().blocks()) {
-                auto const stress = stressCoord_.extract(block.stressRatio()).value();
-                auto const svgColor = stressColors_.colorAt(stress).svgCode();
-                ctx.drawBlock(block, { {"fill", svgColor } });
-                if (block.isFoundation()) {
-                    ctx.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", foundationHatchWidth_} });
-                }
-            }
-            ctx.endGroup();
+        [[nodiscard]]
+        std::unique_ptr<PhaseContext> makeContext(Config const& config, JsonWorld const& world) const override {
+            return std::make_unique<BlockStressPhaseContext>(config, world, *this);
         }
     private:
         Color blockBorderColor_;
