@@ -29,6 +29,7 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgRect.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgWorldBox.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 
@@ -46,85 +47,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using GridCoord = typename SyncWorld::BlockIndex::Coord;
 
         using SvgRect = detail::SvgRect<Float>;
-
-        class SvgWorldBox {
-        public:
-            [[nodiscard]]
-            explicit SvgWorldBox(SyncWorld const& world, Config const& config)
-                : SvgWorldBox{ initData(world, config) }
-            {}
-
-            [[nodiscard]]
-            SvgRect blockCoordinates(BlockIndex const& index) const {
-                Float const x = svgBlockWidth_ * (0.5f + Float(index.x - xMin_));
-                Float const y = svgBlockHeight_ * (0.5f + Float(yMax_ - index.y));
-                return SvgRect{ x, y, svgBlockWidth_, svgBlockHeight_ };
-            }
-
-            [[nodiscard]]
-            SvgRect boxCoordinates() const {
-                return SvgRect{ 0.f, 0.f, boxWidth_, boxHeight_ };
-            }
-        private:
-            struct Init {
-                GridCoord xMin;
-                GridCoord yMax;
-                Float svgBlockHeight;
-                Float svgBlockWidth;
-                Float boxHeight;
-                Float boxWidth;
-            };
-
-            [[nodiscard]]
-            static Init initData(SyncWorld const& world, Config const& config) {
-                using Limits = std::numeric_limits<GridCoord>;
-                GridCoord xMax = Limits::min();
-                GridCoord xMin = Limits::max();
-                GridCoord yMax = Limits::min();
-                GridCoord yMin = Limits::max();
-                if (world.blocks().size() == 0) {
-                    xMax = 0;
-                    xMin = 0;
-                    yMax = 0;
-                    yMin = 0;
-                } else {
-                    for (auto const& block : world.blocks()) {
-                        auto const& id = block.index();
-                        xMax = std::max(xMax, id.x);
-                        xMin = std::min(xMin, id.x);
-                        yMax = std::max(yMax, id.y);
-                        yMin = std::min(yMin, id.y);
-                    }
-                }
-                Float const svgBlockHeight = config.spaceRes() * world.scene().blockSize().y().value();
-                Float const svgBlockWidth = config.spaceRes() * world.scene().blockSize().x().value();
-                return Init{
-                    .xMin = xMin,
-                    .yMax = yMax,
-                    .svgBlockHeight = svgBlockHeight,
-                    .svgBlockWidth = svgBlockWidth,
-                    .boxHeight = svgBlockHeight * Float(2 + yMax - yMin),
-                    .boxWidth = svgBlockWidth * Float(2 + xMax - xMin),
-                };
-            }
-
-            [[nodiscard]]
-            explicit SvgWorldBox(Init const& init)
-                : xMin_{ init.xMin }
-                , yMax_{ init.yMax }
-                , svgBlockHeight_{ init.svgBlockHeight }
-                , svgBlockWidth_{ init.svgBlockWidth }
-                , boxHeight_{ init.boxHeight }
-                , boxWidth_{ init.boxWidth }
-            {}
-
-            GridCoord xMin_;
-            GridCoord yMax_;
-            Float svgBlockHeight_;
-            Float svgBlockWidth_;
-            Float boxHeight_;
-            Float boxWidth_;
-        };
+        using SvgWorldBox = detail::SvgWorldBox<G>;
     public:
         [[nodiscard]]
         explicit SvgCanvas(JsonWorld const& world, std::ostream& output, Config const& config)
