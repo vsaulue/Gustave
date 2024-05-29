@@ -64,10 +64,10 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             {}
 
             void render(SvgCanvas& canvas) const override {
-                auto const mForce = maxForce(canvas);
-                auto const g = NormalizedVector3{ canvas.world().syncWorld().g() };
+                auto const mForce = maxForce();
+                auto const g = NormalizedVector3{ this->world_.syncWorld().g() };
                 canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
-                for (auto const& contact : canvas.world().syncWorld().links()) {
+                for (auto const& contact : this->world_.syncWorld().links()) {
                     auto const stressFactor = contact.stressRatio().maxCoord();
                     auto const color = phase_.stressColors_.colorAt(stressFactor.value()).svgCode();
                     auto const forceVector = contact.forceVector();
@@ -82,6 +82,15 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 canvas.endGroup();
             }
         private:
+            [[nodiscard]]
+            Real<u.force> maxForce() const {
+                auto result = Real<u.force>::zero();
+                for (auto const& contact : this->world_.syncWorld().links()) {
+                    result = rt.max(result, contact.forceVector().norm());
+                }
+                return result;
+            }
+
             ContactStressPhase const& phase_;
         };
 
@@ -104,15 +113,6 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             return std::make_unique<ContactStressPhaseContext>(config, world, *this);
         }
     private:
-        [[nodiscard]]
-        static Real<u.force> maxForce(SvgCanvas& canvas) {
-            auto result = Real<u.force>::zero();
-            for (auto const& contact : canvas.world().syncWorld().links()) {
-                result = rt.max(result, contact.forceVector().norm());
-            }
-            return result;
-        }
-
         Float strokeWidth_;
         Color strokeColor_;
         ColorScale stressColors_;
