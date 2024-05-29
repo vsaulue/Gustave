@@ -28,6 +28,7 @@
 #include <svgwrite/writer.hpp>
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgRect.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 
@@ -44,32 +45,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using BlockIndex = typename SyncWorld::BlockIndex;
         using GridCoord = typename SyncWorld::BlockIndex::Coord;
 
-        struct SvgRect {
-            Float xMin;
-            Float yMin;
-            Float width;
-            Float height;
-
-            [[nodiscard]]
-            Float xMax() const {
-                return xMin + width;
-            }
-
-            [[nodiscard]]
-            Float xMean() const {
-                return xMin + width / 2;
-            }
-
-            [[nodiscard]]
-            Float yMax() const {
-                return yMin + height;
-            }
-
-            [[nodiscard]]
-            Float yMean() const {
-                return yMin + height / 2;
-            }
-        };
+        using SvgRect = detail::SvgRect<Float>;
 
         class SvgWorldBox {
         public:
@@ -82,12 +58,12 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             SvgRect blockCoordinates(BlockIndex const& index) const {
                 Float const x = svgBlockWidth_ * (0.5f + Float(index.x - xMin_));
                 Float const y = svgBlockHeight_ * (0.5f + Float(yMax_ - index.y));
-                return { x, y, svgBlockWidth_, svgBlockHeight_ };
+                return SvgRect{ x, y, svgBlockWidth_, svgBlockHeight_ };
             }
 
             [[nodiscard]]
             SvgRect boxCoordinates() const {
-                return { 0.f, 0.f, boxWidth_, boxHeight_ };
+                return SvgRect{ 0.f, 0.f, boxWidth_, boxHeight_ };
             }
         private:
             struct Init {
@@ -167,7 +143,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
                 }
             }
             SvgRect const worldBox = worldBox_.boxCoordinates();
-            writer_.start_svg(worldBox.width, worldBox.height);
+            writer_.start_svg(worldBox.width(), worldBox.height());
         }
 
         SvgCanvas(SvgCanvas const&) = delete;
@@ -176,7 +152,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         void drawBlock(SyncWorld::BlockReference const& block, svgw::attr_list attrs = { {} }) {
             throwIfFinalized();
             auto const coords = worldBox_.blockCoordinates(block.index());
-            writer_.rect(coords.xMin, coords.yMin, coords.width, coords.height, attrs);
+            writer_.rect(coords.xMin(), coords.yMin(), coords.width(), coords.height(), attrs);
         }
 
         void drawContactArrow(SyncWorld::ContactReference const& contact, Float lengthRatio, svgw::attr_list attrs = { {} }) {
@@ -185,21 +161,21 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             auto const blockCoords = worldBox_.blockCoordinates(contact.localBlock().index());
             auto const direction = contact.index().direction();
             Float const triangleFactor = config_.arrowTriangleFactor();
-            Float const minDim = std::min(blockCoords.height, blockCoords.width);
+            Float const minDim = std::min(blockCoords.height(), blockCoords.width());
             Float const triangleSize = minDim * triangleFactor;
             Float const lineWidth = triangleSize * config_.arrowLineFactor();
             Float const lineLength = minDim * (0.5f - triangleFactor) * lengthRatio;
             std::stringstream path;
             switch (direction.id()) {
             case Direction::Id::minusX: {
-                Float const xTriangleBase = blockCoords.xMin + lineLength;
+                Float const xTriangleBase = blockCoords.xMin() + lineLength;
                 Float const yMean = blockCoords.yMean();
                 path << 'M' << xTriangleBase << ' ' << yMean - triangleSize;
                 path << " L" << xTriangleBase + triangleSize << ' ' << yMean;
                 path << " L" << xTriangleBase << ' ' << yMean + triangleSize;
                 path << " L" << xTriangleBase << ' ' << yMean + lineWidth;
-                path << " L" << blockCoords.xMin << ' ' << yMean + lineWidth;
-                path << " L" << blockCoords.xMin << ' ' << yMean - lineWidth;
+                path << " L" << blockCoords.xMin() << ' ' << yMean + lineWidth;
+                path << " L" << blockCoords.xMin() << ' ' << yMean - lineWidth;
                 path << " L" << xTriangleBase << ' ' << yMean - lineWidth;
                 break;
             }
@@ -231,13 +207,13 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             }
             case Direction::Id::plusY: {
                 Float const xMean = blockCoords.xMean();
-                Float const yTriangleBase = blockCoords.yMin + lineLength;
+                Float const yTriangleBase = blockCoords.yMin() + lineLength;
                 path << 'M' << xMean - triangleSize << ' ' << yTriangleBase;
                 path << " L" << xMean << ' ' << yTriangleBase + triangleSize;
                 path << " L" << xMean + triangleSize << ' ' << yTriangleBase;
                 path << " L" << xMean + lineWidth << ' ' << yTriangleBase;
-                path << " L" << xMean + lineWidth << ' ' << blockCoords.yMin;
-                path << " L" << xMean - lineWidth << ' ' << blockCoords.yMin;
+                path << " L" << xMean + lineWidth << ' ' << blockCoords.yMin();
+                path << " L" << xMean - lineWidth << ' ' << blockCoords.yMin();
                 path << " L" << xMean - lineWidth << ' ' << yTriangleBase;
                 break;
             }
@@ -255,7 +231,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         void drawWorldFrame(svgw::attr_list attrs = { {} }) {
             throwIfFinalized();
             SvgRect const box = worldBox_.boxCoordinates();
-            writer_.rect(box.xMin, box.yMin, box.width, box.height, attrs);
+            writer_.rect(box.xMin(), box.yMin(), box.width(), box.height(), attrs);
         }
 
         void endGroup() {
@@ -281,9 +257,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             throwIfFinalized();
             auto coords = worldBox_.blockCoordinates(block.index());
             writer_.start_g(attrs);
-            writer_.line(coords.xMean(), coords.yMin, coords.xMax(), coords.yMean());
-            writer_.line(coords.xMin, coords.yMin, coords.xMax(), coords.yMax());
-            writer_.line(coords.xMin, coords.yMean(), coords.xMean(), coords.yMax());
+            writer_.line(coords.xMean(), coords.yMin(), coords.xMax(), coords.yMean());
+            writer_.line(coords.xMin(), coords.yMin(), coords.xMax(), coords.yMax());
+            writer_.line(coords.xMin(), coords.yMean(), coords.xMean(), coords.yMax());
             writer_.end_g();
         }
 
