@@ -31,7 +31,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 
-namespace gustave::examples::jsonGustave::svgRenderer {
+namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class SvgCanvas {
     public:

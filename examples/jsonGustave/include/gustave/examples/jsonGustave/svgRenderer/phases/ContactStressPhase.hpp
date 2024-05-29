@@ -26,10 +26,10 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorPoint.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
 
@@ -53,7 +53,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Config = typename Phase<G>::Config;
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
-        using SvgCanvas = svgRenderer::SvgCanvas<G>;
+        using SvgCanvas = detail::SvgCanvas<G>;
 
         class ContactStressPhaseContext : public PhaseContext {
         public:

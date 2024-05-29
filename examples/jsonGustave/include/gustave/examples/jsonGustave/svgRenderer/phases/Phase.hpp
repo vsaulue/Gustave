@@ -29,8 +29,8 @@
 #include <string_view>
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::phases {
@@ -41,7 +41,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
 
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
-        using SvgCanvas = svgRenderer::SvgCanvas<G>;
+        using SvgCanvas = detail::SvgCanvas<G>;
 
         class PhaseContext {
         public:

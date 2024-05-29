@@ -31,13 +31,13 @@
 #include <utility>
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockTypePhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/ContactStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/WorldFramePhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/JsonPhase.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 #include <gustave/meta/Meta.hpp>
 
@@ -46,7 +46,7 @@ namespace gustave::examples::jsonGustave {
     class SvgRenderer {
     private:
         using Float = typename G::RealRep;
-        using SvgCanvas = svgRenderer::SvgCanvas<G>;
+        using SvgCanvas = svgRenderer::detail::SvgCanvas<G>;
     public:
         using Config = svgRenderer::Config<Float>;
         using JsonPhase = svgRenderer::JsonPhase<G>;

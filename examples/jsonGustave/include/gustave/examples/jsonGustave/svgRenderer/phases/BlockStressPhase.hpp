@@ -26,9 +26,9 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/StressCoord.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
@@ -44,7 +44,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using ColorScale = svgRenderer::ColorScale<Float>;
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
-        using SvgCanvas = svgRenderer::SvgCanvas<G>;
+        using SvgCanvas = detail::SvgCanvas<G>;
         using StressCoord = jsonGustave::StressCoord;
 
         class BlockStressPhaseContext : public PhaseContext {
