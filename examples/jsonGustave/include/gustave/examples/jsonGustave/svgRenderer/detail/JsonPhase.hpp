@@ -33,7 +33,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/phases/WorldFramePhase.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
 
-namespace gustave::examples::jsonGustave::svgRenderer {
+namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     struct JsonPhase {
         using Phase = phases::Phase<G>;
@@ -43,8 +43,8 @@ namespace gustave::examples::jsonGustave::svgRenderer {
 }
 
 template<gustave::core::cGustave G>
-struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::JsonPhase<G>> {
-    using JsonPhase = gustave::examples::jsonGustave::svgRenderer::JsonPhase<G>;
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::detail::JsonPhase<G>> {
+    using JsonPhase = gustave::examples::jsonGustave::svgRenderer::detail::JsonPhase<G>;
 
     using BlockStressPhase = gustave::examples::jsonGustave::svgRenderer::phases::BlockStressPhase<G>;
     using BlockTypePhase = gustave::examples::jsonGustave::svgRenderer::phases::BlockTypePhase<G>;

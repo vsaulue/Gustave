@@ -31,13 +31,13 @@
 #include <utility>
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/JsonPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockTypePhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/ContactStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/WorldFramePhase.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/JsonPhase.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 #include <gustave/meta/Meta.hpp>
 
@@ -49,7 +49,6 @@ namespace gustave::examples::jsonGustave {
         using SvgCanvas = svgRenderer::detail::SvgCanvas<G>;
     public:
         using Config = svgRenderer::Config<Float>;
-        using JsonPhase = svgRenderer::JsonPhase<G>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
         using Phase = svgRenderer::phases::Phase<G>;
         using PhaseContext = typename Phase::PhaseContext;
@@ -102,7 +101,7 @@ struct nlohmann::adl_serializer<typename gustave::examples::jsonGustave::SvgRend
     using SvgRenderer = gustave::examples::jsonGustave::SvgRenderer<G>;
 
     using Config = typename SvgRenderer::Config;
-    using JsonPhase = typename SvgRenderer::JsonPhase;
+    using JsonPhase = gustave::examples::jsonGustave::svgRenderer::detail::JsonPhase<G>;
 
     [[nodiscard]]
     static SvgRenderer from_json(nlohmann::json const& json) {
