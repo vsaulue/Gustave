@@ -44,7 +44,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using BlockIndex = typename SyncWorld::BlockIndex;
         using GridCoord = typename SyncWorld::BlockIndex::Coord;
 
-        struct BlockCoordinates {
+        struct SvgRect {
             Float xMin;
             Float yMin;
             Float width;
@@ -79,14 +79,14 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             {}
 
             [[nodiscard]]
-            BlockCoordinates blockCoordinates(BlockIndex const& index) const {
+            SvgRect blockCoordinates(BlockIndex const& index) const {
                 Float const x = svgBlockWidth_ * (0.5f + Float(index.x - xMin_));
                 Float const y = svgBlockHeight_ * (0.5f + Float(yMax_ - index.y));
                 return { x, y, svgBlockWidth_, svgBlockHeight_ };
             }
 
             [[nodiscard]]
-            BlockCoordinates boxCoordinates() const {
+            SvgRect boxCoordinates() const {
                 return { 0.f, 0.f, boxWidth_, boxHeight_ };
             }
         private:
@@ -166,7 +166,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
                     throw std::invalid_argument(msg.str());
                 }
             }
-            BlockCoordinates const worldBox = worldBox_.boxCoordinates();
+            SvgRect const worldBox = worldBox_.boxCoordinates();
             writer_.start_svg(worldBox.width, worldBox.height);
         }
 
@@ -254,7 +254,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
 
         void drawWorldFrame(svgw::attr_list attrs = { {} }) {
             throwIfFinalized();
-            BlockCoordinates const box = worldBox_.boxCoordinates();
+            SvgRect const box = worldBox_.boxCoordinates();
             writer_.rect(box.xMin, box.yMin, box.width, box.height, attrs);
         }
 
