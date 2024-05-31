@@ -44,7 +44,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
         using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
-        using SvgCanvas = typename Phase<G>::SvgCanvas;
+        using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
         using StressCoord = jsonGustave::StressCoord;
 
         class BlockStressPhaseContext : public PhaseContext {
@@ -55,15 +55,15 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 , phase_{ phase }
             {}
 
-            void render(SvgCanvas& canvas) const override {
+            void render(SvgPhaseCanvas& canvas) const override {
                 canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
                 auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
                 for (auto const& block : this->syncWorld().blocks()) {
                     auto const stress = phase_.stressCoord_.extract(block.stressRatio()).value();
                     auto const svgColor = phase_.stressColors_.colorAt(stress).svgCode();
-                    canvas.drawBlock(block, { {"fill", svgColor } });
+                    canvas.drawWorldBlock(block, { {"fill", svgColor } });
                     if (block.isFoundation()) {
-                        canvas.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_}});
+                        canvas.hatchWorldBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_}});
                     }
                 }
                 canvas.endGroup();

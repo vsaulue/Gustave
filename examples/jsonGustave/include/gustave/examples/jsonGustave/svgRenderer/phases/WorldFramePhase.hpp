@@ -40,7 +40,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Config = typename Phase<G>::Config;
         using JsonWorld = typename Phase<G>::JsonWorld;
         using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
-        using SvgCanvas = typename Phase<G>::SvgCanvas;
+        using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
         using PhaseContext = typename Phase<G>::PhaseContext;
 
         class WorldFramePhaseContext : public PhaseContext {
@@ -51,7 +51,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 , phase_{ phase }
             {}
 
-            void render(SvgCanvas& canvas) const override {
+            void render(SvgPhaseCanvas& canvas) const override {
                 canvas.drawWorldFrame({ {"fill-opacity",0.f}, {"stroke", phase_.frameColor_.svgCode()},{"stroke-width", phase_.frameWidth_} });
             }
         private:

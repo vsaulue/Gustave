@@ -53,7 +53,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
         using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
-        using SvgCanvas = typename Phase<G>::SvgCanvas;
+        using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
 
         class ContactStressPhaseContext : public PhaseContext {
         public:
@@ -63,7 +63,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 , phase_{ phase }
             {}
 
-            void render(SvgCanvas& canvas) const override {
+            void render(SvgPhaseCanvas& canvas) const override {
                 auto const mForce = maxForce();
                 auto const g = NormalizedVector3{ this->syncWorld().g() };
                 canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
@@ -73,10 +73,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                     auto const forceVector = contact.forceVector();
                     auto const lengthFactor = (forceVector.norm() / mForce).value();
                     if (forceVector.dot(g) > 0.f * u.force) {
-                        canvas.drawContactArrow(contact, lengthFactor, { {"fill",color} });
-                    }
-                    else {
-                        canvas.drawContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
+                        canvas.drawWorldContactArrow(contact, lengthFactor, { {"fill",color} });
+                    } else {
+                        canvas.drawWorldContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
                     }
                 }
                 canvas.endGroup();

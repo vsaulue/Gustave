@@ -34,6 +34,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/detail/JsonPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgPhaseCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockTypePhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/ContactStressPhase.hpp>
@@ -49,6 +50,7 @@ namespace gustave::examples::jsonGustave {
         using Float = typename G::RealRep;
         using SvgCanvas = svgRenderer::detail::SvgCanvas<G>;
         using SvgCanvasContext = svgRenderer::detail::SvgCanvasContext<G>;
+        using SvgPhaseCanvas = svgRenderer::detail::SvgPhaseCanvas<G>;
     public:
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
@@ -89,7 +91,8 @@ namespace gustave::examples::jsonGustave {
             }
             SvgCanvas canvas{ canvasCtx, output };
             for (auto const& phaseCtx : phaseContexts) {
-                phaseCtx->render(canvas);
+                SvgPhaseCanvas phaseCanvas{ canvas };
+                phaseCtx->render(phaseCanvas);
             }
             canvas.finalize();
         }
