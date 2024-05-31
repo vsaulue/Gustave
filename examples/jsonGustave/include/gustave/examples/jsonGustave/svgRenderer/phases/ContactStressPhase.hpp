@@ -26,7 +26,6 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorPoint.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
@@ -53,21 +52,22 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Config = typename Phase<G>::Config;
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
-        using SvgCanvas = detail::SvgCanvas<G>;
+        using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
+        using SvgCanvas = typename Phase<G>::SvgCanvas;
 
         class ContactStressPhaseContext : public PhaseContext {
         public:
             [[nodiscard]]
-            explicit ContactStressPhaseContext(Config const& config, JsonWorld const& world, ContactStressPhase const& phase)
-                : PhaseContext{ config, world }
+            explicit ContactStressPhaseContext(SvgCanvasContext const& ctx, ContactStressPhase const& phase)
+                : PhaseContext{ ctx }
                 , phase_{ phase }
             {}
 
             void render(SvgCanvas& canvas) const override {
                 auto const mForce = maxForce();
-                auto const g = NormalizedVector3{ this->world_.syncWorld().g() };
+                auto const g = NormalizedVector3{ this->syncWorld().g() };
                 canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
-                for (auto const& contact : this->world_.syncWorld().links()) {
+                for (auto const& contact : this->syncWorld().links()) {
                     auto const stressFactor = contact.stressRatio().maxCoord();
                     auto const color = phase_.stressColors_.colorAt(stressFactor.value()).svgCode();
                     auto const forceVector = contact.forceVector();
@@ -85,7 +85,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             [[nodiscard]]
             Real<u.force> maxForce() const {
                 auto result = Real<u.force>::zero();
-                for (auto const& contact : this->world_.syncWorld().links()) {
+                for (auto const& contact : this->syncWorld().links()) {
                     result = rt.max(result, contact.forceVector().norm());
                 }
                 return result;
@@ -109,8 +109,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         {}
 
         [[nodiscard]]
-        std::unique_ptr<PhaseContext> makeContext(Config const& config, JsonWorld const& world) const override {
-            return std::make_unique<ContactStressPhaseContext>(config, world, *this);
+        std::unique_ptr<PhaseContext> makeContext(SvgCanvasContext const& canvasCtx) const override {
+            return std::make_unique<ContactStressPhaseContext>(canvasCtx, *this);
         }
     private:
         Float strokeWidth_;

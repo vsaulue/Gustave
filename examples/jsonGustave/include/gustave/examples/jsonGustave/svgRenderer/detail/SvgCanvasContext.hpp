@@ -25,60 +25,52 @@
 
 #pragma once
 
-#include <stdexcept>
-#include <string_view>
-
 #include <gustave/core/cGustave.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
 
-namespace gustave::examples::jsonGustave::svgRenderer::phases {
+namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
-    class Phase {
+    class SvgCanvasContext {
     public:
         using Float = typename G::RealRep;
 
+        using World = jsonGustave::JsonWorld<G>;
         using Config = svgRenderer::Config<Float>;
-        using JsonWorld = jsonGustave::JsonWorld<G>;
-        using SyncWorld = typename JsonWorld::SyncWorld;
-        using SvgCanvasContext = detail::SvgCanvasContext<G>;
-        using SvgCanvas = detail::SvgCanvas<G>;
-
-        class PhaseContext {
-        public:
-            [[nodiscard]]
-            explicit PhaseContext(SvgCanvasContext const& ctx)
-                : canvasCtx_{ ctx }
-            {}
-
-            virtual ~PhaseContext() = default;
-            virtual void render(SvgCanvas& canvas) const = 0;
-        protected:
-            [[nodiscard]]
-            JsonWorld const& jsonWorld() const {
-                return canvasCtx_.world();
-            }
-
-            [[nodiscard]]
-            SyncWorld const& syncWorld() const {
-                return canvasCtx_.world().syncWorld();
-            }
-
-            SvgCanvasContext const& canvasCtx_;
-        };
-
-        virtual ~Phase() = default;
 
         [[nodiscard]]
-        virtual std::unique_ptr<PhaseContext> makeContext(SvgCanvasContext const& canvasCtx) const = 0;
-    protected:
-        [[nodiscard]]
-        static std::invalid_argument invalidWidthError(std::string_view fieldName, Float value) {
-            std::stringstream msg;
-            msg << "Invalid value for '" << fieldName << "': must be positive (passed: " << value << ").";
-            return std::invalid_argument{ msg.str() };
+        explicit SvgCanvasContext(World const& world, Config const& config)
+            : world_{ world }
+            , config_{ config }
+        {
+            auto const& blockSize = world.syncWorld().scene().blockSize();
+            svgBlockHeight_ = config.spaceRes() * blockSize.y().value();
+            svgBlockWidth_ = config.spaceRes() * blockSize.x().value();
         }
+
+        [[nodiscard]]
+        Config const& config() const {
+            return config_;
+        }
+
+        [[nodiscard]]
+        Float svgBlockHeight() const {
+            return svgBlockHeight_;
+        }
+
+        [[nodiscard]]
+        Float svgBlockWidth() const {
+            return svgBlockWidth_;
+        }
+
+        [[nodiscard]]
+        World const& world() const {
+            return world_;
+        }
+    private:
+        World const& world_;
+        Config const& config_;
+        Float svgBlockHeight_;
+        Float svgBlockWidth_;
     };
 }

@@ -26,6 +26,7 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgRect.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 
@@ -37,13 +38,13 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using SyncWorld = typename G::Worlds::SyncWorld;
 
         using BlockIndex = typename SyncWorld::BlockIndex;
-        using Config = svgRenderer::Config<Float>;
         using GridCoord = typename SyncWorld::BlockIndex::Coord;
+        using SvgCanvasContext = detail::SvgCanvasContext<G>;
         using SvgRect = detail::SvgRect<Float>;
 
         [[nodiscard]]
-        explicit SvgWorldBox(SyncWorld const& world, Config const& config)
-            : SvgWorldBox{ initData(world, config) }
+        explicit SvgWorldBox(SvgCanvasContext const& ctx)
+            : SvgWorldBox{ initData(ctx) }
         {}
 
         [[nodiscard]]
@@ -68,20 +69,21 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         };
 
         [[nodiscard]]
-        static Init initData(SyncWorld const& world, Config const& config) {
+        static Init initData(SvgCanvasContext const& ctx) {
             using Limits = std::numeric_limits<GridCoord>;
+            auto const& sWorld = ctx.world().syncWorld();
             GridCoord xMax = Limits::min();
             GridCoord xMin = Limits::max();
             GridCoord yMax = Limits::min();
             GridCoord yMin = Limits::max();
-            if (world.blocks().size() == 0) {
+            if (sWorld.blocks().size() == 0) {
                 xMax = 0;
                 xMin = 0;
                 yMax = 0;
                 yMin = 0;
             }
             else {
-                for (auto const& block : world.blocks()) {
+                for (auto const& block : sWorld.blocks()) {
                     auto const& id = block.index();
                     xMax = std::max(xMax, id.x);
                     xMin = std::min(xMin, id.x);
@@ -89,8 +91,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
                     yMin = std::min(yMin, id.y);
                 }
             }
-            Float const svgBlockHeight = config.spaceRes() * world.scene().blockSize().y().value();
-            Float const svgBlockWidth = config.spaceRes() * world.scene().blockSize().x().value();
+            Float const svgBlockHeight = ctx.svgBlockHeight();
+            Float const svgBlockWidth = ctx.svgBlockWidth();
             return Init{
                 .xMin = xMin,
                 .yMax = yMax,

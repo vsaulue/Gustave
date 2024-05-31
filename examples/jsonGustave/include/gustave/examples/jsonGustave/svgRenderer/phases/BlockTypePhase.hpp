@@ -26,7 +26,6 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
@@ -40,22 +39,23 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Color = jsonGustave::Color<Float>;
         using Config = typename Phase<G>::Config;
         using JsonWorld = typename Phase<G>::JsonWorld;
-        using SvgCanvas = detail::SvgCanvas<G>;
+        using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
+        using SvgCanvas = typename Phase<G>::SvgCanvas;
         using PhaseContext = typename Phase<G>::PhaseContext;
 
         class BlockTypePhaseContext : public PhaseContext {
         public:
             [[nodiscard]]
-            explicit BlockTypePhaseContext(Config const& config, JsonWorld const& world, BlockTypePhase const& phase)
-                : PhaseContext{ config, world }
+            explicit BlockTypePhaseContext(SvgCanvasContext const& ctx, BlockTypePhase const& phase)
+                : PhaseContext{ ctx }
                 , phase_{ phase }
             {}
 
             void render(SvgCanvas& canvas) const override {
                 canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
                 auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
-                for (auto const& block : this->world_.syncWorld().blocks()) {
-                    auto const svgColor = this->world_.blockTypeOf().at(block.index())->color().svgCode();
+                for (auto const& block : this->syncWorld().blocks()) {
+                    auto const svgColor = this->jsonWorld().blockTypeOf().at(block.index())->color().svgCode();
                     canvas.drawBlock(block, { {"fill", svgColor } });
                     if (block.isFoundation()) {
                         canvas.hatchBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_} });
@@ -91,8 +91,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         }
 
         [[nodiscard]]
-        std::unique_ptr<PhaseContext> makeContext(Config const& config, JsonWorld const& world) const override {
-            return std::make_unique<BlockTypePhaseContext>(config, world, *this);
+        std::unique_ptr<PhaseContext> makeContext(SvgCanvasContext const& canvasCtx) const override {
+            return std::make_unique<BlockTypePhaseContext>(canvasCtx, *this);
         }
     private:
         Color blockBorderColor_;

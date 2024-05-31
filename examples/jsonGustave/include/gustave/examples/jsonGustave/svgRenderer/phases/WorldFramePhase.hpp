@@ -26,7 +26,6 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
@@ -40,14 +39,15 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using Color = jsonGustave::Color<Float>;
         using Config = typename Phase<G>::Config;
         using JsonWorld = typename Phase<G>::JsonWorld;
-        using SvgCanvas = detail::SvgCanvas<G>;
+        using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
+        using SvgCanvas = typename Phase<G>::SvgCanvas;
         using PhaseContext = typename Phase<G>::PhaseContext;
 
         class WorldFramePhaseContext : public PhaseContext {
         public:
             [[nodiscard]]
-            explicit WorldFramePhaseContext(Config const& config, JsonWorld const& world, WorldFramePhase const& phase)
-                : PhaseContext{ config, world }
+            explicit WorldFramePhaseContext(SvgCanvasContext const& ctx, WorldFramePhase const& phase)
+                : PhaseContext{ ctx }
                 , phase_{ phase }
             {}
 
@@ -75,8 +75,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         }
 
         [[nodiscard]]
-        std::unique_ptr<PhaseContext> makeContext(Config const& config, JsonWorld const& world) const override {
-            return std::make_unique<WorldFramePhaseContext>(config, world, *this);
+        std::unique_ptr<PhaseContext> makeContext(SvgCanvasContext const& canvasCtx) const override {
+            return std::make_unique<WorldFramePhaseContext>(canvasCtx, *this);
         }
     private:
         Color frameColor_;

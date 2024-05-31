@@ -33,6 +33,7 @@
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/JsonPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockTypePhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/ContactStressPhase.hpp>
@@ -47,6 +48,7 @@ namespace gustave::examples::jsonGustave {
     private:
         using Float = typename G::RealRep;
         using SvgCanvas = svgRenderer::detail::SvgCanvas<G>;
+        using SvgCanvasContext = svgRenderer::detail::SvgCanvasContext<G>;
     public:
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
@@ -81,10 +83,11 @@ namespace gustave::examples::jsonGustave {
         void run(JsonWorld const& world, std::ostream& output) const {
             std::vector<std::unique_ptr<PhaseContext>> phaseContexts;
             phaseContexts.reserve(phases_.size());
+            SvgCanvasContext canvasCtx{ world, config_ };
             for (auto const& phase : phases_) {
-                phaseContexts.emplace_back(phase->makeContext(config_, world));
+                phaseContexts.emplace_back(phase->makeContext(canvasCtx));
             }
-            SvgCanvas canvas{ world, output, config_ };
+            SvgCanvas canvas{ canvasCtx, output };
             for (auto const& phaseCtx : phaseContexts) {
                 phaseCtx->render(canvas);
             }

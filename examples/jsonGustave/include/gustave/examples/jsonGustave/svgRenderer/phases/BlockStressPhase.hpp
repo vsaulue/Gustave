@@ -26,7 +26,6 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
-#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
 #include <gustave/examples/jsonGustave/StressCoord.hpp>
@@ -44,21 +43,22 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using ColorScale = svgRenderer::ColorScale<Float>;
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
-        using SvgCanvas = detail::SvgCanvas<G>;
+        using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
+        using SvgCanvas = typename Phase<G>::SvgCanvas;
         using StressCoord = jsonGustave::StressCoord;
 
         class BlockStressPhaseContext : public PhaseContext {
         public:
             [[nodiscard]]
-            explicit BlockStressPhaseContext(Config const& config, JsonWorld const& world, BlockStressPhase const& phase)
-                : PhaseContext{ config, world }
+            explicit BlockStressPhaseContext(SvgCanvasContext const& ctx, BlockStressPhase const& phase)
+                : PhaseContext{ ctx }
                 , phase_{ phase }
             {}
 
             void render(SvgCanvas& canvas) const override {
                 canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
                 auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
-                for (auto const& block : this->world_.syncWorld().blocks()) {
+                for (auto const& block : this->syncWorld().blocks()) {
                     auto const stress = phase_.stressCoord_.extract(block.stressRatio()).value();
                     auto const svgColor = phase_.stressColors_.colorAt(stress).svgCode();
                     canvas.drawBlock(block, { {"fill", svgColor } });
@@ -100,8 +100,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         {}
 
         [[nodiscard]]
-        std::unique_ptr<PhaseContext> makeContext(Config const& config, JsonWorld const& world) const override {
-            return std::make_unique<BlockStressPhaseContext>(config, world, *this);
+        std::unique_ptr<PhaseContext> makeContext(SvgCanvasContext const& canvasCtx) const override {
+            return std::make_unique<BlockStressPhaseContext>(canvasCtx, *this);
         }
     private:
         Color blockBorderColor_;

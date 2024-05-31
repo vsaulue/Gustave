@@ -28,6 +28,7 @@
 #include <svgwrite/writer.hpp>
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgRect.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgWorldBox.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
@@ -41,6 +42,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
 
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
+        using SvgCanvasContext = detail::SvgCanvasContext<G>;
         using SyncWorld = typename G::Worlds::SyncWorld;
     private:
         using BlockIndex = typename SyncWorld::BlockIndex;
@@ -50,15 +52,15 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using SvgWorldBox = detail::SvgWorldBox<G>;
     public:
         [[nodiscard]]
-        explicit SvgCanvas(JsonWorld const& world, std::ostream& output, Config const& config)
-            : config_{ config }
+        explicit SvgCanvas(SvgCanvasContext const& ctx, std::ostream& output)
+            : ctx_{ ctx }
             , output_{ output }
-            , worldBox_{ world.syncWorld(), config }
+            , worldBox_{ ctx }
             , writer_{ output }
             , groupCount_{ 0 }
             , finalized_{ false }
         {
-            for (auto const& block : world.syncWorld().blocks()) {
+            for (auto const& block : ctx.world().syncWorld().blocks()) {
                 if (block.index().z != 0) {
                     std::stringstream msg;
                     msg << "SvgRenderer doesn't support 3d scenes: all blocks must hase 'index.z == 0' (passed: " << block.index() << ").";
@@ -83,10 +85,10 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             using Direction = SyncWorld::ContactIndex::Direction;
             auto const blockCoords = worldBox_.blockCoordinates(contact.localBlock().index());
             auto const direction = contact.index().direction();
-            Float const triangleFactor = config_.arrowTriangleFactor();
+            Float const triangleFactor = ctx_.config().arrowTriangleFactor();
             Float const minDim = std::min(blockCoords.height(), blockCoords.width());
             Float const triangleSize = minDim * triangleFactor;
-            Float const lineWidth = triangleSize * config_.arrowLineFactor();
+            Float const lineWidth = triangleSize * ctx_.config().arrowLineFactor();
             Float const lineLength = minDim * (0.5f - triangleFactor) * lengthRatio;
             std::stringstream path;
             switch (direction.id()) {
@@ -198,7 +200,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             }
         }
 
-        Config const& config_;
+        SvgCanvasContext const& ctx_;
         std::ostream& output_;
         SvgWorldBox worldBox_;
         svgw::writer writer_;
