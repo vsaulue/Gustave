@@ -30,6 +30,7 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgDims.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgPhaseCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
@@ -44,6 +45,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using JsonWorld = jsonGustave::JsonWorld<G>;
         using SyncWorld = typename JsonWorld::SyncWorld;
         using SvgCanvasContext = detail::SvgCanvasContext<G>;
+        using SvgDims = detail::SvgDims<Float>;
         using SvgPhaseCanvas = detail::SvgPhaseCanvas<G>;
 
         class PhaseContext {
@@ -51,14 +53,25 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             [[nodiscard]]
             explicit PhaseContext(SvgCanvasContext const& ctx)
                 : canvasCtx_{ ctx }
+                , legendDims_{ 0.f, 0.f }
             {}
 
             virtual ~PhaseContext() = default;
+
+            [[nodiscard]]
+            SvgDims const& legendDims() const {
+                return legendDims_;
+            }
+
             virtual void render(SvgPhaseCanvas& canvas) const = 0;
         protected:
             [[nodiscard]]
             JsonWorld const& jsonWorld() const {
                 return canvasCtx_.world();
+            }
+
+            void setLegendDims(SvgDims const& value) {
+                legendDims_ = value;
             }
 
             [[nodiscard]]
@@ -67,6 +80,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             }
 
             SvgCanvasContext const& canvasCtx_;
+            SvgDims legendDims_;
         };
 
         virtual ~Phase() = default;
