@@ -66,6 +66,11 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             virtual void render(SvgPhaseCanvas& canvas) const = 0;
         protected:
             [[nodiscard]]
+            Config const& config() const {
+                return canvasCtx_.config();
+            }
+
+            [[nodiscard]]
             JsonWorld const& jsonWorld() const {
                 return canvasCtx_.world();
             }
@@ -75,8 +80,23 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             }
 
             [[nodiscard]]
+            Float svgBlockHeight() const {
+                return canvasCtx_.svgBlockHeight();
+            }
+
+            [[nodiscard]]
+            Float svgBlockWidth() const {
+                return canvasCtx_.svgBlockWidth();
+            }
+
+            [[nodiscard]]
             SyncWorld const& syncWorld() const {
                 return canvasCtx_.world().syncWorld();
+            }
+
+            [[nodiscard]]
+            Float textWidth(std::string_view text, Float fontSize) const {
+                return 0.6f * fontSize * Float(text.size()); // horrible estimate.
             }
 
             SvgCanvasContext const& canvasCtx_;
