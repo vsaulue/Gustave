@@ -34,6 +34,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/detail/JsonPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgDims.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgPhaseCanvas.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockStressPhase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/BlockTypePhase.hpp>
@@ -50,6 +51,7 @@ namespace gustave::examples::jsonGustave {
         using Float = typename G::RealRep;
         using SvgCanvas = svgRenderer::detail::SvgCanvas<G>;
         using SvgCanvasContext = svgRenderer::detail::SvgCanvasContext<G>;
+        using SvgDims = svgRenderer::detail::SvgDims<Float>;
         using SvgPhaseCanvas = svgRenderer::detail::SvgPhaseCanvas<G>;
     public:
         using Config = svgRenderer::Config<Float>;
@@ -86,13 +88,26 @@ namespace gustave::examples::jsonGustave {
             std::vector<std::unique_ptr<PhaseContext>> phaseContexts;
             phaseContexts.reserve(phases_.size());
             SvgCanvasContext canvasCtx{ world, config_ };
+            SvgDims legendDims = { 0.f, 0.f };
             for (auto const& phase : phases_) {
-                phaseContexts.emplace_back(phase->makeContext(canvasCtx));
+                auto phaseCtx = phase->makeContext(canvasCtx);
+                SvgDims const phaseDims = phaseCtx->legendDims();
+                if (phaseDims.height() > 0.f) {
+                    Float const newWidth = std::max(legendDims.width(), phaseDims.width());
+                    Float const newHeight = legendDims.height() + phaseDims.height() + config_.legendSpace();
+                    legendDims = { newWidth, newHeight };
+                }
+                phaseContexts.emplace_back(std::move(phaseCtx));
             }
-            SvgCanvas canvas{ canvasCtx, output };
+            SvgCanvas canvas{ canvasCtx, legendDims, output };
+            Float yLegendOffset = canvas.worldBox().boxCoordinates().yMax() + config_.legendSpace();
             for (auto const& phaseCtx : phaseContexts) {
-                SvgPhaseCanvas phaseCanvas{ canvas };
+                SvgPhaseCanvas phaseCanvas{ canvas, yLegendOffset };
                 phaseCtx->render(phaseCanvas);
+                SvgDims const phaseDims = phaseCtx->legendDims();
+                if (phaseDims.height() > 0.f) {
+                    yLegendOffset += phaseDims.height() + config_.legendSpace();
+                }
             }
             canvas.finalize();
         }

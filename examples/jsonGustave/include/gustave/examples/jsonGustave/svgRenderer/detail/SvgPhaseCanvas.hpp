@@ -37,23 +37,33 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using SvgCanvas = detail::SvgCanvas<G>;
         using SyncWorld = typename G::Worlds::SyncWorld;
 
+        using Attrs = typename SvgCanvas::Attrs;
         using BlockReference = typename SyncWorld::BlockReference;
         using ContactReference = typename SyncWorld::ContactReference;
 
         [[nodiscard]]
-        explicit SvgPhaseCanvas(SvgCanvas& canvas)
+        explicit SvgPhaseCanvas(SvgCanvas& canvas, Float yLegendOffset)
             : canvas_{ canvas }
+            , yLegendOffset_{ yLegendOffset }
         {}
 
-        void drawWorldBlock(BlockReference const& block, svgw::attr_list attrs) {
-            canvas_.drawBlock(block, attrs);
+        void drawLegendBlock(Float xMin, Float yMin, Attrs attrs) {
+            canvas_.drawLegendBlock(xMin, yMin + yLegendOffset_, attrs);
         }
 
-        void drawWorldContactArrow(ContactReference const& contact, Float lengthRatio, svgw::attr_list attrs) {
-            canvas_.drawContactArrow(contact, lengthRatio, attrs);
+        void drawLegendText(Float xMin, Float yMin, std::string_view text, Attrs attrs) {
+            canvas_.drawLegendText(xMin, yMin + yLegendOffset_, text, attrs);
         }
 
-        void drawWorldFrame(svgw::attr_list attrs) {
+        void drawWorldBlock(BlockReference const& block, Attrs attrs) {
+            canvas_.drawWorldBlock(block, attrs);
+        }
+
+        void drawWorldContactArrow(ContactReference const& contact, Float lengthRatio, Attrs attrs) {
+            canvas_.drawWorldContactArrow(contact, lengthRatio, attrs);
+        }
+
+        void drawWorldFrame(Attrs attrs) {
             canvas_.drawWorldFrame(attrs);
         }
 
@@ -61,14 +71,19 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             canvas_.endGroup();
         }
 
-        void hatchWorldBlock(BlockReference const& block, svgw::attr_list attrs) {
-            canvas_.hatchBlock(block, attrs);
+        void hatchLegendBlock(Float xMin, Float yMax, Attrs attrs) {
+            canvas_.hatchLegendBlock(xMin, yMax + yLegendOffset_, attrs);
         }
 
-        void startGroup(svgw::attr_list attrs) {
+        void hatchWorldBlock(BlockReference const& block, Attrs attrs) {
+            canvas_.hatchWorldBlock(block, attrs);
+        }
+
+        void startGroup(Attrs attrs) {
             canvas_.startGroup(attrs);
         }
     private:
         SvgCanvas& canvas_;
+        Float yLegendOffset_;
     };
 }
