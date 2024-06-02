@@ -25,9 +25,8 @@
 
 #pragma once
 
-#include <cassert>
-
 #include <gustave/cfg/cRealRep.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgDims.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<cfg::cRealRep Float_>
@@ -35,35 +34,33 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     public:
         using Float = Float_;
 
+        using SvgDims = detail::SvgDims<Float>;
+
         [[nodiscard]]
         explicit SvgRect(Float xMin, Float yMin, Float width, Float height)
             : xMin_{ xMin }
             , yMin_{ yMin }
-            , width_{ width }
-            , height_{ height }
-        {
-            assert(width_ >= 0.f);
-            assert(height_ >= 0.f);
-        }
+            , dims_{ width, height }
+        {}
 
         [[nodiscard]]
         Float height() const {
-            return height_;
+            return dims_.height();
         }
 
         [[nodiscard]]
         Float width() const {
-            return width_;
+            return dims_.width();
         }
 
         [[nodiscard]]
         Float xMax() const {
-            return xMin_ + width_;
+            return xMin_ + dims_.width();
         }
 
         [[nodiscard]]
         Float xMean() const {
-            return xMin_ + width_ / 2;
+            return xMin_ + dims_.width() / 2;
         }
 
         [[nodiscard]]
@@ -73,12 +70,12 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
 
         [[nodiscard]]
         Float yMax() const {
-            return yMin_ + height_;
+            return yMin_ + dims_.height();
         }
 
         [[nodiscard]]
         Float yMean() const {
-            return yMin_ + height_ / 2;
+            return yMin_ + dims_.height() / 2;
         }
 
         [[nodiscard]]
@@ -88,7 +85,6 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     private:
         Float xMin_;
         Float yMin_;
-        Float width_;
-        Float height_;
+        SvgDims dims_;
     };
 }
