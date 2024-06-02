@@ -37,12 +37,10 @@ namespace gustave::examples::jsonGustave::svgRenderer {
     public:
         using Float = Float_;
 
+        using Color = jsonGustave::Color<Float>;
+
         [[nodiscard]]
-        Config()
-            : arrowLineFactor_{ 0.5f }
-            , arrowTriangleFactor_{ 0.1875f }
-            , spaceRes_{ 32.f }
-        {}
+        Config() = default;
 
         [[nodiscard]]
         Float arrowLineFactor() const {
@@ -52,6 +50,26 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         [[nodiscard]]
         Float arrowTriangleFactor() const {
             return arrowTriangleFactor_;
+        }
+
+        [[nodiscard]]
+        Float legendSpace() const {
+            return legendSpace_;
+        }
+
+        [[nodiscard]]
+        Color legendTextColor() const {
+            return legendTextColor_;
+        }
+
+        [[nodiscard]]
+        Float legendTextSize() const {
+            return legendTextSize_;
+        }
+
+        [[nodiscard]]
+        Float legendTitleSize() const {
+            return legendTitleSize_;
         }
 
         [[nodiscard]]
@@ -75,10 +93,45 @@ namespace gustave::examples::jsonGustave::svgRenderer {
             return *this;
         }
 
+        Config& setLegendSpace(Float value) {
+            if (value < 0.f) {
+                std::stringstream msg;
+                msg << "Invalid legendSpace: it must be positive (passed: " << value << ").";
+                throw std::invalid_argument(msg.str());
+            }
+            legendSpace_ = value;
+            return *this;
+        }
+
+        Config& setLegendTextColor(Color const& value) {
+            legendTextColor_ = value;
+            return *this;
+        }
+
+        Config& setLegendTextSize(Float value) {
+            if (value < 0.f) {
+                std::stringstream msg;
+                msg << "Invalid legendTextSize: it must be positive (passed: " << value << ").";
+                throw std::invalid_argument(msg.str());
+            }
+            legendTextSize_ = value;
+            return *this;
+        }
+
+        Config& setLegendTitleSize(Float value) {
+            if (value < 0.f) {
+                std::stringstream msg;
+                msg << "Invalid legendTitleSize: it must be positive (passed: " << value << ").";
+                throw std::invalid_argument(msg.str());
+            }
+            legendTitleSize_ = value;
+            return *this;
+        }
+
         Config& setSpaceRes(Float value) {
             if (value <= 0.f) {
                 std::stringstream msg;
-                msg << "Invalid spaceRes: it must be strictly positive (passed: " << spaceRes_ << ").";
+                msg << "Invalid spaceRes: it must be strictly positive (passed: " << value << ").";
                 throw std::invalid_argument(msg.str());
             }
             spaceRes_ = value;
@@ -92,9 +145,13 @@ namespace gustave::examples::jsonGustave::svgRenderer {
             return std::invalid_argument(msg.str());
         }
 
+        Color legendTextColor_ = { 0.f, 0.f, 0.f };
         Float arrowLineFactor_ = 0.5f;
         Float arrowTriangleFactor_ = 0.1875f;
-        Float spaceRes_;
+        Float legendSpace_ = 8.f;
+        Float legendTextSize_ = 12.f;
+        Float legendTitleSize_ = 24.f;
+        Float spaceRes_ = 32.f;
     };
 }
 
