@@ -53,6 +53,16 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         }
 
         [[nodiscard]]
+        Float legendColorScaleRes() const {
+            return legendColorScaleRes_;
+        }
+
+        [[nodiscard]]
+        Float legendColorScaleWidth() const {
+            return legendColorScaleWidth_;
+        }
+
+        [[nodiscard]]
         Float legendSpace() const {
             return legendSpace_;
         }
@@ -148,6 +158,8 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         Color legendTextColor_ = { 0.f, 0.f, 0.f };
         Float arrowLineFactor_ = 0.5f;
         Float arrowTriangleFactor_ = 0.1875f;
+        Float legendColorScaleRes_ = 32.f;
+        Float legendColorScaleWidth_ = 32.f;
         Float legendSpace_ = 8.f;
         Float legendTextSize_ = 12.f;
         Float legendTitleSize_ = 24.f;
