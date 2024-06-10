@@ -96,7 +96,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
 
             [[nodiscard]]
             Float textWidth(std::string_view text, Float fontSize) const {
-                return 0.6f * fontSize * Float(text.size()); // horrible estimate.
+                return canvasCtx_.textWidth(text, fontSize);
             }
 
             SvgCanvasContext const& canvasCtx_;

@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
@@ -61,6 +63,11 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         [[nodiscard]]
         Float svgBlockWidth() const {
             return svgBlockWidth_;
+        }
+
+        [[nodiscard]]
+        Float textWidth(std::string_view text, Float fontSize) const {
+            return 0.6f * fontSize * Float(text.size()); // horrible estimate.
         }
 
         [[nodiscard]]
