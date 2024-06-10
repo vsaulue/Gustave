@@ -49,6 +49,16 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             return height_;
         }
 
+        void setHeight(Float value) {
+            assert(value >= 0.f);
+            height_ = value;
+        }
+
+        void setWidth(Float value) {
+            assert(value >= 0.f);
+            width_ = value;
+        }
+
         [[nodiscard]]
         Float width() const {
             return width_;
