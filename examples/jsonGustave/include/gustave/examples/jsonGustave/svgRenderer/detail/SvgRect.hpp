@@ -48,6 +48,14 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             return dims_.height();
         }
 
+        void setHeight(Float value) {
+            dims_.setHeight(value);
+        }
+
+        void setWidth(Float value) {
+            dims_.setWidth(value);
+        }
+
         [[nodiscard]]
         Float width() const {
             return dims_.width();
@@ -69,6 +77,11 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         }
 
         [[nodiscard]]
+        Float& xMin() {
+            return xMin_;
+        }
+
+        [[nodiscard]]
         Float yMax() const {
             return yMin_ + dims_.height();
         }
@@ -80,6 +93,11 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
 
         [[nodiscard]]
         Float yMin() const {
+            return yMin_;
+        }
+
+        [[nodiscard]]
+        Float& yMin() {
             return yMin_;
         }
     private:
