@@ -40,6 +40,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using Attrs = typename SvgCanvas::Attrs;
         using BlockReference = typename SyncWorld::BlockReference;
         using ContactReference = typename SyncWorld::ContactReference;
+        using SvgLinearGradient = typename SvgCanvas::SvgLinearGradient;
+        using SvgRect = typename SvgCanvas::SvgRect;
 
         [[nodiscard]]
         explicit SvgPhaseCanvas(SvgCanvas& canvas, Float xLegendOffset, Float yLegendOffset)
@@ -48,8 +50,22 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             , yLegendOffset_{ yLegendOffset }
         {}
 
+        [[nodiscard]]
+        std::string defLinearGradient(SvgLinearGradient const& gradient) {
+            return canvas_.defLinearGradient(gradient);
+        }
+
         void drawLegendBlock(Float xMin, Float yMin, Attrs attrs) {
             canvas_.drawLegendBlock(xMin + xLegendOffset_, yMin + yLegendOffset_, attrs);
+        }
+
+        void drawLegendLine(Float x1, Float y1, Float x2, Float y2, Attrs attrs) {
+            canvas_.drawLegendLine(x1 + xLegendOffset_, y1 + yLegendOffset_, x2 + xLegendOffset_, y2 + yLegendOffset_, attrs);
+        }
+
+        void drawLegendRect(SvgRect const& rect, Attrs attrs) {
+            auto const absRect = SvgRect{ rect.xMin() + xLegendOffset_, rect.yMin() + yLegendOffset_, rect.width(), rect.height() };
+            canvas_.drawLegendRect(absRect, attrs);
         }
 
         void drawLegendText(Float xMin, Float yMin, std::string_view text, Attrs attrs) {

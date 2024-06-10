@@ -33,6 +33,7 @@
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgDims.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/SvgLinearGradient.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgRect.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgWorldBox.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
@@ -48,12 +49,13 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using JsonWorld = jsonGustave::JsonWorld<G>;
         using SvgCanvasContext = detail::SvgCanvasContext<G>;
         using SvgDims = detail::SvgDims<Float>;
+        using SvgLinearGradient = detail::SvgLinearGradient<Float>;
+        using SvgRect = detail::SvgRect<Float>;
         using SyncWorld = typename G::Worlds::SyncWorld;
     private:
         using BlockIndex = typename SyncWorld::BlockIndex;
         using GridCoord = typename SyncWorld::BlockIndex::Coord;
 
-        using SvgRect = detail::SvgRect<Float>;
         using SvgWorldBox = detail::SvgWorldBox<G>;
     public:
         class Attrs {
@@ -103,10 +105,38 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         SvgCanvas(SvgCanvas const&) = delete;
         SvgCanvas(SvgCanvas&&) = delete;
 
+        [[nodiscard]]
+        std::string defLinearGradient(SvgLinearGradient const& grad) {
+            writer_.start_defs();
+            std::string defId = std::format("linGrad_{}", nextDefId_);
+            ++nextDefId_;
+            std::string rawSvg = std::format(R"(<linearGradient id="{}" x1="{}" x2="{}" y1="{}" y2="{}">)",
+                defId, grad.x1(), grad.x2(), grad.y1(), grad.y2()
+            );
+            writer_.write(rawSvg);
+            for (auto const& stop : grad.stops()) {
+                rawSvg = std::format(R"(<stop offset="{}" stop-color="{}" />)", stop.offset, stop.color.svgCode());
+                writer_.write(rawSvg);
+            }
+            writer_.write("</linearGradient>");
+            writer_.end_defs();
+            return defId;
+        }
+
         void drawLegendBlock(Float xMin, Float yMin, Attrs attrs) {
             throwIfFinalized();
             auto const coords = SvgRect{ xMin, yMin, ctx_.svgBlockWidth(), ctx_.svgBlockHeight() };
             drawBlock(coords, attrs);
+        }
+
+        void drawLegendLine(Float x1, Float y1, Float x2, Float y2, Attrs attrs) {
+            throwIfFinalized();
+            writer_.line(x1, y1, x2, y2, attrs);
+        }
+
+        void drawLegendRect(SvgRect const& rect, Attrs attrs) {
+            throwIfFinalized();
+            writer_.rect(rect.xMin(), rect.yMin(), rect.width(), rect.height(), attrs);
         }
 
         void drawLegendText(Float xMin, Float yMax, std::string_view text, Attrs attrs) {
@@ -263,6 +293,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         std::ostream& output_;
         SvgWorldBox worldBox_;
         svgw::writer writer_;
+        std::size_t nextDefId_ = 0;
         unsigned groupCount_;
         bool finalized_;
     };
