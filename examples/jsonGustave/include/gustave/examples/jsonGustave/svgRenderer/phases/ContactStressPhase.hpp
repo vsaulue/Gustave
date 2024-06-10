@@ -26,6 +26,7 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/LegendColorScale.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorPoint.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
@@ -41,6 +42,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
 
         using NormalizedVector3 = typename G::NormalizedVector3;
 
+        using LegendColorScale = detail::LegendColorScale<G>;
+
         static constexpr auto u = G::units();
         static constexpr auto rt = G::libConfig().realTraits;
     public:
@@ -53,6 +56,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
         using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
+        using SvgDims = typename Phase<G>::SvgDims;
         using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
 
         class ContactStressPhaseContext : public PhaseContext {
@@ -61,9 +65,40 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             explicit ContactStressPhaseContext(SvgCanvasContext const& ctx, ContactStressPhase const& phase)
                 : PhaseContext{ ctx }
                 , phase_{ phase }
-            {}
+                , legendScale_{ phase.stressColors_, ctx, std::string{ legendColorTitle() }, 0.f, 0.f }
+            {
+                this->setLegendDims(computeLegendDims());
+            }
 
             void render(SvgPhaseCanvas& canvas) const override {
+                renderWorld(canvas);
+                renderLegend(canvas);
+            }
+        private:
+            [[nodiscard]]
+            SvgDims computeLegendDims() const {
+                return legendScale_.dims();
+            }
+
+            [[nodiscard]]
+            static std::string_view legendColorTitle() {
+                return "Contact arrow color (max stress ratio):";
+            }
+
+            [[nodiscard]]
+            Real<u.force> maxForce() const {
+                auto result = Real<u.force>::zero();
+                for (auto const& contact : this->syncWorld().links()) {
+                    result = rt.max(result, contact.forceVector().norm());
+                }
+                return result;
+            }
+
+            void renderLegend(SvgPhaseCanvas& canvas) const {
+                legendScale_.render(canvas);
+            }
+
+            void renderWorld(SvgPhaseCanvas& canvas) const {
                 auto const mForce = maxForce();
                 auto const g = NormalizedVector3{ this->syncWorld().g() };
                 canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
@@ -80,17 +115,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 }
                 canvas.endGroup();
             }
-        private:
-            [[nodiscard]]
-            Real<u.force> maxForce() const {
-                auto result = Real<u.force>::zero();
-                for (auto const& contact : this->syncWorld().links()) {
-                    result = rt.max(result, contact.forceVector().norm());
-                }
-                return result;
-            }
 
             ContactStressPhase const& phase_;
+            LegendColorScale legendScale_;
         };
 
         [[nodiscard]]
