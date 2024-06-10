@@ -85,6 +85,7 @@ namespace gustave::examples::jsonGustave {
         }
 
         void run(JsonWorld const& world, std::ostream& output) const {
+            Float const space = config_.legendSpace();
             std::vector<std::unique_ptr<PhaseContext>> phaseContexts;
             phaseContexts.reserve(phases_.size());
             SvgCanvasContext canvasCtx{ world, config_ };
@@ -94,19 +95,19 @@ namespace gustave::examples::jsonGustave {
                 SvgDims const phaseDims = phaseCtx->legendDims();
                 if (phaseDims.height() > 0.f) {
                     Float const newWidth = std::max(legendDims.width(), phaseDims.width());
-                    Float const newHeight = legendDims.height() + phaseDims.height() + config_.legendSpace();
+                    Float const newHeight = legendDims.height() + phaseDims.height() + space;
                     legendDims = { newWidth, newHeight };
                 }
                 phaseContexts.emplace_back(std::move(phaseCtx));
             }
             SvgCanvas canvas{ canvasCtx, legendDims, output };
-            Float yLegendOffset = canvas.worldBox().boxCoordinates().yMax() + config_.legendSpace();
+            Float yLegendOffset = canvas.worldBox().boxCoordinates().yMax() + space;
             for (auto const& phaseCtx : phaseContexts) {
-                SvgPhaseCanvas phaseCanvas{ canvas, yLegendOffset };
+                SvgPhaseCanvas phaseCanvas{ canvas, space, yLegendOffset };
                 phaseCtx->render(phaseCanvas);
                 SvgDims const phaseDims = phaseCtx->legendDims();
                 if (phaseDims.height() > 0.f) {
-                    yLegendOffset += phaseDims.height() + config_.legendSpace();
+                    yLegendOffset += phaseDims.height() + space;
                 }
             }
             canvas.finalize();

@@ -42,17 +42,18 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using ContactReference = typename SyncWorld::ContactReference;
 
         [[nodiscard]]
-        explicit SvgPhaseCanvas(SvgCanvas& canvas, Float yLegendOffset)
+        explicit SvgPhaseCanvas(SvgCanvas& canvas, Float xLegendOffset, Float yLegendOffset)
             : canvas_{ canvas }
+            , xLegendOffset_{ xLegendOffset }
             , yLegendOffset_{ yLegendOffset }
         {}
 
         void drawLegendBlock(Float xMin, Float yMin, Attrs attrs) {
-            canvas_.drawLegendBlock(xMin, yMin + yLegendOffset_, attrs);
+            canvas_.drawLegendBlock(xMin + xLegendOffset_, yMin + yLegendOffset_, attrs);
         }
 
         void drawLegendText(Float xMin, Float yMin, std::string_view text, Attrs attrs) {
-            canvas_.drawLegendText(xMin, yMin + yLegendOffset_, text, attrs);
+            canvas_.drawLegendText(xMin + xLegendOffset_, yMin + yLegendOffset_, text, attrs);
         }
 
         void drawWorldBlock(BlockReference const& block, Attrs attrs) {
@@ -72,7 +73,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         }
 
         void hatchLegendBlock(Float xMin, Float yMax, Attrs attrs) {
-            canvas_.hatchLegendBlock(xMin, yMax + yLegendOffset_, attrs);
+            canvas_.hatchLegendBlock(xMin + xLegendOffset_, yMax + yLegendOffset_, attrs);
         }
 
         void hatchWorldBlock(BlockReference const& block, Attrs attrs) {
@@ -84,6 +85,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         }
     private:
         SvgCanvas& canvas_;
+        Float xLegendOffset_;
         Float yLegendOffset_;
     };
 }

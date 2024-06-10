@@ -84,7 +84,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 auto const blockBorderColorCode = phase_.blockBorderColor_.svgCode();
                 auto const titleHeight = this->config().legendTitleSize();
                 auto const space = this->config().legendSpace();
-                canvas.drawLegendText(space, titleHeight, legendTitle(), {
+                canvas.drawLegendText(0.f, titleHeight, legendTitle(), {
                     {"font-size", titleHeight},
                     {"fill", textColorCode},
                 });
@@ -94,7 +94,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 } };
                 Float yBlock = titleHeight + space + 0.5f * (legendItemHeight() - this->svgBlockHeight());
                 Float yText = titleHeight + space + 0.5f * (legendItemHeight() + this->config().legendTextSize());
-                Float const xText = this->svgBlockWidth() + 2.f * this->config().legendSpace();
+                Float const xText = this->svgBlockWidth() + this->config().legendSpace();
                 Float const lineHeight = legendItemHeight() + this->config().legendSpace();
                 std::array<svgw::attr, 3> blockAttrs = { {
                     {"stroke", blockBorderColorCode},
@@ -104,7 +104,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 for (auto const& blockType : this->jsonWorld().blockTypes()) {
                     auto const svgColor = blockType.color().svgCode();
                     blockAttrs[2].value = svgColor;
-                    canvas.drawLegendBlock(space, yBlock, blockAttrs);
+                    canvas.drawLegendBlock(0.f, yBlock, blockAttrs);
                     canvas.drawLegendText(xText, yText, blockType.name(), textAttrs);
                     yBlock += lineHeight;
                     yText += lineHeight;
@@ -114,8 +114,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                     {"stroke-width", phase_.blockBorderWidth_},
                     {"fill-opacity",0.f},
                 } };
-                canvas.drawLegendBlock(space, yBlock, foundationAttrs);
-                canvas.hatchLegendBlock(space, yBlock, { {"stroke", getHatchColorCode() },{"stroke-width", phase_.foundationHatchWidth_} });
+                canvas.drawLegendBlock(0.f, yBlock, foundationAttrs);
+                canvas.hatchLegendBlock(0.f, yBlock, { {"stroke", getHatchColorCode() },{"stroke-width", phase_.foundationHatchWidth_} });
                 canvas.drawLegendText(xText, yText, foundationCaption(), textAttrs);
             }
 
