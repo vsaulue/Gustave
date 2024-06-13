@@ -89,7 +89,7 @@ namespace gustave::examples::jsonGustave {
             std::vector<std::unique_ptr<PhaseContext>> phaseContexts;
             phaseContexts.reserve(phases_.size());
             SvgCanvasContext canvasCtx{ world, config_ };
-            SvgDims legendDims = { 0.f, 0.f };
+            SvgDims legendDims = { 0.f, space };
             for (auto const& phase : phases_) {
                 auto phaseCtx = phase->makeContext(canvasCtx);
                 SvgDims const phaseDims = phaseCtx->legendDims();
@@ -100,6 +100,7 @@ namespace gustave::examples::jsonGustave {
                 }
                 phaseContexts.emplace_back(std::move(phaseCtx));
             }
+            legendDims.setWidth(legendDims.width() + 2.f * space);
             SvgCanvas canvas{ canvasCtx, legendDims, output };
             Float yLegendOffset = canvas.worldBox().boxCoordinates().yMax() + space;
             for (auto const& phaseCtx : phaseContexts) {
