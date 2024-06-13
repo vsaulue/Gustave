@@ -25,7 +25,11 @@
 
 #pragma once
 
+#include <string>
+
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/LegendBlockHatch.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/LegendColorScale.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
 #include <gustave/examples/jsonGustave/StressCoord.hpp>
@@ -44,8 +48,13 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using JsonWorld = typename Phase<G>::JsonWorld;
         using PhaseContext = typename Phase<G>::PhaseContext;
         using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
+        using SvgDims = typename Phase<G>::SvgDims;
         using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
         using StressCoord = jsonGustave::StressCoord;
+    private:
+        using LegendBlockHatch = detail::LegendBlockHatch<G>;
+        using LegendColorScale = detail::LegendColorScale<G>;
+    public:
 
         class BlockStressPhaseContext : public PhaseContext {
         public:
@@ -53,9 +62,47 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             explicit BlockStressPhaseContext(SvgCanvasContext const& ctx, BlockStressPhase const& phase)
                 : PhaseContext{ ctx }
                 , phase_{ phase }
-            {}
+                , legendColor_{ phase.stressColors_, ctx, legendColorTitle(phase), 0.f, 0.f}
+                , legendHatch_{ ctx, phase.foundationHatchColor_, phase.foundationHatchWidth_, 0.f, legendColor_.yMax() + ctx.config().legendSpace() }
+            {
+                this->setLegendDims(generateLegendDims());
+            }
 
             void render(SvgPhaseCanvas& canvas) const override {
+                renderWorld(canvas);
+                renderLegend(canvas);
+            }
+        private:
+            [[nodiscard]]
+            SvgDims generateLegendDims() const {
+                SvgDims const colorDims = legendColor_.dims();
+                SvgDims const hatchDims = legendHatch_.dims();
+                Float const width = std::max(colorDims.width(), hatchDims.width());
+                Float const height = colorDims.height() + hatchDims.height() + this->config().legendSpace();
+                return { width, height };
+            }
+
+            [[nodiscard]]
+            static std::string legendColorTitle(BlockStressPhase const& phase) {
+                switch (phase.stressCoord_.id()) {
+                case StressCoord::Id::compression:
+                    return "Block color (compression stress ratio):";
+                case StressCoord::Id::max:
+                    return "Block color (max stress ratio):";
+                case StressCoord::Id::shear:
+                    return "Block color (shear stress ratio):";
+                case StressCoord::Id::tensile:
+                    return "Block color (tensile stress ratio):";
+                }
+                throw phase.stressCoord_.invalidError();
+            }
+
+            void renderLegend(SvgPhaseCanvas& canvas) const {
+                legendColor_.render(canvas);
+                legendHatch_.render(canvas);
+            }
+
+            void renderWorld(SvgPhaseCanvas& canvas) const {
                 canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
                 auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
                 for (auto const& block : this->syncWorld().blocks()) {
@@ -63,13 +110,15 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                     auto const svgColor = phase_.stressColors_.colorAt(stress).svgCode();
                     canvas.drawWorldBlock(block, { {"fill", svgColor } });
                     if (block.isFoundation()) {
-                        canvas.hatchWorldBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_}});
+                        canvas.hatchWorldBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_} });
                     }
                 }
                 canvas.endGroup();
             }
-        private:
+
             BlockStressPhase const& phase_;
+            LegendColorScale legendColor_;
+            LegendBlockHatch legendHatch_;
         };
 
         [[nodiscard]]
