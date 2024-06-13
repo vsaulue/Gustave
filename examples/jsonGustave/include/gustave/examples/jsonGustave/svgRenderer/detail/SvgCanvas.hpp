@@ -44,6 +44,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     class SvgCanvas {
     public:
         using Float = typename G::RealRep;
+        using SyncWorld = typename G::Worlds::SyncWorld;
 
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
@@ -51,9 +52,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using SvgDims = detail::SvgDims<Float>;
         using SvgLinearGradient = detail::SvgLinearGradient<Float>;
         using SvgRect = detail::SvgRect<Float>;
-        using SyncWorld = typename G::Worlds::SyncWorld;
     private:
         using BlockIndex = typename SyncWorld::BlockIndex;
+        using Direction = typename SyncWorld::ContactIndex::Direction;
         using GridCoord = typename SyncWorld::BlockIndex::Coord;
 
         using SvgWorldBox = detail::SvgWorldBox<G>;
@@ -129,6 +130,12 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             drawBlock(coords, attrs);
         }
 
+        void drawLegendContactArrow(Float xMin, Float yMin, Float lengthRatio, Attrs attrs) {
+            throwIfFinalized();
+            auto const blockCoords = SvgRect{ xMin, yMin, ctx_.svgBlockWidth(), ctx_.svgBlockHeight() };
+            drawContactArrow(blockCoords, Direction::minusX(), lengthRatio, attrs);
+        }
+
         void drawLegendLine(Float x1, Float y1, Float x2, Float y2, Attrs attrs) {
             throwIfFinalized();
             writer_.line(x1, y1, x2, y2, attrs);
@@ -152,9 +159,64 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
 
         void drawWorldContactArrow(SyncWorld::ContactReference const& contact, Float lengthRatio, Attrs attrs) {
             throwIfFinalized();
-            using Direction = SyncWorld::ContactIndex::Direction;
             auto const blockCoords = worldBox_.blockCoordinates(contact.localBlock().index());
             auto const direction = contact.index().direction();
+            drawContactArrow(blockCoords, direction, lengthRatio, attrs);
+        }
+
+        void drawWorldFrame(Attrs attrs) {
+            throwIfFinalized();
+            SvgRect const box = worldBox_.boxCoordinates();
+            writer_.rect(box.xMin(), box.yMin(), box.width(), box.height(), attrs);
+        }
+
+        void endGroup() {
+            throwIfFinalized();
+            if (groupCount_ == 0) {
+                throw std::logic_error("Invalid endGroup(): no group to close.");
+            }
+            --groupCount_;
+            writer_.end_g();
+        }
+
+        void finalize() {
+            throwIfFinalized();
+            if (groupCount_ > 0) {
+                throw std::logic_error("Invalid finalize(): all groups aren't closed.");
+            }
+            finalized_ = true;
+            writer_.end_svg();
+            output_ << '\n';
+        }
+
+        void hatchLegendBlock(Float xMin, Float yMin, Attrs attrs) {
+            throwIfFinalized();
+            auto const coords = SvgRect{ xMin, yMin, ctx_.svgBlockWidth(), ctx_.svgBlockHeight() };
+            hatchBlock(coords, attrs);
+        }
+
+        void hatchWorldBlock(SyncWorld::BlockReference const& block, Attrs attrs) {
+            throwIfFinalized();
+            auto const coords = worldBox_.blockCoordinates(block.index());
+            hatchBlock(coords, attrs);
+        }
+
+        void startGroup(Attrs attrs) {
+            throwIfFinalized();
+            writer_.start_g(attrs);
+            ++groupCount_;
+        }
+
+        [[nodiscard]]
+        SvgWorldBox const& worldBox() const {
+            return worldBox_;
+        }
+    private:
+        void drawBlock(SvgRect const& coords, Attrs attrs) {
+            writer_.rect(coords.xMin(), coords.yMin(), coords.width(), coords.height(), attrs);
+        }
+
+        void drawContactArrow(SvgRect const& blockCoords, Direction direction, Float lengthRatio, Attrs attrs) {
             Float const triangleFactor = ctx_.config().arrowTriangleFactor();
             Float const minDim = std::min(blockCoords.height(), blockCoords.width());
             Float const triangleSize = minDim * triangleFactor;
@@ -221,58 +283,6 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             }
             path << " Z";
             writer_.path(path.str(), attrs);
-        }
-
-        void drawWorldFrame(Attrs attrs) {
-            throwIfFinalized();
-            SvgRect const box = worldBox_.boxCoordinates();
-            writer_.rect(box.xMin(), box.yMin(), box.width(), box.height(), attrs);
-        }
-
-        void endGroup() {
-            throwIfFinalized();
-            if (groupCount_ == 0) {
-                throw std::logic_error("Invalid endGroup(): no group to close.");
-            }
-            --groupCount_;
-            writer_.end_g();
-        }
-
-        void finalize() {
-            throwIfFinalized();
-            if (groupCount_ > 0) {
-                throw std::logic_error("Invalid finalize(): all groups aren't closed.");
-            }
-            finalized_ = true;
-            writer_.end_svg();
-            output_ << '\n';
-        }
-
-        void hatchLegendBlock(Float xMin, Float yMin, Attrs attrs) {
-            throwIfFinalized();
-            auto const coords = SvgRect{ xMin, yMin, ctx_.svgBlockWidth(), ctx_.svgBlockHeight() };
-            hatchBlock(coords, attrs);
-        }
-
-        void hatchWorldBlock(SyncWorld::BlockReference const& block, Attrs attrs) {
-            throwIfFinalized();
-            auto const coords = worldBox_.blockCoordinates(block.index());
-            hatchBlock(coords, attrs);
-        }
-
-        void startGroup(Attrs attrs) {
-            throwIfFinalized();
-            writer_.start_g(attrs);
-            ++groupCount_;
-        }
-
-        [[nodiscard]]
-        SvgWorldBox const& worldBox() const {
-            return worldBox_;
-        }
-    private:
-        void drawBlock(SvgRect const& coords, Attrs attrs) {
-            writer_.rect(coords.xMin(), coords.yMin(), coords.width(), coords.height(), attrs);
         }
 
         void hatchBlock(SvgRect const& coords, Attrs attrs) {

@@ -59,6 +59,10 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             canvas_.drawLegendBlock(xMin + xLegendOffset_, yMin + yLegendOffset_, attrs);
         }
 
+        void drawLegendContactArrow(Float xMin, Float yMin, Float lengthFactor, Attrs attrs) {
+            canvas_.drawLegendContactArrow(xMin + xLegendOffset_, yMin + yLegendOffset_, lengthFactor, attrs);
+        }
+
         void drawLegendLine(Float x1, Float y1, Float x2, Float y2, Attrs attrs) {
             canvas_.drawLegendLine(x1 + xLegendOffset_, y1 + yLegendOffset_, x2 + xLegendOffset_, y2 + yLegendOffset_, attrs);
         }
