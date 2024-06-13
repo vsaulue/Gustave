@@ -27,6 +27,7 @@
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/LegendColorScale.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/LegendContactLength.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorPoint.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/ColorScale.hpp>
@@ -43,6 +44,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using NormalizedVector3 = typename G::NormalizedVector3;
 
         using LegendColorScale = detail::LegendColorScale<G>;
+        using LegendContactLength = detail::LegendContactLength<G>;
 
         static constexpr auto u = G::units();
         static constexpr auto rt = G::libConfig().realTraits;
@@ -65,7 +67,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             explicit ContactStressPhaseContext(SvgCanvasContext const& ctx, ContactStressPhase const& phase)
                 : PhaseContext{ ctx }
                 , phase_{ phase }
+                , maxForce_{ computeMaxForce(ctx) }
                 , legendScale_{ phase.stressColors_, ctx, std::string{ legendColorTitle() }, 0.f, 0.f }
+                , legendLength_{ initLegendLength(ctx, phase, maxForce_, legendScale_.yMax() + ctx.config().legendSpace()) }
             {
                 this->setLegendDims(computeLegendDims());
             }
@@ -77,7 +81,38 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         private:
             [[nodiscard]]
             SvgDims computeLegendDims() const {
-                return legendScale_.dims();
+                auto const& scaleDims = legendScale_.dims();
+                auto const& lengthDims = legendLength_.dims();
+                Float const height = this->config().legendSpace() + scaleDims.height() + lengthDims.height();
+                return { std::max(scaleDims.width(), lengthDims.width()), height };
+            }
+
+            [[nodiscard]]
+            static Real<u.force> computeMaxForce(SvgCanvasContext const& ctx) {
+                auto result = Real<u.force>::zero();
+                for (auto const& contact : ctx.world().syncWorld().links()) {
+                    result = rt.max(result, contact.forceVector().norm());
+                }
+                return result;
+            }
+
+            [[nodiscard]]
+            static LegendContactLength initLegendLength(SvgCanvasContext const& ctx, ContactStressPhase const& phase, Real<u.force> maxForce, Float yMin) {
+                std::stringstream minCaption;
+                minCaption << Real<u.force>::zero();
+                std::stringstream maxCaption;
+                maxCaption << maxForce;
+                return LegendContactLength{
+                    ctx,
+                    phase.strokeWidth_,
+                    phase.strokeColor_,
+                    phase.stressColors_.colorAt(0.f),
+                    std::string{ legendLengthTitle() },
+                    minCaption.str(),
+                    maxCaption.str(),
+                    0.f,
+                    yMin,
+                };
             }
 
             [[nodiscard]]
@@ -86,27 +121,23 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             }
 
             [[nodiscard]]
-            Real<u.force> maxForce() const {
-                auto result = Real<u.force>::zero();
-                for (auto const& contact : this->syncWorld().links()) {
-                    result = rt.max(result, contact.forceVector().norm());
-                }
-                return result;
+            static std::string_view legendLengthTitle() {
+                return "Contact arrow length (weight transfert):";
             }
 
             void renderLegend(SvgPhaseCanvas& canvas) const {
                 legendScale_.render(canvas);
+                legendLength_.render(canvas);
             }
 
             void renderWorld(SvgPhaseCanvas& canvas) const {
-                auto const mForce = maxForce();
                 auto const g = NormalizedVector3{ this->syncWorld().g() };
                 canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
                 for (auto const& contact : this->syncWorld().links()) {
                     auto const stressFactor = contact.stressRatio().maxCoord();
                     auto const color = phase_.stressColors_.colorAt(stressFactor.value()).svgCode();
                     auto const forceVector = contact.forceVector();
-                    auto const lengthFactor = (forceVector.norm() / mForce).value();
+                    auto const lengthFactor = (forceVector.norm() / maxForce_).value();
                     if (forceVector.dot(g) > 0.f * u.force) {
                         canvas.drawWorldContactArrow(contact, lengthFactor, { {"fill",color} });
                     } else {
@@ -117,7 +148,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             }
 
             ContactStressPhase const& phase_;
+            Real<u.force> maxForce_;
             LegendColorScale legendScale_;
+            LegendContactLength legendLength_;
         };
 
         [[nodiscard]]
