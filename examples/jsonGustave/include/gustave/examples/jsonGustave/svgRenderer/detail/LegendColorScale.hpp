@@ -102,6 +102,11 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             renderScale(canvas, yOffset);
             renderLabels(canvas, yOffset);
         }
+
+        [[nodiscard]]
+        Float yMax() const {
+            return yMin_ + dims_.height();
+        }
     private:
         [[nodiscard]]
         SvgDims computeDims() const {
