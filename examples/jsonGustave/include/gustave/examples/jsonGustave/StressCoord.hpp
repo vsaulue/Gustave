@@ -58,7 +58,12 @@ namespace gustave::examples::jsonGustave {
             }
             throw invalidError();
         }
-    private:
+
+        [[nodiscard]]
+        Id id() const {
+            return id_;
+        }
+
         [[nodiscard]]
         std::logic_error invalidError() const {
             std::string msg = "Invalid StressCoord : ";
@@ -66,7 +71,7 @@ namespace gustave::examples::jsonGustave {
             msg += '.';
             return std::logic_error{ msg };
         }
-
+    private:
         Id id_;
     };
 }
