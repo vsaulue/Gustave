@@ -42,6 +42,11 @@ namespace gustave::utils::prop {
 
         constexpr Ptr& operator=(Ptr&) = default;
 
+        constexpr Ptr& operator=(T* value) {
+            value_ = value;
+            return *this;
+        }
+
         [[nodiscard]]
         constexpr operator T* () {
             return value_;

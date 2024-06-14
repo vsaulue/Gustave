@@ -80,6 +80,12 @@ TEST_CASE("utils::prop::Ptr") {
         CHECK(ptr2->tag == 1);
     }
 
+    SECTION("operator=(rawptr*)") {
+        auto&res = (ptr = &d2);
+        CHECK(ptr->tag == 2);
+        CHECK(&res == &ptr);
+    }
+
     SECTION("operator*()") {
         SECTION("// mutable") {
             CHECK((*ptr).tag == 1);
