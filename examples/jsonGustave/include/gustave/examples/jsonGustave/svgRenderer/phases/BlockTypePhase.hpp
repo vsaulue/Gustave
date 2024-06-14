@@ -26,6 +26,8 @@
 #pragma once
 
 #include <gustave/core/cGustave.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/LegendBlockHatch.hpp>
+#include <gustave/examples/jsonGustave/svgRenderer/detail/LegendBlockType.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/phases/Phase.hpp>
 #include <gustave/examples/jsonGustave/Color.hpp>
 #include <gustave/examples/jsonGustave/Json.hpp>
@@ -43,6 +45,10 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         using SvgDims = typename Phase<G>::SvgDims;
         using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
         using PhaseContext = typename Phase<G>::PhaseContext;
+    private:
+        using LegendBlockHatch = detail::LegendBlockHatch<G>;
+        using LegendBlockType = detail::LegendBlockType<G>;
+    public:
 
         class BlockTypePhaseContext : public PhaseContext {
         public:
@@ -50,6 +56,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             explicit BlockTypePhaseContext(SvgCanvasContext const& ctx, BlockTypePhase const& phase)
                 : PhaseContext{ ctx }
                 , phase_{ phase }
+                , legendType_{ ctx, phase.blockBorderColor_, phase.blockBorderWidth_, 0.f, 0.f }
+                , legendHatch_{ ctx, phase.foundationHatchColor_, phase.foundationHatchWidth_, 0.f, legendType_.yMax() + ctx.config().legendSpace() }
             {
                 this->setLegendDims(generateLegendDims());
             }
@@ -59,69 +67,14 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 renderLegend(canvas);
             }
         private:
-            [[nodiscard]]
-            std::string getHatchColorCode() const {
-                return phase_.foundationHatchColor_.svgCode();
-            }
-
-            [[nodiscard]]
-            static constexpr std::string_view legendTitle() {
-                return "Block types:";
-            }
-
-            [[nodiscard]]
-            static constexpr std::string_view foundationCaption() {
-                return "Foundation";
-            }
-
-            [[nodiscard]]
-            Float legendItemHeight() const {
-                return std::max(this->svgBlockHeight(), this->config().legendTextSize());
-            }
-
             void renderLegend(SvgPhaseCanvas& canvas) const {
-                auto const textColorCode = this->config().legendTextColor().svgCode();
-                auto const blockBorderColorCode = phase_.blockBorderColor_.svgCode();
-                auto const titleHeight = this->config().legendTitleSize();
-                auto const space = this->config().legendSpace();
-                canvas.drawLegendText(0.f, titleHeight, legendTitle(), {
-                    {"font-size", titleHeight},
-                    {"fill", textColorCode},
-                });
-                std::array<svgw::attr, 2> const textAttrs = { {
-                    {"font-size", this->config().legendTextSize()},
-                    {"fill", textColorCode},
-                } };
-                Float yBlock = titleHeight + space + 0.5f * (legendItemHeight() - this->svgBlockHeight());
-                Float yText = titleHeight + space + 0.5f * (legendItemHeight() + this->config().legendTextSize());
-                Float const xText = this->svgBlockWidth() + this->config().legendSpace();
-                Float const lineHeight = legendItemHeight() + this->config().legendSpace();
-                std::array<svgw::attr, 3> blockAttrs = { {
-                    {"stroke", blockBorderColorCode},
-                    {"stroke-width", phase_.blockBorderWidth_},
-                    {"fill", "UNDEFINED"},
-                } };
-                for (auto const& blockType : this->jsonWorld().blockTypes()) {
-                    auto const svgColor = blockType.color().svgCode();
-                    blockAttrs[2].value = svgColor;
-                    canvas.drawLegendBlock(0.f, yBlock, blockAttrs);
-                    canvas.drawLegendText(xText, yText, blockType.name(), textAttrs);
-                    yBlock += lineHeight;
-                    yText += lineHeight;
-                }
-                std::array<svgw::attr, 3> const foundationAttrs = { {
-                    {"stroke", blockBorderColorCode},
-                    {"stroke-width", phase_.blockBorderWidth_},
-                    {"fill-opacity",0.f},
-                } };
-                canvas.drawLegendBlock(0.f, yBlock, foundationAttrs);
-                canvas.hatchLegendBlock(0.f, yBlock, { {"stroke", getHatchColorCode() },{"stroke-width", phase_.foundationHatchWidth_} });
-                canvas.drawLegendText(xText, yText, foundationCaption(), textAttrs);
+                legendType_.render(canvas);
+                legendHatch_.render(canvas);
             }
 
             void renderWorldBlocks(SvgPhaseCanvas& canvas) const {
                 canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
-                auto const hatchColorCode = getHatchColorCode();
+                auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
                 for (auto const& block : this->syncWorld().blocks()) {
                     auto const svgColor = this->jsonWorld().blockTypeOf().at(block.index())->color().svgCode();
                     canvas.drawWorldBlock(block, { {"fill", svgColor } });
@@ -134,21 +87,16 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
 
             [[nodiscard]]
             SvgDims generateLegendDims() const {
-                auto const space = this->config().legendSpace();
-                auto const textSize = this->config().legendTextSize();
-                auto const matSize = this->jsonWorld().blockTypes().size();
-                Float height = this->config().legendTitleSize();
-                height += Float(matSize + 1) * (legendItemHeight() + space);
-                Float blockNameWidth = this->textWidth(foundationCaption(), textSize);
-                for (auto const& blockType : this->jsonWorld().blockTypes()) {
-                    blockNameWidth = std::max(blockNameWidth, this->textWidth(blockType.name(), textSize));
-                }
-                Float titleWidth = this->textWidth(legendTitle(), this->config().legendTitleSize());
-                Float const width = 2 * space + std::max(titleWidth, blockNameWidth + this->svgBlockWidth() + space);
+                SvgDims const& typeDims = legendType_.dims();
+                SvgDims const& hatchDims = legendHatch_.dims();
+                Float const width = std::max(typeDims.width(), hatchDims.width());
+                Float const height = typeDims.height() + hatchDims.height() + this->config().legendSpace();
                 return { width, height };
             }
 
             BlockTypePhase const& phase_;
+            LegendBlockType legendType_;
+            LegendBlockHatch legendHatch_;
         };
 
         [[nodiscard]]
