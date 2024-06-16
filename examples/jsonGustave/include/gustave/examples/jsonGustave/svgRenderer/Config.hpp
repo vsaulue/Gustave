@@ -103,11 +103,25 @@ namespace gustave::examples::jsonGustave::svgRenderer {
             return *this;
         }
 
+        Config& setLegendColorScaleRes(Float value) {
+            if (value <= 0.f) {
+                throw invalidStrictPositiveError("legendColorScaleRes", value);
+            }
+            legendColorScaleRes_ = value;
+            return *this;
+        }
+
+        Config& setLegendColorScaleWidth(Float value) {
+            if (value < 0.f) {
+                throw invalidPositiveError("legendColorScaleWidth", value);
+            }
+            legendColorScaleWidth_ = value;
+            return *this;
+        }
+
         Config& setLegendSpace(Float value) {
             if (value < 0.f) {
-                std::stringstream msg;
-                msg << "Invalid legendSpace: it must be positive (passed: " << value << ").";
-                throw std::invalid_argument(msg.str());
+                throw invalidPositiveError("legendSpace", value);
             }
             legendSpace_ = value;
             return *this;
@@ -120,9 +134,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
 
         Config& setLegendTextSize(Float value) {
             if (value < 0.f) {
-                std::stringstream msg;
-                msg << "Invalid legendTextSize: it must be positive (passed: " << value << ").";
-                throw std::invalid_argument(msg.str());
+                throw invalidPositiveError("legendTextSize", value);
             }
             legendTextSize_ = value;
             return *this;
@@ -130,9 +142,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
 
         Config& setLegendTitleSize(Float value) {
             if (value < 0.f) {
-                std::stringstream msg;
-                msg << "Invalid legendTitleSize: it must be positive (passed: " << value << ").";
-                throw std::invalid_argument(msg.str());
+                throw invalidPositiveError("legendTitleSize", value);
             }
             legendTitleSize_ = value;
             return *this;
@@ -140,9 +150,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
 
         Config& setSpaceRes(Float value) {
             if (value <= 0.f) {
-                std::stringstream msg;
-                msg << "Invalid spaceRes: it must be strictly positive (passed: " << value << ").";
-                throw std::invalid_argument(msg.str());
+                throw invalidStrictPositiveError("spaceRes", value);
             }
             spaceRes_ = value;
             return *this;
@@ -153,6 +161,20 @@ namespace gustave::examples::jsonGustave::svgRenderer {
             std::stringstream msg;
             msg << "Invalid " << factorName << ": must be between 0 and 1 (passed: " << value << ").";
             return std::invalid_argument(msg.str());
+        }
+
+        [[nodiscard]]
+        static std::invalid_argument invalidStrictPositiveError(std::string_view fieldName, Float value) {
+            std::stringstream msg;
+            msg << "Invalid " << fieldName << ": it must be strictly positive (passed: " << value << ").";
+            throw std::invalid_argument(msg.str());
+        }
+
+        [[nodiscard]]
+        static std::invalid_argument invalidPositiveError(std::string_view fieldName, Float value) {
+            std::stringstream msg;
+            msg << "Invalid " << fieldName << ": it must be positive (passed: " << value << ").";
+            throw std::invalid_argument(msg.str());
         }
 
         Color legendTextColor_ = { 0.f, 0.f, 0.f };
@@ -171,9 +193,17 @@ template<gustave::cfg::cRealRep Float>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::Config<Float>> {
     using Config = gustave::examples::jsonGustave::svgRenderer::Config<Float>;
 
+    using Color = typename Config::Color;
+
     static void from_json(nlohmann::json const& json, Config& config) {
         config.setArrowLineFactor(json.at("arrowLineFactor").get<Float>());
         config.setArrowTriangleFactor(json.at("arrowTriangleFactor").get<Float>());
+        config.setLegendColorScaleRes(json.at("legendColorScaleRes").get<Float>());
+        config.setLegendColorScaleWidth(json.at("legendColorScaleWidth").get<Float>());
+        config.setLegendSpace(json.at("legendSpace").get<Float>());
+        config.setLegendTextColor(json.at("legendTextColor").get<Color>());
+        config.setLegendTextSize(json.at("legendTextSize").get<Float>());
+        config.setLegendTitleSize(json.at("legendTitleSize").get<Float>());
         config.setSpaceRes(json.at("spaceResolution").get<Float>());
     }
 };
