@@ -110,8 +110,8 @@ int main(int argc, char* argv[]) {
         Arguments args;
         initArgumentsParser(argsParser, args);
         argsParser.parse(argc, argv);
-        auto const world = parseWorldFile(args.inputWorldFileName);
         auto const renderer = makeRenderer(args.rendererFileName);
+        auto const world = parseWorldFile(args.inputWorldFileName);
         renderer.run(world, std::cout);
         return EXIT_SUCCESS;
     } catch (CLI::ParseError const& e) {
