@@ -81,14 +81,15 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             Float const labelSize = ctx_.config().legendTextSize();
             Float const blockHeight = ctx_.svgBlockHeight();
             Float const lineHeight = std::max(labelSize, blockHeight);
+            Float const yStep = lineHeight + space;
             std::string const textColor = ctx_.config().legendTextColor().svgCode();
             Float const yBlock = yMin_ + titleSize + space + 0.5f * (lineHeight - blockHeight);
             Float const xLabels = xMin_ + ctx_.svgBlockWidth() + space;
             Float const yLabels = yMin_ + titleSize + space + 0.5f * (lineHeight + labelSize);
             renderTitle(canvas, titleSize, textColor);
-            renderBlocks(canvas, yBlock, lineHeight, textColor);
-            renderContacts(canvas, yBlock, lineHeight);
-            renderLabels(canvas, xLabels, yLabels, lineHeight, labelSize, textColor);
+            renderBlocks(canvas, yBlock, yStep, textColor);
+            renderContacts(canvas, yBlock, yStep);
+            renderLabels(canvas, xLabels, yLabels, yStep, labelSize, textColor);
         }
     private:
         [[nodiscard]]
