@@ -68,8 +68,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             Float const space = ctx.config().legendSpace();
             Float const titleSize = ctx.config().legendTitleSize();
             Float const titleWidth = ctx.textWidth(title(), titleSize);
+            Float const lineHeight = std::max(ctx.svgBlockHeight(), labelSize);
             dims_.setWidth(std::max(ctx.svgBlockWidth() + space + labelWidth, titleWidth));
-            dims_.setHeight(titleSize + Float(blockTypes_.size()) * (ctx.svgBlockHeight() + space));
+            dims_.setHeight(titleSize + Float(blockTypes_.size()) * (lineHeight + space));
         }
 
         [[nodiscard]]
