@@ -99,7 +99,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             for (BlockDataReference root : ctx.newRoots) {
                 assert(!root.isFoundation());
                 if (!data_->isStructureValid(root.structure())) {
-                    auto newStructure = std::make_shared<StructureData const>(*data_, root);
+                    auto newStructure = std::make_shared<StructureData>(*data_, root);
                     data_->structures.emplace(newStructure);
                     ctx.newStructures.emplace_back(std::move(newStructure));
                 }

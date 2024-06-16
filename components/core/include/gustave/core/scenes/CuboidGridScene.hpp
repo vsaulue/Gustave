@@ -79,6 +79,11 @@ namespace gustave::core::scenes {
         CuboidGridScene(CuboidGridScene const&) = delete;
         CuboidGridScene& operator=(CuboidGridScene const&) = delete;
 
+        [[nodiscard]]
+        CuboidGridScene(CuboidGridScene&&) = default;
+
+        CuboidGridScene& operator=(CuboidGridScene&&) = default;
+
         TransactionResult modify(Transaction const& transaction) {
             auto upResult = SceneUpdater{ data_ }.runTransaction(transaction);
             return TransactionResult{ asReferences(std::move(upResult.newStructures)), asReferences(std::move(upResult.removedStructures)) };

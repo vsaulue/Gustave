@@ -35,6 +35,9 @@
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto cfg>
+    class StructureData;
+
+    template<cfg::cLibConfig auto cfg>
     struct SceneData {
     private:
         static constexpr auto u = cfg::units(cfg);
@@ -44,12 +47,32 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using Blocks = SceneBlocks<cfg>;
         using StructureData = detail::StructureData<cfg>;
-        using Structures = utils::PointerHash::Set<std::shared_ptr<StructureData const>>;
+        using Structures = utils::PointerHash::Set<std::shared_ptr<StructureData>>;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)
             : blocks{ blockSize }
         {}
+
+        SceneData(SceneData const&) = delete;
+        SceneData& operator=(SceneData const&) = delete;
+
+        [[nodiscard]]
+        SceneData(SceneData&& other)
+            : blocks{ std::move(other.blocks) }
+            , structures{ std::move(other.structures) }
+        {
+            resetSceneDataPtr();
+        }
+
+        SceneData& operator=(SceneData&& other) {
+            if (&other != this) {
+                blocks = std::move(other.blocks);
+                structures = std::move(other.structures);
+                resetSceneDataPtr();
+            }
+            return *this;
+        }
 
         [[nodiscard]]
         bool isStructureValid(StructureData const* structure) const {
@@ -58,5 +81,11 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         Blocks blocks;
         Structures structures;
+    private:
+        void resetSceneDataPtr() {
+            for (auto& structure : structures) {
+                structure->setSceneData(*this);
+            }
+        }
     };
 }

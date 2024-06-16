@@ -36,6 +36,7 @@ function(add_test_core test_target_name config_lib)
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/IndexNeighbours.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/InternalLinks.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/SceneBlocks.cpp"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/SceneData.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/SceneUpdater.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/Links.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/StructureReference.cpp"

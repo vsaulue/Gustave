@@ -54,6 +54,9 @@ using SolverStructure = gustave::core::solvers::Structure<libCfg>;
 using SolverLink = SolverStructure::Link;
 using SolverNode = SolverStructure::Node;
 
+template<typename Ptr>
+using PtrSet = gustave::utils::PointerHash::Set<Ptr>;
+
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
 static constexpr gustave::utils::PointerHash::Equals ptrEquals;
 
@@ -63,7 +66,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     SceneData data{ blockSize };
 
     auto runTransaction = [&data](Transaction const& transaction) {
-        auto oldStructures = data.structures;
+        PtrSet<std::shared_ptr<StructureData const>> oldStructures = { data.structures.begin(), data.structures.end() };
         auto result = SceneUpdater{ data }.runTransaction(transaction);
         // Check structure diff of the result.
         for (auto const& deletedStructure : result.removedStructures) {
@@ -75,7 +78,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             auto insertResult = oldStructures.insert(newStructure);
             REQUIRE(insertResult.second);
         }
-        REQUIRE(data.structures == oldStructures);
+        REQUIRE_THAT(data.structures, matchers::c2::UnorderedRangeEquals(oldStructures));
         // check structures.
         REQUIRE_FALSE(data.structures.contains(nullptr));
         for (auto const& structure : data.structures) {

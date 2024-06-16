@@ -48,6 +48,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
+        using BlockConstructionInfo = cuboidGridScene::BlockConstructionInfo<libCfg>;
         using BlockIndex = cuboidGridScene::BlockIndex;
         using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<libCfg>>;
         using Direction = math3d::BasicDirection;
@@ -125,7 +126,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return doFind(*this, index);
         }
 
-        BlockDataReference<libCfg, true> insert(BlockConstructionInfo<libCfg> const& info) {
+        BlockDataReference<libCfg, true> insert(BlockConstructionInfo const& info) {
             auto it = blocks_.emplace(info.index(), BlockMappedData{ info }).first;
             return { &(*it) };
         }

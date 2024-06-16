@@ -130,6 +130,10 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return *scene_;
         }
 
+        void setSceneData(SceneData& value) {
+            scene_ = &value;
+        }
+
         [[nodiscard]]
         std::optional<NodeIndex> solverIndexOf(ConstBlockDataReference block) const {
             auto const findResult = solverIndices_.find(block.index());
