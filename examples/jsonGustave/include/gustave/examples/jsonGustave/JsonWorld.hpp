@@ -37,13 +37,12 @@ namespace gustave::examples::jsonGustave {
     template<core::cGustave G>
     class JsonWorld {
     public:
+        using BlockConstructionInfo = jsonWorld::BlockConstructionInfo<G>;
         using BlockType = jsonWorld::BlockType<G>;
         using Transaction = jsonWorld::Transaction<G>;
         using SyncWorld = typename Transaction::SyncWorld;
         using BlockIndex = typename SyncWorld::BlockIndex;
     private:
-        using BlockConstructionInfo = jsonWorld::BlockConstructionInfo<G>;
-
         struct MatHasher {
             using is_transparent = void;
 
@@ -109,36 +108,6 @@ namespace gustave::examples::jsonGustave {
             return blockTypeOf_;
         }
 
-        [[nodiscard]]
-        static std::unique_ptr<JsonWorld> fromJson(Json const& json) {
-            auto const blockSize = json.at("blockSize").get<Vector3<u.length>>();
-            auto const g = json.at("g").get<Vector3<u.acceleration>>();
-            auto result = std::make_unique<JsonWorld>(blockSize, g);
-            {
-                auto const blockTypes = json.at("blockTypes").get<std::vector<BlockType>>();
-                for (auto const& blockType : blockTypes) {
-                    result->addBlockType(blockType);
-                }
-            }
-            {
-                auto const& bTypes = result->blockTypes();
-                auto const blockInfos = json.at("blocks").get<std::vector<BlockConstructionInfo>>();
-                auto transaction = Transaction{};
-                for (auto const& blockInfo : blockInfos) {
-                    auto const& bTypeIt = bTypes.find(blockInfo.blockTypeName());
-                    if (bTypeIt == bTypes.end()) {
-                        std::stringstream msg;
-                        msg << "blockTypeName '" << blockInfo.blockTypeName() << "' of block " << blockInfo.index();
-                        msg << " isn't present in 'blockTypes'.";
-                        throw std::invalid_argument(msg.str());
-                    }
-                    transaction.addBlock(blockInfo.index(), *bTypeIt, blockInfo.isFoundation());
-                }
-                result->update(transaction);
-            }
-            return std::move(result);
-        }
-
         void update(Transaction const& transaction) {
             for (auto const& blockAndType : transaction.blockTypeOf()) {
                 if (!blockTypes_.contains(blockAndType.second)) {
@@ -171,3 +140,47 @@ namespace gustave::examples::jsonGustave {
         BlockTypeOf blockTypeOf_;
     };
 }
+
+template<gustave::core::cGustave G>
+struct nlohmann::adl_serializer<gustave::examples::jsonGustave::JsonWorld<G>> {
+    using JsonWorld = gustave::examples::jsonGustave::JsonWorld<G>;
+
+    using BlockConstructionInfo = typename JsonWorld::BlockConstructionInfo;
+    using BlockType = typename JsonWorld::BlockType;
+    using Transaction = typename JsonWorld::Transaction;
+
+    template<auto unit>
+    using Vector3 = typename G::template Vector3<unit>;
+
+    static constexpr auto u = G::units();
+
+    [[nodiscard]]
+    static JsonWorld from_json(nlohmann::json const& json) {
+        auto const blockSize = json.at("blockSize").get<Vector3<u.length>>();
+        auto const g = json.at("g").get<Vector3<u.acceleration>>();
+        auto result = JsonWorld{ blockSize, g };
+        {
+            auto const blockTypes = json.at("blockTypes").get<std::vector<BlockType>>();
+            for (auto const& blockType : blockTypes) {
+                result.addBlockType(blockType);
+            }
+        }
+        {
+            auto const& bTypes = result.blockTypes();
+            auto const blockInfos = json.at("blocks").get<std::vector<BlockConstructionInfo>>();
+            auto transaction = Transaction{};
+            for (auto const& blockInfo : blockInfos) {
+                auto const& bTypeIt = bTypes.find(blockInfo.blockTypeName());
+                if (bTypeIt == bTypes.end()) {
+                    std::stringstream msg;
+                    msg << "blockTypeName '" << blockInfo.blockTypeName() << "' of block " << blockInfo.index();
+                    msg << " isn't present in 'blockTypes'.";
+                    throw std::invalid_argument(msg.str());
+                }
+                transaction.addBlock(blockInfo.index(), *bTypeIt, blockInfo.isFoundation());
+            }
+            result.update(transaction);
+        }
+        return result;
+    }
+};

@@ -69,11 +69,11 @@ static std::ifstream openFile(std::string_view filename) {
 }
 
 [[nodiscard]]
-static std::unique_ptr<JG::JsonWorld> parseWorldFile(std::string_view fileName) {
+static JG::JsonWorld parseWorldFile(std::string_view fileName) {
     std::ifstream inputFile = openFile(fileName);
     try {
         auto const json = JG::Json::parse(inputFile);
-        return JG::JsonWorld::fromJson(json);
+        return json.get<JG::JsonWorld>();
     } catch (std::exception const& e) {
         std::stringstream msg;
         msg << "Could not parse '" << fileName << "': " << e.what();
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
         argsParser.parse(argc, argv);
         auto const world = parseWorldFile(args.inputWorldFileName);
         auto const renderer = makeRenderer(args.rendererFileName);
-        renderer.run(*world, std::cout);
+        renderer.run(world, std::cout);
         return EXIT_SUCCESS;
     } catch (CLI::ParseError const& e) {
         if (e.get_name() == "CallForHelp") {
