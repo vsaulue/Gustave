@@ -73,6 +73,13 @@ namespace gustave::core::worlds {
             : data_{ blockSize, std::move(solver) }
         {}
 
+        SyncWorld(SyncWorld const&) = delete;
+        SyncWorld& operator=(SyncWorld const&) = delete;
+
+        [[nodiscard]]
+        SyncWorld(SyncWorld&&) = default;
+        SyncWorld& operator=(SyncWorld&&) = default;
+
         [[nodiscard]]
         Blocks blocks() const {
             return Blocks{ data_ };

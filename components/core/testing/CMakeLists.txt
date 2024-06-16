@@ -51,6 +51,7 @@ function(add_test_core test_target_name config_lib)
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/solvers/force1Solver/Config.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/solvers/force1Solver/Solution.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/solvers/Force1Solver.cpp"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/worlds/syncWorld/detail/WorldData.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/worlds/syncWorld/detail/WorldUpdater.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/worlds/syncWorld/BlockReference.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/worlds/syncWorld/Blocks.cpp"

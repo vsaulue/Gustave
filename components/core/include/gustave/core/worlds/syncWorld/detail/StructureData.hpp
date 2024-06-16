@@ -49,7 +49,7 @@ namespace gustave::core::worlds::syncWorld::detail {
 
         [[nodiscard]]
         explicit StructureData(WorldData const& world, SceneStructure sceneStructure)
-            : world_{ world }
+            : world_{ &world }
             , sceneStructure_{ std::move(sceneStructure) }
             , solution_{ nullptr }
             , state_{ State::New }
@@ -78,7 +78,7 @@ namespace gustave::core::worlds::syncWorld::detail {
             assert(state_ == State::New);
             if (solution != nullptr) {
                 assert(&solution->basis().structure() == &sceneStructure_.solverStructure());
-                assert(&solution->basis().config() == &world_.solver.config());
+                assert(&solution->basis().config() == &world_->solver.config());
                 solution_ = std::move(solution);
                 state_ = State::Solved;
             } else {
@@ -91,12 +91,16 @@ namespace gustave::core::worlds::syncWorld::detail {
             return state_;
         }
 
+        void setWorldData(WorldData const& value) {
+            world_ = &value;
+        }
+
         [[nodiscard]]
         WorldData const& world() const {
-            return world_;
+            return *world_;
         }
     private:
-        WorldData const& world_;
+        WorldData const* world_;
         SceneStructure sceneStructure_;
         std::shared_ptr<Solution const> solution_;
         State state_;

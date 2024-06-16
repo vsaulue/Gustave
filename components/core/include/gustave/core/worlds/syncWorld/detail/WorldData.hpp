@@ -35,6 +35,9 @@
 
 namespace gustave::core::worlds::syncWorld::detail {
     template<cfg::cLibConfig auto libCfg>
+    class StructureData;
+
+    template<cfg::cLibConfig auto libCfg>
     struct WorldData {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -55,8 +58,36 @@ namespace gustave::core::worlds::syncWorld::detail {
             , solver{ std::move(solver_) }
         {}
 
+        WorldData(WorldData const&) = delete;
+        WorldData& operator=(WorldData const&) = delete;
+
+        [[nodiscard]]
+        WorldData(WorldData&& other)
+            : scene{ std::move(other.scene) }
+            , solver{ std::move(other.solver) }
+            , structures{ std::move(other.structures) }
+        {
+            resetWorldDataPtr();
+        }
+
+        WorldData& operator=(WorldData&& other) {
+            if (&other != this) {
+                scene = std::move(other.scene);
+                solver = std::move(other.solver);
+                structures = std::move(other.structures);
+                resetWorldDataPtr();
+            }
+            return *this;
+        }
+
         Scene scene;
         Solver solver;
         Structures structures;
+    private:
+        void resetWorldDataPtr() {
+            for (auto& structPair : structures) {
+                structPair.second->setWorldData(*this);
+            }
+        }
     };
 }
