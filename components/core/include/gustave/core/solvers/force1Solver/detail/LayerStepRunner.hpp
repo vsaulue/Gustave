@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
@@ -54,13 +56,22 @@ namespace gustave::core::solvers::force1Solver::detail {
         {}
 
         void runStep() {
-            Real<u.potential> cumulatedOffset = 0.f * u.potential;
-            for (auto const& layer : ctx_.lStructure.layers()) {
-                Real<u.potential> const layerOffset = findBalanceOffset(layer);
-                cumulatedOffset += layerOffset;
-                for (auto nodeIndex : layer.nodeIndices) {
-                    ctx_.nextPotentials[nodeIndex] = ctx_.potentials[nodeIndex] + cumulatedOffset;
+            auto const& layers = ctx_.lStructure.layers();
+            auto& layerOffsets = ctx_.nextPotentials;
+            assert(layerOffsets.size() >= layers.size());
+            for (std::size_t layerId = 0; layerId < layers.size(); ++layerId) {
+                auto const& layer = layers[layerId];
+                if (layer.isFoundation()) {
+                    layerOffsets[layerId] = 0.f * u.potential;
+                } else {
+                    assert(layer.lowLayer >= 0);
+                    assert(std::size_t(layer.lowLayer) < layerId);
+                    layerOffsets[layerId] = layerOffsets[layer.lowLayer] + findBalanceOffset(layer);
                 }
+            }
+            auto const& layerOfNode = ctx_.lStructure.layerOfNode();
+            for (std::size_t nodeId = 0; nodeId < ctx_.potentials.size(); ++nodeId) {
+                ctx_.potentials[nodeId] += layerOffsets[layerOfNode[nodeId]];
             }
         }
     private:
@@ -77,7 +88,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         [[nodiscard]]
         LayerStepPoint pointAt(Layer const& layer, Real<u.potential> const offset) const {
-            Real<u.force> force = layer.weight;
+            Real<u.force> force = layer.cumulatedWeight;
             Real<u.conductivity> derivative = 0.f * u.conductivity;
             for (auto const& contact : layer.lowContacts) {
                 Real<u.potential> const localPotential = offset + ctx_.potentials[contact.localIndex()];
@@ -91,7 +102,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         [[nodiscard]]
         Real<u.potential> findBalanceOffset(Layer const& layer) const {
-            Real<u.force> const maxForceError = targetErrorFactor * ctx_.config().targetMaxError() * layer.weight;
+            Real<u.force> const maxForceError = targetErrorFactor * ctx_.config().targetMaxError() * layer.cumulatedWeight;
             LayerStepPoint curPoint = pointAt(layer, 0.f * u.potential);
             LayerStepPoint nextPoint = pointAt(layer, curPoint.nextOffset());
             if (rt.abs(nextPoint.force) <= maxForceError) {

@@ -133,7 +133,7 @@ namespace gustave::core::solvers {
             LayerStepRunner layerRunner{ ctx };
             do {
                 layerRunner.runStep();
-                ctx.potentials.swap(ctx.nextPotentials);
+                // ctx.potentials.swap(ctx.nextPotentials);
                 BasicStepResult const stepResult = basicRunner.runStep();
                 if (stepResult.currentMaxError >= config_->targetMaxError()) {
                     ctx.potentials.swap(ctx.nextPotentials);

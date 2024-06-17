@@ -86,7 +86,7 @@ TEST_CASE("core::force1Solver::detail::LayerStructure") {
 
     SECTION(".layers()") {
         auto const& layers = lStructure.layers();
-        REQUIRE(layers.size() == 3);
+        REQUIRE(layers.size() == 5);
 
         auto addLowerContact = [&](Layer& output, NodeIndex localId, NodeIndex otherId) {
             output.lowContacts.push_back(LayerContact{ F1BasicContact{ otherId, conductivity.tensile(), conductivity.compression()}, localId });
@@ -97,37 +97,45 @@ TEST_CASE("core::force1Solver::detail::LayerStructure") {
 
         SECTION("// layer 0") {
             Layer expected;
-            expected.weight = 8.f * blockWeight;
-            expected.nodeIndices.push_back(x1y1);
-            addLowerContact(expected, x1y1, x1y0);
-            expected.nodeIndices.push_back(x2y1);
-            addLowerContact(expected, x2y1, x2y0);
-            expected.nodeIndices.push_back(x4y1);
-            addLowerContact(expected, x4y1, x4y0);
+            expected.cumulatedWeight = 11.f * blockWeight;
             CHECK(layers[0] == expected);
         }
 
         SECTION("// layer 1") {
             Layer expected;
-            expected.weight = 5.f * blockWeight;
-            expected.nodeIndices.push_back(x1y2);
-            addLowerContact(expected, x1y2, x1y1);
-            expected.nodeIndices.push_back(x2y2);
-            addLowerContact(expected, x2y2, x2y1);
-            expected.nodeIndices.push_back(x4y2);
-            addLowerContact(expected, x4y2, x4y1);
+            expected.cumulatedWeight = 8.f * blockWeight;
+            expected.lowLayer = 0;
+            addLowerContact(expected, x1y1, x1y0);
+            addLowerContact(expected, x4y1, x4y0);
+            addLowerContact(expected, x2y1, x2y0);
             CHECK(layers[1] == expected);
         }
 
         SECTION("// layer 2") {
             Layer expected;
-            expected.weight = 2.f * blockWeight;
-            expected.nodeIndices.push_back(x0y2);
-            addSideContact(expected, x0y2, x1y2);
-            expected.nodeIndices.push_back(x3y2);
+            expected.cumulatedWeight = 5.f * blockWeight;
+            expected.lowLayer = 1;
+            addLowerContact(expected, x1y2, x1y1);
+            addLowerContact(expected, x2y2, x2y1);
+            addLowerContact(expected, x4y2, x4y1);
+            CHECK(layers[2] == expected);
+        }
+
+        SECTION("// layer 3") {
+            Layer expected;
+            expected.cumulatedWeight = blockWeight;
+            expected.lowLayer = 2;
             addSideContact(expected, x3y2, x2y2);
             addSideContact(expected, x3y2, x4y2);
-            CHECK(layers[2] == expected);
+            CHECK(layers[3] == expected);
+        }
+
+        SECTION("// layer 4") {
+            Layer expected;
+            expected.cumulatedWeight = blockWeight;
+            expected.lowLayer = 2;
+            addSideContact(expected, x0y2, x1y2);
+            CHECK(layers[4] == expected);
         }
     }
 
