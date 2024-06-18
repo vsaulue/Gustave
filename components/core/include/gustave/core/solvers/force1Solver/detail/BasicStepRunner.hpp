@@ -47,7 +47,6 @@ namespace gustave::core::solvers::force1Solver::detail {
         using SolverRunContext = detail::SolverRunContext<libCfg>;
 
         using NodeStats = typename ForceRepartition::NodeStats;
-        using Node = typename ForceRepartition::Structure::Node;
 
         struct NodeStepResult {
             Real<u.one> currentNodeError;
@@ -83,11 +82,10 @@ namespace gustave::core::solvers::force1Solver::detail {
         StepResult runStep() {
             Real<u.one> const stepTargetError = targetErrorFactor * ctx_.config().targetMaxError();
             Real<u.one> currentMaxError = 0.f;
-            auto const nodes = ctx_.fStructure.structure().nodes();
-            for (NodeIndex id = 0; id < nodes.size(); ++id) {
-                Node const& node = nodes[id];
-                if (!node.isFoundation) {
-                    auto const& fNode = ctx_.fStructure.fNodes()[id];
+            auto const& fNodes = ctx_.fStructure.fNodes();
+            for (NodeIndex id = 0; id < fNodes.size(); ++id) {
+                auto const& fNode = fNodes[id];
+                if (!fNode.isFoundation) {
                     Real<u.force> const nodeForceError = stepTargetError * fNode.weight;
                     auto const nodeStepResult = runNodeStep(id, nodeForceError);
                     ctx_.nextPotentials[id] = nodeStepResult.nextPotential;

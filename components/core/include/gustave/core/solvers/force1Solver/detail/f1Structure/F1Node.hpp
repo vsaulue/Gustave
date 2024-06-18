@@ -52,8 +52,9 @@ namespace gustave::core::solvers::force1Solver::detail::f1Structure {
         using Contacts = std::vector<F1Contact>;
 
         [[nodiscard]]
-        explicit F1Node(Real<u.force> weight)
+        explicit F1Node(Real<u.force> weight, bool isFoundation)
             : weight{ weight }
+            , isFoundation{ isFoundation }
         {
             assert(weight > 0.f * u.force);
         }
@@ -67,5 +68,6 @@ namespace gustave::core::solvers::force1Solver::detail::f1Structure {
 
         Contacts contacts;
         Real<u.force> weight;
+        bool isFoundation;
     };
 }

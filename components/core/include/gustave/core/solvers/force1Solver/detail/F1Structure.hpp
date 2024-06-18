@@ -81,7 +81,7 @@ namespace gustave::core::solvers::force1Solver::detail {
             Real<u.acceleration> const gNorm = g().norm();
             fNodes_.reserve(nodes().size());
             for (Node const& node : nodes()) {
-                fNodes_.emplace_back(gNorm * node.mass());
+                fNodes_.emplace_back(gNorm * node.mass(), node.isFoundation);
             }
             auto const& links = structure.links();
             fLinks_.reserve(links.size());
