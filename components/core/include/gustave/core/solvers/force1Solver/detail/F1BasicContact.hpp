@@ -39,6 +39,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Real = cfg::Real<libCfg, unit>;
 
         static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto rt = libCfg.realTraits;
     public:
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
@@ -81,7 +82,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         [[nodiscard]]
         ForceStats forceStats(Real<u.potential> sourcePotential, Real<u.potential> otherPotential) const {
             Real<u.potential> const pDelta = otherPotential - sourcePotential;
-            Real<u.conductivity> const conductivity = (pDelta >= 0.f * u.potential) ? cPlus_ : cMinus_;
+            Real<u.conductivity> const conductivity = rt.signBit(pDelta) ? cMinus_ : cPlus_;
             return { pDelta, conductivity };
         }
 
