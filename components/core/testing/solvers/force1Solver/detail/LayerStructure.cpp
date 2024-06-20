@@ -84,59 +84,44 @@ TEST_CASE("core::force1Solver::detail::LayerStructure") {
     auto const fStructure = F1Structure{ structure, config };
     auto const lStructure = LayerStructure{ fStructure };
 
+    SECTION(".layerOfNode()") {
+        auto const expected = std::vector<NodeIndex>{ 4,0,1,2,0,1,2,3,0,1,2,4 };
+        CHECK_THAT(lStructure.layerOfNode(), matchers::c2::RangeEquals(expected));
+    }
+
     SECTION(".layers()") {
-        auto const& layers = lStructure.layers();
-        REQUIRE(layers.size() == 5);
-
-        auto addLowerContact = [&](Layer& output, NodeIndex localId, NodeIndex otherId) {
-            output.lowContacts.push_back(LayerContact{ F1BasicContact{ otherId, conductivity.tensile(), conductivity.compression()}, localId });
-        };
-        auto addSideContact = [&](Layer& output, NodeIndex localId, NodeIndex otherId) {
-            output.lowContacts.push_back(LayerContact{ F1BasicContact{ otherId, conductivity.shear(), conductivity.shear()}, localId });
+        auto const expected = std::vector<Layer>{
+            Layer{ {0,0}, 4, 11.f * blockWeight },
+            Layer{ {0,3}, 0, 8.f * blockWeight },
+            Layer{ {3,3}, 1, 5.f * blockWeight },
+            Layer{ {6,2}, 2, 1.f * blockWeight },
+            Layer{ {8,1}, 2, 1.f * blockWeight },
         };
 
-        SECTION("// layer 0") {
-            Layer expected;
-            expected.cumulatedWeight = 11.f * blockWeight;
-            CHECK(layers[0] == expected);
-        }
+        CHECK_THAT(lStructure.layers(), matchers::c2::RangeEquals(expected));
+    }
 
-        SECTION("// layer 1") {
-            Layer expected;
-            expected.cumulatedWeight = 8.f * blockWeight;
-            expected.lowLayer = 0;
-            addLowerContact(expected, x1y1, x1y0);
-            addLowerContact(expected, x4y1, x4y0);
-            addLowerContact(expected, x2y1, x2y0);
-            CHECK(layers[1] == expected);
-        }
+    SECTION(".lowContacts()") {
+        auto lowerContact = [&](NodeIndex localId, NodeIndex otherId) {
+            return LayerContact{ F1BasicContact{ otherId, conductivity.tensile(), conductivity.compression()}, localId };
+            };
+        auto sideContact = [&](NodeIndex localId, NodeIndex otherId) {
+            return LayerContact{ F1BasicContact{ otherId, conductivity.shear(), conductivity.shear()}, localId };
+            };
 
-        SECTION("// layer 2") {
-            Layer expected;
-            expected.cumulatedWeight = 5.f * blockWeight;
-            expected.lowLayer = 1;
-            addLowerContact(expected, x1y2, x1y1);
-            addLowerContact(expected, x2y2, x2y1);
-            addLowerContact(expected, x4y2, x4y1);
-            CHECK(layers[2] == expected);
-        }
+        auto const expected = std::vector<LayerContact>{
+            lowerContact(x1y1, x1y0),
+            lowerContact(x2y1, x2y0),
+            lowerContact(x4y1, x4y0),
+            lowerContact(x1y2, x1y1),
+            lowerContact(x2y2, x2y1),
+            lowerContact(x4y2, x4y1),
+            sideContact(x3y2, x2y2),
+            sideContact(x3y2, x4y2),
+            sideContact(x0y2, x1y2),
+        };
 
-        SECTION("// layer 3") {
-            Layer expected;
-            expected.cumulatedWeight = blockWeight;
-            expected.lowLayer = 2;
-            addSideContact(expected, x3y2, x2y2);
-            addSideContact(expected, x3y2, x4y2);
-            CHECK(layers[3] == expected);
-        }
-
-        SECTION("// layer 4") {
-            Layer expected;
-            expected.cumulatedWeight = blockWeight;
-            expected.lowLayer = 2;
-            addSideContact(expected, x0y2, x1y2);
-            CHECK(layers[4] == expected);
-        }
+        CHECK_THAT(lStructure.lowContacts(), matchers::c2::RangeEquals(expected));
     }
 
     SECTION(".reachedCount()") {

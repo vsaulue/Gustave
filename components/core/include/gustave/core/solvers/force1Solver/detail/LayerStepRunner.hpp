@@ -64,9 +64,10 @@ namespace gustave::core::solvers::force1Solver::detail {
                 if (layer.isFoundation()) {
                     layerOffsets[layerId] = 0.f * u.potential;
                 } else {
-                    assert(layer.lowLayer >= 0);
-                    assert(std::size_t(layer.lowLayer) < layerId);
-                    layerOffsets[layerId] = layerOffsets[layer.lowLayer] + findBalanceOffset(layer);
+                    auto const lowLayerId = layer.lowLayerId();
+                    assert(lowLayerId >= 0);
+                    assert(lowLayerId < layerId);
+                    layerOffsets[layerId] = layerOffsets[lowLayerId] + findBalanceOffset(layer);
                 }
             }
             auto const& layerOfNode = ctx_.lStructure.layerOfNode();
@@ -88,9 +89,9 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         [[nodiscard]]
         LayerStepPoint pointAt(Layer const& layer, Real<u.potential> const offset) const {
-            Real<u.force> force = layer.cumulatedWeight;
+            Real<u.force> force = layer.cumulatedWeight();
             Real<u.conductivity> derivative = 0.f * u.conductivity;
-            for (auto const& contact : layer.lowContacts) {
+            for (auto const& contact : layer.lowContactIds().subSpanOf(ctx_.lStructure.lowContacts())) {
                 Real<u.potential> const localPotential = offset + ctx_.potentials[contact.localIndex()];
                 Real<u.potential> const otherPotential = ctx_.potentials[contact.otherIndex()];
                 auto const forceStats = contact.forceStats(localPotential, otherPotential);
@@ -102,7 +103,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         [[nodiscard]]
         Real<u.potential> findBalanceOffset(Layer const& layer) const {
-            Real<u.force> const maxForceError = targetErrorFactor * ctx_.config().targetMaxError() * layer.cumulatedWeight;
+            Real<u.force> const maxForceError = targetErrorFactor * ctx_.config().targetMaxError() * layer.cumulatedWeight();
             LayerStepPoint curPoint = pointAt(layer, 0.f * u.potential);
             LayerStepPoint nextPoint = pointAt(layer, curPoint.nextOffset());
             if (rt.abs(nextPoint.force) <= maxForceError) {

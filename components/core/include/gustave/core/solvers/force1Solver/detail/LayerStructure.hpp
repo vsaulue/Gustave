@@ -25,13 +25,15 @@
 
 #pragma once
 
-#include <stack>
+#include <cassert>
 #include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
+#include <gustave/core/solvers/force1Solver/detail/LayerDecomposition.hpp>
+#include <gustave/utils/IndexRange.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
@@ -41,11 +43,12 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
-
-        using LayerIndex = cfg::NodeIndex<libCfg>;
-        using DepthIndex = std::int64_t;
     public:
         using F1Structure = detail::F1Structure<libCfg>;
+        using LayerDecomposition = detail::LayerDecomposition<libCfg>;
+
+        using ContactIndex = cfg::LinkIndex<libCfg>;
+        using LayerIndex = cfg::NodeIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
         using F1BasicContact = typename F1Structure::F1Contact::F1BasicContact;
@@ -84,124 +87,77 @@ namespace gustave::core::solvers::force1Solver::detail {
             NodeIndex localIndex_;
         };
 
-        struct Layer {
+        class Layer {
+        public:
             [[nodiscard]]
-            Layer() = default;
+            explicit Layer(utils::IndexRange<ContactIndex> lowContactIds, LayerIndex lowLayerId, Real<u.force> cumulatedWeight)
+                : lowContactIds_{ lowContactIds }
+                , lowLayerId_{ lowLayerId }
+                , cumulatedWeight_{ cumulatedWeight }
+            {
+                assert(cumulatedWeight_ >= 0.f * u.force);
+            }
+
+            [[nodiscard]]
+            Real<u.force> cumulatedWeight() const {
+                return cumulatedWeight_;
+            }
 
             [[nodiscard]]
             bool isFoundation() const {
-                return lowContacts.empty();
+                return lowContactIds_.size() == 0;
+            }
+
+            [[nodiscard]]
+            utils::IndexRange<ContactIndex> const& lowContactIds() const {
+                return lowContactIds_;
+            }
+
+            [[nodiscard]]
+            LayerIndex lowLayerId() const {
+                return lowLayerId_;
             }
 
             [[nodiscard]]
             bool operator==(Layer const&) const = default;
-
-            std::vector<LayerContact> lowContacts;
-            LayerIndex lowLayer = 0;
-            Real<u.force> cumulatedWeight = 0.f * u.force;
+        private:
+            utils::IndexRange<ContactIndex> lowContactIds_;
+            LayerIndex lowLayerId_;
+            Real<u.force> cumulatedWeight_;
         };
 
         [[nodiscard]]
-        explicit LayerStructure(F1Structure const& fStructure)
-            : layerOfNode_(fStructure.fNodes().size(), 0)
-        {
-            std::vector<DepthIndex> depthOfNode(fStructure.fNodes().size(), -1);
-            std::stack<std::vector<NodeIndex>> nodesAtDepth;
+        explicit LayerStructure(F1Structure const& fStructure) {
+            auto ld = LayerDecomposition{ fStructure };
+            reachedCount_ = ld.reachedCount;
 
-            DepthIndex depth = 0;
-            std::vector<NodeIndex> curNodes;
-            for (std::size_t nodeId = 0; nodeId < depthOfNode.size(); ++nodeId) {
-                auto const& node = fStructure.structure().nodes()[nodeId];
-                if (node.isFoundation) {
-                    depthOfNode[nodeId] = 0;
-                    curNodes.push_back(nodeId);
-                }
-            }
-
-            std::vector<NodeIndex> nextNodes;
-            while (!curNodes.empty()) {
-                reachedCount_ += curNodes.size();
-                depth += 1;
-                for (NodeIndex localIndex : curNodes) {
-                    auto const& fNode = fStructure.fNodes()[localIndex];
+            LayerIndex const lastLayerId = ld.decLayers.size() - 1;
+            layers_.reserve(ld.decLayers.size());
+            lowContacts_.reserve(ld.lowContactsCount);
+            ContactIndex startLowContact = 0;
+            while (!ld.decLayers.empty()) {
+                auto& decLayer = ld.decLayers.back();
+                ContactIndex sizeLowContact = 0;
+                for (NodeIndex nodeId : decLayer.nodes) {
+                    auto const& fNode = fStructure.fNodes()[nodeId];
+                    LayerIndex const decLayerId = ld.layerOfNode[nodeId];
                     for (auto const& fContact : fNode.contacts) {
-                        NodeIndex const otherIndex = fContact.otherIndex();
-                        DepthIndex const otherDepth = depthOfNode[otherIndex];
-                        if (otherDepth < 0) {
-                            depthOfNode[otherIndex] = depth;
-                            nextNodes.push_back(otherIndex);
+                        if (ld.layerOfNode[fContact.otherIndex()] > decLayerId) {
+                            lowContacts_.emplace_back(fContact.basicContact(), nodeId);
+                            sizeLowContact += 1;
                         }
                     }
                 }
-                std::vector<NodeIndex>& newDepth = nodesAtDepth.emplace();
-                newDepth.swap(curNodes);
-                curNodes.swap(nextNodes);
-                assert(nextNodes.empty());
+                LayerIndex const newLayerId = lastLayerId - decLayer.lowLayerId;
+                auto const lowContactIds = utils::IndexRange<ContactIndex>{ startLowContact, sizeLowContact };
+                layers_.emplace_back(lowContactIds, newLayerId, decLayer.cumulatedWeight);
+                startLowContact += sizeLowContact;
+                ld.decLayers.pop_back();
             }
+            assert(lowContacts_.size() == ld.lowContactsCount);
 
-            std::vector<bool> placed(fStructure.fNodes().size(), false);
-            std::vector<Layer> newLayers;
-            while (!nodesAtDepth.empty()) {
-                auto const& curDepthNodes = nodesAtDepth.top();
-                DepthIndex const depth = nodesAtDepth.size() - 1;
-                for (NodeIndex rootId : curDepthNodes) {
-                    if (!placed[rootId]) {
-                        std::stack<NodeIndex> remainingNodes;
-                        auto const layerId = LayerIndex(newLayers.size());
-                        Layer& newLayer = newLayers.emplace_back();
-                        placed[rootId] = true;
-                        layerOfNode_[rootId] = layerId;
-                        remainingNodes.push(rootId);
-                        while (!remainingNodes.empty()) {
-                            NodeIndex localId = remainingNodes.top();
-                            remainingNodes.pop();
-                            auto const& fNode = fStructure.fNodes()[localId];
-                            newLayer.cumulatedWeight += fNode.weight;
-                            for (auto const& fContact : fNode.contacts) {
-                                NodeIndex const otherId = fContact.otherIndex();
-                                DepthIndex const otherDepth = depthOfNode[otherId];
-                                if (otherDepth < depth) {
-                                    newLayer.lowContacts.emplace_back(fContact.basicContact(), localId);
-                                } else if (otherDepth == depth) {
-                                    if (!placed[otherId]) {
-                                        placed[otherId] = true;
-                                        layerOfNode_[otherId] = layerId;
-                                        remainingNodes.push(otherId);
-                                    }
-                                    assert(layerOfNode_[otherId] == layerId);
-                                } else {
-                                    assert(placed[otherId]);
-                                    Layer& otherLayer = newLayers[layerOfNode_[otherId]];
-                                    if (otherLayer.lowLayer == 0) {
-                                        assert(layerId > 0);
-                                        otherLayer.lowLayer = layerId;
-                                        newLayer.cumulatedWeight += otherLayer.cumulatedWeight;
-                                        for (auto const& otherContact : otherLayer.lowContacts) {
-                                            NodeIndex const adjId = otherContact.otherIndex();
-                                            if (!placed[adjId]) {
-                                                placed[adjId] = true;
-                                                layerOfNode_[adjId] = layerId;
-                                                remainingNodes.push(adjId);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                nodesAtDepth.pop();
-            }
-
-            layers_.reserve(newLayers.size());
-            LayerIndex const lastLayerId = newLayers.size() - 1;
-            for (auto layerIt = newLayers.rbegin(); layerIt != newLayers.rend(); ++layerIt) {
-                if (layerIt->lowLayer > 0) {
-                    layerIt->lowLayer = lastLayerId - layerIt->lowLayer;
-                }
-                layers_.emplace_back(std::move(*layerIt));
-            }
-            for (auto& layerId : layerOfNode_) {
+            layerOfNode_ = std::move(ld.layerOfNode);
+            for (LayerIndex& layerId : layerOfNode_) {
                 layerId = lastLayerId - layerId;
             }
         }
@@ -217,6 +173,11 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
+        std::vector<LayerContact> const& lowContacts() const {
+            return lowContacts_;
+        }
+
+        [[nodiscard]]
         std::size_t reachedCount() const {
             return reachedCount_;
         }
@@ -224,5 +185,6 @@ namespace gustave::core::solvers::force1Solver::detail {
         std::size_t reachedCount_ = 0;
         std::vector<Layer> layers_;
         std::vector<LayerIndex> layerOfNode_;
+        std::vector<LayerContact> lowContacts_;
     };
 }
