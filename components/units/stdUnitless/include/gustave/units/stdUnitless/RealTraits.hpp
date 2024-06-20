@@ -80,7 +80,13 @@ namespace gustave::units::stdUnitless {
 
         [[nodiscard]]
         static bool signBit(lib::cReal auto const real) {
+#ifdef _MSC_VER
+            // MSVC's current std::signbit isn't inlined, and produces a call to a CRT function even with optimized builds.
+            // Using a compiler intrinsic instead enables significant performance gains.
+            return __signbitvalue(real.value());
+#else
             return std::signbit(real.value());
+#endif
         }
 
         [[nodiscard]]
