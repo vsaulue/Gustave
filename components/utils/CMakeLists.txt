@@ -32,6 +32,7 @@ add_executable(Test-Comp-Utils
     "tests/utils/getter.cpp"
     "tests/utils/HashEquals.cpp"
     "tests/utils/Hasher.cpp"
+    "tests/utils/IndexRange.cpp"
     "tests/utils/NumberHyperscript.cpp"
     "tests/utils/PointerHash.cpp"
     "tests/utils/prop/Ptr.cpp"
