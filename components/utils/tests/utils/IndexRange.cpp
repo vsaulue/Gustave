@@ -38,6 +38,16 @@ TEST_CASE("utils::IndexRange") {
         CHECK(ir.end() == 5);
     }
 
+    SECTION(".setSize()") {
+        ir.setSize(7);
+        CHECK(ir.size() == 7);
+    }
+
+    SECTION(".setStart()") {
+        ir.setStart(10);
+        CHECK(ir.start() == 10);
+    }
+
     SECTION(".size()") {
         CHECK(ir.size() == 3);
     }

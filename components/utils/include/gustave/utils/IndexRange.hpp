@@ -53,7 +53,7 @@ namespace gustave::utils {
             , size_{ size }
         {
             assert(size_ >= 0);
-            assert(std::numeric_limits<Index>::max() - size_ >= start_);
+            assert(start_ <= std::numeric_limits<Index>::max() - size_);
         }
 
         [[nodiscard]]
@@ -71,18 +71,31 @@ namespace gustave::utils {
             return size_;
         }
 
+        constexpr void setStart(Index value) {
+            assert(start_ <= std::numeric_limits<Index>::max() - value);
+            start_ = value;
+        }
+
+        constexpr void setSize(Index value) {
+            assert(value >= 0);
+            assert(start_ <= std::numeric_limits<Index>::max() - value);
+            size_ = value;
+        }
+
         template<typename T>
         [[nodiscard]]
         constexpr std::span<T const> subSpanOf(std::vector<T> const& vec) const {
-            assert(start_ + size_ <= vec.size());
-            return { vec.begin() + start_, size_ };
+            assert(size_ <= vec.size());
+            assert(start_ <= vec.size() - size_);
+            return { &vec[start_], size_ };
         }
 
         template<typename T>
         [[nodiscard]]
         constexpr std::span<T> subSpanOf(std::span<T> span) const {
-            assert(start_ + size_ <= span.size());
-            return { span.data() + start_, size_ };
+            assert(size_ <= span.size());
+            assert(start_ <= span.size() - size_);
+            return { &span[start_], size_};
         }
 
         [[nodiscard]]
