@@ -48,11 +48,13 @@ namespace gustave::core::solvers::force1Solver::solution {
         using SolutionData = detail::SolutionData<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
+        using F1LocalContacts = typename SolutionData::F1Structure::LocalContacts;
         using F1Node = typename SolutionData::F1Structure::F1Node;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeStats = detail::NodeStats<libCfg>;
         using StructureNode = typename Structure::Node;
         using StructureLink = typename Structure::Link;
+        using StructureLinks = typename Structure::Links;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -71,19 +73,19 @@ namespace gustave::core::solvers::force1Solver::solution {
         private:
             class Enumerator {
             private:
-                using DataIterator = typename F1Node::Contacts::const_iterator;
+                using DataIterator = typename F1LocalContacts::iterator;
             public:
                 [[nodiscard]]
                 Enumerator()
-                    : node_{ nullptr }
+                    : contacts_{ nullptr }
                     , dataIterator_{}
                     , value_{ utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
-                explicit Enumerator(NodeReference const& node)
-                    : node_{ node }
-                    , dataIterator_{ node.fNode().contacts.begin() }
+                explicit Enumerator(Contacts const& contacts)
+                    : contacts_{ &contacts }
+                    , dataIterator_{ contacts.fLocalContacts_.begin() }
                     , value_{ utils::NO_INIT }
                 {
                     updateValue();
@@ -91,7 +93,7 @@ namespace gustave::core::solvers::force1Solver::solution {
 
                 [[nodiscard]]
                 bool isEnd() const {
-                    return dataIterator_ == node_.fNode().contacts.end();
+                    return dataIterator_ == contacts_->fLocalContacts_.end();
                 }
 
                 void operator++() {
@@ -112,13 +114,13 @@ namespace gustave::core::solvers::force1Solver::solution {
                 void updateValue() {
                     if (!isEnd()) {
                         LinkIndex linkId = dataIterator_->linkIndex();
-                        StructureLink const& link = node_.solution_->basis().structure().links()[linkId];
-                        bool isOnLocalNode = (link.localNodeId() == node_.index_);
-                        value_ = ContactReference{ *node_.solution_, ContactIndex{ linkId, isOnLocalNode } };
+                        StructureLink const& link = (*contacts_->links_)[linkId];
+                        bool isOnLocalNode = (link.localNodeId() == contacts_->node_.index_);
+                        value_ = ContactReference{ *contacts_->node_.solution_, ContactIndex{ linkId, isOnLocalNode } };
                     }
                 }
 
-                NodeReference node_;
+                Contacts const* contacts_;
                 DataIterator dataIterator_;
                 ContactReference value_;
             };
@@ -128,11 +130,13 @@ namespace gustave::core::solvers::force1Solver::solution {
             [[nodiscard]]
             explicit Contacts(NodeReference const& node)
                 : node_{ node }
+                , links_{ &node_.solution_->basis().structure().links() }
+                , fLocalContacts_{ node.fLocalContacts() }
             {}
 
             [[nodiscard]]
             ContactReference at(ContactIndex const& contactIndex) const {
-                StructureLink const& link = node_.solution_->basis().structure().links().at(contactIndex.linkIndex);
+                StructureLink const& link = links_->at(contactIndex.linkIndex);
                 if (contactIndex.isOnLocalNode) {
                     if (link.localNodeId() == node_.index_) {
                         return ContactReference{ *node_.solution_, contactIndex };
@@ -150,7 +154,7 @@ namespace gustave::core::solvers::force1Solver::solution {
 
             [[nodiscard]]
             Iterator begin() const {
-                return Iterator{ node_ };
+                return Iterator{ *this };
             }
 
             [[nodiscard]]
@@ -160,10 +164,12 @@ namespace gustave::core::solvers::force1Solver::solution {
 
             [[nodiscard]]
             std::size_t size() const {
-                return node_.fNode().contacts.size();
+                return fLocalContacts_.size();
             }
         private:
             NodeReference node_;
+            StructureLinks const* links_;
+            F1LocalContacts fLocalContacts_;
         };
 
         [[nodiscard]]
@@ -239,6 +245,11 @@ namespace gustave::core::solvers::force1Solver::solution {
         [[nodiscard]]
         F1Node const& fNode() const {
             return solution_->fStructure().fNodes()[index_];
+        }
+
+        [[nodiscard]]
+        F1LocalContacts fLocalContacts() const {
+            return solution_->fStructure().fContactsOf(index_);
         }
 
         [[nodiscard]]

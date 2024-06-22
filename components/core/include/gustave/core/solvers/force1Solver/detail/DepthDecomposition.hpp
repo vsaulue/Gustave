@@ -64,8 +64,7 @@ namespace gustave::core::solvers::force1Solver::detail {
                 reachedCount += curNodes.size();
                 depth += 1;
                 for (NodeIndex localIndex : curNodes) {
-                    auto const& fNode = fStructure.fNodes()[localIndex];
-                    for (auto const& fContact : fNode.contacts) {
+                    for (auto const& fContact : fStructure.fContactsOf(localIndex)) {
                         NodeIndex const otherIndex = fContact.otherIndex();
                         if (!isNodeReached[otherIndex]) {
                             isNodeReached[otherIndex] = true;

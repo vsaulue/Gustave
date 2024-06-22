@@ -34,6 +34,9 @@ namespace gustave::core::solvers::force1Solver::detail::f1Structure {
     public:
         using LocalContactIndex = cfg::LinkIndex<libCfg>;
 
+        [[nodiscard]]
+        bool operator==(F1Link const&) const = default;
+
         LocalContactIndex localContactId;
         LocalContactIndex otherContactId;
     };

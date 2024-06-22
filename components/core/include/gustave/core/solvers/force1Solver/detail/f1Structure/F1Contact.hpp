@@ -30,7 +30,6 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-
 #include <gustave/core/solvers/force1Solver/detail/F1BasicContact.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail::f1Structure {

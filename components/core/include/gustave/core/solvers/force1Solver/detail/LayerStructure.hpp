@@ -139,9 +139,8 @@ namespace gustave::core::solvers::force1Solver::detail {
                 auto& decLayer = ld.decLayers.back();
                 ContactIndex sizeLowContact = 0;
                 for (NodeIndex nodeId : decLayer.nodes) {
-                    auto const& fNode = fStructure.fNodes()[nodeId];
                     LayerIndex const decLayerId = ld.layerOfNode[nodeId];
-                    for (auto const& fContact : fNode.contacts) {
+                    for (auto const& fContact : fStructure.fContactsOf(nodeId)) {
                         if (ld.layerOfNode[fContact.otherIndex()] > decLayerId) {
                             lowContacts_.emplace_back(fContact.basicContact(), nodeId);
                             sizeLowContact += 1;

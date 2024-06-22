@@ -87,10 +87,9 @@ namespace gustave::core::solvers::force1Solver::detail {
                         addNodeToLayer(rootId);
                         while (!remainingNodes.empty()) {
                             NodeIndex localId = remainingNodes.top();
-                            auto const& localNode = fNodes[localId];
-                            newLayer.cumulatedWeight += localNode.weight;
+                            newLayer.cumulatedWeight += fNodes[localId].weight;
                             remainingNodes.pop();
-                            for (auto const& fContact : localNode.contacts) {
+                            for (auto const& fContact : fStructure.fContactsOf(localId)) {
                                 NodeIndex const otherId = fContact.otherIndex();
                                 DepthIndex const otherDepth = dd.depthOfNode[otherId];
                                 if (otherDepth < depth) {
@@ -105,7 +104,7 @@ namespace gustave::core::solvers::force1Solver::detail {
                                         otherLayer.lowLayerId = layerId;
                                         newLayer.cumulatedWeight += otherLayer.cumulatedWeight;
                                         for (NodeIndex highNodeId : otherLayer.nodes) {
-                                            for (auto const& highContact : fNodes[highNodeId].contacts) {
+                                            for (auto const& highContact : fStructure.fContactsOf(highNodeId)) {
                                                 addNodeToLayer(highContact.otherIndex());
                                             }
                                         }

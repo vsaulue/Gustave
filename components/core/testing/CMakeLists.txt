@@ -44,6 +44,7 @@ function(add_test_core test_target_name config_lib)
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/Transaction.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/CuboidGridScene.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/solvers/force1Solver/detail/DepthDecomposition.cpp"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/solvers/force1Solver/detail/F1Structure.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/solvers/force1Solver/detail/LayerDecomposition.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/solvers/force1Solver/detail/LayerStructure.cpp"
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/solvers/force1Solver/solution/ContactReference.cpp"

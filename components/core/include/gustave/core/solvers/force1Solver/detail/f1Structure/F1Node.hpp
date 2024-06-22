@@ -26,14 +26,13 @@
 #pragma once
 
 #include <cassert>
-#include <stdexcept>
-#include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/solvers/force1Solver/detail/f1Structure/F1Contact.hpp>
 #include <gustave/utils/canNarrow.hpp>
+#include <gustave/utils/IndexRange.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail::f1Structure {
     template<cfg::cLibConfig auto libCfg>
@@ -44,12 +43,13 @@ namespace gustave::core::solvers::force1Solver::detail::f1Structure {
 
         static constexpr auto u = cfg::units(libCfg);
     public:
+        using ContactIndex = cfg::LinkIndex<libCfg>;
         using F1Contact = f1Structure::F1Contact<libCfg>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using LocalContactIndex = LinkIndex;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
-        using Contacts = std::vector<F1Contact>;
+        using ContactIds = utils::IndexRange<ContactIndex>;
 
         [[nodiscard]]
         explicit F1Node(Real<u.force> weight, bool isFoundation)
@@ -59,14 +59,10 @@ namespace gustave::core::solvers::force1Solver::detail::f1Structure {
             assert(weight > 0.f * u.force);
         }
 
-        LocalContactIndex addContact(NodeIndex otherIndex, LinkIndex linkIndex, Real<u.conductivity> cPlus, Real<u.conductivity> cMinus) {
-            auto const result = contacts.size();
-            assert(utils::canNarrow<LocalContactIndex>(result));
-            contacts.emplace_back(otherIndex, linkIndex, cPlus, cMinus);
-            return result;
-        }
+        [[nodiscard]]
+        bool operator==(F1Node const&) const = default;
 
-        Contacts contacts;
+        ContactIds contactIds;
         Real<u.force> weight;
         bool isFoundation;
     };

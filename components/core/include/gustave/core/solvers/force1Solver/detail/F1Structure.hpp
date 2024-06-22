@@ -26,6 +26,7 @@
 #pragma once
 
 #include <memory>
+#include <span>
 #include <vector>
 
 #include <gustave/cfg/cLibConfig.hpp>
@@ -47,6 +48,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
 
+        using ContactIndex = cfg::LinkIndex<libCfg>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
@@ -70,6 +72,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         using F1Node = f1Structure::F1Node<libCfg>;
         using Link = typename Structure::Link;
         using LocalContactIndex = typename F1Link::LocalContactIndex;
+        using LocalContacts = std::span<F1Contact const>;
         using Node = typename Structure::Node;
 
         [[nodiscard]]
@@ -79,12 +82,28 @@ namespace gustave::core::solvers::force1Solver::detail {
             , normalizedG_{ config_->g() }
         {
             Real<u.acceleration> const gNorm = g().norm();
-            fNodes_.reserve(nodes().size());
-            for (Node const& node : nodes()) {
+            auto const& nodes = structure_->nodes();
+            fNodes_.reserve(nodes.size());
+            for (Node const& node : nodes) {
                 fNodes_.emplace_back(gNorm * node.mass(), node.isFoundation);
             }
             auto const& links = structure.links();
             fLinks_.reserve(links.size());
+            for (LinkIndex linkId = 0; linkId < links.size(); ++linkId) {
+                Link const& link = links[linkId];
+                auto& localContactIds = fNodes_[link.localNodeId()].contactIds;
+                auto& otherContactIds = fNodes_[link.otherNodeId()].contactIds;
+                fLinks_.push_back(F1Link{ localContactIds.size(), otherContactIds.size() });
+                localContactIds.setSize(1 + localContactIds.size());
+                otherContactIds.setSize(1 + otherContactIds.size());
+            }
+            ContactIndex startId = 0;
+            for (F1Node& fNode : fNodes_) {
+                fNode.contactIds.setStart(startId);
+                startId += fNode.contactIds.size();
+            }
+            // NOTE: std::vector::resize initializes the content, which isn't needed here. But no easy alternative with std::vector...
+            fContacts_.resize(2 * links.size(), F1Contact{ 0, 0, infConductivity, infConductivity });
             for (LinkIndex linkId = 0; linkId < links.size(); ++linkId) {
                 Link const& link = links[linkId];
                 NodeIndex const id1 = link.localNodeId();
@@ -98,9 +117,11 @@ namespace gustave::core::solvers::force1Solver::detail {
                 Real<u.conductivity> const pCond = rt.min(normalCond.plus, tangentCond);
                 Real<u.conductivity> const nCond = rt.min(normalCond.minus, tangentCond);
 
-                LocalContactIndex contact1 = fNodes_[id1].addContact(id2, linkId, pCond, nCond);
-                LocalContactIndex contact2 = fNodes_[id2].addContact(id1, linkId, nCond, pCond);
-                fLinks_.push_back(F1Link{ contact1, contact2 });
+                F1Link const& fLink = fLinks_[linkId];
+                ContactIndex const contactId1 = fNodes_[id1].contactIds.start() + fLink.localContactId;
+                fContacts_[contactId1] = F1Contact{ id2, linkId, pCond, nCond };
+                ContactIndex const contactId2 = fNodes_[id2].contactIds.start() + fLink.otherContactId;
+                fContacts_[contactId2] = F1Contact{ id1, linkId, nCond, pCond };
             }
         }
 
@@ -115,8 +136,23 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
+        std::vector<F1Contact> const& fContacts() const {
+            return fContacts_;
+        }
+
+        [[nodiscard]]
+        LocalContacts fContactsOf(NodeIndex nodeId) const {
+            return fNodes_[nodeId].contactIds.subSpanOf(fContacts_);
+        }
+
+        [[nodiscard]]
         std::vector<F1Link> const& fLinks() const {
             return fLinks_;
+        }
+
+        [[nodiscard]]
+        std::vector<F1Node> const& fNodes() const {
+            return fNodes_;
         }
 
         [[nodiscard]]
@@ -127,11 +163,6 @@ namespace gustave::core::solvers::force1Solver::detail {
         [[nodiscard]]
         Structure const& structure() const {
             return *structure_;
-        }
-
-        [[nodiscard]]
-        std::vector<F1Node> const& fNodes() const {
-            return fNodes_;
         }
     private:
         [[nodiscard]]
@@ -160,13 +191,9 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         Config const* config_;
         Structure const* structure_;
+        std::vector<F1Contact> fContacts_;
         std::vector<F1Link> fLinks_;
         std::vector<F1Node> fNodes_;
         NormalizedVector3 normalizedG_;
-
-        [[nodiscard]]
-        std::vector<Node> const& nodes() const {
-            return structure_->nodes();
-        }
     };
 }
