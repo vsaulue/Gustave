@@ -79,26 +79,26 @@ namespace gustave::core::solvers::force1Solver::detail {
         struct LayerStepPoint {
             Real<u.potential> offset;
             Real<u.force> force;
-            Real<u.conductivity> derivative;
+            Real<u.conductivity> conductivity;
 
             [[nodiscard]]
             Real<u.potential> nextOffset() const {
-                return offset - force / derivative;
+                return offset + force / conductivity;
             }
         };
 
         [[nodiscard]]
         LayerStepPoint pointAt(Layer const& layer, Real<u.potential> const offset) const {
             Real<u.force> force = layer.cumulatedWeight();
-            Real<u.conductivity> derivative = 0.f * u.conductivity;
+            Real<u.conductivity> conductivity = 0.f * u.conductivity;
             for (auto const& contact : layer.lowContactIds().subSpanOf(ctx_.lStructure.lowContacts())) {
                 Real<u.potential> const localPotential = offset + ctx_.potentials[contact.localIndex()];
                 Real<u.potential> const otherPotential = ctx_.potentials[contact.otherIndex()];
                 auto const forceStats = contact.forceStats(localPotential, otherPotential);
                 force += forceStats.force();
-                derivative += forceStats.derivative();
+                conductivity += forceStats.conductivity;
             }
-            return { offset, force, derivative };
+            return { offset, force, conductivity };
         }
 
         [[nodiscard]]

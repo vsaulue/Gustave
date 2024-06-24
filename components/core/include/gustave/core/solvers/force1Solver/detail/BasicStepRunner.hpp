@@ -64,7 +64,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
             [[nodiscard]]
             Real<u.potential> nextPotential() const {
-                return potential - stats.force() / stats.derivative();
+                return potential + stats.force() / stats.conductivity();
             }
         };
     public:

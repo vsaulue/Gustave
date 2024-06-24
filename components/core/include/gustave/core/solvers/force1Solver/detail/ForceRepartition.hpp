@@ -101,14 +101,14 @@ namespace gustave::core::solvers::force1Solver::detail {
         NodeStats statsOf(NodeIndex const id, Real<u.potential> const potential) const {
             F1Node const& fNode = fNodes()[id];
             Real<u.force> force = fNode.weight;
-            Real<u.conductivity> derivative = 0.f * u.conductivity;
+            Real<u.conductivity> conductivity = 0.f * u.conductivity;
 
             for (F1Contact const& fContact : fStructure_.fContactsOf(id)) {
                 ContactStats const contactStats = contactStatsOf(fContact, potential);
-                derivative += contactStats.derivative();
+                conductivity += contactStats.conductivity;
                 force += contactStats.force();
             }
-            return NodeStats{ fNode, force, derivative };
+            return NodeStats{ fNode, force, conductivity };
         }
 
         [[nodiscard]]

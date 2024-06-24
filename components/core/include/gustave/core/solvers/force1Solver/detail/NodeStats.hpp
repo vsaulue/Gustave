@@ -43,10 +43,10 @@ namespace gustave::core::solvers::force1Solver::detail {
         using F1Node = f1Structure::F1Node<libCfg>;
 
         [[nodiscard]]
-        explicit NodeStats(F1Node const& fNode, Real<u.force> force, Real<u.conductivity> derivative)
+        explicit NodeStats(F1Node const& fNode, Real<u.force> force, Real<u.conductivity> conductivity)
             : fNode_{ &fNode }
             , force_{ force }
-            , derivative_{ derivative }
+            , conductivity_{ conductivity }
         {}
 
         [[nodiscard]]
@@ -65,12 +65,12 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        Real<u.conductivity> derivative() const {
-            return derivative_;
+        Real<u.conductivity> conductivity() const {
+            return conductivity_;
         }
     private:
         F1Node const* fNode_;
         Real<u.force> force_;
-        Real<u.conductivity> derivative_;
+        Real<u.conductivity> conductivity_;
     };
 }

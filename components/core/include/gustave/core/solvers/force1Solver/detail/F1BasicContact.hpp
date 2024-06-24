@@ -52,11 +52,6 @@ namespace gustave::core::solvers::force1Solver::detail {
             Real<u.force> force() const {
                 return potDelta * conductivity;
             }
-
-            [[nodiscard]]
-            Real<u.conductivity> derivative() const {
-                return -conductivity;
-            }
         };
 
         [[nodiscard]]
