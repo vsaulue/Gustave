@@ -33,6 +33,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/LayerDecomposition.hpp>
+#include <gustave/core/solvers/force1Solver/detail/LocalContact.hpp>
 #include <gustave/utils/IndexRange.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
@@ -53,39 +54,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         using F1BasicContact = typename F1Structure::F1Contact::F1BasicContact;
 
-        class LayerContact {
-        public:
-            using ForceStats = typename F1BasicContact::ForceStats;
-
-            [[nodiscard]]
-            explicit LayerContact(F1BasicContact const& fContact, NodeIndex localIndex)
-                : fContact_{ fContact }
-                , localIndex_{ localIndex }
-            {
-                assert(localIndex != fContact.otherIndex());
-            }
-
-            [[nodiscard]]
-            ForceStats forceStats(Real<u.potential> sourcePotential, Real<u.potential> otherPotential) const {
-                return fContact_.forceStats(sourcePotential, otherPotential);
-            }
-
-            [[nodiscard]]
-            NodeIndex localIndex() const {
-                return localIndex_;
-            }
-
-            [[nodiscard]]
-            NodeIndex otherIndex() const {
-                return fContact_.otherIndex();
-            }
-
-            [[nodiscard]]
-            bool operator==(LayerContact const&) const = default;
-        private:
-            F1BasicContact fContact_;
-            NodeIndex localIndex_;
-        };
+        using LayerContact = detail::LocalContact<libCfg>;
 
         class Layer {
         public:
