@@ -124,6 +124,12 @@ TEST_CASE("core::force1Solver::detail::LayerStructure") {
         CHECK_THAT(lStructure.lowContacts(), matchers::c2::RangeEquals(expected));
     }
 
+    SECTION(".lowContactsOf()") {
+        auto const result = lStructure.lowContactsOf(3);
+        CHECK(result.data() == &lStructure.lowContacts()[6]);
+        CHECK(result.size() == 2);
+    }
+
     SECTION(".reachedCount()") {
         CHECK(lStructure.reachedCount() == 11);
     }

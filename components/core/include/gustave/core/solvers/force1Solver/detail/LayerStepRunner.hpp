@@ -30,7 +30,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-
+#include <gustave/core/solvers/force1Solver/detail/ClusterNodeEvaluator.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolverRunContext.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
@@ -42,6 +42,8 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
+
+        using NodeEvaluator = detail::ClusterNodeEvaluator<libCfg>;
     public:
         static constexpr Real<u.one> targetErrorFactor = 0.75f;
 
@@ -49,6 +51,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         using LayerStructure = typename SolverRunContext::LayerStructure;
         using Layer = typename LayerStructure::Layer;
+        using LayerIndex = typename LayerStructure::LayerIndex;
 
         [[nodiscard]]
         explicit LayerStepRunner(SolverRunContext& ctx)
@@ -59,7 +62,7 @@ namespace gustave::core::solvers::force1Solver::detail {
             auto const& layers = ctx_.lStructure.layers();
             auto& layerOffsets = ctx_.nextPotentials;
             assert(layerOffsets.size() >= layers.size());
-            for (std::size_t layerId = 0; layerId < layers.size(); ++layerId) {
+            for (LayerIndex layerId = 0; layerId < layers.size(); ++layerId) {
                 auto const& layer = layers[layerId];
                 if (layer.isFoundation()) {
                     layerOffsets[layerId] = 0.f * u.potential;
@@ -76,57 +79,34 @@ namespace gustave::core::solvers::force1Solver::detail {
             }
         }
     private:
-        struct LayerStepPoint {
-            Real<u.potential> offset;
-            Real<u.force> force;
-            Real<u.conductivity> conductivity;
-
-            [[nodiscard]]
-            Real<u.potential> nextOffset() const {
-                return offset + force / conductivity;
-            }
-        };
-
-        [[nodiscard]]
-        LayerStepPoint pointAt(Layer const& layer, Real<u.potential> const offset) const {
-            Real<u.force> force = layer.cumulatedWeight();
-            Real<u.conductivity> conductivity = 0.f * u.conductivity;
-            for (auto const& contact : layer.lowContactIds().subSpanOf(ctx_.lStructure.lowContacts())) {
-                Real<u.potential> const localPotential = offset + ctx_.potentials[contact.localIndex()];
-                Real<u.potential> const otherPotential = ctx_.potentials[contact.otherIndex()];
-                auto const forceStats = contact.forceStats(localPotential, otherPotential);
-                force += forceStats.force();
-                conductivity += forceStats.conductivity;
-            }
-            return { offset, force, conductivity };
-        }
-
         [[nodiscard]]
         Real<u.potential> findBalanceOffset(Layer const& layer) const {
             Real<u.force> const maxForceError = targetErrorFactor * ctx_.config().targetMaxError() * layer.cumulatedWeight();
-            LayerStepPoint curPoint = pointAt(layer, 0.f * u.potential);
-            LayerStepPoint nextPoint = pointAt(layer, curPoint.nextOffset());
-            if (rt.abs(nextPoint.force) <= maxForceError) {
-                return nextPoint.offset;
+            auto const evaluator = NodeEvaluator{ ctx_.potentials, layer.lowContactIds().subSpanOf(ctx_.lStructure.lowContacts()), layer.cumulatedWeight()};
+
+            auto curPoint = evaluator.pointAt(0.f * u.potential);
+            auto nextPoint = evaluator.pointAt(curPoint.nextOffset());
+            if (rt.abs(nextPoint.force()) <= maxForceError) {
+                return nextPoint.offset();
             }
-            bool const startSignBit = rt.signBit(curPoint.force);
-            while (rt.signBit(nextPoint.force) == startSignBit) {
+            bool const startSignBit = rt.signBit(curPoint.force());
+            while (rt.signBit(nextPoint.force()) == startSignBit) {
                 curPoint = nextPoint;
-                nextPoint = pointAt(layer, curPoint.nextOffset());
-                assert(curPoint.offset != nextPoint.offset); // float resolution too low ?
-                if (rt.abs(nextPoint.force) <= maxForceError) {
-                    return nextPoint.offset;
+                nextPoint = evaluator.pointAt(curPoint.nextOffset());
+                assert(curPoint.offset() != nextPoint.offset()); // float resolution too low ?
+                if (rt.abs(nextPoint.force()) <= maxForceError) {
+                    return nextPoint.offset();
                 }
             }
             do {
-                Real<u.resistance> const invDerivative = (nextPoint.offset - curPoint.offset) / (nextPoint.force - curPoint.force);
-                LayerStepPoint const midPoint = pointAt(layer, curPoint.offset - invDerivative * curPoint.force);
-                assert(midPoint.offset != curPoint.offset);// float resolution too low ?
-                assert(midPoint.offset != nextPoint.offset); // float resolution too low ?
-                if (rt.abs(midPoint.force) <= maxForceError) {
-                    return midPoint.offset;
+                Real<u.resistance> const invDerivative = (nextPoint.offset() - curPoint.offset()) / (nextPoint.force() - curPoint.force());
+                auto const midPoint = evaluator.pointAt(curPoint.offset() - invDerivative * curPoint.force());
+                assert(midPoint.offset() != curPoint.offset());// float resolution too low ?
+                assert(midPoint.offset() != nextPoint.offset()); // float resolution too low ?
+                if (rt.abs(midPoint.force()) <= maxForceError) {
+                    return midPoint.offset();
                 }
-                if (rt.signBit(midPoint.offset) == startSignBit) {
+                if (rt.signBit(midPoint.offset()) == startSignBit) {
                     curPoint = midPoint;
                 } else {
                     nextPoint = midPoint;

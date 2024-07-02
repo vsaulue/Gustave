@@ -146,6 +146,11 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
+        std::span<LayerContact const> lowContactsOf(NodeIndex const nodeId) const {
+            return layers_[nodeId].lowContactIds().subSpanOf(lowContacts_);
+        }
+
+        [[nodiscard]]
         std::size_t reachedCount() const {
             return reachedCount_;
         }
