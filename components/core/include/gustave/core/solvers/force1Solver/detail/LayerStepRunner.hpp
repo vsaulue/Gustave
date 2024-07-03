@@ -83,6 +83,7 @@ namespace gustave::core::solvers::force1Solver::detail {
             for (std::size_t nodeId = 0; nodeId < ctx_.potentials.size(); ++nodeId) {
                 ctx_.potentials[nodeId] += layerOffsets[layerOfNode[nodeId]];
             }
+            ++ctx_.iterationIndex;
         }
     private:
         SolverRunContext& ctx_;
