@@ -34,22 +34,22 @@
 #include <gustave/core/solvers/force1Solver/detail/NodePoint.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
-    template<cfg::cLibConfig auto libCfg>
+    template<cfg::cLibConfig auto libCfg_>
     class ClusterNodeEvaluator {
     private:
-        template<cfg::cUnitOf<libCfg> auto unit>
-        using Real = cfg::Real<libCfg, unit>;
+        template<cfg::cUnitOf<libCfg_> auto unit>
+        using Real = cfg::Real<libCfg_, unit>;
 
-        static constexpr auto u = cfg::units(libCfg);
+        static constexpr auto u = cfg::units(libCfg_);
     public:
-        using LocalContact = detail::LocalContact<libCfg>;
-        using NodePoint = detail::NodePoint<libCfg>;
+        using LocalContact = detail::LocalContact<libCfg_>;
+        using NodePoint = detail::NodePoint<libCfg_>;
 
         using Potentials = std::span<Real<u.potential> const>;
         using Contacts = std::span<LocalContact const>;
 
         [[nodiscard]]
-        explicit ClusterNodeEvaluator( Potentials const& potentials, Contacts const& contacts, Real<u.force> weight)
+        explicit ClusterNodeEvaluator(Potentials const& potentials, Contacts const& contacts, Real<u.force> weight)
             : potentials_{ potentials }
             , contacts_{ contacts }
             , weight_{ weight }
@@ -67,6 +67,11 @@ namespace gustave::core::solvers::force1Solver::detail {
                 conductivity += forceStats.conductivity;
             }
             return NodePoint{ offset, force, conductivity };
+        }
+
+        [[nodiscard]]
+        Real<u.force> weight() const {
+            return weight_;
         }
     private:
         Potentials potentials_;

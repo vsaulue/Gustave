@@ -31,6 +31,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/solvers/force1Solver/detail/ClusterNodeEvaluator.hpp>
+#include <gustave/core/solvers/force1Solver/detail/NodeBalancer.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolverRunContext.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
@@ -43,6 +44,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
 
+        using NodeBalancer = detail::NodeBalancer<libCfg>;
         using NodeEvaluator = detail::ClusterNodeEvaluator<libCfg>;
     public:
         static constexpr Real<u.one> targetErrorFactor = 0.75f;
@@ -59,9 +61,11 @@ namespace gustave::core::solvers::force1Solver::detail {
         {}
 
         void runStep() {
-            auto const& layers = ctx_.lStructure.layers();
+            auto const& lStructure = ctx_.lStructure;
+            auto const& layers = lStructure.layers();
             auto& layerOffsets = ctx_.nextPotentials;
             assert(layerOffsets.size() >= layers.size());
+            auto const balancer = NodeBalancer{ targetErrorFactor * ctx_.config().targetMaxError() };
             for (LayerIndex layerId = 0; layerId < layers.size(); ++layerId) {
                 auto const& layer = layers[layerId];
                 if (layer.isFoundation()) {
@@ -70,7 +74,9 @@ namespace gustave::core::solvers::force1Solver::detail {
                     auto const lowLayerId = layer.lowLayerId();
                     assert(lowLayerId >= 0);
                     assert(lowLayerId < layerId);
-                    layerOffsets[layerId] = layerOffsets[lowLayerId] + findBalanceOffset(layer);
+                    auto const evaluator = NodeEvaluator{ ctx_.potentials, lStructure.lowContactsOf(layerId), layer.cumulatedWeight() };
+                    auto const balanceResult = balancer.findBalanceOffset(evaluator, 0.f * u.potential);
+                    layerOffsets[layerId] = layerOffsets[lowLayerId] + balanceResult.offset;
                 }
             }
             auto const& layerOfNode = ctx_.lStructure.layerOfNode();
@@ -79,41 +85,6 @@ namespace gustave::core::solvers::force1Solver::detail {
             }
         }
     private:
-        [[nodiscard]]
-        Real<u.potential> findBalanceOffset(Layer const& layer) const {
-            Real<u.force> const maxForceError = targetErrorFactor * ctx_.config().targetMaxError() * layer.cumulatedWeight();
-            auto const evaluator = NodeEvaluator{ ctx_.potentials, layer.lowContactIds().subSpanOf(ctx_.lStructure.lowContacts()), layer.cumulatedWeight()};
-
-            auto curPoint = evaluator.pointAt(0.f * u.potential);
-            auto nextPoint = evaluator.pointAt(curPoint.nextOffset());
-            if (rt.abs(nextPoint.force()) <= maxForceError) {
-                return nextPoint.offset();
-            }
-            bool const startSignBit = rt.signBit(curPoint.force());
-            while (rt.signBit(nextPoint.force()) == startSignBit) {
-                curPoint = nextPoint;
-                nextPoint = evaluator.pointAt(curPoint.nextOffset());
-                assert(curPoint.offset() != nextPoint.offset()); // float resolution too low ?
-                if (rt.abs(nextPoint.force()) <= maxForceError) {
-                    return nextPoint.offset();
-                }
-            }
-            do {
-                Real<u.resistance> const invDerivative = (nextPoint.offset() - curPoint.offset()) / (nextPoint.force() - curPoint.force());
-                auto const midPoint = evaluator.pointAt(curPoint.offset() - invDerivative * curPoint.force());
-                assert(midPoint.offset() != curPoint.offset());// float resolution too low ?
-                assert(midPoint.offset() != nextPoint.offset()); // float resolution too low ?
-                if (rt.abs(midPoint.force()) <= maxForceError) {
-                    return midPoint.offset();
-                }
-                if (rt.signBit(midPoint.offset()) == startSignBit) {
-                    curPoint = midPoint;
-                } else {
-                    nextPoint = midPoint;
-                }
-            } while (true);
-        }
-
         SolverRunContext& ctx_;
     };
 }
