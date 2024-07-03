@@ -31,6 +31,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/solvers/force1Solver/detail/ClusterStructure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
 #include <gustave/core/solvers/force1Solver/detail/LayerStructure.hpp>
 #include <gustave/core/solvers/force1Solver/Config.hpp>
@@ -45,6 +46,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = typename cfg::Real<libCfg, unit>;
     public:
+        using ClusterStructure = detail::ClusterStructure<libCfg>;
         using Config = force1Solver::Config<libCfg>;
         using F1Structure = detail::F1Structure<libCfg>;
         using IterationIndex = std::uint64_t;
@@ -55,6 +57,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         explicit SolverRunContext(Structure const& structure, Config const& config)
             : fStructure{ structure, config }
             , lStructure{ fStructure }
+            , cStructure{ fStructure }
             , iterationIndex{ 0 }
             , potentials(structure.nodes().size(), 0.f * u.potential)
             , nextPotentials(structure.nodes().size(), 0.f * u.potential)
@@ -67,6 +70,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         F1Structure fStructure;
         LayerStructure lStructure;
+        ClusterStructure cStructure;
         IterationIndex iterationIndex;
         std::vector<Real<u.potential>> potentials;
         std::vector<Real<u.potential>> nextPotentials;

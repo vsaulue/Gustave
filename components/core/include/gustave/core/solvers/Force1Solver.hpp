@@ -36,6 +36,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/solvers/force1Solver/detail/BasicStepRunner.hpp>
+#include <gustave/core/solvers/force1Solver/detail/ClusterStepRunner.hpp>
 #include <gustave/core/solvers/force1Solver/detail/LayerStepRunner.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolverRunContext.hpp>
 #include <gustave/core/solvers/force1Solver/Config.hpp>
@@ -59,6 +60,7 @@ namespace gustave::core::solvers {
         using NormalizedVector3 = typename cfg::NormalizedVector3<libCfg>;
 
         using BasicStepRunner = force1Solver::detail::BasicStepRunner<libCfg>;
+        using ClusterStepRunner = force1Solver::detail::ClusterStepRunner<libCfg>;
         using LayerStepRunner = force1Solver::detail::LayerStepRunner<libCfg>;
         using SolverRunContext = force1Solver::detail::SolverRunContext<libCfg>;
 
@@ -130,9 +132,11 @@ namespace gustave::core::solvers {
                 return makeInvalidResult(std::move(ctx));
             }
             BasicStepRunner basicRunner{ ctx };
+            ClusterStepRunner clusterRunner{ ctx };
             LayerStepRunner layerRunner{ ctx };
             do {
                 layerRunner.runStep();
+                clusterRunner.runStep();
                 BasicStepResult const stepResult = basicRunner.runStep();
                 if (stepResult.isBelowTargetError) {
                     return makeValidResult(std::move(ctx), std::move(structure));

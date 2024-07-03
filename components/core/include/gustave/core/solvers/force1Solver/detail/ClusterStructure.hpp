@@ -38,6 +38,11 @@
 namespace gustave::core::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
     struct ClusterStructure {
+    private:
+        static constexpr auto u = cfg::units(libCfg);
+
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
     public:
         using F1Structure = detail::F1Structure<libCfg>;
         using ClusterIndex = cfg::NodeIndex<libCfg>;
