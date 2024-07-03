@@ -30,7 +30,6 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/solvers/force1Solver/detail/NodeStats.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolutionData.hpp>
 #include <gustave/core/solvers/force1Solver/solution/ContactReference.hpp>
 #include <gustave/core/solvers/Structure.hpp>
@@ -51,7 +50,7 @@ namespace gustave::core::solvers::force1Solver::solution {
         using F1LocalContacts = typename SolutionData::F1Structure::LocalContacts;
         using F1Node = typename SolutionData::F1Structure::F1Node;
         using LinkIndex = cfg::LinkIndex<libCfg>;
-        using NodeStats = detail::NodeStats<libCfg>;
+        using NodeStats = typename SolutionData::ForceRepartition::NodeStats;
         using StructureNode = typename Structure::Node;
         using StructureLink = typename Structure::Link;
         using StructureLinks = typename Structure::Links;
@@ -226,7 +225,7 @@ namespace gustave::core::solvers::force1Solver::solution {
 
         [[nodiscard]]
         Real<u.one> relativeError() const {
-            return stats().relativeError();
+            return solution_->forceRepartition().relativeErrorOf(index_);
         }
 
         [[nodiscard]]

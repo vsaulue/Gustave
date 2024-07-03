@@ -31,8 +31,9 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/solvers/force1Solver/detail/BasicNodeEvaluator.hpp>
 #include <gustave/core/solvers/force1Solver/detail/F1Structure.hpp>
-#include <gustave/core/solvers/force1Solver/detail/NodeStats.hpp>
+#include <gustave/core/solvers/force1Solver/detail/NodePoint.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
@@ -45,6 +46,8 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Vector3 = cfg::Vector3<libCfg, unit>;
 
         using NodeIndex = cfg::NodeIndex<libCfg>;
+
+        using NodeEvaluator = detail::BasicNodeEvaluator<libCfg>;
 
         static constexpr auto u = cfg::units(libCfg);
         static constexpr auto rt = libCfg.realTraits;
@@ -60,7 +63,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Link = typename Structure::Link;
         using LocalContactIndex = typename F1Link::LocalContactIndex;
         using Node = typename Structure::Node;
-        using NodeStats = detail::NodeStats<libCfg>;
+        using NodeStats = detail::NodePoint<libCfg>;
 
         [[nodiscard]]
         explicit ForceRepartition(F1Structure const& fStructure, std::span<Real<u.potential> const> potentials)
@@ -72,7 +75,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         [[nodiscard]]
         Real<u.one> relativeErrorOf(NodeIndex id) const {
-            return rt.abs(statsOf(id).relativeError());
+            return rt.abs(statsOf(id).force() / fStructure_.fNodes()[id].weight);
         }
 
         [[nodiscard]]
@@ -98,22 +101,9 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        NodeStats statsOf(NodeIndex const id, Real<u.potential> const potential) const {
-            F1Node const& fNode = fNodes()[id];
-            Real<u.force> force = fNode.weight;
-            Real<u.conductivity> conductivity = 0.f * u.conductivity;
-
-            for (F1Contact const& fContact : fStructure_.fContactsOf(id)) {
-                ContactStats const contactStats = contactStatsOf(fContact, potential);
-                conductivity += contactStats.conductivity;
-                force += contactStats.force();
-            }
-            return NodeStats{ fNode, force, conductivity };
-        }
-
-        [[nodiscard]]
-        NodeStats statsOf(NodeIndex const id) const {
-            return statsOf(id, potentials_[id]);
+        NodeStats statsOf(NodeIndex const nodeId) const {
+            auto const evaluator = NodeEvaluator{ potentials_, fStructure_.fContactsOf(nodeId), fStructure_.fNodes()[nodeId].weight };
+            return evaluator.pointAt(potentials_[nodeId]);
         }
 
         [[nodiscard]]
