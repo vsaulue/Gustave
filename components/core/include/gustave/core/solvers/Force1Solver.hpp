@@ -134,10 +134,7 @@ namespace gustave::core::solvers {
             do {
                 layerRunner.runStep();
                 BasicStepResult const stepResult = basicRunner.runStep();
-                if (stepResult.currentMaxError >= config_->targetMaxError()) {
-                    ctx.potentials.swap(ctx.nextPotentials);
-                    ++ctx.iterationIndex;
-                } else {
+                if (stepResult.isBelowTargetError) {
                     return makeValidResult(std::move(ctx), std::move(structure));
                 }
             } while (ctx.iterationIndex < config_->maxIterations());

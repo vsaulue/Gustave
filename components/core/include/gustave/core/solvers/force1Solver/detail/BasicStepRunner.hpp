@@ -52,7 +52,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         static constexpr Real<u.one> targetErrorFactor = 0.75f;
 
         struct StepResult {
-            Real<u.one> currentMaxError;
+            bool isBelowTargetError;
         };
 
         [[nodiscard]]
@@ -73,7 +73,13 @@ namespace gustave::core::solvers::force1Solver::detail {
                     currentMaxError = rt.max(currentMaxError, balanceResult.initialForce / fNode.weight);
                 }
             }
-            return StepResult{ currentMaxError };
+            if (currentMaxError >= ctx_.config().targetMaxError()) {
+                ctx_.potentials.swap(ctx_.nextPotentials);
+                ++ctx_.iterationIndex;
+                return StepResult{ false };
+            } else {
+                return StepResult{ true };
+            }
         }
     private:
         SolverRunContext& ctx_;
