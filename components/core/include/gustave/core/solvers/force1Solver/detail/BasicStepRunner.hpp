@@ -28,8 +28,9 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/solvers/force1Solver/detail/BasicNodeEvaluator.hpp>
+#include <gustave/core/solvers/force1Solver/detail/NodeBalancer.hpp>
 #include <gustave/core/solvers/force1Solver/detail/SolverRunContext.hpp>
-#include <gustave/core/solvers/force1Solver/detail/ForceRepartition.hpp>
 
 namespace gustave::core::solvers::force1Solver::detail {
     template<cfg::cLibConfig auto libCfg>
@@ -43,30 +44,10 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
-        using ForceRepartition = detail::ForceRepartition<libCfg>;
         using SolverRunContext = detail::SolverRunContext<libCfg>;
 
-        using NodeStats = typename ForceRepartition::NodeStats;
-
-        struct NodeStepResult {
-            Real<u.one> currentNodeError;
-            Real<u.potential> nextPotential;
-        };
-
-        struct NodeStepPoint {
-            Real<u.potential> potential;
-            NodeStats stats;
-
-            [[nodiscard]]
-            Real<u.force> force() const {
-                return stats.force();
-            }
-
-            [[nodiscard]]
-            Real<u.potential> nextPotential() const {
-                return potential + stats.force() / stats.conductivity();
-            }
-        };
+        using NodeBalancer = detail::NodeBalancer<libCfg>;
+        using NodeEvaluator = detail::BasicNodeEvaluator<libCfg>;
     public:
         static constexpr Real<u.one> targetErrorFactor = 0.75f;
 
@@ -80,57 +61,21 @@ namespace gustave::core::solvers::force1Solver::detail {
         {}
 
         StepResult runStep() {
-            Real<u.one> const stepTargetError = targetErrorFactor * ctx_.config().targetMaxError();
             Real<u.one> currentMaxError = 0.f;
             auto const& fNodes = ctx_.fStructure.fNodes();
+            auto const balancer = NodeBalancer{ targetErrorFactor * ctx_.config().targetMaxError() };
             for (NodeIndex id = 0; id < fNodes.size(); ++id) {
                 auto const& fNode = fNodes[id];
                 if (!fNode.isFoundation) {
-                    Real<u.force> const nodeForceError = stepTargetError * fNode.weight;
-                    auto const nodeStepResult = runNodeStep(id, nodeForceError);
-                    ctx_.nextPotentials[id] = nodeStepResult.nextPotential;
-                    currentMaxError = rt.max(currentMaxError, nodeStepResult.currentNodeError);
+                    auto const evaluator = NodeEvaluator{ ctx_.potentials, ctx_.fStructure.fContactsOf(id), fNode.weight };
+                    auto const balanceResult = balancer.findBalanceOffset(evaluator, ctx_.potentials[id]);
+                    ctx_.nextPotentials[id] = balanceResult.offset;
+                    currentMaxError = rt.max(currentMaxError, balanceResult.initialForce / fNode.weight);
                 }
             }
             return StepResult{ currentMaxError };
         }
     private:
-        NodeStepResult runNodeStep(NodeIndex const nodeId, Real<u.force> maxForceError) {
-            ForceRepartition const repartition{ ctx_.fStructure, ctx_.potentials };
-            auto pointAt = [&](Real<u.potential> potential) -> NodeStepPoint {
-                return { potential, repartition.statsOf(nodeId, potential) };
-            };
-            NodeStepPoint curPoint = pointAt(ctx_.potentials[nodeId]);
-            Real<u.one> const curMaxError = curPoint.stats.relativeError();
-            NodeStepPoint nextPoint = pointAt(curPoint.nextPotential());
-            if (rt.abs(nextPoint.force()) <= maxForceError) {
-                return { curMaxError, nextPoint.potential };
-            }
-            bool const startSignBit = rt.signBit(curPoint.force());
-            while (rt.signBit(nextPoint.force()) == startSignBit) {
-                curPoint = nextPoint;
-                nextPoint = pointAt(curPoint.nextPotential());
-                assert(curPoint.potential != nextPoint.potential); // float resolution too low ?
-                if (rt.abs(nextPoint.force()) <= maxForceError) {
-                    return { curMaxError, nextPoint.potential };
-                }
-            }
-            do {
-                Real<u.resistance> const invDerivative = (nextPoint.potential - curPoint.potential) / (nextPoint.force() - curPoint.force());
-                NodeStepPoint const midPoint = pointAt(curPoint.potential - invDerivative * curPoint.force());
-                assert(midPoint.potential != curPoint.potential);  // float resolution too low ?
-                assert(midPoint.potential != nextPoint.potential); // float resolution too low ?
-                if (rt.abs(midPoint.force()) <= maxForceError) {
-                    return { curMaxError, midPoint.potential };
-                }
-                if (rt.signBit(midPoint.force()) == startSignBit) {
-                    curPoint = midPoint;
-                } else {
-                    nextPoint = midPoint;
-                }
-            } while (true);
-        }
-
         SolverRunContext& ctx_;
     };
 }
