@@ -88,7 +88,7 @@ namespace gustave::core::solvers::force1Solver::detail {
                 if (rt.abs(midPoint.force()) <= maxForceError) {
                     return { midPoint.offset(), initialForce };
                 }
-                if (rt.signBit(midPoint.offset()) == startSignBit) {
+                if (rt.signBit(midPoint.force()) == startSignBit) {
                     curPoint = midPoint;
                 } else {
                     nextPoint = midPoint;
