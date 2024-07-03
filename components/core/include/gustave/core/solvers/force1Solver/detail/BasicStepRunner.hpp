@@ -71,6 +71,8 @@ namespace gustave::core::solvers::force1Solver::detail {
                     auto const balanceResult = balancer.findBalanceOffset(evaluator, ctx_.potentials[id]);
                     ctx_.nextPotentials[id] = balanceResult.offset;
                     currentMaxError = rt.max(currentMaxError, balanceResult.initialForce / fNode.weight);
+                } else {
+                    ctx_.nextPotentials[id] = 0.f * u.potential;
                 }
             }
             if (currentMaxError >= ctx_.config().targetMaxError()) {
