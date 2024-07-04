@@ -82,7 +82,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         }
 
         [[nodiscard]]
-        explicit ClusterStructure(F1Structure const& fStructure)
+        explicit ClusterStructure(F1Structure const& fStructure, NodeIndex const widthLimit = 1)
             : clusterOfNode_(fStructure.fNodes().size(), invalidClusterId())
         {
             NodeIndex const nodeCount = fStructure.fNodes().size();
@@ -102,54 +102,57 @@ namespace gustave::core::solvers::force1Solver::detail {
                 }
             }
 
-            auto selectRootId = [&](NodeIndex const& initRootId) {
-                NodeIndex result = initRootId;
-                if (numContactsOf[initRootId] == 1) {
-                    auto const nodeContacts = fStructure.fContactsOf(initRootId);
-                    auto remContactIt = std::ranges::find_if(nodeContacts, [&](auto const& contact) {
-                        return numContactsOf[contact.otherIndex()] > 0;
-                    });
-                    assert(remContactIt != nodeContacts.end());
-                    result = remContactIt->otherIndex();
-                }
-                return result;
-            };
-
             auto selectNodes = [&](NodeIndex const rootId, ClusterIndex const clusterId) {
-                std::deque<NodeIndex> result;
                 auto addNode = [&](std::deque<NodeIndex>& idContainer, NodeIndex newNodeId) {
                     assert(clusterOfNode_[newNodeId] == invalidClusterId());
                     numContactsOf[newNodeId] = 0;
                     clusterOfNode_[newNodeId] = clusterId;
                     idContainer.push_back(newNodeId);
                 };
+                std::deque<NodeIndex> result;
+                std::deque<NodeIndex> newNodes;
                 addNode(result, rootId);
-                for (auto const& fContact : fStructure.fContactsOf(rootId)) {
-                    NodeIndex const otherId = fContact.otherIndex();
-                    if (numContactsOf[otherId] > 0) {
-                        addNode(result, otherId);
+                NodeIndex width = widthLimit;
+                NodeIndex remForwardRoot = widthLimit;
+                std::size_t layerStartId = 0;
+                while (width > 0) {
+                    for (auto nodeIt = result.cbegin() + layerStartId; nodeIt != result.cend(); ++nodeIt) {
+                        for (auto const& fContact : fStructure.fContactsOf(*nodeIt)) {
+                            NodeIndex const otherId = fContact.otherIndex();
+                            if (numContactsOf[otherId] > 0) {
+                                addNode(newNodes, otherId);
+                            }
+                        }
                     }
+                    if (remForwardRoot > 0 && newNodes.size() == 1) {
+                        remForwardRoot -= 1;
+                    } else {
+                        remForwardRoot = 0;
+                        width -= 1;
+                    }
+                    layerStartId = result.size();
+                    result.insert(result.end(), newNodes.begin(), newNodes.end());
+                    newNodes.clear();
                 }
-                std::deque<NodeIndex> isolatedNodes;
+
                 for (NodeIndex const nId : result) {
                     for (auto const& fContact : fStructure.fContactsOf(nId)) {
                         NodeIndex const otherId = fContact.otherIndex();
                         if (numContactsOf[otherId] > 0) {
                             numContactsOf[otherId] -= 1;
                             if (numContactsOf[otherId] == 0) {
-                                addNode(isolatedNodes, otherId);
+                                addNode(newNodes, otherId);
                             }
                         }
                     }
                 }
-                result.insert(result.end(), isolatedNodes.begin(), isolatedNodes.end());
+                result.insert(result.end(), newNodes.begin(), newNodes.end());
                 assert(result.size() > 1);
                 return result;
             };
 
-            for (NodeIndex optRootId = 0; optRootId < nodeCount; ++optRootId) {
-                if (numContactsOf[optRootId] > 0) {
-                    NodeIndex const rootId = selectRootId(optRootId);
+            for (NodeIndex rootId = 0; rootId < nodeCount; ++rootId) {
+                if (numContactsOf[rootId] > 0) {
                     ClusterIndex const clusterId = clusters_.size();
                     std::deque<NodeIndex> nodes = selectNodes(rootId, clusterId);
                     Real<u.force> weight = 0.f * u.force;
