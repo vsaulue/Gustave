@@ -71,6 +71,7 @@ TEST_CASE("core::force1Solver::detail::ClusterStructure") {
         NodeIndex const x4y1 = addNode(false);
         NodeIndex const x5y1 = addNode(false);
         // x == 8
+        NodeIndex const x8y0 = addNode(true);
         NodeIndex const x8y1 = addNode(false);
         NodeIndex const x8y2 = addNode(false);
         // y == 2
@@ -115,6 +116,7 @@ TEST_CASE("core::force1Solver::detail::ClusterStructure") {
         // x == 6
         addLink(x6y2, x6y3, Normals::y);
         // x == 8
+        addLink(x8y0, x8y1, Normals::y);
         addLink(x8y1, x8y2, Normals::y);
 
         auto const fStructure = F1Structure{ structure, config };
@@ -134,7 +136,7 @@ TEST_CASE("core::force1Solver::detail::ClusterStructure") {
             std::vector<ClusterIndex> const expected = {
                 inv, inv, inv, inv, // y == 0
                 0, 0, 0, 1, 1,      // y == 1
-                inv, inv,           // x == 8
+                inv, inv, inv,      // x == 8
                 0, 1, 1, 2, 2,      // y == 2
                 0, 2, 2,            // y == 3
             };

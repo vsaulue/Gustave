@@ -158,21 +158,26 @@ namespace gustave::core::solvers::force1Solver::detail {
                     Real<u.force> weight = 0.f * u.force;
                     ContactIndex const startContactIds = ContactIndex(contacts_.size());
                     ContactIndex sizeContactIds = 0;
+                    bool hasNonRootContact = false;
                     for (NodeIndex const nId : nodes) {
                         weight += fStructure.fNodes()[nId].weight;
                         for (auto const& fContact : fStructure.fContactsOf(nId)) {
                             NodeIndex const otherId = fContact.otherIndex();
                             if (clusterOfNode_[otherId] != clusterId) {
+                                hasNonRootContact = hasNonRootContact || !fStructure.fNodes()[otherId].isFoundation;
                                 sizeContactIds += 1;
                                 contacts_.emplace_back(fContact.basicContact(), nId);
                             }
                         }
                     }
-                    if (sizeContactIds > 0) {
+                    if (hasNonRootContact) {
                         clusters_.emplace_back(utils::IndexRange<ContactIndex>{startContactIds, sizeContactIds}, weight);
                     } else {
                         for (NodeIndex const nId : nodes) {
                             clusterOfNode_[nId] = invalidClusterId();
+                        }
+                        for (std::size_t i = 0; i < sizeContactIds; ++i) {
+                            contacts_.pop_back();
                         }
                     }
                 }
