@@ -46,6 +46,7 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         using SolverRunContext = detail::SolverRunContext<libCfg>;
 
+        using ClusterStructure = typename SolverRunContext::ClusterStructure;
         using ClusterIndex = typename SolverRunContext::ClusterStructure::ClusterIndex;
 
         using NodeBalancer = detail::NodeBalancer<libCfg>;
@@ -62,19 +63,19 @@ namespace gustave::core::solvers::force1Solver::detail {
             : ctx_{ ctx }
         {}
 
-        void runStep() {
-            auto const& cNodes = ctx_.cStructure.clusters();
+        void runStep(ClusterStructure const& cStructure) {
+            auto const& cNodes = cStructure.clusters();
             auto const balancer = NodeBalancer{ targetErrorFactor * ctx_.config().targetMaxError() };
             auto const clusterPotentials = std::span<Real<u.potential>>{ ctx_.nextPotentials };
             for (ClusterIndex cId = 0; cId < cNodes.size(); ++cId) {
-                auto const evaluator = NodeEvaluator{ ctx_.potentials, ctx_.cStructure.contactsOf(cId), cNodes[cId].weight() };
+                auto const evaluator = NodeEvaluator{ ctx_.potentials, cStructure.contactsOf(cId), cNodes[cId].weight() };
                 auto const balanceResult = balancer.findBalanceOffset(evaluator, 0.f * u.potential);
                 clusterPotentials[cId] = balanceResult.offset;
             }
-            auto const& clusterOfNode = ctx_.cStructure.clusterOfNode();
+            auto const& clusterOfNode = cStructure.clusterOfNode();
             for (NodeIndex nodeId = 0; nodeId < ctx_.fStructure.fNodes().size(); ++nodeId) {
                 ClusterIndex const clusterId = clusterOfNode[nodeId];
-                if (clusterId != ctx_.cStructure.invalidClusterId()) {
+                if (clusterId != cStructure.invalidClusterId()) {
                     ctx_.potentials[nodeId] += clusterPotentials[clusterId];
                 }
             }

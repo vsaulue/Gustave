@@ -45,6 +45,8 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = typename cfg::Real<libCfg, unit>;
+
+        using NodeIndex = cfg::NodeIndex<libCfg>;
     public:
         using ClusterStructure = detail::ClusterStructure<libCfg>;
         using Config = force1Solver::Config<libCfg>;
@@ -57,7 +59,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         explicit SolverRunContext(Structure const& structure, Config const& config)
             : fStructure{ structure, config }
             , lStructure{ fStructure }
-            , cStructure{ fStructure }
+            , cStructures{ initClusterStuctures(fStructure) }
             , iterationIndex{ 0 }
             , potentials(structure.nodes().size(), 0.f * u.potential)
             , nextPotentials(structure.nodes().size(), 0.f * u.potential)
@@ -70,9 +72,23 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         F1Structure fStructure;
         LayerStructure lStructure;
-        ClusterStructure cStructure;
+        std::vector<ClusterStructure> cStructures;
         IterationIndex iterationIndex;
         std::vector<Real<u.potential>> potentials;
         std::vector<Real<u.potential>> nextPotentials;
+    private:
+        [[nodiscard]]
+        static std::vector<ClusterStructure> initClusterStuctures(F1Structure const& fStructure) {
+            static constexpr auto maxWidth = std::numeric_limits<NodeIndex>::max() / 2;
+            std::vector<ClusterStructure> result;
+            for (NodeIndex width = 3; width < maxWidth; width = 1 + 2 * width) {
+                result.emplace_back(fStructure, width);
+                if (result.back().clusters().size() < 8) {
+                    result.pop_back();
+                    break;
+                }
+            }
+            return result;
+        }
     };
 }

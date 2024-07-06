@@ -136,7 +136,9 @@ namespace gustave::core::solvers {
             LayerStepRunner layerRunner{ ctx };
             do {
                 layerRunner.runStep();
-                clusterRunner.runStep();
+                for (auto const& cStructure : ctx.cStructures) {
+                    clusterRunner.runStep(cStructure);
+                }
                 BasicStepResult const stepResult = basicRunner.runStep();
                 if (stepResult.isBelowTargetError) {
                     return makeValidResult(std::move(ctx), std::move(structure));
