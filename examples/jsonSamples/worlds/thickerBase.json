@@ -1,0 +1,231 @@
+{
+    "blockSize": { "x": 1.0, "y": 1.0, "z": 1.0 },
+    "g": { "x": 0.0, "y": -10.0, "z": 0.0 },
+    "blockTypes": [
+        {
+            "name": "Demo block",
+            "color": { "r": 0.5, "g": 0.5, "b": 0.5 },
+            "mass": 10000.0,
+            "maxStress": {
+                "compression": 800000.0,
+                "shear": 800000.0,
+                "tensile": 800000.0
+            }
+        }
+    ],
+    "blocks": [
+        {
+            "comment": "---- tower 1 ----",
+            "index": { "x": 2, "y": 1, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 2, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 3, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 4, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 5, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 6, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 7, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 8, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 9, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 10, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "comment": "---- tower 2 ----",
+            "index": { "x": 6, "y": 1, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 1, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 8, "y": 1, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 6, "y": 2, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 2, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 8, "y": 2, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 6, "y": 3, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 3, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 8, "y": 3, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 6, "y": 4, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 4, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 8, "y": 4, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 6, "y": 5, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 5, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 8, "y": 5, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 6, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 7, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 8, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 9, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 10, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 11, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 7, "y": 12, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": false
+        },
+        {
+            "comment": "---- ground (foundations) ----",
+            "index": { "x": 0, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 1, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 2, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 3, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 4, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 5, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 6, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 7, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 8, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 9, "y": 0, "z": 0 },
+            "blockTypeName": "Demo block",
+            "isFoundation": true
+        }
+    ]
+}

@@ -1,0 +1,663 @@
+{
+    "blockSize": { "x": 1.0, "y": 1.0, "z": 1.0 },
+    "g": { "x": 0.0, "y": -70.0, "z": 0.0 },
+    "blockTypes": [
+        {
+            "name": "Eiffel Steel",
+            "color": { "r": 0.5, "g": 0.5, "b": 0.5 },
+            "mass": 5000.0,
+            "maxStress": {
+                "compression": 10000000.0,
+                "shear": 10000000.0,
+                "tensile": 10000000.0
+            }
+        }
+    ],
+    "blocks": [
+        {
+            "index": { "x": 17, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 18, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 19, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 20, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 21, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 22, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 23, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 24, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 25, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 26, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 27, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 28, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 29, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 30, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -49, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 17, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 18, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 19, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 20, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 21, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 22, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 23, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 24, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 25, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 26, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 27, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 28, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 29, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 30, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -50, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 18, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 19, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 20, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 21, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 22, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 23, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 24, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 25, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 26, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 27, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 28, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 29, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 30, "y": -51, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 18, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 19, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 20, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 22, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 24, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 26, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 28, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 29, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 30, "y": -52, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 17, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 18, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 19, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 21, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 22, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 23, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 24, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 25, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 26, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 27, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 29, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 30, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -53, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 17, "y": -54, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 19, "y": -54, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 20, "y": -54, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 21, "y": -54, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 27, "y": -54, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 28, "y": -54, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 29, "y": -54, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -54, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 16, "y": -55, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 17, "y": -55, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 18, "y": -55, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 19, "y": -55, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 29, "y": -55, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 30, "y": -55, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -55, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 32, "y": -55, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 16, "y": -56, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 18, "y": -56, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 30, "y": -56, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 32, "y": -56, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 15, "y": -57, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 16, "y": -57, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 17, "y": -57, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 18, "y": -57, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 30, "y": -57, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -57, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 32, "y": -57, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 33, "y": -57, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 15, "y": -58, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 17, "y": -58, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -58, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 33, "y": -58, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 14, "y": -59, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 15, "y": -59, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 16, "y": -59, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 17, "y": -59, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -59, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 32, "y": -59, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 33, "y": -59, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 34, "y": -59, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 13, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 14, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 15, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 16, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 17, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 31, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 32, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 33, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 34, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 35, "y": -60, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 12, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 13, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 14, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 15, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 16, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 17, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 18, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 30, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 31, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 32, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 33, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 34, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 35, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 36, "y": -61, "z": 0 },
+            "blockTypeName": "Eiffel Steel",
+            "isFoundation": true
+        }
+    ]
+}

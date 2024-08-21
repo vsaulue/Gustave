@@ -1,0 +1,68 @@
+{
+    "blockSize": { "x": 1.0, "y": 1.0, "z": 1.0 },
+    "g": { "x": 0.0, "y": -10.0, "z": 0.0 },
+    "blockTypes": [
+        {
+            "name": "Demo material",
+            "color": { "r": 0.5, "g": 0.5, "b": 0.5 },
+            "mass": 20000.0,
+            "maxStress": {
+                "compression": 1000000.0,
+                "shear": 1000000.0,
+                "tensile": 1000000.0
+            }
+        }
+    ],
+    "blocks": [
+        {
+            "index": { "x": 0, "y": 0, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 1, "y": 0, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 2, "y": 0, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 1, "y": 1, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 1, "y": 2, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 1, "y": 3, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 1, "y": 4, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 1, "y": 5, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 1, "y": 6, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 1, "y": 7, "z": 0 },
+            "blockTypeName": "Demo material",
+            "isFoundation": false
+        }
+    ]
+}
