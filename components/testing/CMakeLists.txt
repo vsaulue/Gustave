@@ -29,7 +29,7 @@ target_include_directories(Comp-Testing INTERFACE
 target_link_libraries(Comp-Testing
     INTERFACE Comp-Config
     INTERFACE Comp-Utils
-    INTERFACE catch2::catch2base
+    INTERFACE Catch2::Catch2
 )
 
 add_executable(Test-Comp-Testing
