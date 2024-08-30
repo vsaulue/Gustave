@@ -1,0 +1,36 @@
+---
+
+name: Linux clang-17
+
+on: [push, pull_request]
+
+jobs:
+  linux-clang17:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "[setup] Install apt-get packages"
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build libc++-17-dev
+
+      - name: "[setup] Install conan"
+        run: |
+          pipx install conan
+          pipx ensurepath
+
+      - name: "[build] conan install"
+        run: conan install . -pr:b=./.github/conanProfiles/ubuntu24.txt -pr:h=./.github/conanProfiles/linux-clang17.txt -s:h build_type=Release --build=missing
+
+      - name: "[build] cmake config"
+        run: cmake . --preset conan-x86_64-linux-clang-17
+
+      - name: "[build] Build"
+        run: cmake --build . --preset conan-x86_64-linux-clang-17-release
+
+      - name: "[build] Run unit tests"
+        run: cmake --build . --preset conan-x86_64-linux-clang-17-release --target run-tests

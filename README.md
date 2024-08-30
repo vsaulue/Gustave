@@ -1,7 +1,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.txt)
 [![C++ standard: 20](https://img.shields.io/badge/C%2B%2B-20-blue)](https://en.cppreference.com/w/cpp/compiler_support#cpp20)
 
-[![CI linux gcc-13](https://github.com/vsaulue/gustave/actions/workflows/linux-gcc13.yml/badge.svg?label=CI%20Linux%20gcc-13)](./.github/workflows/linux-gcc13.yml)
+[![CI linux gcc-13](https://github.com/vsaulue/gustave/actions/workflows/linux-gcc13.yml/badge.svg)](./.github/workflows/linux-gcc13.yml)
+[![CI linux clang-17](https://github.com/vsaulue/gustave/actions/workflows/linux-clang17.yml/badge.svg)](./.github/workflows/linux-clang17.yml)
 
 # Gustave: structural integrity library for video games
 
