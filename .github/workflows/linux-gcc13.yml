@@ -5,8 +5,20 @@ name: Linux gcc-13
 on: [push, pull_request]
 
 jobs:
-  linux-gcc13:
+  skip_duplicate:
     runs-on: ubuntu-24.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          skip_after_successful_duplicate: true
+
+  linux_gcc13:
+    runs-on: ubuntu-24.04
+    needs: skip_duplicate
+    if: needs.skip_duplicate.outputs.should_skip != 'true'
     defaults:
       run:
         shell: bash
