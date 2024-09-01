@@ -1,0 +1,48 @@
+---
+
+name: Windows VS-2022
+
+on: [push, pull_request]
+
+jobs:
+  skip_duplicate:
+    runs-on: ubuntu-24.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          skip_after_successful_duplicate: true
+
+  windows_msvc193:
+    runs-on: windows-2022
+    needs: skip_duplicate
+    if: needs.skip_duplicate.outputs.should_skip != 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: "[setup] Install conan"
+        run: |
+          pipx install conan
+          pipx ensurepath
+
+      - name: "[setup] Cache conan packages"
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2/p
+          key: conan-windows-msvc193-release
+
+      - name: "[build] conan install"
+        run: conan install . -pr:b=./.github/conanProfiles/windows2022.txt -pr:h=./.github/conanProfiles/windows-msvc193.txt -s:h build_type=Release --build=missing
+
+      - name: "[build] cmake config"
+        run: cmake . --preset conan-x86_64-windows-msvc-193
+
+      - name: "[build] Build"
+        run: cmake --build . --preset conan-x86_64-windows-msvc-193-release
+
+      - name: "[build] Run unit tests"
+        run: cmake --build . --preset conan-x86_64-windows-msvc-193-release --target run-tests
