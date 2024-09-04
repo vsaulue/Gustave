@@ -35,14 +35,18 @@
 #include <gustave/meta/Meta.hpp>
 
 namespace gustave::core::model {
-    template<cfg::cLibConfig auto libCfg_, cfg::cUnitOf<libCfg_> auto unit_>
+    template<cfg::cLibConfig auto libCfg_, auto unit_>
+        // Concept moved to a require clause due to a MSVC bug.
+        // See https://developercommunity.visualstudio.com/t/Regression-Reject-valid-Wrong-concep/10736602
+        requires cfg::cUnitOf<decltype(unit_), libCfg_>
     struct Stress;
 
     template<typename T>
     concept cStress = std::same_as<T, Stress<T::libCfg(), T::unit()>>;
 
 
-    template<cfg::cLibConfig auto libCfg_, cfg::cUnitOf<libCfg_> auto unit_>
+    template<cfg::cLibConfig auto libCfg_, auto unit_>
+        requires cfg::cUnitOf<decltype(unit_), libCfg_>
     struct Stress {
     private:
         static constexpr auto rt = libCfg_.realTraits;
