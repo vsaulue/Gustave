@@ -3,6 +3,7 @@
 
 [![CI linux gcc-13](https://github.com/vsaulue/gustave/actions/workflows/linux-gcc13.yml/badge.svg)](./.github/workflows/linux-gcc13.yml)
 [![CI linux clang-17](https://github.com/vsaulue/gustave/actions/workflows/linux-clang17.yml/badge.svg)](./.github/workflows/linux-clang17.yml)
+[![Windows VS-2022](https://github.com/vsaulue/gustave/actions/workflows/windows-msvc193.yml/badge.svg)](./.github/workflows/windows-msvc193.yml)
 
 # Gustave: structural integrity library for video games
 
