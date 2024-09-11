@@ -32,8 +32,11 @@ find_package(CLI11 CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(svgwrite CONFIG REQUIRED)
 
+find_package(Python COMPONENTS Interpreter)
+
 add_custom_target(build-tests)
 add_custom_target(run-tests)
+add_custom_target(run-tool-tests)
 
 set(test_compile_options)
 
