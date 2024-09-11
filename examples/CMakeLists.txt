@@ -24,3 +24,9 @@
 
 add_subdirectory("jsonGustave")
 add_subdirectory("svgViewer")
+
+add_custom_target(run-svgViewer-test
+    COMMAND Python::Interpreter "${CMAKE_CURRENT_SOURCE_DIR}/testSvgViewer.py" "$<TARGET_FILE:svgViewer>" ${test_command_args}
+    DEPENDS svgViewer
+)
+add_dependencies(run-tool-tests run-svgViewer-test)
