@@ -48,10 +48,10 @@ jobs:
         run: cmake . --preset conan-x86_64-linux-clang-17
 
       - name: "[build] Build"
-        run: cmake --build . --preset conan-x86_64-linux-clang-17-release
+        run: cmake --build --preset conan-x86_64-linux-clang-17-release
 
       - name: "[build] Run unit tests"
-        run: cmake --build . --preset conan-x86_64-linux-clang-17-release --target run-tests
+        run: cmake --build --preset conan-x86_64-linux-clang-17-release --target run-tests
 
       - name: "[build] Run tool tests"
         run: cmake --build --preset conan-x86_64-linux-clang-17-release --target run-tool-tests

@@ -42,10 +42,10 @@ jobs:
         run: cmake . --preset conan-x86_64-windows-msvc-193
 
       - name: "[build] Build"
-        run: cmake --build . --preset conan-x86_64-windows-msvc-193-release
+        run: cmake --build --preset conan-x86_64-windows-msvc-193-release
 
       - name: "[build] Run unit tests"
-        run: cmake --build . --preset conan-x86_64-windows-msvc-193-release --target run-tests
+        run: cmake --build --preset conan-x86_64-windows-msvc-193-release --target run-tests
 
       - name: "[build] Run tool tests"
         run: cmake --build --preset conan-x86_64-windows-msvc-193-release --target run-tool-tests
