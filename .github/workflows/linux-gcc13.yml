@@ -11,15 +11,26 @@ on:
         required: false
         type: string
 
+env:
+  cmake_profile: conan-x86_64-linux-gcc-13
+
 jobs:
   linux_gcc13:
     runs-on: ubuntu-24.04
     if: inputs.should_skip != 'true'
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v4
+
+      - id: build_type
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ${{ matrix.build_type }}
 
       - name: "[setup] Install apt-get packages"
         run: |
@@ -35,19 +46,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.conan2/p
-          key: conan-linux-gcc13-release
+          key: ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] conan install"
-        run: conan install . -pr:b=./.github/conanProfiles/ubuntu24.txt -pr:h=./.github/conanProfiles/linux-gcc13.txt -s:h build_type=Release --build=missing
+        run: conan install . -pr:b=./.github/conanProfiles/ubuntu24.txt -pr:h=./.github/conanProfiles/linux-gcc13.txt -s:h build_type=${{ matrix.build_type }} --build=missing
 
       - name: "[build] cmake config"
-        run: cmake . --preset conan-x86_64-linux-gcc-13
+        run: cmake . --preset ${{ env.cmake_profile }}
 
       - name: "[build] Build"
-        run: cmake --build --preset conan-x86_64-linux-gcc-13-release
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] Run unit tests"
-        run: cmake --build --preset conan-x86_64-linux-gcc-13-release --target run-tests
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tests
 
       - name: "[build] Run tool tests"
-        run: cmake --build --preset conan-x86_64-linux-gcc-13-release --target run-tool-tests
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tool-tests
