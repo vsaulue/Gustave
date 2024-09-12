@@ -1,0 +1,34 @@
+---
+
+name: CI workflow
+
+on: [push, pull_request]
+
+jobs:
+  skip_duplicate:
+    runs-on: ubuntu-24.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          skip_after_successful_duplicate: true
+
+  linux_clang17:
+    uses: ./.github/workflows/linux-clang17.yml
+    needs: skip_duplicate
+    with:
+      should_skip: ${{needs.skip_duplicate.outputs.should_skip}}
+
+  linux_gcc13:
+    uses: ./.github/workflows/linux-gcc13.yml
+    needs: skip_duplicate
+    with:
+      should_skip: ${{needs.skip_duplicate.outputs.should_skip}}
+
+  windows_msvc193:
+    uses: ./.github/workflows/windows-msvc193.yml
+    needs: skip_duplicate
+    with:
+      should_skip: ${{needs.skip_duplicate.outputs.should_skip}}
