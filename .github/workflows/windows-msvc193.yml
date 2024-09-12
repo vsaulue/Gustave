@@ -2,23 +2,19 @@
 
 name: Windows VS-2022
 
-on: [push, pull_request]
+on:
+  workflow_call:
+    inputs:
+      should_skip:
+        description: 'Indicates if the workflow must be run'
+        default: 'true'
+        required: false
+        type: string
 
 jobs:
-  skip_duplicate:
-    runs-on: ubuntu-24.04
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@v5
-        with:
-          skip_after_successful_duplicate: true
-
   windows_msvc193:
     runs-on: windows-2022
-    needs: skip_duplicate
-    if: needs.skip_duplicate.outputs.should_skip != 'true'
+    if: inputs.should_skip != 'true'
     steps:
       - uses: actions/checkout@v4
 
