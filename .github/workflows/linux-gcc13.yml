@@ -35,7 +35,7 @@ jobs:
       - name: "[setup] Install apt-get packages"
         run: |
           sudo apt update
-          sudo apt install -y ninja-build
+          sudo apt install -y ninja-build valgrind
 
       - name: "[setup] Install conan"
         run: |
@@ -62,3 +62,6 @@ jobs:
 
       - name: "[build] Run tool tests"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tool-tests
+
+      - name: "[build] Run memcheck tests"
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests

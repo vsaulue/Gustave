@@ -1,5 +1,6 @@
 .vs
 build/
+cmake/python/__pycache__/
 CMakeSettings.json
 CMakeUserPresets.json
 
