@@ -27,12 +27,17 @@ cmake_minimum_required (VERSION 3.24)
 project ("Gustave" VERSION 0.0.1 LANGUAGES "CXX")
 set(CMAKE_CXX_STANDARD 20)
 
+set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (valgrind, DrMemory).")
+
 find_package(Catch2 CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(svgwrite CONFIG REQUIRED)
-
 find_package(Python COMPONENTS Interpreter)
+
+set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")
+
+include("cmake/MemcheckTests.cmake")
 
 add_custom_target(build-tests)
 add_custom_target(run-tests)
@@ -64,6 +69,10 @@ function(declare_unit_test test_target_name)
         PUBLIC ${test_compile_options}
     )
     add_dependencies(run-tests "run-${test_target_name}")
+    declare_memcheck_test(
+        TEST_ID "unitTest-${test_target_name}"
+        TARGET "${test_target_name}"
+    )
 endfunction()
 
 add_subdirectory("components")

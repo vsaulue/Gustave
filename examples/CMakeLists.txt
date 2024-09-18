@@ -25,8 +25,23 @@
 add_subdirectory("jsonGustave")
 add_subdirectory("svgViewer")
 
+set(toolsDir "${CMAKE_CURRENT_SOURCE_DIR}")
+
 add_custom_target(run-svgViewer-test
-    COMMAND Python::Interpreter "${CMAKE_CURRENT_SOURCE_DIR}/testSvgViewer.py" "$<TARGET_FILE:svgViewer>" ${test_command_args}
+    COMMAND Python::Interpreter "${toolsDir}/testSvgViewer.py" "$<TARGET_FILE:svgViewer>" ${test_command_args}
     DEPENDS svgViewer
 )
 add_dependencies(run-tool-tests run-svgViewer-test)
+
+declare_memcheck_test(
+    TEST_ID "svgViewer-01"
+    TARGET svgViewer
+    ARGS "${toolsDir}/jsonSamples/worlds/tower10.json"
+)
+declare_memcheck_test(
+    TEST_ID "svgViewer-02"
+    TARGET svgViewer
+    ARGS
+        "-r" "${toolsDir}/jsonSamples/renderers/blockMaxStress.json"
+        "${toolsDir}/jsonSamples/worlds/tower10.json"
+)
