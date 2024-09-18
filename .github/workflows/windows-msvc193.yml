@@ -13,6 +13,7 @@ on:
 
 env:
   cmake_profile: conan-x86_64-windows-msvc-193
+  drMemory_base: '$HOME/drMemory'
 
 jobs:
   windows_msvc193:
@@ -31,6 +32,9 @@ jobs:
 
       - uses: ilammy/msvc-dev-cmd@v1
 
+      - name: "[setup] Install DrMemory"
+        run: python '.github/scripts/msvc/installDrMemory.py' --dest "${{ env.drMemory_base }}"
+
       - name: "[setup] Install conan"
         run: |
           pipx install conan
@@ -46,7 +50,7 @@ jobs:
         run: conan install . -pr:b=./.github/conanProfiles/windows2022.txt -pr:h=./.github/conanProfiles/windows-msvc193.txt -s:h build_type=${{ matrix.build_type }} --build=missing
 
       - name: "[build] cmake config"
-        run: cmake . --preset ${{ env.cmake_profile }}
+        run: cmake . --preset ${{ env.cmake_profile }} -D "GUSTAVE_MEMCHECKER_PATH=${{ env.drMemory_base }}/bin64"
 
       - name: "[build] Build"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
@@ -56,3 +60,7 @@ jobs:
 
       - name: "[build] Run tool tests"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tool-tests
+
+      - name: "[build] Run memcheck tests"
+        if: matrix.build_type == 'Release'
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
