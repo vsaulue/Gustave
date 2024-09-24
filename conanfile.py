@@ -70,7 +70,7 @@ class GustaveRecipe(ConanFile):
         if not self.conf.get("tools.build:skip_test", default=False):
             cmake.build(target="build-tests")
             if can_run(self):
-                cmake.build(target="run-tests")
+                cmake.build(target="run-unit-tests")
 
     def package(self):
         copy(self, "LICENSE.txt", src=str(self.recipe_folder), dst=os.path.join(self.package_folder, "licenses"))
