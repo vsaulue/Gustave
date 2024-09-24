@@ -56,7 +56,7 @@ jobs:
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] Run unit tests"
-        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tests
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-unit-tests
 
       - name: "[build] Run tool tests"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tool-tests

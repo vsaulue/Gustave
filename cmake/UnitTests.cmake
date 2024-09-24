@@ -27,7 +27,7 @@ include_guard(GLOBAL)
 include("cmake/MemcheckTests.cmake")
 
 add_custom_target(build-tests)
-add_custom_target(run-tests)
+add_custom_target(run-unit-tests)
 
 set(test_compile_options)
 
@@ -54,7 +54,7 @@ function(declare_unit_test test_target_name)
     target_compile_options(${test_target_name}
         PUBLIC ${test_compile_options}
     )
-    add_dependencies(run-tests "run-${test_target_name}")
+    add_dependencies(run-unit-tests "run-${test_target_name}")
     declare_memcheck_test(
         TEST_ID "unitTest-${test_target_name}"
         TARGET "${test_target_name}"
