@@ -68,7 +68,7 @@ class GustaveRecipe(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         if not self.conf.get("tools.build:skip_test", default=False):
-            cmake.build(target="build-tests")
+            cmake.build()
             if can_run(self):
                 cmake.build(target="run-unit-tests")
 

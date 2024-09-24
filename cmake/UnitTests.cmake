@@ -26,7 +26,6 @@ include_guard(GLOBAL)
 
 include("cmake/MemcheckTests.cmake")
 
-add_custom_target(build-tests)
 add_custom_target(run-unit-tests)
 
 set(test_compile_options)
@@ -46,7 +45,6 @@ if(CMAKE_COLOR_DIAGNOSTICS)
 endif()
 
 function(declare_unit_test test_target_name)
-    add_dependencies(build-tests "${test_target_name}")
     add_custom_target("run-${test_target_name}"
         COMMAND ${test_target_name} ${test_command_args}
         DEPENDS ${test_target_name}
