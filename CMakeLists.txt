@@ -36,6 +36,7 @@ find_package(svgwrite CONFIG REQUIRED)
 find_package(Python COMPONENTS Interpreter)
 
 set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")
+set(json_samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/examples/jsonSamples")
 
 include("cmake/MemcheckTests.cmake")
 include("cmake/UnitTests.cmake")

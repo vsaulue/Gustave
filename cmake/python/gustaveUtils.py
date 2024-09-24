@@ -26,6 +26,25 @@ import argparse
 import os
 import sys
 
+class DirectoryParser(object):
+    """
+    Argument parser for a directory path.
+
+    It is meant to be used in `argparse.ArgumentParser.add_argument(type=DirectoryParser())`.
+    """
+
+    def __call__(self, arg: str) -> str:
+        """
+        Checks if the argument is a diretory path.
+
+        :param arg: string to test.
+        :returns: the input `arg`.
+        :raises argparse.ArgumentTypeError: if the path isn't an existing directory.
+        """
+        if not os.path.isdir(arg):
+            raise argparse.ArgumentTypeError('Invalid directory path.')
+        return arg
+
 class ExecutableParser(object):
     """
     Argument parser for a path to an executable.

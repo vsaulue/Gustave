@@ -29,58 +29,38 @@ import subprocess
 import sys
 import tempfile
 
+import gustaveUtils as gu
+
 class TestConfig(object):
-    ScriptFolder = pathlib.Path(__file__).parent.resolve()
-    WorldFolder = os.path.join(ScriptFolder, 'jsonSamples', 'worlds')
-    RendererFolder = os.path.join(ScriptFolder, 'jsonSamples', 'renderers')
-
-    DefaultWorldPath = os.path.join(WorldFolder, 'tower10.json')
-
-class TtyColors:
-    Green = '\033[92m'
-    Red = '\033[91m'
-    Reset = '\033[0m'
-
-class ExecutableParser(object):
-    def __init__(self):
-        pass
-
-    def __call__(self, arg: str) -> str:
-        if not os.path.isfile(arg):
-            raise argparse.ArgumentTypeError('Invalid file path.')
-        if not os.access(arg, mode= os.X_OK):
-            raise argparse.ArgumentTypeError('The file must be executable.')
-        return arg
+    WorldSubFolder: str = 'worlds'
+    RendererSubFolder: str = 'renderers'
+    DefaultWorldFilename: str = 'tower10.json'
 
 class TestContext(object):
-    IsAtty = sys.stdout.isatty()
+    coloring: gu.TtyColoring
+    samplesDir: str
+    svgViewerPath: str
 
     def __init__(self, args: list[str]):
         parser = argparse.ArgumentParser(prog='testSvgViewer', description='Runs automated tests for svgViewer and jsonSamples.')
-        parser.add_argument('svgViewerPath', type=ExecutableParser(), help='Path of the svgViewer binary to test')
+        parser.add_argument('svgViewerPath', type=gu.ExecutableParser(), help='Path of the svgViewer binary to test')
         parser.add_argument('--colour-mode', dest='colorMode', choices=['ansi','none','auto'], default='auto', help='Color mode used in the standard output')
+        parser.add_argument('--samples-dir', dest='samplesDir', type=gu.DirectoryParser(), required=True, help='Path to the directory containing the JSON samples')
         args = parser.parse_args(args)
         self.svgViewerPath = args.svgViewerPath
-        if args.colorMode == 'ansi':
-            self._useAnsiColor = True
-        elif args.colorMode == 'none':
-            self._useAnsiColor = False
-        else:
-            self._useAnsiColor = self.IsAtty
+        self.coloring = gu.Tty.makeColoring(args.colorMode)
+        self.samplesDir = args.samplesDir
 
-    def printDelimiter(self, char: str):
+    def printDelimiter(self, char: str) -> None:
         print(char * 40)
 
-    def printLine(self, *msg: str):
+    def printLine(self, *msg: str) -> None:
         print(*msg)
 
-    def textColor(self, msg: str, colorCode: str):
-        if self._useAnsiColor:
-            return '{0}{1}{2}'.format(colorCode, msg, TtyColors.Reset)
-        else:
-            return msg
-
 class TestReport(object):
+    numSuccessCases: int
+    numFailedCases: int
+
     def __init__(self, numSuccessCases: int, numFailedCases: int):
         self.numSuccessCases = numSuccessCases
         self.numFailedCases = numFailedCases
@@ -95,6 +75,9 @@ class TestReport(object):
 
 
 class TestFolder(object):
+    name: str
+    context: TestContext
+
     def __init__(self, name: str, context: TestContext):
         self.name = name
         self.context = context
@@ -103,9 +86,9 @@ class TestFolder(object):
         raise NotImplementedError()
 
     def folderPath(self) -> str:
-        raise NotImplementedError()
+        return os.path.join(self.context.samplesDir, self.name)
 
-    def fullCasePath(self, filename) -> str:
+    def fullCasePath(self, filename: str) -> str:
         return os.path.join(self.folderPath(), filename)
 
     def listCases(self) -> list[str]:
@@ -118,7 +101,7 @@ class TestFolder(object):
         curCaseId = 0
         numSuccessCases = 0
         numFailedCases = 0
-        failedText = ctx.textColor('FAILED', TtyColors.Red)
+        failedText = ctx.coloring('FAILED', 'red')
 
         ctx.printDelimiter('=')
         print('Running "{0}" samples folder ({1} files found)...'.format(self.name, numCases))
@@ -140,23 +123,18 @@ class TestFolder(object):
 
 class WorldsFolder(TestFolder):
     def __init__(self, context: TestContext):
-        super().__init__('worlds', context)
-
-    def folderPath(self) -> str:
-        return TestConfig.WorldFolder
+        super().__init__(TestConfig.WorldSubFolder, context)
 
     def commandList(self, filename) -> list[str]:
         return [ self.context.svgViewerPath, self.fullCasePath(filename) ]
 
 class RenderersFolder(TestFolder):
     def __init__(self, context: TestContext):
-        super().__init__('renderers', context)
-
-    def folderPath(self) -> str:
-        return TestConfig.RendererFolder
+        super().__init__(TestConfig.RendererSubFolder, context)
 
     def commandList(self, filename) -> list[str]:
-        return [ self.context.svgViewerPath, TestConfig.DefaultWorldPath, '-r', self.fullCasePath(filename) ]
+        defaultWorldPath = os.path.join(self.context.samplesDir, TestConfig.WorldSubFolder, TestConfig.DefaultWorldFilename)
+        return [ self.context.svgViewerPath, defaultWorldPath, '-r', self.fullCasePath(filename) ]
 
 if __name__ == "__main__":
     ctx = TestContext(sys.argv[1:])
@@ -165,11 +143,11 @@ if __name__ == "__main__":
     for folder in folders:
         reports = reports + folder.run()
     if reports.numFailedCases == 0:
-        ctx.printLine(ctx.textColor('All tests passed ({0} cases)'.format(reports.numSuccessCases), TtyColors.Green))
+        ctx.printLine(ctx.coloring('All tests passed ({0} cases)'.format(reports.numSuccessCases), 'green'))
         sys.exit(0)
     else:
-        passedText = ctx.textColor('{0} passed'.format(reports.numSuccessCases), TtyColors.Green)
-        failedText = ctx.textColor('{0} failed'.format(reports.numFailedCases), TtyColors.Red)
+        passedText = ctx.coloring('{0} passed'.format(reports.numSuccessCases), 'green')
+        failedText = ctx.coloring('{0} failed'.format(reports.numFailedCases), 'red')
         ctx.printLine('Test cases: {0} | {1} | {2}'.format(reports.numCases(), passedText, failedText))
         sys.exit(1)
 
