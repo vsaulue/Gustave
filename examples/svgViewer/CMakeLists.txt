@@ -33,3 +33,25 @@ target_link_libraries(svgViewer
 target_compile_options(svgViewer
     PUBLIC ${test_compile_options}
 )
+
+add_custom_target(run-svgViewer-test
+    COMMAND Python::Interpreter "${python_scripts_dir}/testSvgViewer.py"
+        "$<TARGET_FILE:svgViewer>"
+        "--samples-dir" "${json_samples_dir}"
+        ${test_command_args}
+    DEPENDS svgViewer
+)
+add_dependencies(run-tool-tests run-svgViewer-test)
+
+declare_memcheck_test(
+    TEST_ID "svgViewer-01"
+    TARGET svgViewer
+    ARGS "${json_samples_dir}/worlds/tower10.json"
+)
+declare_memcheck_test(
+    TEST_ID "svgViewer-02"
+    TARGET svgViewer
+    ARGS
+        "-r" "${json_samples_dir}/renderers/blockMaxStress.json"
+        "${json_samples_dir}/worlds/tower10.json"
+)
