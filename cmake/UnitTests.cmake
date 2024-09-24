@@ -22,26 +22,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required (VERSION 3.24)
-
-project ("Gustave" VERSION 0.0.1 LANGUAGES "CXX")
-set(CMAKE_CXX_STANDARD 20)
-
-set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (valgrind, DrMemory).")
-
-find_package(Catch2 CONFIG REQUIRED)
-find_package(CLI11 CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(svgwrite CONFIG REQUIRED)
-find_package(Python COMPONENTS Interpreter)
-
-set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")
+include_guard(GLOBAL)
 
 include("cmake/MemcheckTests.cmake")
-include("cmake/UnitTests.cmake")
 
-add_custom_target(run-tool-tests)
+add_custom_target(build-tests)
+add_custom_target(run-tests)
 
-add_subdirectory("components")
-add_subdirectory("distribs")
-add_subdirectory("examples")
+set(test_compile_options)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    list(APPEND test_compile_options "/W3" "/WX" "/permissive-" "/utf-8")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    list(APPEND test_compile_options "-Wall" "-Wextra" "-Wpedantic" "-Werror" "-fconcepts-diagnostics-depth=5")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    list(APPEND test_compile_options "-Wall" "-Wextra" "-Wpedantic" "-Werror")
+endif()
+
+set(test_command_args)
+
+if(CMAKE_COLOR_DIAGNOSTICS)
+    list(APPEND test_command_args "--colour-mode" "ansi")
+endif()
+
+function(declare_unit_test test_target_name)
+    add_dependencies(build-tests "${test_target_name}")
+    add_custom_target("run-${test_target_name}"
+        COMMAND ${test_target_name} ${test_command_args}
+        DEPENDS ${test_target_name}
+    )
+    target_compile_options(${test_target_name}
+        PUBLIC ${test_compile_options}
+    )
+    add_dependencies(run-tests "run-${test_target_name}")
+    declare_memcheck_test(
+        TEST_ID "unitTest-${test_target_name}"
+        TARGET "${test_target_name}"
+    )
+endfunction()
