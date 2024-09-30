@@ -78,10 +78,16 @@ class GustaveRecipe(ConanFile):
         cmake.install(component="Std-Gustave")
 
     def package_info(self):
-        self.cpp_info.bindirs = []
-        self.cpp_info.libdirs = []
-        self.cpp_info.set_property("cmake_file_name", "Gustave")
-        self.cpp_info.set_property("cmake_target_name", "Gustave::Std-Gustave")
+        std = self.cpp_info.components['distrib-std']
+        std.libdirs = []
+        std.bindirs = []
+        std.includedirs = ['include']
+        std.set_property('cmake_file_name', 'Gustave')
+        std.set_property('cmake_target_name', 'Gustave::Distrib-Std')
+
+        # Disable the generation of the default 'gustave::gustave' target by giving it an existing name.
+        self.cpp_info.set_property('cmake_file_name', 'Gustave')
+        self.cpp_info.set_property('cmake_target_name', 'Gustave::Distrib-Std')
 
     def package_id(self):
         self.info.clear()
