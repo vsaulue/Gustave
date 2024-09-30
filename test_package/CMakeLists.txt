@@ -32,4 +32,4 @@ find_package(Gustave CONFIG REQUIRED)
 add_executable(Gustave-Package-Test
     "main.cpp"
 )
-target_link_libraries(Gustave-Package-Test PRIVATE Gustave::Std-Gustave)
+target_link_libraries(Gustave-Package-Test PRIVATE Gustave::Distrib-Std)
