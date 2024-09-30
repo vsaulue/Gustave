@@ -41,6 +41,7 @@ class GustaveRecipe(ConanFile):
 
     exports = "LICENSE.txt"
     exports_sources = "cmake/*", "components/*", "distribs/*", "tools/*", "CMakeLists.txt"
+    test_package_folder = "packaging/conan/test_package"
 
     def build_requirements(self):
         self.tool_requires("cmake/3.29.0")
