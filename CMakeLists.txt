@@ -24,7 +24,9 @@
 
 cmake_minimum_required (VERSION 3.24)
 
-project ("Gustave" VERSION 0.0.1 LANGUAGES "CXX")
+set(gustave_version "0.0.1")
+
+project("Gustave" VERSION "${gustave_version}" LANGUAGES "CXX")
 set(CMAKE_CXX_STANDARD 20)
 
 set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (valgrind, DrMemory).")
