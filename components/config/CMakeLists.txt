@@ -24,4 +24,4 @@
 
 add_library(Comp-Config INTERFACE)
 target_include_directories(Comp-Config INTERFACE "include")
-install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
+install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION include)

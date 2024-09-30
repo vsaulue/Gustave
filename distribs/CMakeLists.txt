@@ -22,5 +22,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory("std/strictUnit")
-add_subdirectory("std/unitless")
+add_subdirectory("std")

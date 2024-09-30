@@ -75,7 +75,7 @@ class GustaveRecipe(ConanFile):
     def package(self):
         copy(self, "LICENSE.txt", src=str(self.recipe_folder), dst=os.path.join(self.package_folder, "licenses"))
         cmake = CMake(self)
-        cmake.install(component="Std-Gustave")
+        cmake.install(component="Distrib-Std")
 
     def package_info(self):
         std = self.cpp_info.components['distrib-std']
