@@ -26,11 +26,11 @@ from conan import ConanFile
 from conan.tools.build import can_run, check_min_cppstd
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps, cmake_layout
 from conan.tools.files import copy
+import re
 import os
 
 class GustaveRecipe(ConanFile):
     name = "gustave"
-    version = "0.0.1"
     license = "MIT"
     author = "Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>"
     url = "https://github.com/vsaulue/Gustave"
@@ -42,6 +42,16 @@ class GustaveRecipe(ConanFile):
     exports = "LICENSE.txt"
     exports_sources = "cmake/*", "components/*", "distribs/*", "tools/*", "CMakeLists.txt"
     test_package_folder = "packaging/conan/test_package"
+
+    def set_version(self):
+        cmakeFilePath = os.path.join(self.recipe_folder, 'CMakeLists.txt')
+        regex = re.compile(r'^ *set\( *gustave_version +"(\d+\.\d+\.\d+)" *\)')
+        with open(cmakeFilePath) as cmakeFile:
+            for line in cmakeFile:
+                res = regex.match(line)
+                if res != None:
+                    self.version = res.group(1)
+                    break
 
     def build_requirements(self):
         self.tool_requires("cmake/3.29.0")
