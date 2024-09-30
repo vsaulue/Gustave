@@ -24,7 +24,7 @@
 
 add_library(Distrib-Std-StrictUnit INTERFACE)
 target_include_directories(Distrib-Std-StrictUnit INTERFACE "include")
-install(DIRECTORY "include/" COMPONENT Std-Gustave DESTINATION include)
+install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION include)
 
 target_link_libraries(Distrib-Std-StrictUnit
     INTERFACE Comp-Core
