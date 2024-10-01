@@ -31,11 +31,18 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (valgrind, DrMemory).")
 
+set(GUSTAVE_CONAN_PATH CACHE PATH "Path to conan program (for packaging tests).")
+set(GUSTAVE_CONAN_BUILD_PROFILE CACHE STRING "Conan build profile (for packaging tests).")
+set(GUSTAVE_CONAN_HOST_PROFILE CACHE STRING "Conan host profile (for packaging tests).")
+
 find_package(Catch2 CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(svgwrite CONFIG REQUIRED)
 find_package(Python COMPONENTS Interpreter)
+
+find_program(conanExe conan PATHS "${GUSTAVE_CONAN_PATH}" DOC "Conan executable (package manager).")
+message(STATUS "Conan: using conan at: '${conanExe}'.")
 
 set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")
 set(json_samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/tools/jsonSamples")
@@ -43,8 +50,10 @@ set(json_samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/tools/jsonSamples")
 include("cmake/MemcheckTests.cmake")
 include("cmake/UnitTests.cmake")
 
+add_custom_target(run-packaging-tests)
 add_custom_target(run-tool-tests)
 
 add_subdirectory("components")
 add_subdirectory("distribs")
+add_subdirectory("packaging")
 add_subdirectory("tools")
