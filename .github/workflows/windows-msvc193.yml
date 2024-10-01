@@ -14,6 +14,8 @@ on:
 env:
   cmake_profile: conan-x86_64-windows-msvc-193
   drMemory_base: '$HOME/drMemory'
+  conan_pr_build: ./.github/conanProfiles/windows2022.txt
+  conan_pr_host: ./.github/conanProfiles/windows-msvc193.txt
 
 jobs:
   windows_msvc193:
@@ -47,10 +49,14 @@ jobs:
           key: ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] conan install"
-        run: conan install . -pr:b=./.github/conanProfiles/windows2022.txt -pr:h=./.github/conanProfiles/windows-msvc193.txt -s:h build_type=${{ matrix.build_type }} --build=missing
+        run: conan install . -pr:b=${{ env.conan_pr_build }} -pr:h=${{ env.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
 
       - name: "[build] cmake config"
-        run: cmake . --preset ${{ env.cmake_profile }} -D "GUSTAVE_MEMCHECKER_PATH=${{ env.drMemory_base }}/bin64"
+        run: >
+          cmake . --preset ${{ env.cmake_profile }}
+          -D "GUSTAVE_MEMCHECKER_PATH=${{ env.drMemory_base }}/bin64"
+          -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ env.conan_pr_build }}"
+          -D "GUSTAVE_CONAN_HOST_PROFILE=${{ env.conan_pr_host }}"
 
       - name: "[build] Build"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
@@ -64,3 +70,6 @@ jobs:
       - name: "[build] Run memcheck tests"
         if: matrix.build_type == 'Release'
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
+
+      - name: "[build] Run packaging tests"
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-packaging-tests

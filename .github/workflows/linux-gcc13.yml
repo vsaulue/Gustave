@@ -13,6 +13,8 @@ on:
 
 env:
   cmake_profile: conan-x86_64-linux-gcc-13
+  conan_pr_build: ./.github/conanProfiles/ubuntu24.txt
+  conan_pr_host: ./.github/conanProfiles/linux-gcc13.txt
 
 jobs:
   linux_gcc13:
@@ -49,10 +51,13 @@ jobs:
           key: ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] conan install"
-        run: conan install . -pr:b=./.github/conanProfiles/ubuntu24.txt -pr:h=./.github/conanProfiles/linux-gcc13.txt -s:h build_type=${{ matrix.build_type }} --build=missing
+        run: conan install . -pr:b=${{ env.conan_pr_build }} -pr:h=${{ env.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
 
       - name: "[build] cmake config"
-        run: cmake . --preset ${{ env.cmake_profile }}
+        run: >
+          cmake . --preset ${{ env.cmake_profile }}
+          -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ env.conan_pr_build }}"
+          -D "GUSTAVE_CONAN_HOST_PROFILE=${{ env.conan_pr_host }}"
 
       - name: "[build] Build"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
@@ -65,3 +70,6 @@ jobs:
 
       - name: "[build] Run memcheck tests"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
+
+      - name: "[build] Run packaging tests"
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-packaging-tests
