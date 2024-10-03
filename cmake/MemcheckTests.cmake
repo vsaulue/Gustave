@@ -24,6 +24,8 @@
 
 include_guard(GLOBAL)
 
+include("cmake/PythonTests.cmake")
+
 add_custom_target(run-memcheck-tests)
 
 set(memcheck_options)
@@ -35,9 +37,6 @@ else()
     find_program(memcheck_exe valgrind PATHS "${GUSTAVE_MEMCHECKER_PATH}")
     message(STATUS "Memcheck: using valgrind at: '${memcheck_exe}'.")
     list(APPEND memcheck_options "--valgrind" "${memcheck_exe}")
-endif()
-if (CMAKE_COLOR_DIAGNOSTICS)
-    list(APPEND memcheck_options "--colour-mode" "ansi")
 endif()
 
 function(declare_memcheck_test)
@@ -62,6 +61,7 @@ function(declare_memcheck_test)
         COMMAND Python::Interpreter
             "${python_scripts_dir}/runMemcheckTest.py"
             ${memcheck_options}
+            ${python_test_args}
             "--"
             "$<TARGET_FILE:${ARG_TARGET}>"
             ${ARG_ARGS}

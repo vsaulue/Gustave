@@ -55,6 +55,7 @@ set(json_samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/tools/jsonSamples")
 
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
+include("cmake/PythonTests.cmake")
 include("cmake/UnitTests.cmake")
 
 add_custom_target(run-packaging-tests)

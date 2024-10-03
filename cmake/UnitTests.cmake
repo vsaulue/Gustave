@@ -29,15 +29,15 @@ include("cmake/MemcheckTests.cmake")
 
 add_custom_target(run-unit-tests)
 
-set(test_command_args)
+set(unit_test_args)
 
 if(CMAKE_COLOR_DIAGNOSTICS)
-    list(APPEND test_command_args "--colour-mode" "ansi")
+    list(APPEND unit_test_args "--colour-mode" "ansi")
 endif()
 
 function(declare_unit_test test_target_name)
     add_custom_target("run-${test_target_name}"
-        COMMAND ${test_target_name} ${test_command_args}
+        COMMAND ${test_target_name} ${unit_test_args}
         DEPENDS ${test_target_name}
     )
     add_dependencies(run-unit-tests "run-${test_target_name}")

@@ -25,6 +25,7 @@
 add_custom_target(run-packaging-conan-test
     COMMAND Python::Interpreter "${python_scripts_dir}/testConanPackaging.py"
         "${Gustave_SOURCE_DIR}"
+        ${python_test_args}
         "--conan" "${conanExe}"
         "--build-type" "$<CONFIG>"
         "--pr-build" "${GUSTAVE_CONAN_BUILD_PROFILE}"
