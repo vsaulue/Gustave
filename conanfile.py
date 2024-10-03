@@ -40,7 +40,7 @@ class GustaveRecipe(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
     exports = "LICENSE.txt"
-    exports_sources = "cmake/*", "components/*", "distribs/*", "packaging/*", "tools/*", "CMakeLists.txt"
+    exports_sources = "cmake/*", "components/*", "distribs/*", "packaging/*", "tools/*", "CMakeLists.txt", "!*/build", "!*/__pycache__"
     test_package_folder = "packaging/conan/test_package"
 
     def set_version(self):
