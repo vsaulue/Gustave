@@ -24,25 +24,10 @@
 
 include_guard(GLOBAL)
 
-include("cmake/CompilerOptions.cmake")
-include("cmake/MemcheckTests.cmake")
-
-add_custom_target(run-unit-tests)
-
-set(test_command_args)
-
-if(CMAKE_COLOR_DIAGNOSTICS)
-    list(APPEND test_command_args "--colour-mode" "ansi")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_compile_options("/W3" "/permissive-" "/utf-8")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    add_compile_options("-Wall" "-Wextra" "-Wpedantic" "-fconcepts-diagnostics-depth=5")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    add_compile_options("-Wall" "-Wextra" "-Wpedantic")
 endif()
-
-function(declare_unit_test test_target_name)
-    add_custom_target("run-${test_target_name}"
-        COMMAND ${test_target_name} ${test_command_args}
-        DEPENDS ${test_target_name}
-    )
-    add_dependencies(run-unit-tests "run-${test_target_name}")
-    declare_memcheck_test(
-        TEST_ID "unitTest-${test_target_name}"
-        TARGET "${test_target_name}"
-    )
-endfunction()

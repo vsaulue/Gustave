@@ -31,8 +31,11 @@ set(CMAKE_CXX_STANDARD 20)
 
 # General settings
 option(CMAKE_COMPILE_WARNING_AS_ERROR "Compile warnings as errors." ON)
+# CMAKE_COLOR_DIAGNOSTICS: Add colors to build/test output.
+
 # Memcheck tests settings
 set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (valgrind, DrMemory).")
+
 # Packaging tests settings
 set(GUSTAVE_CONAN_PATH CACHE PATH "Path to conan program (for packaging tests).")
 set(GUSTAVE_CONAN_BUILD_PROFILE CACHE STRING "Conan build profile (for packaging tests).")
@@ -50,6 +53,7 @@ message(STATUS "Conan: using conan at: '${conanExe}'.")
 set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")
 set(json_samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/tools/jsonSamples")
 
+include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 include("cmake/UnitTests.cmake")
 
