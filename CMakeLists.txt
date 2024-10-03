@@ -29,8 +29,11 @@ set(gustave_version "0.0.1")
 project("Gustave" VERSION "${gustave_version}" LANGUAGES "CXX")
 set(CMAKE_CXX_STANDARD 20)
 
+# General settings
+option(CMAKE_COMPILE_WARNING_AS_ERROR "Compile warnings as errors." ON)
+# Memcheck tests settings
 set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (valgrind, DrMemory).")
-
+# Packaging tests settings
 set(GUSTAVE_CONAN_PATH CACHE PATH "Path to conan program (for packaging tests).")
 set(GUSTAVE_CONAN_BUILD_PROFILE CACHE STRING "Conan build profile (for packaging tests).")
 set(GUSTAVE_CONAN_HOST_PROFILE CACHE STRING "Conan host profile (for packaging tests).")
