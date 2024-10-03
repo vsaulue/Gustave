@@ -30,9 +30,6 @@ target_link_libraries(svgViewer
     PRIVATE Distrib-Std-StrictUnit
     PRIVATE Examples-JsonWorld
 )
-target_compile_options(svgViewer
-    PUBLIC ${test_compile_options}
-)
 
 add_custom_target(run-svgViewer-test
     COMMAND Python::Interpreter "${python_scripts_dir}/testSvgViewer.py"
