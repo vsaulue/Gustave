@@ -402,6 +402,39 @@ class CMakeFolders(object):
             self._sourceChecked = True
         return result
 
+class CMakeConanProfiles(object):
+    """Class holding the name/path of the conan profiles."""
+
+    _build: str
+    """Value of the `build` property."""
+
+    _host: str
+    """Value of the `host` property."""
+
+    def __init__(self, jsonObject: dict[str, typing.Any]):
+        """
+        :param jsonObject: Input JSON sub-object.
+        :raises TypeError: if an unexpected type is found in the JSON.
+        """
+        self._build = JsonUtils.getStr(jsonObject, 'build')
+        self._host = JsonUtils.getStr(jsonObject, 'host')
+
+    @property
+    def build(self) -> str:
+        """Name (or path) of the Conan build profile."""
+        result = self._build
+        if result == '':
+            raise ValueError('"build" property is empty.')
+        return result
+
+    @property
+    def host(self) -> str:
+        """Name (or path) of the Conan host profile."""
+        result = self._host
+        if result == '':
+            raise ValueError('"host" property is empty.')
+        return result
+
 class CMakeVariables(object):
     """Class holding various values provided by CMake in the current Gustave build."""
 
@@ -410,6 +443,9 @@ class CMakeVariables(object):
 
     _colorDiagnostics: bool
     """Value of the `colorDiagnostics` property."""
+
+    _conanProfiles: CMakeConanProfiles
+    """Value of the `conanProfiles` property."""
 
     _config : str
     """Value of the `config` property."""
@@ -427,6 +463,7 @@ class CMakeVariables(object):
         """
         self._buildFlags = CMakeBuildFlags(JsonUtils.getObject(jsonObject, 'buildFlags'))
         self._colorDiagnostics = JsonUtils.getBool(jsonObject, 'colorDiagnostics')
+        self._conanProfiles = CMakeConanProfiles(JsonUtils.getObject(jsonObject, 'conanProfiles'))
         self._config = JsonUtils.getStr(jsonObject, 'config')
         self._executables = CMakeExecutables(JsonUtils.getObject(jsonObject, 'executables'))
         self._folders = CMakeFolders(JsonUtils.getObject(jsonObject, 'folders'))
@@ -440,6 +477,10 @@ class CMakeVariables(object):
     def colorDiagnostics(self) -> bool:
         """Flag set when CMake is with color diagnostics (CMAKE_COLOR_DIAGNOSTICS)."""
         return self._colorDiagnostics
+
+    @property
+    def conanProfiles(self) -> CMakeConanProfiles:
+        return self._conanProfiles
 
     @property
     def config(self) -> str:
