@@ -59,6 +59,8 @@ message(STATUS "Conan: using conan at: '${conanExe}'.")
 set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")
 set(json_samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/tools/jsonSamples")
 
+include("CMakePackageConfigHelpers")
+
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 include("cmake/PythonTests.cmake")
