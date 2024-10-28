@@ -1,0 +1,21 @@
+
+{
+    "buildFlags": {
+        "cxx": "${cxx_flags}"
+    },
+    "colorDiagnostics": ${color_diagnostics},
+    "config": "$<CONFIG>",
+    "executables": {
+        "cmake": "${CMAKE_COMMAND}",
+        "conan": "${conanExe}",
+        "compilers": {
+            "cxx": "${CMAKE_CXX_COMPILER}"
+        },
+        "svgViewer": "$<TARGET_FILE:svgViewer>"
+    },
+    "folders":  {
+        "build": "${Gustave_BINARY_DIR}",
+        "install": "${CMAKE_INSTALL_PREFIX}",
+        "source": "${Gustave_SOURCE_DIR}"
+    }
+}
