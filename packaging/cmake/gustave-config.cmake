@@ -22,19 +22,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required (VERSION 3.24)
+block(SCOPE_FOR VARIABLES)
+    set(Gustave_FOUND "TRUE" PARENT_SCOPE)
 
-project ("Gustave-Package-Test" "CXX")
-set(CMAKE_CXX_STANDARD 20)
+    set(known_components "Distrib-Std")
+    foreach(component_name IN LISTS Gustave_FIND_COMPONENTS)
+        set(Gustave_${component_name}_FOUND "FALSE" PARENT_SCOPE)
+        if(NOT component_name IN_LIST known_components)
+            if(Gustave_FIND_REQUIRED_${component_name})
+                message(SEND_ERROR "Gustave: unknown REQUIRED component: ${component_name}")
+                set(Gustave_FOUND "FALSE" PARENT_SCOPE)
+            else()
+                message(WARNING "Gustave: unknown optional component: ${component_name}")
+            endif()
+        endif()
+    endforeach()
 
-find_package(Gustave CONFIG REQUIRED Distrib-Std)
-
-add_executable(Gustave-Package-Test
-    "main.cpp"
-)
-target_link_libraries(Gustave-Package-Test PRIVATE Gustave::Distrib-Std)
-
-add_custom_target(run-test
-    COMMAND Gustave-Package-Test
-    DEPENDS Gustave-Package-Test
-)
+    # Component Distrib-Std
+    set(Gustave_Distrib-Std_FOUND "TRUE" PARENT_SCOPE)
+    include("${CMAKE_CURRENT_LIST_DIR}/Distrib-Std-targets.cmake")
+endblock()

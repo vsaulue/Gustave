@@ -27,8 +27,11 @@ add_subdirectory("unitless")
 
 add_library(Distrib-Std INTERFACE)
 target_link_libraries(Distrib-Std
-    INTERFACE Distrib-Std-StrictUnit
-    INTERFACE Distrib-Std-Unitless
+    INTERFACE $<BUILD_INTERFACE:Distrib-Std-StrictUnit>
+    INTERFACE $<BUILD_INTERFACE:Distrib-Std-Unitless>
+)
+target_include_directories(Distrib-Std
+    INTERFACE $<INSTALL_INTERFACE:include>
 )
 
 add_library(Gustave::Distrib-Std ALIAS Distrib-Std)

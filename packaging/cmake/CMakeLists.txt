@@ -22,19 +22,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required (VERSION 3.24)
-
-project ("Gustave-Package-Test" "CXX")
-set(CMAKE_CXX_STANDARD 20)
-
-find_package(Gustave CONFIG REQUIRED Distrib-Std)
-
-add_executable(Gustave-Package-Test
-    "main.cpp"
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/gustave-config-version.cmake"
+    COMPATIBILITY SameMinorVersion
+    ARCH_INDEPENDENT
 )
-target_link_libraries(Gustave-Package-Test PRIVATE Gustave::Distrib-Std)
-
-add_custom_target(run-test
-    COMMAND Gustave-Package-Test
-    DEPENDS Gustave-Package-Test
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/gustave-config-version.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/gustave-config.cmake"
+    COMPONENT Packaging-CMake
+    DESTINATION "cmake"
 )
+
+install(
+    TARGETS Distrib-Std
+    EXPORT Distrib-Std-targets
+    COMPONENT Distrib-Std
+    RUNTIME
+        DESTINATION "bin"
+    LIBRARY
+        DESTINATION "lib"
+    ARCHIVE
+        DESTINATION "lib"
+    FILE_SET HEADERS
+        DESTINATION "include"
+)
+install(
+    EXPORT Distrib-Std-targets
+    COMPONENT Packaging-CMake
+    NAMESPACE Gustave::
+    DESTINATION "cmake"
+)
+
+add_custom_target(run-cmake-packaging-test
+    COMMAND Python::Interpreter "${python_scripts_dir}/testCMakePackaging.py"
+        "--cmakeVariables" "${cmake_variables_json}"
+    WORKING_DIRECTORY "${Gustave_SOURCE_DIR}"
+)
+add_dependencies(run-cmake-packaging-test install-to-cmake-prefix)
+add_dependencies(run-packaging-tests run-cmake-packaging-test)
