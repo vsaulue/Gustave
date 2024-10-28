@@ -32,6 +32,12 @@ set(CMAKE_CXX_STANDARD 20)
 # General settings
 option(CMAKE_COMPILE_WARNING_AS_ERROR "Compile warnings as errors." ON)
 # CMAKE_COLOR_DIAGNOSTICS: Add colors to build/test output.
+# CMAKE_INSTALL_PREFIX: Default location of the install target (also used for packaging tests).
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "${CMAKE_CURRENT_BINARY_DIR}/install")
+endif()
+
 
 # Memcheck tests settings
 set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (valgrind, DrMemory).")
@@ -57,6 +63,10 @@ include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 include("cmake/PythonTests.cmake")
 include("cmake/UnitTests.cmake")
+
+add_custom_target(install-to-cmake-prefix
+    COMMAND "${CMAKE_COMMAND}" "--build" "${CMAKE_CURRENT_BINARY_DIR}" "--config" "$<CONFIG>" "--target" "install"
+)
 
 add_custom_target(run-packaging-tests)
 add_custom_target(run-tool-tests)
