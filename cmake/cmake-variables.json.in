@@ -4,6 +4,10 @@
         "cxx": "${cxx_flags}"
     },
     "colorDiagnostics": ${color_diagnostics},
+    "conanProfiles": {
+        "build": "${GUSTAVE_CONAN_BUILD_PROFILE}",
+        "host": "${GUSTAVE_CONAN_HOST_PROFILE}"
+    },
     "config": "$<CONFIG>",
     "executables": {
         "cmake": "${CMAKE_COMMAND}",
