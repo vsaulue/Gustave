@@ -63,6 +63,7 @@ include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 include("cmake/PythonTests.cmake")
 include("cmake/UnitTests.cmake")
+include("cmake/VariablesJson.cmake")
 
 add_custom_target(install-to-cmake-prefix
     COMMAND "${CMAKE_COMMAND}" "--build" "${CMAKE_CURRENT_BINARY_DIR}" "--config" "$<CONFIG>" "--target" "install"
