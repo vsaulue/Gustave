@@ -24,8 +24,6 @@
 
 include_guard(GLOBAL)
 
-include("cmake/PythonTests.cmake")
-
 add_custom_target(run-memcheck-tests)
 
 set(memcheck_type "")

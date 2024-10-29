@@ -63,7 +63,6 @@ include("CMakePackageConfigHelpers")
 
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
-include("cmake/PythonTests.cmake")
 include("cmake/UnitTests.cmake")
 include("cmake/VariablesJson.cmake")
 
