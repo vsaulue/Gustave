@@ -22,40 +22,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import abc
 import argparse
 import os
-import pathlib
-import subprocess
 import sys
-import tempfile
 
 import gustaveUtils as gu
 
 class TestConfig(object):
+    JsonSamplesPath: list[str] = ['tools','jsonSamples']
     WorldSubFolder: str = 'worlds'
     RendererSubFolder: str = 'renderers'
     DefaultWorldFilename: str = 'tower10.json'
-
-class TestContext(object):
-    coloring: gu.TtyColoring
-    samplesDir: str
-    svgViewerPath: str
-
-    def __init__(self, args: list[str]):
-        parser = argparse.ArgumentParser(prog='testSvgViewer', description='Runs automated tests for svgViewer and jsonSamples.')
-        parser.add_argument('svgViewerPath', type=gu.ExecutableParser(), help='Path of the svgViewer binary to test')
-        parser.add_argument('--colour-mode', dest='colorMode', choices=['ansi','none','auto'], default='auto', help='Color mode used in the standard output')
-        parser.add_argument('--samples-dir', dest='samplesDir', type=gu.DirectoryParser(), required=True, help='Path to the directory containing the JSON samples')
-        args = parser.parse_args(args)
-        self.svgViewerPath = args.svgViewerPath
-        self.coloring = gu.Tty.makeColoring(args.colorMode)
-        self.samplesDir = args.samplesDir
-
-    def printDelimiter(self, char: str) -> None:
-        print(char * 40)
-
-    def printLine(self, *msg: str) -> None:
-        print(*msg)
 
 class TestReport(object):
     numSuccessCases: int
@@ -75,79 +53,85 @@ class TestReport(object):
 
 
 class TestFolder(object):
-    name: str
-    context: TestContext
+    _name: str
+    _ctx: gu.TestScriptContext
+    _casesFolderPath : str
 
-    def __init__(self, name: str, context: TestContext):
-        self.name = name
-        self.context = context
+    def __init__(self, name: str, ctx: gu.TestScriptContext):
+        self._name = name
+        self._ctx = ctx
+        self._casesFolderPath = os.path.join(ctx.cmakeVars.folders.source, *TestConfig.JsonSamplesPath, name)
 
     def commandList(self, filename: str) -> list[str]:
         raise NotImplementedError()
 
-    def folderPath(self) -> str:
-        return os.path.join(self.context.samplesDir, self.name)
-
     def fullCasePath(self, filename: str) -> str:
-        return os.path.join(self.folderPath(), filename)
+        return os.path.join(self._casesFolderPath, filename)
 
     def listCases(self) -> list[str]:
-        return [ f for f in os.listdir(self.folderPath()) if self.fullCasePath(f) ]
+        return [ f for f in os.listdir(self._casesFolderPath) if self.fullCasePath(f) ]
+
+    @property
+    def svgViewerPath(self):
+        return self._ctx.cmakeVars.executables.svgViewer
 
     def run(self) -> TestReport:
-        ctx = self.context
         allCases = self.listCases()
         numCases = len(allCases)
-        curCaseId = 0
         numSuccessCases = 0
         numFailedCases = 0
-        failedText = ctx.coloring('FAILED', 'red')
 
-        ctx.printDelimiter('=')
-        print('Running "{0}" samples folder ({1} files found)...'.format(self.name, numCases))
-        ctx.printDelimiter('-')
+        print('=' * 40, file=sys.stderr)
+        print(f'Running "{self._name}" samples folder ({numCases} files found)...\n', file=sys.stderr)
         for case in allCases:
-            curCaseId += 1
-            with tempfile.TemporaryFile(mode='w+') as stderrFile:
-                cmd = self.commandList(case)
-                viewerProcess = subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=stderrFile)
-                if viewerProcess.returncode != 0:
+            cmd = self.commandList(case)
+            with self._ctx.newCmd(cmd, exitOnError=False, separateStderr=True) as caseRun:
+                retCode = caseRun.returncode
+                if retCode != 0:
+                    print(f'{self._ctx.coloring("Command failed", "red")} (exit code: {retCode}): {caseRun.cmdStr}', file=sys.stderr)
                     numFailedCases += 1
-                    ctx.printLine("[{0}/{1}] {2}: {3}".format(curCaseId, numCases, failedText, ' '.join(cmd)))
-                    stderrFile.seek(0)
-                    ctx.printLine(stderrFile.read())
-                    ctx.printDelimiter('-')
                 else:
                     numSuccessCases += 1
         return TestReport(numSuccessCases, numFailedCases)
 
 class WorldsFolder(TestFolder):
-    def __init__(self, context: TestContext):
-        super().__init__(TestConfig.WorldSubFolder, context)
+    def __init__(self, ctx: gu.TestScriptContext):
+        super().__init__(TestConfig.WorldSubFolder, ctx)
 
     def commandList(self, filename) -> list[str]:
-        return [ self.context.svgViewerPath, self.fullCasePath(filename) ]
+        return [ self.svgViewerPath, self.fullCasePath(filename) ]
 
 class RenderersFolder(TestFolder):
-    def __init__(self, context: TestContext):
-        super().__init__(TestConfig.RendererSubFolder, context)
+    _defaultWorldPath : str
+
+    def __init__(self, ctx: gu.TestScriptContext):
+        super().__init__(TestConfig.RendererSubFolder, ctx)
+        self._defaultWorldPath = os.path.join(ctx.cmakeVars.folders.source, *TestConfig.JsonSamplesPath, TestConfig.WorldSubFolder, TestConfig.DefaultWorldFilename)
 
     def commandList(self, filename) -> list[str]:
-        defaultWorldPath = os.path.join(self.context.samplesDir, TestConfig.WorldSubFolder, TestConfig.DefaultWorldFilename)
-        return [ self.context.svgViewerPath, defaultWorldPath, '-r', self.fullCasePath(filename) ]
+        return [ self.svgViewerPath, self._defaultWorldPath, '-r', self.fullCasePath(filename) ]
+
+class TestSvgViewer(gu.TestScript):
+    """Tests the svgViewer executable and the JSON samples."""
+
+    # @typing.override
+    def makeArgsParser(self) -> argparse.ArgumentParser:
+        result = argparse.ArgumentParser(description='Checks that svgViewer and the examples in jsonSamples/ work.')
+        return result
+
+    # @typing.override
+    def doRun(self, ctx: gu.TestScriptContext) -> None:
+        folders = [ WorldsFolder(ctx), RenderersFolder(ctx) ]
+        reports = TestReport(0,0)
+        for folder in folders:
+            reports = reports + folder.run()
+        if reports.numFailedCases == 0:
+            print(ctx.coloring(f'All tests passed ({reports.numSuccessCases} cases)', 'green'), file=sys.stderr)
+        else:
+            passedText = ctx.coloring('{0} passed'.format(reports.numSuccessCases), 'green')
+            failedText = ctx.coloring('{0} failed'.format(reports.numFailedCases), 'red')
+            print(f'Test cases: {reports.numCases()} | {passedText} | {failedText}', file=sys.stderr)
+            raise gu.TestScriptException()
 
 if __name__ == "__main__":
-    ctx = TestContext(sys.argv[1:])
-    folders = [ WorldsFolder(ctx), RenderersFolder(ctx) ]
-    reports = TestReport(0,0)
-    for folder in folders:
-        reports = reports + folder.run()
-    if reports.numFailedCases == 0:
-        ctx.printLine(ctx.coloring('All tests passed ({0} cases)'.format(reports.numSuccessCases), 'green'))
-        sys.exit(0)
-    else:
-        passedText = ctx.coloring('{0} passed'.format(reports.numSuccessCases), 'green')
-        failedText = ctx.coloring('{0} failed'.format(reports.numFailedCases), 'red')
-        ctx.printLine('Test cases: {0} | {1} | {2}'.format(reports.numCases(), passedText, failedText))
-        sys.exit(1)
-
+    TestSvgViewer().run()
