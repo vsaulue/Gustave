@@ -15,11 +15,14 @@
         "compilers": {
             "cxx": "${CMAKE_CXX_COMPILER}"
         },
-        "svgViewer": "$<TARGET_FILE:svgViewer>"
+        "drMemory": "${drMemory_exe}",
+        "svgViewer": "$<TARGET_FILE:svgViewer>",
+        "valgrind": "${valgrind_exe}"
     },
     "folders":  {
         "build": "${Gustave_BINARY_DIR}",
         "install": "${CMAKE_INSTALL_PREFIX}",
         "source": "${Gustave_SOURCE_DIR}"
-    }
+    },
+    "memcheckType": "${memcheck_type}"
 }
