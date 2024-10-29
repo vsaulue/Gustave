@@ -33,9 +33,7 @@ target_link_libraries(svgViewer
 
 add_custom_target(run-svgViewer-test
     COMMAND Python::Interpreter "${python_scripts_dir}/testSvgViewer.py"
-        "$<TARGET_FILE:svgViewer>"
-        "--samples-dir" "${json_samples_dir}"
-        ${python_test_args}
+        "--cmakeVariables" "${cmake_variables_json}"
     DEPENDS svgViewer
 )
 add_dependencies(run-tool-tests run-svgViewer-test)
