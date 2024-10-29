@@ -29,18 +29,15 @@ include("cmake/PythonTests.cmake")
 add_custom_target(run-memcheck-tests)
 
 set(memcheck_type "")
-set(memcheck_options)
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
     set(memcheck_type "drMemory")
     find_program(drMemory_exe "drmemory" HINTS "${GUSTAVE_MEMCHECKER_PATH}")
     message(STATUS "Gustave: using drMemory at: '${drMemory_exe}'.")
-    list(APPEND memcheck_options "--${memcheck_type}" "${drMemory_exe}")
 else()
     set(memcheck_type "valgrind")
     find_program(valgrind_exe "valgrind" HINTS "${GUSTAVE_MEMCHECKER_PATH}")
     message(STATUS "Gustave: using valgrind at: '${valgrind_exe}'.")
-    list(APPEND memcheck_options "--${memcheck_type}" "${valgrind_exe}")
 endif()
 
 function(declare_memcheck_test)
@@ -62,10 +59,8 @@ function(declare_memcheck_test)
     endif()
 
     add_custom_target("${new_memcheck_target}"
-        COMMAND Python::Interpreter
-            "${python_scripts_dir}/runMemcheckTest.py"
-            ${memcheck_options}
-            ${python_test_args}
+        COMMAND Python::Interpreter "${python_scripts_dir}/runMemcheckTest.py"
+            "--cmakeVariables" "${cmake_variables_json}"
             "--"
             "$<TARGET_FILE:${ARG_TARGET}>"
             ${ARG_ARGS}

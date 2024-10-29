@@ -23,42 +23,35 @@
 # SOFTWARE.
 
 import argparse
-import subprocess
 import sys
-import tempfile
 
 import gustaveUtils as gu
 
-def fatalError(msg : str) -> None:
-    print(msg, file=sys.stderr)
-    sys.exit(1)
+class RunMemcheckTest(gu.TestScript):
+    """Tests that the CMake config files from the install folder works correctly."""
+
+    # @typing.override
+    def makeArgsParser(self) -> argparse.ArgumentParser:
+        result = argparse.ArgumentParser(description='Checks that the cmake Config files in the install folder works.')
+        result.add_argument('command', nargs='*', help='Program/arguments to instrument/run in memcheck')
+        return result
+
+    # @typing.override
+    def doRun(self, ctx: gu.TestScriptContext) -> None:
+        if len(ctx.args.command) == 0:
+            print(f'{ctx.coloring("ERROR","red")}: No program name & arguments provided.', file=sys.stderr)
+            raise gu.TestScriptException()
+        cmd = None
+        memcheckType = ctx.cmakeVars.memcheckType
+        if memcheckType == 'valgrind':
+            cmd = [ ctx.cmakeVars.executables.valgrind, '--error-exitcode=1', '--leak-check=full', '--' ] + ctx.args.command
+        elif memcheckType == 'drMemory':
+            cmd = [ ctx.cmakeVars.executables.drMemory, '-exit_code_if_errors', '1', '-batch', '--' ] + ctx.args.command
+        else:
+            print(f'{ctx.coloring("ERROR","red")}: Unknown "memcheckType" value: {memcheckType}.', file=sys.stderr)
+
+        ctx.runCmd(cmd, separateStderr=True)
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog='runMemcheckTest', description='Runs memcheck (valgrind/drMemory) on a test program.')
-    parser.add_argument('command', nargs='*', help='Test program & arguments to run')
-    parser.add_argument('--colour-mode', dest='colorMode', choices=['ansi','none','auto'], default='auto', help='Color mode used in the standard output')
-    parser.add_argument('--valgrind', type=gu.ExecutableParser(), help='Path to the valgrind executable')
-    parser.add_argument('--drMemory', type=gu.ExecutableParser(), help='Path to the drMemory executable')
-    args = parser.parse_args()
-    coloring = gu.Tty.makeColoring(args.colorMode)
-
-    if len(args.command) == 0:
-        fatalError('No test program provided.')
-    cmd = None
-    if args.valgrind != None:
-        cmd = [ args.valgrind, '--error-exitcode=1', '--leak-check=full', '--' ] + args.command
-    if args.drMemory != None:
-        if cmd != None:
-            fatalError('"--valgrind" and "--drMemory" cannot be used at the same time.')
-        cmd = [ args.drMemory, '-exit_code_if_errors', '1', '-batch', '--' ] + args.command
-    if cmd == None:
-        fatalError('Missing mandatory option: "--valgrind" or "--drMemory".')
-
-    failedText = coloring('Test FAILED', 'red')
-    with tempfile.TemporaryFile(mode='w+') as stderrFile:
-        memcheckRun = subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=stderrFile)
-        if memcheckRun.returncode != 0:
-            stderrFile.seek(0)
-            print(stderrFile.read(), file=sys.stderr)
-            print('{0}: {1}'.format(failedText, ' '.join(cmd)), file=sys.stderr)
-        sys.exit(memcheckRun.returncode)
+    RunMemcheckTest().run()
