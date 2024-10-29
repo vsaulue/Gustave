@@ -771,15 +771,16 @@ class TestScriptContext(object):
             raise TestScriptException(result.returncode)
         return result
 
-    def runCmd(self, cmd: list[str], exitOnError : bool = True) -> None:
+    def runCmd(self, cmd: list[str], exitOnError : bool = True, separateStderr : bool = False) -> None:
         """
         Runs an external program.
 
         :param cmd: program name/path and command line arguments.
         :param exitOnError: name of the color to use.
+        :param separateStderr: True if stdout & stderr should be stored into separate file.
         :raises TestScriptException: if the program returned an error and `exitOnError` is True.
         """
-        with self.newCmd(cmd, exitOnError):
+        with self.newCmd(cmd, exitOnError, separateStderr):
             pass
 
     @property
