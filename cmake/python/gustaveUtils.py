@@ -269,7 +269,7 @@ class CMakeExecutables(object):
     """Class holding the executables used/produced in the current Gustave build."""
 
     _cmake : str
-    """Value of the `cmake` porperty."""
+    """Value of the `cmake` property."""
 
     _cmakeChecked : bool
     """Flag set when `_cmake` was checked to be a path to an executable."""
@@ -278,16 +278,28 @@ class CMakeExecutables(object):
     """Value of the `compilers` property."""
 
     _conan : str
-    """Value of the `conan` porperty."""
+    """Value of the `conan` property."""
 
     _conanChecked : bool
     """Flag set when `_conan` was checked to be a path to an executable."""
 
+    _drMemory : str
+    """Value of the `drMemory` property."""
+
+    _drMemoryChecked : bool
+    """Flag set when `_drMemory` was checked to be a path to an executable."""
+
     _svgViewer : str
-    """Value of the `svgViewer` porperty."""
+    """Value of the `svgViewer` property."""
 
     _svgViewerChecked : bool
     """Flag set when `_conan` was checked to be a path to an executable."""
+
+    _valgrind : str
+    """Value of the `valgrind` property."""
+
+    _valgrindChecked : bool
+    """Flag set when `_valgrind` was checked to be a path to an executable."""
 
     def __init__(self, jsonObject: dict[str, typing.Any]):
         """
@@ -299,8 +311,12 @@ class CMakeExecutables(object):
         self._compilers = CMakeCompilers(JsonUtils.getObject(jsonObject, 'compilers'))
         self._conan = JsonUtils.getStr(jsonObject, 'conan')
         self._conanChecked = False
+        self._drMemory = JsonUtils.getStr(jsonObject, 'drMemory')
+        self._drMemoryChecked = False
         self._svgViewer = JsonUtils.getStr(jsonObject, 'svgViewer')
         self._svgViewerChecked = False
+        self._valgrind = JsonUtils.getStr(jsonObject, 'valgrind')
+        self._valgrindChecked = False
 
     @property
     def cmake(self) -> str:
@@ -336,6 +352,20 @@ class CMakeExecutables(object):
         return result
 
     @property
+    def drMemory(self) -> str:
+        """
+        Path to the drMemory executable.
+
+        :raises ValueError: The value is not the path to an executable.
+        """
+        result = self._drMemory
+        if not self._drMemoryChecked:
+            if not ExecutableParser.isValid(result):
+                raise ValueError(f'"drMemory" property is not a valid executable: {result}.')
+            self._drMemoryChecked = True
+        return result
+
+    @property
     def svgViewer(self):
         """
         Path to the svgViewer executable (built in Gustave).
@@ -347,6 +377,20 @@ class CMakeExecutables(object):
             if not ExecutableParser.isValid(result):
                 raise ValueError(f'"svgViewer" property is not a valid executable: {result}.')
             self._svgViewerChecked = True
+        return result
+
+    @property
+    def valgrind(self):
+        """
+        Path to the valgrind executable.
+
+        :raises ValueError: The value is not the path to an executable.
+        """
+        result = self._valgrind
+        if not self._valgrindChecked:
+            if not ExecutableParser.isValid(result):
+                raise ValueError(f'"valgrind" property is not a valid executable: {result}.')
+            self._valgrindChecked = True
         return result
 
 class CMakeFolders(object):
@@ -478,6 +522,9 @@ class CMakeVariables(object):
     _folders : CMakeFolders
     """Value of the `folders` property."""
 
+    _memcheckType : str
+    """Value of the `memcheckType` property."""
+
     def __init__(self, jsonObject: dict[str, typing.Any]):
         """
         :param jsonObject: Input JSON sub-object.
@@ -489,6 +536,7 @@ class CMakeVariables(object):
         self._config = JsonUtils.getStr(jsonObject, 'config')
         self._executables = CMakeExecutables(JsonUtils.getObject(jsonObject, 'executables'))
         self._folders = CMakeFolders(JsonUtils.getObject(jsonObject, 'folders'))
+        self._memcheckType = JsonUtils.getStr(jsonObject, 'memcheckType')
 
     @property
     def buildFlags(self) -> CMakeBuildFlags:
@@ -518,6 +566,10 @@ class CMakeVariables(object):
     def folders(self) -> CMakeFolders:
         """Directories provided by CMake."""
         return self._folders
+
+    @property
+    def memcheckType(self) -> str:
+        return self._memcheckType
 
 class TestScriptCommand(object):
     """Class to run an external program and store its results."""
