@@ -283,6 +283,12 @@ class CMakeExecutables(object):
     _conanChecked : bool
     """Flag set when `_conan` was checked to be a path to an executable."""
 
+    _svgViewer : str
+    """Value of the `svgViewer` porperty."""
+
+    _svgViewerChecked : bool
+    """Flag set when `_conan` was checked to be a path to an executable."""
+
     def __init__(self, jsonObject: dict[str, typing.Any]):
         """
         :param jsonObject: Input JSON sub-object.
@@ -293,6 +299,8 @@ class CMakeExecutables(object):
         self._compilers = CMakeCompilers(JsonUtils.getObject(jsonObject, 'compilers'))
         self._conan = JsonUtils.getStr(jsonObject, 'conan')
         self._conanChecked = False
+        self._svgViewer = JsonUtils.getStr(jsonObject, 'svgViewer')
+        self._svgViewerChecked = False
 
     @property
     def cmake(self) -> str:
@@ -325,6 +333,20 @@ class CMakeExecutables(object):
             if not ExecutableParser.isValid(result):
                 raise ValueError(f'"conan" property is not a valid executable: {result}.')
             self._conanChecked = True
+        return result
+
+    @property
+    def svgViewer(self):
+        """
+        Path to the svgViewer executable (built in Gustave).
+
+        :raises ValueError: The value is not the path to an executable.
+        """
+        result = self._svgViewer
+        if not self._svgViewerChecked:
+            if not ExecutableParser.isValid(result):
+                raise ValueError(f'"svgViewer" property is not a valid executable: {result}.')
+            self._svgViewerChecked = True
         return result
 
 class CMakeFolders(object):
