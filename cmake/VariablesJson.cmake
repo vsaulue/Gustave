@@ -24,6 +24,8 @@
 
 include_guard(GLOBAL)
 
+include("cmake/MemcheckTests.cmake")
+
 set(cmake_variables_json "${CMAKE_CURRENT_BINARY_DIR}/cmake-variables-$<CONFIG>.json")
 
 block(SCOPE_FOR VARIABLES)
