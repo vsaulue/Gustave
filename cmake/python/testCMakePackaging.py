@@ -37,7 +37,7 @@ class TestCMakePackaging(gu.TestScript):
 
     # @typing.override
     def doRun(self, ctx: gu.TestScriptContext) -> None:
-        testProjectPath = os.path.join(ctx.cmakeVars.folders.source, 'packaging', 'conan', 'test_package')
+        testProjectPath = os.path.join(ctx.cmakeVars.folders.source, 'packaging', 'test_package')
         gustaveConfigPath = os.path.join(ctx.cmakeVars.folders.install, 'cmake')
         buildFolder = ctx.tmpFolder
 
