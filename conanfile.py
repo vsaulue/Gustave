@@ -41,7 +41,7 @@ class GustaveRecipe(ConanFile):
 
     exports = "LICENSE.txt"
     exports_sources = "cmake/*", "components/*", "distribs/*", "packaging/*", "tools/*", "CMakeLists.txt", "!*/build", "!*/__pycache__"
-    test_package_folder = "packaging/conan/test_package"
+    test_package_folder = "packaging/test_package"
 
     def set_version(self):
         cmakeFilePath = os.path.join(self.recipe_folder, 'CMakeLists.txt')
