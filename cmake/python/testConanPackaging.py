@@ -24,7 +24,9 @@
 
 import argparse
 import json
+import os
 import re
+import shutil
 import typing
 
 import gustaveUtils as gu
@@ -54,22 +56,25 @@ class TestConanPackaging(gu.TestScript):
 
     # @typing.override
     def doRun(self, ctx: gu.TestScriptContext) -> None:
+        tmpTestPackagePath = os.path.join(ctx.tmpFolder, 'test_package')
         conanExe = ctx.cmakeVars.executables.conan
 
+        shutil.copytree(os.path.join(ctx.cmakeVars.folders.source, 'packaging', 'conan', 'test_package'), tmpTestPackagePath)
+
         createCmd = [ conanExe, 'create', ctx.cmakeVars.folders.source,
-            f'-pr:b={ctx.cmakeVars.conanProfiles.build}',
-            f'-pr:h={ctx.cmakeVars.conanProfiles.host}',
-            '-s:h', 'build_type={0}'.format(ctx.cmakeVars.config),
+            '-pr:b', ctx.cmakeVars.conanProfiles.build,
+            '-pr:h', ctx.cmakeVars.conanProfiles.host,
+            '-s:h', f'build_type={ctx.cmakeVars.config}',
             '-c', 'tools.build:skip_test=True',
+            '--test-folder', tmpTestPackagePath,
             '--build=missing',
             '--format=json'
         ]
         with ctx.newCmd(createCmd, separateStderr=True) as createRun:
             with open(createRun.outPath) as stdoutFile:
-                createJson = json.load(stdoutFile)
+                gustavePackageRef = self._extractGustaveRef(json.load(stdoutFile))
 
         # Cleanup
-        gustavePackageRef = self._extractGustaveRef(createJson)
         cleanupCmd = [ conanExe, 'remove', gustavePackageRef, '--confirm' ]
         ctx.runCmd(cleanupCmd, exitOnError=False)
 
