@@ -24,7 +24,7 @@
 
 add_library(Comp-StdStrictUnit-Lib INTERFACE)
 target_include_directories(Comp-StdStrictUnit-Lib INTERFACE "include")
-install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION include)
+install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION "distrib-std/include")
 
 target_link_libraries(Comp-StdStrictUnit-Lib
     INTERFACE Comp-Config

@@ -24,7 +24,7 @@
 
 add_library(Comp-Math INTERFACE)
 target_include_directories(Comp-Math INTERFACE "include")
-install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION include)
+install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION "distrib-std/include")
 
 target_link_libraries(Comp-Math
     INTERFACE Comp-Config

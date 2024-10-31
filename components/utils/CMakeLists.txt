@@ -24,7 +24,7 @@
 
 add_library(Comp-Utils INTERFACE)
 target_include_directories(Comp-Utils INTERFACE "include")
-install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION include)
+install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION "distrib-std/include")
 
 add_executable(Test-Comp-Utils
     "tests/utils/canNarrow.cpp"

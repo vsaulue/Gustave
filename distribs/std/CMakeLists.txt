@@ -31,7 +31,7 @@ target_link_libraries(Distrib-Std
     INTERFACE $<BUILD_INTERFACE:Distrib-Std-Unitless>
 )
 target_include_directories(Distrib-Std
-    INTERFACE $<INSTALL_INTERFACE:include>
+    INTERFACE "$<INSTALL_INTERFACE:distrib-std/include>"
 )
 
 add_library(Gustave::Distrib-Std ALIAS Distrib-Std)
