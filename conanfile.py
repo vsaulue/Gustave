@@ -92,7 +92,7 @@ class GustaveRecipe(ConanFile):
         std = self.cpp_info.components['distrib-std']
         std.libdirs = []
         std.bindirs = []
-        std.includedirs = ['include']
+        std.includedirs = ['distrib-std/include']
         std.set_property('cmake_file_name', 'Gustave')
         std.set_property('cmake_target_name', 'Gustave::Distrib-Std')
 
