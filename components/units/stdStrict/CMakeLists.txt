@@ -33,10 +33,7 @@ target_link_libraries(Comp-StdStrictUnit
     INTERFACE Comp-StdStrictUnit-Lib
 )
 
-add_library(Testconfig-Comp-StdStrictUnit-Realtraits INTERFACE)
-target_include_directories(Testconfig-Comp-StdStrictUnit-Realtraits INTERFACE "tests/include")
-target_link_libraries(Testconfig-Comp-StdStrictUnit-Realtraits
-    INTERFACE Comp-StdStrictUnit
+add_realtraits_unit_test(TARGET Comp-Realtraits-StdStrictUnit-unit-test
+    INCLUDE_DIRECTORIES "tests/include"
+    LINK_LIBRARIES Comp-StdStrictUnit
 )
-
-add_test_real_traits(Comp-StdStrictUnit-Realtraits-unit-test Testconfig-Comp-StdStrictUnit-Realtraits)
