@@ -32,10 +32,10 @@ target_link_libraries(Distrib-Std-Unitless
     INTERFACE Comp-StdUnitless
 )
 
-add_library(Testconfig-Core-Std-Unitless INTERFACE)
-target_include_directories(Testconfig-Core-Std-Unitless INTERFACE "tests/include")
-target_link_libraries(Testconfig-Core-Std-Unitless
+add_library(Testconfig-Std-Unitless INTERFACE)
+target_include_directories(Testconfig-Std-Unitless INTERFACE "tests/include")
+target_link_libraries(Testconfig-Std-Unitless
     INTERFACE Distrib-Std-Unitless
 )
 
-add_test_core(Test-Core-Std-Unitless Testconfig-Core-Std-Unitless)
+add_test_core(Distrib-Std-Unitless-unit-test Testconfig-Std-Unitless)

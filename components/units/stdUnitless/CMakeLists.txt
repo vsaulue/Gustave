@@ -37,4 +37,4 @@ target_link_libraries(Testconfig-Comp-StdUnitless-Realtraits
     INTERFACE Comp-StdUnitless
 )
 
-add_test_real_traits(Test-Comp-StdUnitless-Realtraits Testconfig-Comp-StdUnitless-Realtraits)
+add_test_real_traits(Comp-StdUnitless-Realtraits-unit-test Testconfig-Comp-StdUnitless-Realtraits)

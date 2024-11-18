@@ -39,4 +39,4 @@ target_link_libraries(Testconfig-Comp-StdStrictUnit-Realtraits
     INTERFACE Comp-StdStrictUnit
 )
 
-add_test_real_traits(Test-Comp-StdStrictUnit-Realtraits Testconfig-Comp-StdStrictUnit-Realtraits)
+add_test_real_traits(Comp-StdStrictUnit-Realtraits-unit-test Testconfig-Comp-StdStrictUnit-Realtraits)

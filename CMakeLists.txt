@@ -31,6 +31,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 # General settings
 option(CMAKE_COMPILE_WARNING_AS_ERROR "Compile warnings as errors." ON)
+# BUILD_TESTING: build tests (set this to OFF if you just want to package).
 # CMAKE_COLOR_DIAGNOSTICS: Add colors to build/test output.
 # CMAKE_INSTALL_PREFIX: Default location of the install target (also used for packaging tests).
 
@@ -60,6 +61,7 @@ set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")
 set(json_samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/tools/jsonSamples")
 
 include("CMakePackageConfigHelpers")
+include("CTest")
 
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")

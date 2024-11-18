@@ -23,17 +23,14 @@
 # SOFTWARE.
 
 function(add_test_real_traits test_target_name real_traits_lib)
-    add_executable("${test_target_name}"
-        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Real.cpp"
-        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/RealTraits.cpp"
-        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/UnitSystem.cpp"
+    add_unit_test(TARGET "${test_target_name}"
+        SOURCE_FILES
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Real.cpp"
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/RealTraits.cpp"
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/UnitSystem.cpp"
+        INCLUDE_DIRECTORIES
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include"
+        LINK_LIBRARIES
+            "${real_traits_lib}"
     )
-    target_include_directories("${test_target_name}"
-        PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include"
-    )
-    target_link_libraries("${test_target_name}"
-        PRIVATE "${real_traits_lib}"
-        PRIVATE Catch2::Catch2WithMain
-    )
-    declare_unit_test("${test_target_name}")
 endfunction()
