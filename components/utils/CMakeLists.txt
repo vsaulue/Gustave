@@ -26,24 +26,19 @@ add_library(Comp-Utils INTERFACE)
 target_include_directories(Comp-Utils INTERFACE "include")
 install(DIRECTORY "include/" COMPONENT Distrib-Std DESTINATION "distrib-std/include")
 
-add_executable(Test-Comp-Utils
-    "tests/utils/canNarrow.cpp"
-    "tests/utils/ForwardIterator.cpp"
-    "tests/utils/getter.cpp"
-    "tests/utils/HashEquals.cpp"
-    "tests/utils/Hasher.cpp"
-    "tests/utils/IndexRange.cpp"
-    "tests/utils/NumberHyperscript.cpp"
-    "tests/utils/PointerHash.cpp"
-    "tests/utils/prop/Ptr.cpp"
-    "tests/utils/SizedString.cpp"
-    "tests/utils/SizedStringView.cpp"
+add_unit_test(TARGET Comp-Utils-unit-test
+    SOURCE_FILES
+        "tests/utils/canNarrow.cpp"
+        "tests/utils/ForwardIterator.cpp"
+        "tests/utils/getter.cpp"
+        "tests/utils/HashEquals.cpp"
+        "tests/utils/Hasher.cpp"
+        "tests/utils/IndexRange.cpp"
+        "tests/utils/NumberHyperscript.cpp"
+        "tests/utils/PointerHash.cpp"
+        "tests/utils/prop/Ptr.cpp"
+        "tests/utils/SizedString.cpp"
+        "tests/utils/SizedStringView.cpp"
+    INCLUDE_DIRECTORIES "tests/include"
+    LINK_LIBRARIES Comp-Utils
 )
-target_include_directories(Test-Comp-Utils
-    PRIVATE "tests/include"
-)
-target_link_libraries(Test-Comp-Utils
-    PRIVATE Catch2::Catch2WithMain
-    PRIVATE Comp-Utils
-)
-declare_unit_test(Test-Comp-Utils)

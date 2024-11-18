@@ -32,17 +32,13 @@ target_link_libraries(Comp-Testing
     INTERFACE Catch2::Catch2
 )
 
-add_executable(Test-Comp-Testing
-    "tests/RealMatchers.cpp"
-    "tests/Vector3Matchers.cpp"
+add_unit_test(TARGET Comp-Testing-unit-test
+    SOURCE_FILES
+        "tests/RealMatchers.cpp"
+        "tests/Vector3Matchers.cpp"
+    INCLUDE_DIRECTORIES "tests/include"
+    LINK_LIBRARIES
+        Comp-Math
+        Comp-StdStrictUnit
+        Comp-Testing
 )
-target_include_directories(Test-Comp-Testing
-    PRIVATE "tests/include"
-)
-target_link_libraries(Test-Comp-Testing
-    PRIVATE Catch2::Catch2WithMain
-    PRIVATE Comp-Math
-    PRIVATE Comp-StdStrictUnit
-    PRIVATE Comp-Testing
-)
-declare_unit_test(Test-Comp-Testing)

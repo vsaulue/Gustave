@@ -31,17 +31,15 @@ target_link_libraries(Comp-StdStrictUnit-Lib
     INTERFACE Comp-Utils
 )
 
-add_executable(Test-Comp-StdStrictUnit-Lib
-    "tests/BasicUnitIdentifier.cpp"
-    "tests/Exponent.cpp"
-    "tests/Math.cpp"
-    "tests/Real.cpp"
-    "tests/Unit.cpp"
-    "tests/UnitIdentifier.cpp"
-    "tests/UnitTerm.cpp"
+add_unit_test(TARGET Comp-StdStrictUnit-Lib-unit-test
+    SOURCE_FILES
+        "tests/BasicUnitIdentifier.cpp"
+        "tests/Exponent.cpp"
+        "tests/Math.cpp"
+        "tests/Real.cpp"
+        "tests/Unit.cpp"
+        "tests/UnitIdentifier.cpp"
+        "tests/UnitTerm.cpp"
+    LINK_LIBRARIES
+        Comp-StdStrictUnit-Lib
 )
-target_link_libraries(Test-Comp-StdStrictUnit-Lib
-    PRIVATE Catch2::Catch2WithMain
-    PRIVATE Comp-StdStrictUnit-Lib
-)
-declare_unit_test(Test-Comp-StdStrictUnit-Lib)

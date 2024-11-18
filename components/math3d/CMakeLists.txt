@@ -30,16 +30,14 @@ target_link_libraries(Comp-Math
     INTERFACE Comp-Config
 )
 
-add_executable(Test-Comp-Math
-    "tests/BasicDirection.cpp"
-    "tests/NormalizedVector3.cpp"
-    "tests/Vector3.cpp"
+add_unit_test(TARGET Comp-Math-unit-test
+    SOURCE_FILES
+        "tests/BasicDirection.cpp"
+        "tests/NormalizedVector3.cpp"
+        "tests/Vector3.cpp"
+    INCLUDE_DIRECTORIES "tests/include"
+    LINK_LIBRARIES
+        Comp-Math
+        Comp-StdStrictUnit
+        Comp-Testing
 )
-target_include_directories(Test-Comp-Math PRIVATE "tests/include")
-target_link_libraries(Test-Comp-Math
-    PRIVATE Catch2::Catch2WithMain
-    PRIVATE Comp-Math
-    PRIVATE Comp-StdStrictUnit
-    PRIVATE Comp-Testing
-)
-declare_unit_test(Test-Comp-Math)

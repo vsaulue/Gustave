@@ -32,10 +32,10 @@ target_link_libraries(Distrib-Std-StrictUnit
     INTERFACE Comp-StdStrictUnit
 )
 
-add_library(Testconfig-Core-Std-StrictUnit INTERFACE)
-target_include_directories(Testconfig-Core-Std-StrictUnit INTERFACE "tests/include")
-target_link_libraries(Testconfig-Core-Std-StrictUnit
+add_library(Testconfig-Std-StrictUnit INTERFACE)
+target_include_directories(Testconfig-Std-StrictUnit INTERFACE "tests/include")
+target_link_libraries(Testconfig-Std-StrictUnit
     INTERFACE Distrib-Std-StrictUnit
 )
 
-add_test_core(Test-Core-Std-StrictUnit Testconfig-Core-Std-StrictUnit)
+add_test_core(Distrib-Std-StrictUnit-unit-test Testconfig-Std-StrictUnit)

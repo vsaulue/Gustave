@@ -27,22 +27,54 @@ include_guard(GLOBAL)
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 
-add_custom_target(run-unit-tests)
+set(unit_tests_enabled "${BUILD_TESTING}")
 
-set(unit_test_args)
+if(unit_tests_enabled)
+    add_custom_target(run-unit-tests)
 
-if(CMAKE_COLOR_DIAGNOSTICS)
-    list(APPEND unit_test_args "--colour-mode" "ansi")
+    set(unit_test_args)
+    if(CMAKE_COLOR_DIAGNOSTICS)
+        list(APPEND unit_test_args "--colour-mode" "ansi")
+    endif()
 endif()
 
-function(declare_unit_test test_target_name)
-    add_custom_target("run-${test_target_name}"
-        COMMAND ${test_target_name} ${unit_test_args}
-        DEPENDS ${test_target_name}
-    )
-    add_dependencies(run-unit-tests "run-${test_target_name}")
-    declare_memcheck_test(
-        TEST_ID "unitTest-${test_target_name}"
-        TARGET "${test_target_name}"
-    )
+function(add_unit_test)
+    cmake_parse_arguments(PARSE_ARGV 0 ARG "" "TARGET" "SOURCE_FILES;INCLUDE_DIRECTORIES;LINK_LIBRARIES")
+    if("TARGET" IN_LIST ARG_KEYWORDS_MISSING_VALUES OR NOT DEFINED ARG_TARGET)
+        message(FATAL_ERROR "Missing mandatory TARGET argument.")
+    endif()
+    if(("SOURCE_FILES" IN_LIST ARG_KEYWORDS_MISSING_VALUES) OR NOT DEFINED ARG_SOURCE_FILES)
+        message(FATAL_ERROR "Missing mandatory SOURCE_FILES argument.")
+    endif()
+    if(("LINK_LIBRARIES" IN_LIST ARG_KEYWORDS_MISSING_VALUES) OR NOT DEFINED ARG_LINK_LIBRARIES)
+        message(FATAL_ERROR "Missing mandatory LINK_LIBRARIES argument.")
+    endif()
+
+    if(unit_tests_enabled)
+        add_executable("${ARG_TARGET}"
+            ${ARG_SOURCE_FILES}
+        )
+        target_include_directories("${ARG_TARGET}"
+            PRIVATE ${ARG_INCLUDE_DIRECTORIES}
+        )
+        target_link_libraries("${ARG_TARGET}"
+            PRIVATE ${ARG_LINK_LIBRARIES}
+            PRIVATE Catch2::Catch2WithMain
+        )
+        add_custom_target("run-${ARG_TARGET}"
+            COMMAND ${ARG_TARGET} ${unit_test_args}
+            DEPENDS ${ARG_TARGET}
+        )
+        add_dependencies(run-unit-tests "run-${ARG_TARGET}")
+        add_test(NAME "${ARG_TARGET}"
+            COMMAND "${ARG_TARGET}" ${unit_test_args}
+        )
+        set_property(TEST "${ARG_TARGET}"
+            PROPERTY LABELS "unit-test"
+        )
+        declare_memcheck_test(
+            TEST_ID "${ARG_TARGET}"
+            TARGET "${ARG_TARGET}"
+        )
+    endif()
 endfunction()
