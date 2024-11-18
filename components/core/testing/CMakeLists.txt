@@ -21,8 +21,16 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 
-function(add_test_core test_target_name config_lib)
-    add_unit_test(TARGET "${test_target_name}"
+function(add_distrib_unit_test)
+    cmake_parse_arguments(PARSE_ARGV 0 ARG "" "TARGET" "INCLUDE_DIRECTORIES;LINK_LIBRARIES")
+    if("TARGET" IN_LIST ARG_KEYWORDS_MISSING_VALUES OR NOT DEFINED ARG_TARGET)
+        message(FATAL_ERROR "Missing mandatory TARGET argument.")
+    endif()
+    if(("LINK_LIBRARIES" IN_LIST ARG_KEYWORDS_MISSING_VALUES) OR NOT DEFINED ARG_LINK_LIBRARIES)
+        message(FATAL_ERROR "Missing mandatory LINK_LIBRARIES argument.")
+    endif()
+
+    add_unit_test(TARGET "${ARG_TARGET}"
         SOURCE_FILES
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/model/Stress.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/BlockConstructionInfo.cpp"
@@ -66,9 +74,11 @@ function(add_test_core test_target_name config_lib)
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/worlds/syncWorld/StructureReference.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/worlds/syncWorld/Structures.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/worlds/SyncWorld.cpp"
-        INCLUDE_DIRECTORIES "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include"
+        INCLUDE_DIRECTORIES
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include"
+            ${ARG_INCLUDE_DIRECTORIES}
         LINK_LIBRARIES
-            "${config_lib}"
+            ${ARG_LINK_LIBRARIES}
             Comp-Core
             Comp-Testing
     )
