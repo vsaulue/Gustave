@@ -38,12 +38,12 @@ add_custom_target(run-svgViewer-test
 )
 add_dependencies(run-tool-tests run-svgViewer-test)
 
-declare_memcheck_test(
+add_memcheck_test(
     TEST_ID "svgViewer-01"
     TARGET svgViewer
     ARGS "${json_samples_dir}/worlds/tower10.json"
 )
-declare_memcheck_test(
+add_memcheck_test(
     TEST_ID "svgViewer-02"
     TARGET svgViewer
     ARGS
