@@ -72,7 +72,7 @@ function(add_unit_test)
         set_property(TEST "${ARG_TARGET}"
             PROPERTY LABELS "unit-test"
         )
-        declare_memcheck_test(
+        add_memcheck_test(
             TEST_ID "${ARG_TARGET}"
             TARGET "${ARG_TARGET}"
         )
