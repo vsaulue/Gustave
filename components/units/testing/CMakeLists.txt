@@ -22,15 +22,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-function(add_test_real_traits test_target_name real_traits_lib)
-    add_unit_test(TARGET "${test_target_name}"
+function(add_realtraits_unit_test)
+    cmake_parse_arguments(PARSE_ARGV 0 ARG "" "TARGET" "INCLUDE_DIRECTORIES;LINK_LIBRARIES")
+    if("TARGET" IN_LIST ARG_KEYWORDS_MISSING_VALUES OR NOT DEFINED ARG_TARGET)
+        message(FATAL_ERROR "Missing mandatory TARGET argument.")
+    endif()
+    if(("LINK_LIBRARIES" IN_LIST ARG_KEYWORDS_MISSING_VALUES) OR NOT DEFINED ARG_LINK_LIBRARIES)
+        message(FATAL_ERROR "Missing mandatory LINK_LIBRARIES argument.")
+    endif()
+
+    add_unit_test(TARGET "${ARG_TARGET}"
         SOURCE_FILES
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Real.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/RealTraits.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/UnitSystem.cpp"
         INCLUDE_DIRECTORIES
+            ${ARG_INCLUDE_DIRECTORIES}
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/include"
         LINK_LIBRARIES
+            ${ARG_LINK_LIBRARIES}
             "${real_traits_lib}"
     )
 endfunction()

@@ -31,10 +31,7 @@ target_link_libraries(Comp-StdUnitless
     INTERFACE Comp-Utils
 )
 
-add_library(Testconfig-Comp-StdUnitless-Realtraits INTERFACE)
-target_include_directories(Testconfig-Comp-StdUnitless-Realtraits INTERFACE "tests/include")
-target_link_libraries(Testconfig-Comp-StdUnitless-Realtraits
-    INTERFACE Comp-StdUnitless
+add_realtraits_unit_test(TARGET Comp-Realtraits-StdUnitless-unit-test
+    INCLUDE_DIRECTORIES "tests/include"
+    LINK_LIBRARIES Comp-StdUnitless
 )
-
-add_test_real_traits(Comp-StdUnitless-Realtraits-unit-test Testconfig-Comp-StdUnitless-Realtraits)
