@@ -62,14 +62,13 @@ include("CTest")
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 include("cmake/PackagingTests.cmake")
+include("cmake/ToolTests.cmake")
 include("cmake/UnitTests.cmake")
 include("cmake/VariablesJson.cmake")
 
 add_custom_target(install-to-cmake-prefix
     COMMAND "${CMAKE_COMMAND}" "--build" "${CMAKE_CURRENT_BINARY_DIR}" "--config" "$<CONFIG>" "--target" "install"
 )
-
-add_custom_target(run-tool-tests)
 
 add_subdirectory("components")
 add_subdirectory("distribs")
