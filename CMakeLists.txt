@@ -53,9 +53,6 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(svgwrite CONFIG REQUIRED)
 find_package(Python COMPONENTS Interpreter)
 
-find_program(conanExe conan PATHS "${GUSTAVE_CONAN_PATH}" DOC "Conan executable (package manager).")
-message(STATUS "Conan: using conan at: '${conanExe}'.")
-
 set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")
 set(json_samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/tools/jsonSamples")
 
@@ -64,6 +61,7 @@ include("CTest")
 
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
+include("cmake/PackagingTests.cmake")
 include("cmake/UnitTests.cmake")
 include("cmake/VariablesJson.cmake")
 
@@ -71,7 +69,6 @@ add_custom_target(install-to-cmake-prefix
     COMMAND "${CMAKE_COMMAND}" "--build" "${CMAKE_CURRENT_BINARY_DIR}" "--config" "$<CONFIG>" "--target" "install"
 )
 
-add_custom_target(run-packaging-tests)
 add_custom_target(run-tool-tests)
 
 add_subdirectory("components")

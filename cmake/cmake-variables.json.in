@@ -11,7 +11,7 @@
     "config": "$<CONFIG>",
     "executables": {
         "cmake": "${CMAKE_COMMAND}",
-        "conan": "${conanExe}",
+        "conan": "${conan_exe}",
         "compilers": {
             "cxx": "${CMAKE_CXX_COMPILER}"
         },

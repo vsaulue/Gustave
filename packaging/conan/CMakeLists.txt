@@ -22,9 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_custom_target(run-conan-packaging-test
+add_packaging_test(TEST_ID conan-packaging-test
     COMMAND Python::Interpreter "${python_scripts_dir}/testConanPackaging.py"
         "--cmakeVariables" "${cmake_variables_json}"
     WORKING_DIRECTORY "${Gustave_SOURCE_DIR}"
 )
-add_dependencies(run-packaging-tests run-conan-packaging-test)
