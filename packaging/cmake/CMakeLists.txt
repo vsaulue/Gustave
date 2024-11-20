@@ -55,10 +55,9 @@ install(
     DESTINATION "cmake"
 )
 
-add_custom_target(run-cmake-packaging-test
+add_packaging_test(TEST_ID cmake-packaging-test
     COMMAND Python::Interpreter "${python_scripts_dir}/testCMakePackaging.py"
         "--cmakeVariables" "${cmake_variables_json}"
     WORKING_DIRECTORY "${Gustave_SOURCE_DIR}"
+    DEPENDS_ON install-to-cmake-prefix
 )
-add_dependencies(run-cmake-packaging-test install-to-cmake-prefix)
-add_dependencies(run-packaging-tests run-cmake-packaging-test)
