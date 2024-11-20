@@ -31,6 +31,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 # General settings
 option(CMAKE_COMPILE_WARNING_AS_ERROR "Compile warnings as errors." ON)
+option(GUSTAVE_BUILD_TOOLS "Build internal tools (set this to OFF if you just want to package)." ON)
 # BUILD_TESTING: build tests (set this to OFF if you just want to package).
 # CMAKE_COLOR_DIAGNOSTICS: Add colors to build/test output.
 # CMAKE_INSTALL_PREFIX: Default location of the install target (also used for packaging tests).
@@ -48,9 +49,6 @@ set(GUSTAVE_CONAN_PATH CACHE PATH "Path to conan program (for packaging tests)."
 set(GUSTAVE_CONAN_BUILD_PROFILE CACHE STRING "Conan build profile (for packaging tests).")
 set(GUSTAVE_CONAN_HOST_PROFILE CACHE STRING "Conan host profile (for packaging tests).")
 
-find_package(CLI11 CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(svgwrite CONFIG REQUIRED)
 find_package(Python COMPONENTS Interpreter)
 
 set(python_scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/cmake/python")

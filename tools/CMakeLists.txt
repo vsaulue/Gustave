@@ -22,5 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory("jsonGustave")
-add_subdirectory("svgViewer")
+if(GUSTAVE_BUILD_TOOLS)
+    find_package(CLI11 CONFIG REQUIRED)
+    find_package(nlohmann_json CONFIG REQUIRED)
+    find_package(svgwrite CONFIG REQUIRED)
+
+    add_subdirectory("jsonGustave")
+    add_subdirectory("svgViewer")
+endif()
