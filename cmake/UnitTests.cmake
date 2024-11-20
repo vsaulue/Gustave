@@ -28,11 +28,12 @@ include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 
 set(unit_tests_enabled "${BUILD_TESTING}")
+set(unit_test_args)
 
 if(unit_tests_enabled)
+    find_package(Catch2 CONFIG REQUIRED)
     add_custom_target(run-unit-tests)
 
-    set(unit_test_args)
     if(CMAKE_COLOR_DIAGNOSTICS)
         list(APPEND unit_test_args "--colour-mode" "ansi")
     endif()

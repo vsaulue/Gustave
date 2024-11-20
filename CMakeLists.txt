@@ -48,7 +48,6 @@ set(GUSTAVE_CONAN_PATH CACHE PATH "Path to conan program (for packaging tests)."
 set(GUSTAVE_CONAN_BUILD_PROFILE CACHE STRING "Conan build profile (for packaging tests).")
 set(GUSTAVE_CONAN_HOST_PROFILE CACHE STRING "Conan host profile (for packaging tests).")
 
-find_package(Catch2 CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(svgwrite CONFIG REQUIRED)
