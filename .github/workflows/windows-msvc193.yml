@@ -71,5 +71,8 @@ jobs:
         if: matrix.build_type == 'Release'
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
 
+      - name: "[build] Run tutorials"
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tutorials
+
       - name: "[build] Run packaging tests"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-packaging-tests
