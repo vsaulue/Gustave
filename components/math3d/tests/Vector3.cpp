@@ -348,11 +348,22 @@ TEST_CASE("Vector3") {
     }
 
     SECTION("operator<<(std::ostream&, Vector3 const&)") {
-        auto const vec = vector3(1.f, -2.f, 3.f, pa);
-        std::stringstream stream;
-        stream << vec;
-        std::stringstream expected;
-        expected << "{" << 1.f << ", " << -2.f << ", " << 3.f << "}Pa";
-        CHECK(stream.view() == expected.view());
+        SECTION("// Pascal") {
+            auto const vec = vector3(1.f, -2.f, 3.f, pa);
+            std::stringstream stream;
+            stream << vec;
+            std::stringstream expected;
+            expected << "{" << 1.f << ", " << -2.f << ", " << 3.f << "} Pa";
+            CHECK(stream.view() == expected.view());
+        }
+
+        SECTION("// No unit") {
+            auto const vec = vector3(1.f, 2.f, -3.f, u.one);
+            std::stringstream stream;
+            stream << vec;
+            std::stringstream expected;
+            expected << '{' << 1.f << ", " << 2.f << ", " << -3.f << "}";
+            CHECK(stream.view() == expected.view());
+        }
     }
 }

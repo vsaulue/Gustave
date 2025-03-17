@@ -323,7 +323,12 @@ namespace gustave::math3d {
         }
 
         friend std::ostream& operator<<(std::ostream& stream, Vector3 const& vector) {
-            return stream << '{' << vector.x().value() << ", " << vector.y().value() << ", " << vector.z().value() << "}" << vector.unit();
+            stream << '{' << vector.x().value() << ", " << vector.y().value() << ", " << vector.z().value() << "}";
+            auto const& unit = vector.unit();
+            if (!unit.isTrivialOne()) {
+                stream << ' ' << unit;
+            }
+            return stream;
         }
 
         [[nodiscard]]
