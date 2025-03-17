@@ -69,7 +69,7 @@ namespace gustave::units::stdUnitless::lib {
         }
 
         friend std::ostream& operator<<(std::ostream& stream, Unit) {
-            return stream << "undefined";
+            return stream;
         }
 
         [[nodiscard]]
