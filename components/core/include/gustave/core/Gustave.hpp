@@ -71,5 +71,11 @@ namespace gustave::core {
         static constexpr auto vector3(RealRep x, RealRep y, RealRep z, Unit unit) {
             return Vector3<Unit{}>{ x, y, z, unit };
         }
+
+        [[nodiscard]]
+        static constexpr auto vector3(RealRep x, RealRep y, RealRep z) {
+            constexpr auto u = cfg::units(libCfg_);
+            return Vector3<u.one>{ x, y, z, u.one };
+        }
     };
 }
