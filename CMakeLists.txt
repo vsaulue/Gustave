@@ -32,6 +32,7 @@ set(CMAKE_CXX_STANDARD 20)
 # General settings
 option(CMAKE_COMPILE_WARNING_AS_ERROR "Compile warnings as errors." ON)
 option(GUSTAVE_BUILD_TOOLS "Build internal tools (set this to OFF if you just want to package)." ON)
+option(GUSTAVE_BUILD_TUTORIALS "Build example executables (set this to OFF if you just want to package)." ON)
 # BUILD_TESTING: build tests (set this to OFF if you just want to package).
 # CMAKE_COLOR_DIAGNOSTICS: Add colors to build/test output.
 # CMAKE_INSTALL_PREFIX: Default location of the install target (also used for packaging tests).
@@ -61,6 +62,7 @@ include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 include("cmake/PackagingTests.cmake")
 include("cmake/ToolTests.cmake")
+include("cmake/Tutorials.cmake")
 include("cmake/UnitTests.cmake")
 include("cmake/VariablesJson.cmake")
 
@@ -72,3 +74,4 @@ add_subdirectory("components")
 add_subdirectory("distribs")
 add_subdirectory("packaging")
 add_subdirectory("tools")
+add_subdirectory("tutorials")
