@@ -175,6 +175,16 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
         }
     }
 
+    SECTION(".isSolved()") {
+        SECTION("// true") {
+            CHECK(s010.isSolved());
+        }
+
+        SECTION("// false") {
+            CHECK_FALSE(s202.isSolved());
+        }
+    }
+
     SECTION(".isValid()") {
         SECTION("// true") {
             CHECK(s010.isValid());
