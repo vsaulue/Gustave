@@ -157,7 +157,11 @@ namespace gustave::core::model {
             stream << "{ \"compression\": " << stress.compression_.value();
             stream << ", \"shear\": " << stress.shear_.value();
             stream << ", \"tensile\": " << stress.tensile_.value();
-            stream << ", \"unit\": \"" << stress.unit() << "\" }";
+            if (stress.unit().isTrivialOne()) {
+                stream << " }";
+            } else {
+                stream << ", \"unit\": \"" << stress.unit() << "\" }";
+            }
             return stream;
         }
     private:
