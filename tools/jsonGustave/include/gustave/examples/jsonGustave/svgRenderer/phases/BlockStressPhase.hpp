@@ -68,9 +68,24 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 this->setLegendDims(generateLegendDims());
             }
 
-            void render(SvgPhaseCanvas& canvas) const override {
-                renderWorld(canvas);
-                renderLegend(canvas);
+        protected:
+            void renderLegend(SvgPhaseCanvas& canvas) const override {
+                legendColor_.render(canvas);
+                legendHatch_.render(canvas);
+            }
+
+            void renderWorld(SvgPhaseCanvas& canvas) const override {
+                canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
+                auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
+                for (auto const& block : this->syncWorld().blocks()) {
+                    auto const stress = phase_.stressCoord_.extract(block.stressRatio()).value();
+                    auto const svgColor = phase_.stressColors_.colorAt(stress).svgCode();
+                    canvas.drawWorldBlock(block, { {"fill", svgColor } });
+                    if (block.isFoundation()) {
+                        canvas.hatchWorldBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_} });
+                    }
+                }
+                canvas.endGroup();
             }
         private:
             [[nodiscard]]
@@ -95,25 +110,6 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                     return "Block color (tensile stress ratio):";
                 }
                 throw phase.stressCoord_.invalidError();
-            }
-
-            void renderLegend(SvgPhaseCanvas& canvas) const {
-                legendColor_.render(canvas);
-                legendHatch_.render(canvas);
-            }
-
-            void renderWorld(SvgPhaseCanvas& canvas) const {
-                canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
-                auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
-                for (auto const& block : this->syncWorld().blocks()) {
-                    auto const stress = phase_.stressCoord_.extract(block.stressRatio()).value();
-                    auto const svgColor = phase_.stressColors_.colorAt(stress).svgCode();
-                    canvas.drawWorldBlock(block, { {"fill", svgColor } });
-                    if (block.isFoundation()) {
-                        canvas.hatchWorldBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_} });
-                    }
-                }
-                canvas.endGroup();
             }
 
             BlockStressPhase const& phase_;

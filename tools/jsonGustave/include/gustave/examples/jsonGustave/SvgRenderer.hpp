@@ -100,7 +100,11 @@ namespace gustave::examples::jsonGustave {
                 }
                 phaseContexts.emplace_back(std::move(phaseCtx));
             }
-            legendDims.setWidth(legendDims.width() + 2.f * space);
+            if (config_.legendEnabled()) {
+                legendDims.setWidth(legendDims.width() + 2.f * space);
+            } else {
+                legendDims = { 0.f, 0.f };
+            }
             SvgCanvas canvas{ canvasCtx, legendDims, output };
             Float yLegendOffset = canvas.worldBox().boxCoordinates().yMax() + space;
             for (auto const& phaseCtx : phaseContexts) {

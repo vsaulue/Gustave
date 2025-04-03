@@ -63,8 +63,16 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 return legendDims_;
             }
 
-            virtual void render(SvgPhaseCanvas& canvas) const = 0;
+            void render(SvgPhaseCanvas& canvas) const {
+                renderWorld(canvas);
+                if (config().legendEnabled()) {
+                    renderLegend(canvas);
+                }
+            }
         protected:
+            virtual void renderLegend(SvgPhaseCanvas& canvas) const = 0;
+            virtual void renderWorld(SvgPhaseCanvas& canvas) const = 0;
+
             [[nodiscard]]
             Config const& config() const {
                 return canvasCtx_.config();

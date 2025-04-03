@@ -63,6 +63,11 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         }
 
         [[nodiscard]]
+        bool legendEnabled() const {
+            return legendEnabled_;
+        }
+
+        [[nodiscard]]
         Float legendSpace() const {
             return legendSpace_;
         }
@@ -116,6 +121,11 @@ namespace gustave::examples::jsonGustave::svgRenderer {
                 throw invalidPositiveError("legendColorScaleWidth", value);
             }
             legendColorScaleWidth_ = value;
+            return *this;
+        }
+
+        Config& setLegendEnabled(bool value) {
+            legendEnabled_ = value;
             return *this;
         }
 
@@ -186,6 +196,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         Float legendTextSize_ = 12.f;
         Float legendTitleSize_ = 24.f;
         Float spaceRes_ = 32.f;
+        bool legendEnabled_ = true;
     };
 }
 
@@ -200,6 +211,7 @@ struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::Con
         config.setArrowTriangleFactor(json.at("arrowTriangleFactor").get<Float>());
         config.setLegendColorScaleRes(json.at("legendColorScaleRes").get<Float>());
         config.setLegendColorScaleWidth(json.at("legendColorScaleWidth").get<Float>());
+        config.setLegendEnabled(json.at("legendEnabled").get<bool>());
         config.setLegendSpace(json.at("legendSpace").get<Float>());
         config.setLegendTextColor(json.at("legendTextColor").get<Color>());
         config.setLegendTextSize(json.at("legendTextSize").get<Float>());

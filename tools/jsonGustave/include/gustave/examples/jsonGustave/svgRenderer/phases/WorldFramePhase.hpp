@@ -50,8 +50,12 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 : PhaseContext{ ctx }
                 , phase_{ phase }
             {}
+        protected:
+            void renderLegend(SvgPhaseCanvas&) const override {
+                // no legend
+            }
 
-            void render(SvgPhaseCanvas& canvas) const override {
+            void renderWorld(SvgPhaseCanvas& canvas) const override {
                 canvas.drawWorldFrame({ {"fill-opacity",0.f}, {"stroke", phase_.frameColor_.svgCode()},{"stroke-width", phase_.frameWidth_} });
             }
         private:
