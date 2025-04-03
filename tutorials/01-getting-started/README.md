@@ -51,9 +51,9 @@ Expected output:
 ```
 Gustave 'Unitless' Demo
 
-g = {0, -9.8, 0}
+g = { "x": 0, "y": -9.8, "z": 0 }
 mass = 1000
-weight = mass * g = {0, -9800, 0}
+weight = mass * g = { "x": 0, "y": -9800, "z": 0 }
 wrong_operation = mass + g.y() = 990.2
 ```
 

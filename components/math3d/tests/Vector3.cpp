@@ -353,7 +353,12 @@ TEST_CASE("Vector3") {
             std::stringstream stream;
             stream << vec;
             std::stringstream expected;
-            expected << "{" << 1.f << ", " << -2.f << ", " << 3.f << "} Pa";
+            expected << "{ \"x\": " << 1.f << ", \"y\": " << -2.f << ", \"z\": " << 3.f;
+            if (pa.isTrivialOne()) {
+                expected << " }";
+            } else {
+                expected << ", \"unit\": \"" << pa.symbol() << "\" }";
+            }
             CHECK(stream.view() == expected.view());
         }
 
@@ -362,7 +367,7 @@ TEST_CASE("Vector3") {
             std::stringstream stream;
             stream << vec;
             std::stringstream expected;
-            expected << '{' << 1.f << ", " << 2.f << ", " << -3.f << "}";
+            expected << "{ \"x\": " << 1.f << ", \"y\": " << 2.f << ", \"z\": " << -3.f << " }";
             CHECK(stream.view() == expected.view());
         }
     }
