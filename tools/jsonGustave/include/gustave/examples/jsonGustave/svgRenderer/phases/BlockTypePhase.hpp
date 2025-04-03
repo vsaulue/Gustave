@@ -61,18 +61,13 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             {
                 this->setLegendDims(generateLegendDims());
             }
-
-            void render(SvgPhaseCanvas& canvas) const override {
-                renderWorldBlocks(canvas);
-                renderLegend(canvas);
-            }
-        private:
-            void renderLegend(SvgPhaseCanvas& canvas) const {
+        protected:
+            void renderLegend(SvgPhaseCanvas& canvas) const override {
                 legendType_.render(canvas);
                 legendHatch_.render(canvas);
             }
 
-            void renderWorldBlocks(SvgPhaseCanvas& canvas) const {
+            void renderWorld(SvgPhaseCanvas& canvas) const override {
                 canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
                 auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
                 for (auto const& block : this->syncWorld().blocks()) {
@@ -84,7 +79,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 }
                 canvas.endGroup();
             }
-
+        private:
             [[nodiscard]]
             SvgDims generateLegendDims() const {
                 SvgDims const& typeDims = legendType_.dims();

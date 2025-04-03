@@ -74,10 +74,30 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                 this->setLegendDims(computeLegendDims());
             }
 
-            void render(SvgPhaseCanvas& canvas) const override {
-                renderWorld(canvas);
-                renderLegend(canvas);
+        protected:
+            void renderLegend(SvgPhaseCanvas& canvas) const override {
+                legendScale_.render(canvas);
+                legendLength_.render(canvas);
             }
+
+            void renderWorld(SvgPhaseCanvas& canvas) const override {
+                auto const g = NormalizedVector3{ this->syncWorld().g() };
+                canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
+                for (auto const& contact : this->syncWorld().links()) {
+                    auto const stressFactor = contact.stressRatio().maxCoord();
+                    auto const color = phase_.stressColors_.colorAt(stressFactor.value()).svgCode();
+                    auto const forceVector = contact.forceVector();
+                    auto const lengthFactor = (forceVector.norm() / maxForce_).value();
+                    if (forceVector.dot(g) > 0.f * u.force) {
+                        canvas.drawWorldContactArrow(contact, lengthFactor, { {"fill",color} });
+                    }
+                    else {
+                        canvas.drawWorldContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
+                    }
+                }
+                canvas.endGroup();
+            }
+
         private:
             [[nodiscard]]
             SvgDims computeLegendDims() const {
@@ -123,28 +143,6 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             [[nodiscard]]
             static std::string_view legendLengthTitle() {
                 return "Contact arrow length (weight transfert):";
-            }
-
-            void renderLegend(SvgPhaseCanvas& canvas) const {
-                legendScale_.render(canvas);
-                legendLength_.render(canvas);
-            }
-
-            void renderWorld(SvgPhaseCanvas& canvas) const {
-                auto const g = NormalizedVector3{ this->syncWorld().g() };
-                canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
-                for (auto const& contact : this->syncWorld().links()) {
-                    auto const stressFactor = contact.stressRatio().maxCoord();
-                    auto const color = phase_.stressColors_.colorAt(stressFactor.value()).svgCode();
-                    auto const forceVector = contact.forceVector();
-                    auto const lengthFactor = (forceVector.norm() / maxForce_).value();
-                    if (forceVector.dot(g) > 0.f * u.force) {
-                        canvas.drawWorldContactArrow(contact, lengthFactor, { {"fill",color} });
-                    } else {
-                        canvas.drawWorldContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
-                    }
-                }
-                canvas.endGroup();
             }
 
             ContactStressPhase const& phase_;

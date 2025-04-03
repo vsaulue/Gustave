@@ -5,6 +5,7 @@
         "spaceResolution": 32.0,
         "legendColorScaleRes": 32.0,
         "legendColorScaleWidth": 32.0,
+        "legendEnabled": true,
         "legendSpace": 8.0,
         "legendTextColor": {"r": 0.0, "g": 0.0, "b":  0.0},
         "legendTextSize": 12.0,
