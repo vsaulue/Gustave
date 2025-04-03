@@ -83,16 +83,19 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             void renderWorld(SvgPhaseCanvas& canvas) const override {
                 auto const g = NormalizedVector3{ this->syncWorld().g() };
                 canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
-                for (auto const& contact : this->syncWorld().links()) {
-                    auto const stressFactor = contact.stressRatio().maxCoord();
-                    auto const color = phase_.stressColors_.colorAt(stressFactor.value()).svgCode();
-                    auto const forceVector = contact.forceVector();
-                    auto const lengthFactor = (forceVector.norm() / maxForce_).value();
-                    if (forceVector.dot(g) > 0.f * u.force) {
-                        canvas.drawWorldContactArrow(contact, lengthFactor, { {"fill",color} });
-                    }
-                    else {
-                        canvas.drawWorldContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
+                for (auto const& structure : this->syncWorld().structures()) {
+                    if (structure.isSolved()) {
+                        for (auto const& contact : structure.links()) {
+                            auto const stressFactor = contact.stressRatio().maxCoord();
+                            auto const color = phase_.stressColors_.colorAt(stressFactor.value()).svgCode();
+                            auto const forceVector = contact.forceVector();
+                            auto const lengthFactor = (forceVector.norm() / maxForce_).value();
+                            if (forceVector.dot(g) > 0.f * u.force) {
+                                canvas.drawWorldContactArrow(contact, lengthFactor, { {"fill",color} });
+                            } else {
+                                canvas.drawWorldContactArrow(contact.opposite(), lengthFactor, { {"fill",color} });
+                            }
+                        }
                     }
                 }
                 canvas.endGroup();
@@ -110,8 +113,12 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             [[nodiscard]]
             static Real<u.force> computeMaxForce(SvgCanvasContext const& ctx) {
                 auto result = Real<u.force>::zero();
-                for (auto const& contact : ctx.world().syncWorld().links()) {
-                    result = rt.max(result, contact.forceVector().norm());
+                for (auto const& structure : ctx.world().syncWorld().structures()) {
+                    if (structure.isSolved()) {
+                        for (auto const& contact : structure.links()) {
+                            result = rt.max(result, contact.forceVector().norm());
+                        }
+                    }
                 }
                 return result;
             }
