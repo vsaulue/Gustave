@@ -300,6 +300,11 @@ namespace gustave::core::worlds::syncWorld {
         }
 
         [[nodiscard]]
+        bool isSolved() const {
+            return data_->state() == State::Solved;
+        }
+
+        [[nodiscard]]
         bool isValid() const {
             return data_->state() != State::Invalid;
         }
