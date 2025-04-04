@@ -67,9 +67,10 @@ jobs:
       - name: "[build] Run tool tests"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tool-tests
 
-      - name: "[build] Run memcheck tests"
-        if: matrix.build_type == 'Release'
-        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
+      # Disabled drMemory test because of false positives that can't be reproduced outside Github's runners.
+      #- name: "[build] Run memcheck tests"
+      #  if: matrix.build_type == 'Release'
+      #  run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
 
       - name: "[build] Run tutorials"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tutorials
