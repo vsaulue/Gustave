@@ -22,5 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory("01-creating-world")
-add_subdirectory("02-world-blocks")
+add_tutorial_executable(TARGET tuto-02-02
+    SOURCE_FILES "main.cpp"
+)
