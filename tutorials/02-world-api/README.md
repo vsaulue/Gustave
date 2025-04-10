@@ -13,3 +13,4 @@ For now, this API only support grids of cuboids (like a Minecraft world). The ex
 ## Index
 
 1. [Creating a world](01-creating-world/README.md): how to create an empty `SyncWorld`.
+1. [World blocks](02-world-blocks/README.md): how to add/remove/inspect blocks in a world.
