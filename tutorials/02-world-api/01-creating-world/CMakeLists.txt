@@ -22,7 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-if(GUSTAVE_BUILD_TUTORIALS)
-    add_subdirectory("01-getting-started")
-    add_subdirectory("02-world-api")
-endif()
+add_tutorial_executable(TARGET tuto-02-01
+    SOURCE_FILES "main.cpp"
+)
