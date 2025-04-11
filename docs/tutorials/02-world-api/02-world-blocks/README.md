@@ -1,6 +1,6 @@
 # Tutorial: World blocks
 
-This sections explains how to inspect/add/modify/remove [blocks](../../../docs/lexicon.md#block) in a `SyncWorld`
+This sections explains how to inspect/add/modify/remove [blocks](../../../lexicon.md#block) in a `SyncWorld`
 
 **Note:** All modifications of a world are done through a `Transaction`. A transaction can do multiple insertion/modification/deletion at once. For performance reasons, always try to group your modifications in as few transactions as possible.
 
@@ -76,7 +76,7 @@ The key method is `World::Transaction::addBlock(BlockConstructionInfo const&)`. 
 * `blockIndex`: the position of the block in the world.
 * `maxBlockStress`: the maximum constraints this block can withstand before failing.
 * `mass`: the mass of this block.
-* `isFoundation`: whether this block is a [foundation](../../../docs/lexicon.md#Block).
+* `isFoundation`: whether this block is a [foundation](../../../lexicon.md#Block).
 
 So the previous chunk of code:
 * creates a transaction `tr`

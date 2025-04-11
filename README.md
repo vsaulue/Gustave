@@ -48,7 +48,7 @@ Gustave is a **header-only** library that just requires a **C++20** compiler and
 
 - [Overview](./docs/overview.md)
 - [Install](./docs/install.md)
-- [Getting Started](./tutorials/tutorials.md)
+- [Getting Started](./docs/tutorials/tutorials.md)
 - [Lexicon](./docs/lexicon.md)
 
 ## Future work

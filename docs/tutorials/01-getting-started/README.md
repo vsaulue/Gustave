@@ -1,6 +1,6 @@
 # Tutorial 01: Getting started
 
-If not done yet, please read the [install guide](../../docs/install.md) to download Gustave and link it to your project.
+If not done yet, please read the [install guide](../../install.md) to download Gustave and link it to your project.
 
 Gustave is a customisable library. Most of its classes takes a *library configuration* template parameter that enables using others:
 * 3d math implementations (ex: 3d vectors)
