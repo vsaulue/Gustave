@@ -1,0 +1,93 @@
+{
+    "blockSize": { "x": 1.0, "y": 1.0, "z": 1.0 },
+    "g": { "x": 0.0, "y": -10.0, "z": 0.0 },
+    "blockTypes": [
+        {
+            "name": "Foundation",
+            "color": { "r": 0.5, "g": 0.5, "b": 0.5 },
+            "mass": 10000.0,
+            "maxStress": {
+                "compression": 100000.0,
+                "shear": 50000.0,
+                "tensile": 20000.0
+            }
+        },
+        {
+            "name": "Structure 1",
+            "color": { "r": 1.0, "g": 0.0, "b": 0.0 },
+            "mass": 1000.0,
+            "maxStress": {
+                "compression": 100000.0,
+                "shear": 50000.0,
+                "tensile": 20000.0
+            }
+        },
+        {
+            "name": "Structure 2",
+            "color": { "r": 0.0, "g": 1.0, "b": 0.0 },
+            "mass": 2000.0,
+            "maxStress": {
+                "compression": 100000.0,
+                "shear": 50000.0,
+                "tensile": 20000.0
+            }
+        },
+        {
+            "name": "Structure 3",
+            "color": { "r": 0.0, "g": 0.0, "b": 1.0 },
+            "mass": 3000.0,
+            "maxStress": {
+                "compression": 100000.0,
+                "shear": 50000.0,
+                "tensile": 20000.0
+            }
+        }
+    ],
+    "blocks": [
+        {
+            "index": { "x": 0, "y": 0, "z": 0 },
+            "blockTypeName": "Foundation",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 0, "y": 1, "z": 0 },
+            "blockTypeName": "Structure 1",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 0, "y": 2, "z": 0 },
+            "blockTypeName": "Structure 1",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 1, "y": 0, "z": 0 },
+            "blockTypeName": "Structure 2",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 2, "y": 0, "z": 0 },
+            "blockTypeName": "Structure 2",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 3, "y": 0, "z": 0 },
+            "blockTypeName": "Structure 2",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 4, "y": 0, "z": 0 },
+            "blockTypeName": "Foundation",
+            "isFoundation": true
+        },
+        {
+            "index": { "x": 7, "y": 0, "z": 0 },
+            "blockTypeName": "Structure 3",
+            "isFoundation": false
+        },
+        {
+            "index": { "x": 8, "y": 0, "z": 0 },
+            "blockTypeName": "Structure 3",
+            "isFoundation": false
+        }
+    ]
+}
