@@ -72,6 +72,6 @@ add_custom_target(install-to-cmake-prefix
 
 add_subdirectory("components")
 add_subdirectory("distribs")
+add_subdirectory("docs")
 add_subdirectory("packaging")
 add_subdirectory("tools")
-add_subdirectory("tutorials")
