@@ -47,6 +47,7 @@ namespace gustave::core::worlds::syncWorld {
         using WorldData = detail::WorldData<libCfg>;
         using SceneContact = typename WorldData::Scene::ContactReference;
         using SceneStructure = typename WorldData::Scene::StructureReference;
+        using StructureData = typename WorldData::StructureData;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -112,6 +113,16 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         std::string invalidMessage() const {
             return sceneContact().invalidMessage();
+        }
+
+        [[nodiscard]]
+        bool isSolved() const {
+            auto const sContact = world_->scene.contacts().find(index_);
+            if (sContact.isValid()) {
+                return world_->structures.at(sContact.structure())->state() == StructureData::State::Solved;
+            } else {
+                return false;
+            }
         }
 
         [[nodiscard]]

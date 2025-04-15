@@ -153,6 +153,20 @@ TEST_CASE("core::worlds::syncWorld::ContactReference") {
         CHECK(contact.index() == contactId);
     }
 
+    SECTION(".isSolved()") {
+        SECTION("// solved") {
+            CHECK(contact.isSolved());
+        }
+
+        SECTION("// not solved") {
+            CHECK_FALSE(unsolvedContact.isSolved());
+        }
+
+        SECTION("// invalid") {
+            CHECK_FALSE(invalidContact.isSolved());
+        }
+    }
+
     SECTION(".isValid()") {
         SECTION("// true") {
             CHECK(contact.isValid());
