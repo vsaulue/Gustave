@@ -1,0 +1,105 @@
+{
+    "blockSize": { "x": 1.0, "y": 1.0, "z": 1.0 },
+    "g": { "x": 0.0, "y": -10.0, "z": 0.0 },
+    "blockTypes": [
+        {
+            "name": "Weak block",
+            "color": { "r": 0.8, "g": 0.8, "b": 0.8 },
+            "mass": 3000.0,
+            "maxStress": {
+                "compression": 100000.0,
+                "shear": 100000.0,
+                "tensile": 100000.0
+            }
+        },
+        {
+            "name": "Strong block",
+            "color": { "r": 0.5, "g": 0.5, "b": 0.5 },
+            "mass": 3000.0,
+            "maxStress": {
+                "compression": 500000.0,
+                "shear": 500000.0,
+                "tensile": 500000.0
+            }
+        }
+    ],
+    "blocks": [
+        {
+            "index": { "x": 0, "y": 0, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": true
+        },{
+            "index": { "x": 0, "y": 1, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 0, "y": 2, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 0, "y": 3, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 0, "y": 4, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 0, "y": 5, "z": 0 },
+            "blockTypeName": "Weak block",
+            "isFoundation": false
+        },{
+            "index": { "x": 0, "y": 6, "z": 0 },
+            "blockTypeName": "Weak block",
+            "isFoundation": false
+        },{
+            "index": { "x": 0, "y": 7, "z": 0 },
+            "blockTypeName": "Weak block",
+            "isFoundation": false
+        },{
+            "index": { "x": 0, "y": 8, "z": 0 },
+            "blockTypeName": "Weak block",
+            "isFoundation": false
+        },{
+            "index": { "x": 1, "y": 4, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 2, "y": 4, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 3, "y": 4, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 4, "y": 0, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": true
+        },{
+            "index": { "x": 4, "y": 1, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 4, "y": 2, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 4, "y": 3, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 4, "y": 4, "z": 0 },
+            "blockTypeName": "Strong block",
+            "isFoundation": false
+        },{
+            "index": { "x": 3, "y": 8, "z": 0 },
+            "blockTypeName": "Weak block",
+            "isFoundation": false
+        },{
+            "index": { "x": 4, "y": 8, "z": 0 },
+            "blockTypeName": "Weak block",
+            "isFoundation": false
+        }
+    ]
+}
