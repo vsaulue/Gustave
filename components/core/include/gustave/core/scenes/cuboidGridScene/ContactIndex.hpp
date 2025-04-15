@@ -82,7 +82,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         friend std::ostream& operator<<(std::ostream& stream, ContactIndex const& index) {
-            return stream << "{ blockIndex: " << index.localBlockIndex_ << ", direction: " << index.direction_ << " }";
+            return stream << "{ \"blockIndex\": " << index.localBlockIndex_ << ", \"direction\": \"" << index.direction_ << "\" }";
         }
     private:
         BlockIndex localBlockIndex_;
