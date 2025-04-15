@@ -157,6 +157,11 @@ namespace gustave::core::worlds::syncWorld {
         }
 
         [[nodiscard]]
+        BlockReference otherBlock() const {
+            return BlockReference{ *world_, sceneContact().otherBlock().index() };
+        }
+
+        [[nodiscard]]
         PressureStress pressureStress() const {
             return forceStress() / sceneContact().area();
         }

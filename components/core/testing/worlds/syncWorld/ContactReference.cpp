@@ -214,6 +214,10 @@ TEST_CASE("core::worlds::syncWorld::ContactReference") {
         }
     }
 
+    SECTION(".otherBlock()") {
+        CHECK(contact.otherBlock() == makeBlockRef({ 2,1,2 }));
+    }
+
     SECTION(".pressureStress()") {
         auto checkPressureStress = [&](PressureStress const& value, PressureStress const& expected) {
             CHECK_THAT(value.compression(), matchers::WithinRel(expected.compression(), solverPrecision));
