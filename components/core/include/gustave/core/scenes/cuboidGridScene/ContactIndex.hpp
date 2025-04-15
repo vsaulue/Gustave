@@ -47,7 +47,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         {}
 
         [[nodiscard]]
-        explicit ContactIndex(BlockIndex const& localBlockIndex, Direction direction)
+        ContactIndex(BlockIndex const& localBlockIndex, Direction direction)
             : localBlockIndex_{ localBlockIndex }
             , direction_{ direction }
         {}
