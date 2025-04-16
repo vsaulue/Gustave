@@ -1,4 +1,4 @@
-# Tutorial: World blocks
+# Tutorial 02-02: World blocks
 
 This sections explains how to inspect/add/modify/remove [blocks](../../../lexicon.md#block) in a `SyncWorld`
 

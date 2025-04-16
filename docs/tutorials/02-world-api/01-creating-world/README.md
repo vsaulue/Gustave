@@ -1,4 +1,4 @@
-# Tutorial: Creating an empty world
+# Tutorial 02-01: Creating an empty world
 
 This section explains how to create a new `SyncWorld` object.
 

@@ -1,4 +1,4 @@
-# Tutorial: World links, forces and stresses
+# Tutorial 02-04: World links, forces and stresses
 
 This section explains how to inspect [links and contacts](../../../lexicon.md#links-and-contacts) in a `SyncWorld`.
 
