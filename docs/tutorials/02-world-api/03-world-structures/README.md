@@ -1,4 +1,4 @@
-# Tutorial: World blocks
+# Tutorial 02-03: World blocks
 
 This sections explains how to inspect [structures](../../../lexicon.md#structure) in a `SyncWorld`.
 

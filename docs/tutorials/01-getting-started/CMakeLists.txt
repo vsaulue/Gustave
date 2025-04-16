@@ -22,6 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_tutorial_executable(TARGET tuto-getting-started
+add_tutorial_executable(TARGET tuto-01
     SOURCE_FILES "main.cpp"
 )
