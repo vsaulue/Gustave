@@ -63,6 +63,12 @@ namespace gustave::core {
             using Stress = gustave::core::model::Stress<libCfg_, unit>;
         };
 
+        struct Solvers {
+            using Structure = gustave::core::solvers::Structure<libCfg_>;
+
+            using F1Solver = gustave::core::solvers::Force1Solver<libCfg_>;
+        };
+
         struct Worlds {
             using SyncWorld = gustave::core::worlds::SyncWorld<libCfg_>;
         };
