@@ -54,6 +54,7 @@ namespace gustave::core {
         using Vector3 = cfg::Vector3<libCfg_, unit>;
 
         struct Model {
+            using ConductivityStress = gustave::core::model::ConductivityStress<libCfg_>;
             using ForceStress = gustave::core::model::ForceStress<libCfg_>;
             using PressureStress = gustave::core::model::PressureStress<libCfg_>;
             using StressRatio = gustave::core::model::StressRatio<libCfg_>;
