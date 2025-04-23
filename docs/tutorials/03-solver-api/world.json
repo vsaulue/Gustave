@@ -1,0 +1,56 @@
+{
+    "blockSize": { "x": 1.0, "y": 1.0, "z": 1.0 },
+    "g": { "x": 0.0, "y": -10.0, "z": 0.0 },
+    "blockTypes": [
+        {
+            "name": "Wall",
+            "color": { "r": 0.3, "g": 0.3, "b": 0.3 },
+            "mass": 3000.0,
+            "maxStress": {
+                "compression": 1000000.0,
+                "shear": 500000.0,
+                "tensile": 200000.0
+            }
+        },{
+            "name": "Roof",
+            "color": { "r": 0.7, "g": 0.7, "b": 0.7 },
+            "mass": 3000.0,
+            "maxStress": {
+                "compression": 100000.0,
+                "shear": 500000.0,
+                "tensile": 100000.0
+            }
+        }
+    ],
+    "blocks": [
+        {
+            "index": { "x": 0, "y": 0, "z": 0 },
+            "blockTypeName": "Wall",
+            "isFoundation": true
+        },{
+            "index": { "x": 0, "y": 1, "z": 0 },
+            "blockTypeName": "Wall",
+            "isFoundation": false
+        },{
+            "index": { "x": 0, "y": 2, "z": 0 },
+            "blockTypeName": "Wall",
+            "isFoundation": false
+        },{
+            "index": { "x": 2, "y": 0, "z": 0 },
+            "blockTypeName": "Wall",
+            "isFoundation": true
+        },{
+            "index": { "x": 2, "y": 1, "z": 0 },
+            "blockTypeName": "Wall",
+            "isFoundation": false
+        },{
+            "index": { "x": 2, "y": 2, "z": 0 },
+            "blockTypeName": "Wall",
+            "isFoundation": false
+        },{
+            "index": { "x": 1, "y": 2, "z": 0 },
+            "blockTypeName": "Roof",
+            "isFoundation": false
+        }
+    ]
+}
