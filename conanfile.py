@@ -43,6 +43,9 @@ class GustaveRecipe(ConanFile):
     exports_sources = "cmake/*", "components/*", "distribs/*", "docs/*", "packaging/*", "tools/*", "CMakeLists.txt", "!*/build", "!*/__pycache__"
     test_package_folder = "packaging/test_package"
 
+    def _toolsEnabled(self) -> bool:
+        return self.conf.get("user.gustave:build_tools", default=True, check_type=bool)
+
     def set_version(self):
         cmakeFilePath = os.path.join(self.recipe_folder, 'CMakeLists.txt')
         regex = re.compile(r'^ *set\( *gustave_version +"(\d+\.\d+\.\d+)" *\)')
@@ -56,9 +59,10 @@ class GustaveRecipe(ConanFile):
     def build_requirements(self):
         self.tool_requires("cmake/3.29.0")
         self.test_requires("catch2/3.6.0")
-        self.test_requires("cli11/2.4.2")
-        self.test_requires("nlohmann_json/3.11.3")
-        self.test_requires("svgwrite/0.2.0")
+        if self._toolsEnabled():
+            self.test_requires("cli11/2.4.2")
+            self.test_requires("nlohmann_json/3.11.3")
+            self.test_requires("svgwrite/0.2.0")
 
     def validate(self):
         check_min_cppstd(self, 20)
@@ -71,6 +75,7 @@ class GustaveRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         toolchain = CMakeToolchain(self)
+        toolchain.cache_variables["GUSTAVE_BUILD_TOOLS"] = self._toolsEnabled()
         if self.conf.get("user.gustave:disable_cmake_user_preset", default=False):
             toolchain.user_presets_path = False
         toolchain.generate()
@@ -82,6 +87,8 @@ class GustaveRecipe(ConanFile):
             cmake.build()
             if can_run(self):
                 cmake.build(target="run-unit-tests")
+                if self._toolsEnabled():
+                    cmake.ctest(cli_args=["-L", "tool-test"])
 
     def package(self):
         copy(self, "LICENSE.txt", src=str(self.recipe_folder), dst=os.path.join(self.package_folder, "licenses"))
