@@ -16,7 +16,7 @@
             "cxx": "${CMAKE_CXX_COMPILER}"
         },
         "drMemory": "${drMemory_exe}",
-        "svgViewer": "$<TARGET_FILE:svgViewer>",
+        "svgViewer": "${svgViewer_path}",
         "valgrind": "${valgrind_exe}"
     },
     "folders":  {
