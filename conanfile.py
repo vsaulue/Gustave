@@ -46,6 +46,9 @@ class GustaveRecipe(ConanFile):
     def _toolsEnabled(self) -> bool:
         return self.conf.get("user.gustave:build_tools", default=True, check_type=bool)
 
+    def _tutorialsEnabled(self) -> bool:
+        return self.conf.get("user.gustave:build_tutorials", default=True, check_type=bool)
+
     def set_version(self):
         cmakeFilePath = os.path.join(self.recipe_folder, 'CMakeLists.txt')
         regex = re.compile(r'^ *set\( *gustave_version +"(\d+\.\d+\.\d+)" *\)')
@@ -76,6 +79,7 @@ class GustaveRecipe(ConanFile):
         deps.generate()
         toolchain = CMakeToolchain(self)
         toolchain.cache_variables["GUSTAVE_BUILD_TOOLS"] = self._toolsEnabled()
+        toolchain.cache_variables["GUSTAVE_BUILD_TUTORIALS"] = self._tutorialsEnabled()
         if self.conf.get("user.gustave:disable_cmake_user_preset", default=False):
             toolchain.user_presets_path = False
         toolchain.generate()
@@ -89,6 +93,8 @@ class GustaveRecipe(ConanFile):
                 cmake.build(target="run-unit-tests")
                 if self._toolsEnabled():
                     cmake.ctest(cli_args=["-L", "tool-test"])
+                if self._tutorialsEnabled():
+                    cmake.ctest(cli_args=["-L", "tutorial"])
 
     def package(self):
         copy(self, "LICENSE.txt", src=str(self.recipe_folder), dst=os.path.join(self.package_folder, "licenses"))
