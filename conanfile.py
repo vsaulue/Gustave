@@ -43,6 +43,9 @@ class GustaveRecipe(ConanFile):
     exports_sources = "cmake/*", "components/*", "distribs/*", "docs/*", "packaging/*", "tools/*", "CMakeLists.txt", "!*/build", "!*/__pycache__"
     test_package_folder = "packaging/test_package"
 
+    def _memcheckTestsEnabled(self) -> bool:
+        return self.conf.get("user.gustave:enable_memcheck_tests", default=True, check_type=bool)
+
     def _toolsEnabled(self) -> bool:
         return self.conf.get("user.gustave:build_tools", default=True, check_type=bool)
 
@@ -84,6 +87,7 @@ class GustaveRecipe(ConanFile):
         toolchain = CMakeToolchain(self)
         toolchain.cache_variables["GUSTAVE_BUILD_TOOLS"] = self._toolsEnabled()
         toolchain.cache_variables["GUSTAVE_BUILD_TUTORIALS"] = self._tutorialsEnabled()
+        toolchain.cache_variables["GUSTAVE_ENABLE_MEMCHECK_TESTS"] = self._memcheckTestsEnabled()
         toolchain.cache_variables["GUSTAVE_ENABLE_UNIT_TESTS"] = self._unitTestsEnabled()
         if self.conf.get("user.gustave:disable_cmake_user_preset", default=False):
             toolchain.user_presets_path = False
