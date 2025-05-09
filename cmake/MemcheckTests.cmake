@@ -24,7 +24,11 @@
 
 include_guard(GLOBAL)
 
-set(memcheck_tests_enabled "${BUILD_TESTING}")
+set(memcheck_tests_enabled "OFF")
+if(BUILD_TESTING AND GUSTAVE_ENABLE_MEMCHECK_TESTS)
+    set(memcheck_tests_enabled "ON")
+endif()
+
 set(memcheck_type "")
 
 if(memcheck_tests_enabled)
