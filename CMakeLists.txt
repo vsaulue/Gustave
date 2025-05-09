@@ -43,6 +43,7 @@ endif()
 # General test settings
 # BUILD_TESTING: build tests (set this to OFF if you just want to package).
 option(GUSTAVE_ENABLE_MEMCHECK_TESTS "Enable memcheck tests (ignored if BUILD_TESTING is OFF)." ON)
+option(GUSTAVE_ENABLE_PACKAGING_TESTS "Enable packaging tests (ignored if BUILD_TESTING is OFF)." ON)
 option(GUSTAVE_ENABLE_UNIT_TESTS "Enable unit tests (ignored if BUILD_TESTING is OFF)." ON)
 
 # Memcheck tests settings

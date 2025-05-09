@@ -24,7 +24,10 @@
 
 include_guard(GLOBAL)
 
-set(packaging_tests_enabled "${BUILD_TESTING}")
+set(packaging_tests_enabled "OFF")
+if(BUILD_TESTING AND GUSTAVE_ENABLE_PACKAGING_TESTS)
+    set(packaging_tests_enabled "ON")
+endif()
 
 if(packaging_tests_enabled)
     add_custom_target(run-packaging-tests)
