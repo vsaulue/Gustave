@@ -33,7 +33,6 @@ set(CMAKE_CXX_STANDARD 20)
 option(CMAKE_COMPILE_WARNING_AS_ERROR "Compile warnings as errors." ON)
 option(GUSTAVE_BUILD_TOOLS "Build internal tools (set this to OFF if you just want to package)." ON)
 option(GUSTAVE_BUILD_TUTORIALS "Build example executables (set this to OFF if you just want to package)." ON)
-# BUILD_TESTING: build tests (set this to OFF if you just want to package).
 # CMAKE_COLOR_DIAGNOSTICS: Add colors to build/test output.
 # CMAKE_INSTALL_PREFIX: Default location of the install target (also used for packaging tests).
 
@@ -41,6 +40,9 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "${CMAKE_CURRENT_BINARY_DIR}/install")
 endif()
 
+# General test settings
+# BUILD_TESTING: build tests (set this to OFF if you just want to package).
+option(GUSTAVE_ENABLE_UNIT_TESTS "Enable unit tests (ignored if BUILD_TESTING is OFF)." ON)
 
 # Memcheck tests settings
 set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (valgrind, DrMemory).")
