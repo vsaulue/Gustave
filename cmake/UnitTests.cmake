@@ -27,7 +27,11 @@ include_guard(GLOBAL)
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 
-set(unit_tests_enabled "${BUILD_TESTING}")
+set(unit_tests_enabled "OFF")
+if(BUILD_TESTING AND GUSTAVE_ENABLE_UNIT_TESTS)
+    set(unit_tests_enabled "ON")
+endif()
+
 set(unit_test_args)
 
 if(unit_tests_enabled)
