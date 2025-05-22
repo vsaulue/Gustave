@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required (VERSION 3.24)
+cmake_minimum_required(VERSION 3.29)
 
 project ("Gustave-Package-Test" "CXX")
 set(CMAKE_CXX_STANDARD 20)
