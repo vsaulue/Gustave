@@ -33,6 +33,7 @@ class GustavePackageTestRecipe(ConanFile):
     generators = "CMakeDeps", "CMakeToolchain"
 
     def requirements(self):
+        self.tool_requires("cmake/3.29.0")
         self.requires(self.tested_reference_str)
 
     def build(self):
