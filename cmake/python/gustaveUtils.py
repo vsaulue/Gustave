@@ -414,6 +414,9 @@ class CMakeFolders(object):
     _sourceChecked : bool
     """Flag set when `_source` was checked to be a path to a folder."""
 
+    _testPackageChecked: bool
+    """Flag set when `testPackage` was checked to be a path to a folder."""
+
     def __init__(self, jsonObject: dict[str, typing.Any]):
         """
         :param jsonObject: Input JSON sub-object.
@@ -425,6 +428,7 @@ class CMakeFolders(object):
         self._installChecked = False
         self._source = JsonUtils.getStr(jsonObject, 'source')
         self._sourceChecked = False
+        self._testPackageChecked = False
 
     @property
     def build(self) -> str:
@@ -466,6 +470,20 @@ class CMakeFolders(object):
             if not DirectoryParser.isValid(result):
                 raise ValueError(f'"source" property is not a valid directory: {result}.')
             self._sourceChecked = True
+        return result
+
+    @property
+    def testPackage(self) -> str:
+        """
+        Path to the project's test_package folder.
+
+        :raises ValueError: The value is not the path to a folder.
+        """
+        result = os.path.join(self._source, "packaging", "test_package")
+        if not self._testPackageChecked:
+            if not DirectoryParser.isValid(result):
+                raise ValueError(f'"testPackage" property is not a valid directory: {result}.')
+            self._testPackageChecked = True
         return result
 
 class CMakeConanProfiles(object):
