@@ -59,7 +59,7 @@ class TestConanPackaging(gu.TestScript):
         tmpTestPackagePath = os.path.join(ctx.tmpFolder, 'test_package')
         conanExe = ctx.cmakeVars.executables.conan
 
-        shutil.copytree(os.path.join(ctx.cmakeVars.folders.source, 'packaging', 'test_package'), tmpTestPackagePath)
+        shutil.copytree(ctx.cmakeVars.folders.testPackage, tmpTestPackagePath)
 
         createCmd = [ conanExe, 'create', ctx.cmakeVars.folders.source,
             '-pr:b', ctx.cmakeVars.conanProfiles.build,
