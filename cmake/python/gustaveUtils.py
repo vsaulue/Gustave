@@ -417,6 +417,12 @@ class CMakeFolders(object):
     _testPackageChecked: bool
     """Flag set when `testPackage` was checked to be a path to a folder."""
 
+    _vcpkgRoot: str
+    """Value of the `vcpkgRoot` property."""
+
+    _vcpkgRootChecked: bool
+    """Flag set when `vcpkgRoot` was checked to be a path to a folder."""
+
     def __init__(self, jsonObject: dict[str, typing.Any]):
         """
         :param jsonObject: Input JSON sub-object.
@@ -429,6 +435,8 @@ class CMakeFolders(object):
         self._source = JsonUtils.getStr(jsonObject, 'source')
         self._sourceChecked = False
         self._testPackageChecked = False
+        self._vcpkgRoot = JsonUtils.getStr(jsonObject, "vcpkgRoot")
+        self._vcpkgRootChecked = False
 
     @property
     def build(self) -> str:
@@ -485,6 +493,16 @@ class CMakeFolders(object):
                 raise ValueError(f'"testPackage" property is not a valid directory: {result}.')
             self._testPackageChecked = True
         return result
+
+    @property
+    def vcpkgRoot(self) -> str:
+        result = self._vcpkgRoot
+        if not self._vcpkgRootChecked:
+            if not DirectoryParser.isValid(result):
+                raise ValueError(f'"vcpkgRoot" property is not a valid directory: {result}.')
+            self._vcpkgRootChecked = True
+        return result
+
 
 class CMakeConanProfiles(object):
     """Class holding the name/path of the conan profiles."""
