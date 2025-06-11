@@ -54,6 +54,7 @@ endfunction()
 
 json_bool(OUTPUT_VARIABLE json_color_diagnostics VALUE "${CMAKE_COLOR_DIAGNOSTICS}")
 json_string(OUTPUT_VARIABLE json_cxx_flags VALUE "${CMAKE_CXX_FLAGS}")
+json_string(OUTPUT_VARIABLE json_vcpkg_root VALUE "${GUSTAVE_VCPKG_ROOT}")
 json_string(OUTPUT_VARIABLE json_cxx_compiler VALUE "${CMAKE_CXX_COMPILER}")
 
 block(SCOPE_FOR VARIABLES)
