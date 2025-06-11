@@ -34,6 +34,13 @@ if(packaging_tests_enabled)
 
     find_program(conan_exe conan PATHS "${GUSTAVE_CONAN_PATH}" DOC "Conan executable (package manager)." REQUIRED)
     message(STATUS "Gustave: using conan at: '${conan_exe}'.")
+
+    if(GUSTAVE_VCPKG_ROOT STREQUAL "")
+        if(DEFINED ENV{VCPKG_ROOT})
+            set(GUSTAVE_VCPKG_ROOT "$ENV{VCPKG_ROOT}")
+            message(STATUS "Gustave: setting GUSTAVE_VCPKG_ROOT to ENV{VCPKG_ROOT}: ${GUSTAVE_VCPKG_ROOT}.")
+        endif()
+    endif()
 endif()
 
 function(add_packaging_test)
