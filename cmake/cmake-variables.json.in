@@ -1,9 +1,9 @@
 
 {
     "buildFlags": {
-        "cxx": "${cxx_flags}"
+        "cxx": ${json_cxx_flags}
     },
-    "colorDiagnostics": ${color_diagnostics},
+    "colorDiagnostics": ${json_color_diagnostics},
     "conanProfiles": {
         "build": "${GUSTAVE_CONAN_BUILD_PROFILE}",
         "host": "${GUSTAVE_CONAN_HOST_PROFILE}"
@@ -13,7 +13,7 @@
         "cmake": "${CMAKE_COMMAND}",
         "conan": "${conan_exe}",
         "compilers": {
-            "cxx": "${CMAKE_CXX_COMPILER}"
+            "cxx": ${json_cxx_compiler}
         },
         "drMemory": "${drMemory_exe}",
         "svgViewer": "${svgViewer_path}",
