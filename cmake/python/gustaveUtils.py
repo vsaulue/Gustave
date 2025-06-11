@@ -622,10 +622,11 @@ class TestScriptCommand(object):
     _stderrPath : str | None
     """(Optional) path to the file storing the program's standard error."""
 
-    def __init__(self, cmd: list[str], separateStderr = False):
+    def __init__(self, cmd: list[str], separateStderr: bool = False, cwd: None|str = None):
         """
         :param cmd: Program name & arguments.
         :param separateStderr: True to store the command's stdout & stderr into separate files.
+        :param cwd: Working directory to use (or None to keep the current one).
         """
         self._outPath = None
         self._stderrPath = None
@@ -637,7 +638,7 @@ class TestScriptCommand(object):
             if separateStderr:
                 errFile = tempfile.NamedTemporaryFile('w+', delete = False)
                 self._stderrPath = errFile.name
-            self._completedProcess = subprocess.run(cmd, stdin=subprocess.DEVNULL, stdout=outFile, stderr=errFile)
+            self._completedProcess = subprocess.run(cmd, cwd=cwd, stdin=subprocess.DEVNULL, stdout=outFile, stderr=errFile)
         except:
             self.close()
             raise
