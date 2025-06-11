@@ -777,7 +777,7 @@ class TestScriptContext(object):
             self._coloring = result
         return result
 
-    def newCmd(self, cmd: list[str], exitOnError : bool = True, separateStderr : bool = False) -> TestScriptCommand:
+    def newCmd(self, cmd: list[str], exitOnError : bool = True, separateStderr : bool = False, cwd: None|str = None) -> TestScriptCommand:
         """
         Runs an external program.
 
@@ -786,24 +786,25 @@ class TestScriptContext(object):
         :param cmd: program name/path and command line arguments.
         :param exitOnError: name of the color to use.
         :param separateStderr: True if stdout & stderr should be stored into separate file.
+        :param cwd: Working directory to use (or None to keep the current one).
         :returns: the result of the program run.
         :raises TestScriptException: if the program returned an error and `exitOnError` is True.
         """
         cmdInfoPrinted = self.verboseLevel > 0
         if cmdInfoPrinted:
-            print(f'{self.coloring("Running command", "yellow")}: {" ".join(cmd)}', file = sys.stderr)
-        result = TestScriptCommand(cmd, separateStderr=separateStderr)
+            self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd)
+        result = TestScriptCommand(cmd, separateStderr=separateStderr, cwd=cwd)
         if (result.returncode != 0) or (self.verboseLevel > 1):
             errPath = result.stderrPath if separateStderr else result.outPath
             if os.path.getsize(errPath) > 0:
                 if not cmdInfoPrinted:
-                    print(f'{self.coloring("Running command", "yellow")}: {" ".join(cmd)}', file = sys.stderr)
+                    self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd)
                 print('--------------------', file=sys.stderr)
                 with open(errPath) as errFile:
                     shutil.copyfileobj(fsrc = errFile, fdst = sys.stderr)
                 print('--------------------\n', file=sys.stderr)
         if result.returncode != 0 and exitOnError:
-            print(f'{self.coloring("Command FAILED", "red")} (exit code: {result.returncode}): {result.cmdStr}', file=sys.stderr)
+            self._printCmd(self.coloring("Command FAILED", "red"), cmd=cmd, cwd=cwd)
             result.close()
             raise TestScriptException(result.returncode)
         return result
@@ -841,6 +842,19 @@ class TestScriptContext(object):
         """Deletes the temporary directory."""
         if self._tmpFolder != None:
             shutil.rmtree(self._tmpFolder)
+
+    def _printCmd(self, title: str, cmd: list[str], cwd: None|str, file: "_typeshed.SupportsWrite[str]" = sys.stderr) -> None:
+        """
+        Print the command.
+
+        :param title: Header text printed before the command.
+        :param cmd: Full command (program & arguments).
+        :param cwd: Working directory of the command.
+        :param file: Output file of this function.
+        """
+        print(f'{title}: {" ".join(cmd)}', file=file)
+        if cwd is not None:
+            print(f'└> Working dir: {cwd}', file=file)
 
 class TestScript(abc.ABC):
     """Class to run a test in Gustave's build."""
