@@ -1,0 +1,25 @@
+
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "vcpkg",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_CXX_FLAGS": @json_cxx_flags@,
+                "CMAKE_CXX_COMPILER": @json_cxx_compiler@
+            },
+            "environment": {
+                "VCPKG_ROOT": @json_vcpkg_root@
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "vcpkg",
+            "configurePreset": "vcpkg"
+        }
+    ]
+}

@@ -22,6 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory("cmake")
-add_subdirectory("conan")
-add_subdirectory("vcpkg")
+cmake_path(SET json_overlay_path NORMALIZE "${CMAKE_CURRENT_LIST_DIR}/overlay")
+json_string(VALUE "${json_overlay_path}" OUTPUT_VARIABLE json_overlay_path)
+
+configure_file("CMakePresets.json.in" "test_package/CMakePresets.json" @ONLY)
+configure_file("vcpkg-configuration.json.in" "test_package/vcpkg-configuration.json" @ONLY)
+
+add_packaging_test(TEST_ID vcpkg-packaging-test
+    COMMAND Python::Interpreter "${python_scripts_dir}/testVcpkgPackaging.py"
+        "--cmakeVariables" "${cmake_variables_json}"
+    WORKING_DIRECTORY "${Gustave_SOURCE_DIR}"
+)
