@@ -22,6 +22,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory("cmake")
-add_subdirectory("conan")
-add_subdirectory("vcpkg")
+cmake_path(SET SRC_PATH NORMALIZE "${CMAKE_CURRENT_LIST_DIR}/../../../..")
+set(VCPKG_POLICY_EMPTY_INCLUDE_FOLDER enabled)
+
+vcpkg_cmake_configure(
+    SOURCE_PATH "${SRC_PATH}"
+    OPTIONS
+        "-DCMAKE_COMPILE_WARNING_AS_ERROR=OFF"
+        "-DBUILD_TESTING=OFF"
+        "-DGUSTAVE_BUILD_TOOLS=OFF"
+        "-DGUSTAVE_BUILD_TUTORIALS=OFF"
+)
+
+vcpkg_cmake_install()
+
+vcpkg_cmake_config_fixup(
+    PACKAGE_NAME "Gustave"
+    CONFIG_PATH "cmake"
+)
+
+file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+vcpkg_install_copyright(FILE_LIST "${SRC_PATH}/LICENSE.txt")
