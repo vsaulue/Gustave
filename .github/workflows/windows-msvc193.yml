@@ -16,6 +16,7 @@ env:
   drMemory_base: '$HOME/drMemory'
   conan_pr_build: ./.github/conanProfiles/windows2022.txt
   conan_pr_host: ./.github/conanProfiles/windows-msvc193.txt
+  vcpkg_base: '$HOME/vcpkg'
 
 jobs:
   windows_msvc193:
@@ -33,6 +34,9 @@ jobs:
           string: ${{ matrix.build_type }}
 
       - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: "[setup] Install vcpkg"
+        run: python '.github/scripts/installVcpkg.py' --dest "${{ env.vcpkg_base }}"
 
       - name: "[setup] Install DrMemory"
         run: python '.github/scripts/msvc/installDrMemory.py' --dest "${{ env.drMemory_base }}"
@@ -57,6 +61,7 @@ jobs:
           -D "GUSTAVE_MEMCHECKER_PATH=${{ env.drMemory_base }}/bin64"
           -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ env.conan_pr_build }}"
           -D "GUSTAVE_CONAN_HOST_PROFILE=${{ env.conan_pr_host }}"
+          -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
 
       - name: "[build] Build"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
