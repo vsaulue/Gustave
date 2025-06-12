@@ -37,6 +37,45 @@ conan create ./Gustave -s:h build_type=Release -c tools.build:skip_test=True --b
 
 This package can then be consumed normally by your other local Conan projects.
 
+## Vcpkg
+
+### From official registry (available SOON™)
+
+### From source
+
+Gustave's [source tree](https://github.com/vsaulue/Gustave/packaging/vcpkg/overlay) has a vcpkg overlay that can be used by your projects locally.
+
+**Note:** if you're using Visual Studio, use a [standalone installation of vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell#1---set-up-vcpkg) (the one shipped with the IDE seems to have issues with overlays).
+
+1. Clone Gustave somewhere on your machine (and optionally, checkout a specific version):
+```
+git clone https://github.com/vsaulue/Gustave.git /home/user123/somewhere/gustave
+```
+
+2. Add an [overlay port](https://learn.microsoft.com/en-us/vcpkg/concepts/overlay-ports) in the [vcpkg-configuration.json](https://learn.microsoft.com/en-us/vcpkg/reference/vcpkg-configuration-json) file of your project, to `packaging/vcpkg/overlay` inside Gustave. Example:
+```
+{
+    "default-registry": {
+        "kind": "git",
+        "baseline": "1a21d756f26d6b974cf52544b291bcdc65de6f4c",
+        "repository": "https://github.com/microsoft/vcpkg"
+    },
+    "overlay-ports": [
+        "/home/user123/somewhere/Gustave/packaging/vcpkg/overlay"
+    ]
+}
+
+```
+
+3. Add a dependency to Gustave in the [vcpkg.json](https://learn.microsoft.com/en-us/vcpkg/reference/vcpkg-json) of your project:
+```
+{
+    "dependencies": [
+        "gustave"
+    ]
+}
+```
+
 ## CMake
 
 The release builds includes proper CMake packaging files in the `cmake/` subfolder. To use them:
