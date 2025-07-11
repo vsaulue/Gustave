@@ -1,4 +1,4 @@
-# Tutorial 02-04: World links, forces and stresses
+# 2.4. Links, forces and stresses
 
 This section explains how to inspect [links and contacts](../../../lexicon.md#links-and-contacts) in a `SyncWorld`.
 
@@ -6,25 +6,16 @@ In a world, links and contacts have a force and a stress factor computed by the 
 
 As links and contacts are quite similar, they are both manipulated with the same type: `ContactReference`.
 
-## Index
-
-1. [Prerequisites](#prerequisites)
-1. [Inspect a specific contact](#inspect-a-specific-contact)
-1. [Check a contact's status](#check-a-contacts-status)
-1. [Contact's force](#contacts-force)
-1. [Link's stress ratio](#links-stress-ratio)
-1. [Stress ratio of a structure](#stress-ratio-of-a-structure)
-
 ## Prerequisites
 
-- [Selecting a Gustave configuration](../../01-getting-started/README.md)
-- [Creating an empty SyncWorld](../01-creating-world/README.md): we'll reuse the `newWorld()` function.
+- [Selecting a Gustave configuration](../../01-getting-started/index.md)
+- [Creating an empty World](../01-creating-world/index.md): we'll reuse the [`newWorld()`](../01-creating-world/index.md#configuring-a-world) function.
 
 ```c++
 auto world = newWorld();
 ```
 
-- [Adding & inspecting world blocks](../02-world-blocks/README.md): we'll add a few blocks for this tutorial.
+- [Adding & inspecting world blocks](../02-world-blocks/index.md): we'll add a few blocks for this tutorial.
 
 We'll prepopulate the world with "A chair and a floating platform":
 
@@ -134,7 +125,7 @@ Contact { "blockIndex": { "x": 9, "y": 9, "z": 0}, "direction": "minusX" }: inva
 
 ## Contact's force
 
-For a solved `ContactReference`, the `forceVector()` method is available. This method return the force exerced by `otherBlock()` on `localBlock()` through this link:
+For a solved `ContactReference`, the `forceVector()` method is available. It returns the force exerced by `otherBlock()` on `localBlock()` through this link:
 
 ```c++
 {
@@ -162,7 +153,8 @@ A few comment on this output:
 - **Line 1:** According to Newton's 1st law of motion, this contact must receive the full weight of the 4 blocks making the "back of the chair". The weight vector of 4 blocks is `4 * mass * g = {0, -120'000, 0} Newton`.
 - **Line 2 & 3:** These 2 contacts are on the surface of the 2 foundations blocks supporting the whole chair. How Gustave balance the weight between the 2 feet is implementation defined, but the sum of these two forces must be the **opposite**  of the weight vector of the chair. Chair's weight vector: `15 * mass * g = {0, -450'000, 0} Newton`
 
-**Note:** The [solver](../../../lexicon.md#solver) doesn't always find an exact solution (regarding Newton's 1st law). Remember the `solverPrecision` value from [Tutorial: Creating an empty SyncWorld](../01-creating-world/README.md) ? This is where it matters: here the solver is allowed a `0.01` (1%) error factor. So the output's **"line 1"** could be between `-118'800` and `-121'200` Newton.
+!!! note
+    The [solver](../../../lexicon.md#solver) doesn't always find an exact solution (regarding Newton's 1st law). Remember the `solverPrecision` value from [Tutorial: Creating an empty SyncWorld](../01-creating-world/index.md) ? This is where it matters: here the solver is allowed a `0.01` (1%) error factor. So the Y-value in **line 1** could be between `-118'800` and `-121'200` Newton.
 
 ## Link's stress ratio
 

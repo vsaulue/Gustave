@@ -1,0 +1,54 @@
+
+site_name: "Gustave"
+site_description: "Structural integrity library for video games"
+site_url: "https://vsaulue.github.io/gustave"
+
+repo_name: "vsaulue/Gustave"
+repo_url: "https://github.com/vsaulue/Gustave"
+
+copyright: Copyright © 2022-2025 Vincent Saulue-Laborde
+
+theme:
+  name: material
+  features:
+    - navigation.indexes  
+    - navigation.path
+    - navigation.tabs
+    - navigation.top
+    - toc.follow
+    - toc.integrate
+
+plugins:
+  search: {}
+  glightbox:
+    draggable: false
+  mike: {}
+
+extra:
+  version:
+    provider: mike    
+
+markdown_extensions:
+  admonition: {}    
+  attr_list: {}
+  def_list: {}
+  md_in_html: {}
+  pymdownx.snippets:
+    check_paths: True
+  pymdownx.superfences: {}
+
+nav:
+  - Home: index.md
+  - Overview: "overview.md"
+  - Install: "install.md"
+  - Tutorials:
+    - tutorials/index.md      
+    - tutorials/01-getting-started/index.md
+    - "2. World API":
+      - tutorials/02-world-api/index.md      
+      - tutorials/02-world-api/01-creating-world/index.md
+      - tutorials/02-world-api/02-world-blocks/index.md
+      - tutorials/02-world-api/03-world-structures/index.md
+      - tutorials/02-world-api/04-world-links/index.md
+    - tutorials/03-solver-api/index.md
+  - Lexicon: lexicon.md

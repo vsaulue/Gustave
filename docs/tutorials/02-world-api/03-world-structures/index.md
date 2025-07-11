@@ -1,26 +1,19 @@
-# Tutorial 02-03: World blocks
+# 2.3. Structures
 
 This sections explains how to inspect [structures](../../../lexicon.md#structure) in a `SyncWorld`.
 
 Structures are automatically created/deleted by the `SyncWorld` when it is modified, so users can't directly edit structures. They can be inspected by getting a `StructureReference` object.
 
-## Index
-
-1. [Prerequisites](#prerequisites)
-1. [List all structures and their blocks](#list-all-structures-and-their-blocks)
-1. [List all structures of a block](#list-all-structures-of-a-block)
-1. [Structure status: valid and solved](#structure-status-valid-and-solved)
-
 ## Prerequisites
 
-- [Selecting a Gustave configuration](../../01-getting-started/README.md)
-- [Creating an empty SyncWorld](../01-creating-world/README.md): we'll reuse the `newWorld()` function.
+- [Selecting a Gustave configuration](../../01-getting-started/index.md)
+- [Creating an empty World](../01-creating-world/index.md): we'll reuse the [`newWorld()`](../01-creating-world/index.md#configuring-a-world) function.
 
 ```c++
 auto world = newWorld();
 ```
 
-- [Adding & inspecting world blocks](../02-world-blocks/README.md): we'll add a few blocks for this tutorial:
+- [Adding & inspecting world blocks](../02-world-blocks/index.md): we'll add a few blocks for this tutorial:
 
 ```c++
 {
@@ -63,6 +56,9 @@ for (auto const& structure : world.structures()) {
 }
 ```
 
+!!! note
+    Both `world.structures()` and `structure.blocks()` are unordered containers, so all structures and blocks are given in no particular order.
+
 Possible output:
 
 ```
@@ -81,8 +77,6 @@ List of structures (size = 3)
   - { "x": 0, "y": 0, "z": 0}
   - { "x": 0, "y": 1, "z": 0}
 ```
-
-Both `world.structures()` and `structure.blocks()` are unordered containers, so all structures and blocks are given in no particular order.
 
 In the above output:
 
@@ -116,7 +110,8 @@ Structures of block { "x": 7, "y": 0, "z": 0} (size = 1):
 - structure of 2 blocks
 ```
 
-**Note:** a non-foundation block always has exactly 1 structure. A foundation block can have 0 to 6 structures in a cuboid world.
+!!! note
+    A non-foundation block always has exactly 1 structure. A foundation block can have 0 to 6 structures in a cuboid world.
 
 ## Structure status: valid and solved
 
