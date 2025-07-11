@@ -1,22 +1,14 @@
-# Tutorial 02-02: World blocks
+# 2.2. Blocks
 
 This sections explains how to inspect/add/modify/remove [blocks](../../../lexicon.md#block) in a `SyncWorld`
 
-**Note:** All modifications of a world are done through a `Transaction`. A transaction can do multiple insertion/modification/deletion at once. For performance reasons, always try to group your modifications in as few transactions as possible.
-
-## Index
-
-1. [Prerequisites](#prerequisites)
-1. [List all blocks](#list-all-blocks)
-1. [Insert blocks](#insert-blocks)
-1. [Delete blocks](#delete-blocks)
-1. [Modify blocks](#modify-blocks)
-1. [Inspect a block](#inspect-a-block)
+!!! note
+    All world modifications are done through a `Transaction`. A transaction can do multiple insertions/modifications/deletions at once. For performance reasons, always try to group your modifications in as few transactions as possible.
 
 ## Prerequisites
 
-- [Selecting a Gustave configuration](../../01-getting-started/README.md)
-- [Creating an empty SyncWorld](../01-creating-world/README.md): we'll reuse the `newWorld()` function.
+- [Selecting a Gustave configuration](../../01-getting-started/index.md)
+- [Creating an empty SyncWorld](../01-creating-world/index.md): we'll reuse the [`newWorld()`](../01-creating-world/index.md#configuring-a-world) function.
 
 ```c++
 auto world = newWorld();
@@ -43,7 +35,8 @@ auto printBlocks = [&world]() -> void {
 - if it's a foundation: `block.isFoundation()`
 - the structures it belongs to, its contacts, its current stress ratio...
 
-The iteration order is **implementation defined**. It might not match the order of insertion, or the order of the block indices (like an [unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map)).
+!!! note
+    The iteration order is **implementation defined**. It will probably be different from the order of insertion, or the order of the block indices (like an [unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map)).
 
 ## Insert blocks
 
@@ -73,16 +66,18 @@ Then we can create a simple tower in the `SyncWorld` with a `Transaction` like t
 ```
 
 The key method is `World::Transaction::addBlock(BlockConstructionInfo const&)`. The `BlockConstructionInfo` has a constructor taking 4 arguments:
-* `blockIndex`: the position of the block in the world.
-* `maxBlockStress`: the maximum constraints this block can withstand before failing.
-* `mass`: the mass of this block.
-* `isFoundation`: whether this block is a [foundation](../../../lexicon.md#Block).
+
+- `blockIndex`: the position of the block in the world.
+- `maxBlockStress`: the maximum constraints this block can withstand before failing.
+- `mass`: the mass of this block.
+- `isFoundation`: whether this block is a [foundation](../../../lexicon.md#block).
 
 So the previous chunk of code:
-* creates a transaction `tr`
-* adds a single foundation block at `{0,0,0}` of mass `heavyMass`
-* adds 6 non-foundation blocks of mass `lightMass` on top of this foundation
-* runs the transaction using `world.modify(tr)`
+
+- creates a transaction `tr`
+- adds a single foundation block at `{0,0,0}` of mass `heavyMass`
+- adds 6 non-foundation blocks of mass `lightMass` on top of this foundation
+- runs the transaction using `world.modify(tr)`
 
 Possible output of [`printBlocks()`](#list-all-blocks):
 

@@ -1,19 +1,21 @@
-# Tutorial 01: Getting started
+# 1. Getting started
 
 If not done yet, please read the [install guide](../../install.md) to download Gustave and link it to your project.
 
 Gustave is a customisable library. Most of its classes takes a *library configuration* template parameter that enables using others:
-* 3d math implementations (ex: 3d vectors)
-* units/dimensional analysis libraries (ex: using imperial units, or just not using any dimensional analysis)
-* floating-point precision (float or double)
+
+- 3d math implementations (ex: 3d vectors)
+- units/dimensional analysis libraries (ex: using imperial units, or just not using any dimensional analysis)
+- floating-point precision (float or double)
 
 The Gustave's core library with a configuration is called a **distribution**. You can eventually make your own, but to get started, you can use one of the 2 standard distribution.
 
 ## Distribution: StdStrictUnit vs StdUnitless
 
 Both these distributions just require a C++20 standard library to work. The difference is the unit/dimensional-analysis used:
-* `StdUnitless` doesn't do any dimensional analysis.
-* `StdStrictUnit` enforces dimensional analysis: any invalid operation (ex: assigning a velocity to a force), will produce an atrocious compile-time errors that will rival the average Boost library. This is extremely valuable for Gustave's internal tests, but probably not worth the trouble for you.
+
+- `StdUnitless` doesn't do any dimensional analysis.
+- `StdStrictUnit` enforces dimensional analysis: any invalid operation (ex: assigning a velocity to a force), will produce atrocious compile-time errors that will rival the average Boost library. This is extremely valuable for Gustave's internal tests, but probably not worth the trouble for you.
 
 **Conclusion:** for your sanity, use `StdUnitless`.
 

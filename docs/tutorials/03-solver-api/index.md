@@ -1,22 +1,13 @@
-# Tutorial 03: Solver API
+# 3. Solver API
 
 This section will describe Gustave's low-level API: [Solvers](../../lexicon.md#solver).
 
-**Note:** In this tutorial, all quantities are interpreted in the metric system. This is not mandatory when using the `unitless` distribution. You can interpret them in another natural system of unit: if you choose to interpret 1 unit of length as an imperial `foot`, 1 unit of mass as an imperial `pound`, and 1 unit of time as a `second`, then 1 unit of force must be interpreted as a `pound.foot/second²`.
-
-## Index
-
-1. [Prerequisites](#prerequisites)
-1. [Create a new solver structure](#create-a-new-solver-structure)
-1. [Add blocks to a structure](#add-blocks-to-a-structure)
-1. [Add links to a structure](#add-links-to-a-structure)
-1. [Configure a solver](#configure-a-solver)
-1. [Solve a structure](#solve-a-structure)
-1. [Inspect a solution's force vectors](#inspect-a-solutions-force-vectors)
+!!! note
+    In this tutorial, all quantities are interpreted in the metric system. This is not mandatory when using the `unitless` distribution. You can interpret them in another natural system of unit: if you choose to interpret 1 unit of length as an imperial `foot`, 1 unit of mass as an imperial `pound`, and 1 unit of time as a `second`, then 1 unit of force must be interpreted as a `pound.foot/second²`.
 
 ## Prerequisites
 
-- [Selecting a Gustave configuration](../01-getting-started/README.md)
+- [Selecting a Gustave configuration](../01-getting-started/index.md)
 
 We'll choose the `std::unitless` distribution with `double` precision:
 
@@ -91,7 +82,7 @@ Use `Structure::addLink(...)`. This takes a `Structure::Link` object, whose cons
 
 - **localNodeId:** the index of the first node
 - **otherNodeId:** the index of the second node
-- **normal:** the normal vector of the contact surface on **localNode**
+- **normal:** the normal vector on the surface of **localNode**
 - **conductivity:** a compression/shear/tensile quantity in `Newton/metre`. This is used by the [solver](../../lexicon.md#solver) to compute a [force distribution](../../lexicon.md#force-distribution): the higher the 3 components are, the more force will be transmitted through this link. It should be proportional to the maximum nominal force/pressure of the contact surface, and inversely proportional to the distance between the 2 nodes.
 
 It sequentially returns a `LinkIndex`, which uniquely identifies this link in the structure.
@@ -169,7 +160,8 @@ Expected output:
 solution.isSolved() = 1
 ```
 
-**Note:** do not modify `structure` after passing it to the solver.
+!!! warning
+    Do not modify `structure` after passing it to the solver.
 
 ## Inspect a solution's force vectors
 

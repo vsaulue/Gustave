@@ -1,10 +1,10 @@
-# Tutorial 02-01: Creating an empty world
+# 2.1. New world
 
 This section explains how to create a new `SyncWorld` object.
 
 ## Choosing a distribution
 
-First, let's choose the `std::unitless` distribution with `double` precision, as explained in [getting started](../../01-getting-started/README.md):
+First, let's choose the `std::unitless` distribution with `double` precision, as explained in [getting started](../../01-getting-started/index.md):
 
 ```c++
 // Choosing the Std Unitless distribution, with double precision
@@ -34,10 +34,10 @@ static World newWorld() {
 A `SyncWorld` requires some configuration. Here are the key parameters:
 
 - `g` is the gravity acceleration vector. Here it's `10 m/s²` in the -Y direction.
-- `solverPrecision`: the precision of the [solver](../../../lexicon.md#Solver). A Lower value gives a more accurate solutions (respecting Newton's 1st law of mostion), at a performance cost.
+- `solverPrecision`: the precision of the [solver](../../../lexicon.md#solver). A lower value gives more accurate solutions (respecting Newton's 1st law of mostion), at a performance cost.
 - `blockSize`: the dimensions of the blocks. Here each block is a `1 m` wide cube.
 
-Currently the only [solver](../../../lexicon.md#Solver) available is `F1Solver`. It generates [force distributions](../../../lexicon.md#force-distribution) in which all forces transferred between blocks are collinear with the gravity vector `g`.
+Currently the only [solver](../../../lexicon.md#solver) available is `F1Solver`. It generates [force distributions](../../../lexicon.md#force-distribution) in which all forces transferred between blocks are collinear with the gravity vector `g`.
 
 ## Usage
 

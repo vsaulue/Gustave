@@ -56,7 +56,7 @@ In Gustave, they respect the following conventions:
 
 ## Solver
 
-A **solver** finds a [force distribution](force-distribution) for a given [structure](#structure) that satisfies equilibrium conditions:
+A **solver** finds a [force distribution](#force-distribution) for a given [structure](#structure) that satisfies equilibrium conditions:
 
 - Non-foundation blocks: the [net force](https://en.wikipedia.org/wiki/Net_force) must be zero (within a margin of error), following [Newton's 1st law of motion](https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion).
 - Foundation blocks: no restriction on the net force.
@@ -73,8 +73,11 @@ There is currently a single solver in Gustave, the `F1Solver` (Force 1):
 
 The **world** is the higher API level of Gustave. A user can simply place/remove [blocks](#block) into it, and the world will:
 
-- generate links between adjacent [blocks](#blocks)
+- generate links between adjacent [blocks](#block)
 - regroup them into minimal, independent [structures](#structure)
 - pass them to a [solver](#solver) to generate equilibrium [force distributions](#force-distribution), evaluate stresses, and checks if any block is subjected to stresses above their maximum [compression/tensile/shear pressure](https://en.wikipedia.org/wiki/Strength_of_materials#Stress_terms) values.
 
-The World API is currently limited to cuboid grids: mean that blocks must be cuboid, aligned on global axis, and
+The World API is currently limited to cuboid grids:
+
+- all blocks are cuboid of the same dimensions
+- they must be aligned to the global axes
