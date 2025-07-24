@@ -40,7 +40,7 @@ class RunMemcheckTest(gu.TestScript):
     def doRun(self, ctx: gu.TestScriptContext) -> None:
         if len(ctx.args.command) == 0:
             print(f'{ctx.coloring("ERROR","red")}: No program name & arguments provided.', file=sys.stderr)
-            raise gu.TestScriptException()
+            raise gu.ScriptException()
         cmd = None
         memcheckType = ctx.cmakeVars.memcheckType
         if memcheckType == 'valgrind':

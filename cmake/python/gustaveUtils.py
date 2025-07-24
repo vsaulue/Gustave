@@ -747,7 +747,7 @@ class ScriptCommand(object):
         except Exception:
             pass
 
-class TestScriptException(Exception):
+class ScriptException(Exception):
     """Exception thrown when a ScriptCommand failed unexpectedly."""
 
     _errCode: int
@@ -827,7 +827,7 @@ class BasicTestScriptContext(object):
         :param cwd: Working directory to use (or None to keep the current one).
         :param envDelta: Environment variables to modify (or None to use the same as the current process).
         :returns: the result of the program run.
-        :raises TestScriptException: if the program returned an error and `exitOnError` is True.
+        :raises ScriptException: if the program returned an error and `exitOnError` is True.
         """
         cmdInfoPrinted = self.verboseLevel > 0
         if cmdInfoPrinted:
@@ -845,7 +845,7 @@ class BasicTestScriptContext(object):
         if result.returncode != 0 and exitOnError:
             self._printCmd(self.coloring("Command FAILED", "red"), cmd=cmd, cwd=cwd, envDelta=envDelta)
             result.close()
-            raise TestScriptException(result.returncode)
+            raise ScriptException(result.returncode)
         return result
 
     def runCmd(self, cmd: list[str], exitOnError: bool = True, separateStderr: bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None) -> None:
@@ -857,7 +857,7 @@ class BasicTestScriptContext(object):
         :param separateStderr: True if stdout & stderr should be stored into separate file.
         :param cwd: Working directory to use (or None to keep the current one).
         :param envDelta: Environment variables to modify (or None to use the same as the current process).
-        :raises TestScriptException: if the program returned an error and `exitOnError` is True.
+        :raises ScriptException: if the program returned an error and `exitOnError` is True.
         """
         with self.newCmd(cmd, exitOnError=exitOnError, separateStderr=separateStderr, cwd=cwd, envDelta=envDelta):
             pass
@@ -952,7 +952,7 @@ class Venv(object):
         :param cwd: Working directory to use (or None to keep the current one).
         :param envDelta: Environment variables to modify (or None to use the same as the current process).
         :param prependCmdWithPath: True to prepend the full "bin" path to the first element of `cmd`.
-        :raises TestScriptException: if the program returned an error and `exitOnError` is True.
+        :raises ScriptException: if the program returned an error and `exitOnError` is True.
         """
         binPath = self._binPath
         cmdEnvDelta = {}
@@ -1061,7 +1061,7 @@ class TestScript(abc.ABC):
         ctx = TestScriptContext(cmakeVars, args)
         try:
             self.doRun(ctx)
-        except TestScriptException as e:
+        except ScriptException as e:
             print(f'{ctx.coloring("Test FAILED", "red")}: {argsParser.prog}', file=sys.stderr)
             sys.exit(e.errCode)
         ctx.cleanup()
