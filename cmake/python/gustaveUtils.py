@@ -639,7 +639,7 @@ class CMakeVariables(object):
         """String indicating the type of memchecker ("valgrind" or "drMemory")."""
         return self._memcheckType
 
-class TestScriptCommand(object):
+class ScriptCommand(object):
     """Class to run an external program and store its results."""
 
     _completedProcess: subprocess.CompletedProcess
@@ -681,7 +681,7 @@ class TestScriptCommand(object):
             self.close()
             raise
 
-    def __enter__(self) -> 'TestScriptCommand':
+    def __enter__(self) -> 'ScriptCommand':
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -748,7 +748,7 @@ class TestScriptCommand(object):
             pass
 
 class TestScriptException(Exception):
-    """Exception thrown when a TestScriptCommand failed unexpectedly."""
+    """Exception thrown when a ScriptCommand failed unexpectedly."""
 
     _errCode: int
     """Value of the `errCode` property."""
@@ -815,7 +815,7 @@ class BasicTestScriptContext(object):
             self._coloring = result
         return result
 
-    def newCmd(self, cmd: list[str], exitOnError : bool = True, separateStderr : bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None) -> TestScriptCommand:
+    def newCmd(self, cmd: list[str], exitOnError : bool = True, separateStderr : bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None) -> ScriptCommand:
         """
         Runs an external program.
 
@@ -832,7 +832,7 @@ class BasicTestScriptContext(object):
         cmdInfoPrinted = self.verboseLevel > 0
         if cmdInfoPrinted:
             self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd, envDelta=envDelta)
-        result = TestScriptCommand(cmd, separateStderr=separateStderr, cwd=cwd, envDelta=envDelta)
+        result = ScriptCommand(cmd, separateStderr=separateStderr, cwd=cwd, envDelta=envDelta)
         if (result.returncode != 0) or (self.verboseLevel > 1):
             errPath = result.stderrPath if separateStderr else result.outPath
             if os.path.getsize(errPath) > 0:
