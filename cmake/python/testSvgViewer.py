@@ -111,7 +111,7 @@ class RenderersFolder(TestFolder):
     def commandList(self, filename) -> list[str]:
         return [ self.svgViewerPath, self._defaultWorldPath, '-r', self.fullCasePath(filename) ]
 
-class TestSvgViewer(gu.TestScript):
+class TestSvgViewer(gu.GustaveScript):
     """Tests the svgViewer executable and the JSON samples."""
 
     # @typing.override

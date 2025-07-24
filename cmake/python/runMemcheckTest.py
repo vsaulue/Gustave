@@ -27,7 +27,7 @@ import sys
 
 import gustaveUtils as gu
 
-class RunMemcheckTest(gu.TestScript):
+class RunMemcheckTest(gu.GustaveScript):
     """Tests that the CMake config files from the install folder works correctly."""
 
     # @typing.override

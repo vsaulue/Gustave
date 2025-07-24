@@ -31,7 +31,7 @@ import typing
 
 import gustaveUtils as gu
 
-class TestConanPackaging(gu.TestScript):
+class TestConanPackaging(gu.GustaveScript):
     """Tests that the conanfile.py packaging works."""
 
     @staticmethod

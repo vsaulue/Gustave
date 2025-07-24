@@ -27,7 +27,7 @@ import os
 
 import gustaveUtils as gu
 
-class TestCMakePackaging(gu.TestScript):
+class TestCMakePackaging(gu.GustaveScript):
     """Tests that the CMake config files from the install folder works correctly."""
 
     # @typing.override

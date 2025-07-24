@@ -1015,8 +1015,8 @@ class ScriptContext(BasicScriptContext):
         """Interface to use the project's virtual environments."""
         return Venvs(self)
 
-class TestScript(abc.ABC):
-    """Class to run a test in Gustave's build."""
+class GustaveScript(abc.ABC):
+    """Class to implement a script run by Gustave's build."""
 
     def useCMakeVars(self) -> bool:
         """
@@ -1038,7 +1038,7 @@ class TestScript(abc.ABC):
     @abc.abstractmethod
     def doRun(self, ctx: ScriptContext) -> None:
         """
-        Internal implementation of the test.
+        Internal implementation of the script.
 
         :param ctx: Script's context.
         """
@@ -1046,7 +1046,7 @@ class TestScript(abc.ABC):
 
     def run(self) -> None:
         """
-        Runs the full test.
+        Runs the full script.
 
         This method parses the command line arguments, reads build info from CMake, and calls `self.doRun()`.
         """
@@ -1062,6 +1062,6 @@ class TestScript(abc.ABC):
         try:
             self.doRun(ctx)
         except ScriptException as e:
-            print(f'{ctx.coloring("Test FAILED", "red")}: {argsParser.prog}', file=sys.stderr)
+            print(f'{ctx.coloring("Script FAILED", "red")}: {argsParser.prog}', file=sys.stderr)
             sys.exit(e.errCode)
         ctx.cleanup()
