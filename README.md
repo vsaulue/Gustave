@@ -29,7 +29,7 @@ To do so, Gustave uses a more realistic model than commonly used in the gaming i
 - **3D physics**
 - **Multi-level API**:
     - **World (cube grid only)**: just insert/remove blocks in a world. Gustave will automatically group them into independent structures, compute force distributions, and evaluate stresses.
-    - **Solver (any block shape/position)**: Gustave generates a force distribution and stresses for a given structure.
+    - **Solver (any block shape/position)**: Gustave generates a force distribution for a given structure.
 - **Compile-time dimensional analysis (optional)**: Gustave uses C++ metaprogramming to enforce dimensional correctness at the API level and in its implementation. Adding a position vector with a force vector, or assigning a mass to a length, will generate compiler errors.
 - **Highly customizable library**: template parameters allows to use float/double, another 3d-vector implementation, or another unit/dimension library.
 - **Performance & scale**: Gustave is currently able to evaluate a structure of 8,000 blocks in less than a second on a PC from 2012. This should already be sufficient for some video games, and there is still a lot of room for optimisation in future releases.
