@@ -45,7 +45,7 @@ Gustave is a **header-only** library that just requires a **C++20** compiler and
 
 - **gcc 13.1** (Linux, libstdc++)
 - **clang 17.0** (Linux, libc++)
-- **MSVC 19.39.33522** (Windows, Microsoft STL) (Visual Studio 2022)
+- **MSVC 19.44.35207** (Windows, Microsoft STL) (Visual Studio 2022)
 
 <!-- -8<- [end:body] -->
 
