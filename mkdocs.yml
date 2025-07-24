@@ -26,7 +26,11 @@ plugins:
 
 extra:
   version:
-    provider: mike    
+    provider: mike
+
+exclude_docs: |
+  CMakeLists.txt
+  /tutorials/**/world.json
 
 markdown_extensions:
   admonition: {}    
