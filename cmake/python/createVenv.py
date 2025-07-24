@@ -27,7 +27,7 @@ import os
 
 import gustaveUtils as gu
 
-class MakeVenv(gu.TestScript):
+class MakeVenv(gu.GustaveScript):
     """Reinstall a virtual environment required by the build system."""
 
     # @typing.override

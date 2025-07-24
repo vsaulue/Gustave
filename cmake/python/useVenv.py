@@ -27,7 +27,7 @@ import pathlib
 
 import gustaveUtils as gu
 
-class UseVenv(gu.TestScript):
+class UseVenv(gu.GustaveScript):
     """Launch a command in a specific virtual environment."""
 
     # @typing.override
