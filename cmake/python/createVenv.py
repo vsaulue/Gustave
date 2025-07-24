@@ -22,25 +22,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_path(SET SRC_PATH NORMALIZE "${CMAKE_CURRENT_LIST_DIR}/../../../..")
-set(VCPKG_POLICY_EMPTY_INCLUDE_FOLDER enabled)
+import argparse
+import os
 
-vcpkg_cmake_configure(
-    SOURCE_PATH "${SRC_PATH}"
-    OPTIONS
-        "-DCMAKE_COMPILE_WARNING_AS_ERROR=OFF"
-        "-DBUILD_TESTING=OFF"
-        "-DGUSTAVE_BUILD_DOCS=OFF"
-        "-DGUSTAVE_BUILD_TOOLS=OFF"
-        "-DGUSTAVE_BUILD_TUTORIALS=OFF"
-)
+import gustaveUtils as gu
 
-vcpkg_cmake_install()
+class MakeVenv(gu.TestScript):
+    """Reinstall a virtual environment required by the build system."""
 
-vcpkg_cmake_config_fixup(
-    PACKAGE_NAME "Gustave"
-    CONFIG_PATH "cmake"
-)
+    # @typing.override
+    def makeArgsParser(self) -> argparse.ArgumentParser:
+        result = argparse.ArgumentParser(description="")
+        result.add_argument("--name", type=str, required=True, help="Name of the new virtual environment")
+        return result
 
-file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
-vcpkg_install_copyright(FILE_LIST "${SRC_PATH}/LICENSE.txt")
+    # @typing.override
+    def doRun(self, ctx: gu.TestScriptContext) -> None:
+        venvsSource = ctx.cmakeVars.folders.venvsSource
+        requirementPath = os.path.join(venvsSource, ctx.args.name, "requirements.txt")
+        if not os.path.isfile(requirementPath):
+            raise ValueError(f'Cannot build venv "{ctx.args.name}": no requirements at "{requirementPath}".')
+        newEnv = ctx.venvs.create(ctx.args.name)
+        newEnv.runCmd(["python", "-m", "pip", "install", "-r", requirementPath])
+
+
+if __name__ == "__main__":
+    MakeVenv().run()

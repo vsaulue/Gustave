@@ -66,6 +66,7 @@ class TestConanPackaging(gu.TestScript):
             '-pr:h', ctx.cmakeVars.conanProfiles.host,
             '-s:h', f'build_type={ctx.cmakeVars.config}',
             '-c', 'tools.build:skip_test=True',
+            '-c', 'user.gustave:build_docs=False',
             '-c', 'user.gustave:build_tools=False',
             '-c', 'user.gustave:build_tutorials=False',
             '--test-folder', tmpTestPackagePath,

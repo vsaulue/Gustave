@@ -22,25 +22,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_path(SET SRC_PATH NORMALIZE "${CMAKE_CURRENT_LIST_DIR}/../../../..")
-set(VCPKG_POLICY_EMPTY_INCLUDE_FOLDER enabled)
+import argparse
+import pathlib
 
-vcpkg_cmake_configure(
-    SOURCE_PATH "${SRC_PATH}"
-    OPTIONS
-        "-DCMAKE_COMPILE_WARNING_AS_ERROR=OFF"
-        "-DBUILD_TESTING=OFF"
-        "-DGUSTAVE_BUILD_DOCS=OFF"
-        "-DGUSTAVE_BUILD_TOOLS=OFF"
-        "-DGUSTAVE_BUILD_TUTORIALS=OFF"
-)
+import gustaveUtils as gu
 
-vcpkg_cmake_install()
+class UseVenv(gu.TestScript):
+    """Launch a command in a specific virtual environment."""
 
-vcpkg_cmake_config_fixup(
-    PACKAGE_NAME "Gustave"
-    CONFIG_PATH "cmake"
-)
+    # @typing.override
+    def makeArgsParser(self) -> argparse.ArgumentParser:
+        result = argparse.ArgumentParser(description="")
+        result.add_argument("command", type=str, nargs="+", help="Command to launch")
+        result.add_argument("--venv", type=str, required=True, help="Name of the virtual environment")
+        return result
 
-file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
-vcpkg_install_copyright(FILE_LIST "${SRC_PATH}/LICENSE.txt")
+    # @typing.override
+    def doRun(self, ctx: gu.TestScriptContext) -> None:
+        env = ctx.venvs.get(ctx.args.venv)
+        env.runCmd(ctx.args.command)
+
+
+if __name__ == "__main__":
+    UseVenv().run()

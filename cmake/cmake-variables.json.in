@@ -8,7 +8,7 @@
         "build": "${GUSTAVE_CONAN_BUILD_PROFILE}",
         "host": "${GUSTAVE_CONAN_HOST_PROFILE}"
     },
-    "config": "$<CONFIG>",
+    "config": "${json_config}",
     "executables": {
         "cmake": "${CMAKE_COMMAND}",
         "conan": "${conan_exe}",
