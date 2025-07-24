@@ -765,8 +765,8 @@ class ScriptException(Exception):
         """Error code returned by the failed program."""
         return self._errCode
 
-class BasicTestScriptContext(object):
-    """Class holding various data/utility useful to run Gustave tests."""
+class BasicScriptContext(object):
+    """Class holding various data/utility useful to run Gustave scripts."""
 
     _args: argparse.Namespace
     """Value of the `args` property."""
@@ -905,13 +905,13 @@ class BasicTestScriptContext(object):
 class Venv(object):
     """Class to interact with a specific venv of the project."""
 
-    _ctx: BasicTestScriptContext
+    _ctx: BasicScriptContext
     """ Context of the current script. """
 
     _name: str
     """ Name of the virtual environment. """
 
-    def __init__(self, ctx: BasicTestScriptContext, name: str, checkExistence: bool = True):
+    def __init__(self, ctx: BasicScriptContext, name: str, checkExistence: bool = True):
         """
         :param ctx: Context of the script using this object.
         :param name: Name of the venv (defined by Gustave).
@@ -969,10 +969,10 @@ class Venv(object):
 class Venvs(object):
     """Class to access all venvs of the project."""
 
-    _ctx: BasicTestScriptContext
+    _ctx: BasicScriptContext
     """ Context of the current script."""
 
-    def __init__(self, ctx: BasicTestScriptContext):
+    def __init__(self, ctx: BasicScriptContext):
         """
         :param ctx: Context of the script using this object.
         """
@@ -1000,7 +1000,7 @@ class Venvs(object):
         """
         return Venv(self._ctx, name)
 
-class TestScriptContext(BasicTestScriptContext):
+class TestScriptContext(BasicScriptContext):
     """Class holding various data/utility useful to run Gustave tests."""
 
     def __init__(self, cmakeVars: CMakeVariables | None, args: argparse.Namespace):
