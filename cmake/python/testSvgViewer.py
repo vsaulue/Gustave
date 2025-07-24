@@ -131,7 +131,7 @@ class TestSvgViewer(gu.TestScript):
             passedText = ctx.coloring('{0} passed'.format(reports.numSuccessCases), 'green')
             failedText = ctx.coloring('{0} failed'.format(reports.numFailedCases), 'red')
             print(f'Test cases: {reports.numCases()} | {passedText} | {failedText}', file=sys.stderr)
-            raise gu.TestScriptException()
+            raise gu.ScriptException()
 
 if __name__ == "__main__":
     TestSvgViewer().run()
