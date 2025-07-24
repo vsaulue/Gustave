@@ -49,6 +49,9 @@ class GustaveRecipe(ConanFile):
     def _packagingTestsEnabled(self) -> bool:
         return self.conf.get("user.gustave:enable_packaging_tests", default=True, check_type=bool)
 
+    def _docsEnabled(self) -> bool:
+        return self.conf.get("user.gustave:build_docs", default=True, check_type=bool)
+
     def _toolsEnabled(self) -> bool:
         return self.conf.get("user.gustave:build_tools", default=True, check_type=bool)
 
@@ -88,6 +91,7 @@ class GustaveRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         toolchain = CMakeToolchain(self)
+        toolchain.cache_variables["GUSTAVE_BUILD_DOCS"] = self._docsEnabled()
         toolchain.cache_variables["GUSTAVE_BUILD_TOOLS"] = self._toolsEnabled()
         toolchain.cache_variables["GUSTAVE_BUILD_TUTORIALS"] = self._tutorialsEnabled()
         toolchain.cache_variables["GUSTAVE_ENABLE_MEMCHECK_TESTS"] = self._memcheckTestsEnabled()

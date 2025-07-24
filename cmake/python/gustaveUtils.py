@@ -26,11 +26,13 @@ import abc
 import argparse
 import json
 import os
+import platform
 import shutil
 import subprocess
 import sys
 import tempfile
 import typing
+import venv
 
 class DirectoryParser(object):
     """
@@ -423,6 +425,9 @@ class CMakeFolders(object):
     _vcpkgRootChecked: bool
     """Flag set when `vcpkgRoot` was checked to be a path to a folder."""
 
+    _venvsSourceChecked: bool
+    """Flag set when `venvsSource` was checked to be a path to a folder."""
+
     def __init__(self, jsonObject: dict[str, typing.Any]):
         """
         :param jsonObject: Input JSON sub-object.
@@ -437,6 +442,7 @@ class CMakeFolders(object):
         self._testPackageChecked = False
         self._vcpkgRoot = JsonUtils.getStr(jsonObject, "vcpkgRoot")
         self._vcpkgRootChecked = False
+        self._venvsSourceChecked = False
 
     @property
     def build(self) -> str:
@@ -496,12 +502,36 @@ class CMakeFolders(object):
 
     @property
     def vcpkgRoot(self) -> str:
+        """
+        Path to the installation directory of vcpkg.
+
+        :raises ValueError: The value is not the path to a folder.
+        """
         result = self._vcpkgRoot
         if not self._vcpkgRootChecked:
             if not DirectoryParser.isValid(result):
                 raise ValueError(f'"vcpkgRoot" property is not a valid directory: {result}.')
             self._vcpkgRootChecked = True
         return result
+
+    @property
+    def venvsSource(self) -> str:
+        """
+        Path to the folder holding the specifications of Python venvs.
+
+        :raises ValueError: The value is not the path to a folder.
+        """
+        result = os.path.join(self._source, "cmake", "venvs")
+        if not self._venvsSourceChecked:
+            if not DirectoryParser.isValid(result):
+                raise ValueError(f'"venvsSource" property is not a valid directory: {result}.')
+            self._venvsSourceChecked = True
+        return result
+
+    @property
+    def venvs(self) -> str:
+        """Path to the folder holding the Python venvs."""
+        return os.path.join(self.build, "venvs")
 
 
 class CMakeConanProfiles(object):
@@ -586,6 +616,7 @@ class CMakeVariables(object):
 
     @property
     def conanProfiles(self) -> CMakeConanProfiles:
+        """Conan profiles used by the project."""
         return self._conanProfiles
 
     @property
@@ -605,6 +636,7 @@ class CMakeVariables(object):
 
     @property
     def memcheckType(self) -> str:
+        """String indicating the type of memchecker ("valgrind" or "drMemory")."""
         return self._memcheckType
 
 class TestScriptCommand(object):
@@ -622,15 +654,21 @@ class TestScriptCommand(object):
     _stderrPath : str | None
     """(Optional) path to the file storing the program's standard error."""
 
-    def __init__(self, cmd: list[str], separateStderr: bool = False, cwd: None|str = None):
+    def __init__(self, cmd: list[str], separateStderr: bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None):
         """
         :param cmd: Program name & arguments.
         :param separateStderr: True to store the command's stdout & stderr into separate files.
         :param cwd: Working directory to use (or None to keep the current one).
+        :param envDelta: Environment variables to modify (or None to use the same as the current process).
         """
         self._outPath = None
         self._stderrPath = None
         self._separateStderr = separateStderr
+        env = None
+        if envDelta is not None:
+            env = os.environ.copy()
+            for key,value in envDelta.items():
+                env[key] = value
         try:
             outFile = tempfile.NamedTemporaryFile('w+', delete = False)
             self._outPath = outFile.name
@@ -638,7 +676,7 @@ class TestScriptCommand(object):
             if separateStderr:
                 errFile = tempfile.NamedTemporaryFile('w+', delete = False)
                 self._stderrPath = errFile.name
-            self._completedProcess = subprocess.run(cmd, cwd=cwd, stdin=subprocess.DEVNULL, stdout=outFile, stderr=errFile)
+            self._completedProcess = subprocess.run(cmd, cwd=cwd, stdin=subprocess.DEVNULL, stdout=outFile, stderr=errFile, env=env)
         except:
             self.close()
             raise
@@ -727,7 +765,7 @@ class TestScriptException(Exception):
         """Error code returned by the failed program."""
         return self._errCode
 
-class TestScriptContext(object):
+class BasicTestScriptContext(object):
     """Class holding various data/utility useful to run Gustave tests."""
 
     _args: argparse.Namespace
@@ -777,7 +815,7 @@ class TestScriptContext(object):
             self._coloring = result
         return result
 
-    def newCmd(self, cmd: list[str], exitOnError : bool = True, separateStderr : bool = False, cwd: None|str = None) -> TestScriptCommand:
+    def newCmd(self, cmd: list[str], exitOnError : bool = True, separateStderr : bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None) -> TestScriptCommand:
         """
         Runs an external program.
 
@@ -787,29 +825,30 @@ class TestScriptContext(object):
         :param exitOnError: name of the color to use.
         :param separateStderr: True if stdout & stderr should be stored into separate file.
         :param cwd: Working directory to use (or None to keep the current one).
+        :param envDelta: Environment variables to modify (or None to use the same as the current process).
         :returns: the result of the program run.
         :raises TestScriptException: if the program returned an error and `exitOnError` is True.
         """
         cmdInfoPrinted = self.verboseLevel > 0
         if cmdInfoPrinted:
-            self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd)
-        result = TestScriptCommand(cmd, separateStderr=separateStderr, cwd=cwd)
+            self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd, envDelta=envDelta)
+        result = TestScriptCommand(cmd, separateStderr=separateStderr, cwd=cwd, envDelta=envDelta)
         if (result.returncode != 0) or (self.verboseLevel > 1):
             errPath = result.stderrPath if separateStderr else result.outPath
             if os.path.getsize(errPath) > 0:
                 if not cmdInfoPrinted:
-                    self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd)
+                    self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd, envDelta=envDelta)
                 print('--------------------', file=sys.stderr)
                 with open(errPath) as errFile:
                     shutil.copyfileobj(fsrc = errFile, fdst = sys.stderr)
                 print('--------------------\n', file=sys.stderr)
         if result.returncode != 0 and exitOnError:
-            self._printCmd(self.coloring("Command FAILED", "red"), cmd=cmd, cwd=cwd)
+            self._printCmd(self.coloring("Command FAILED", "red"), cmd=cmd, cwd=cwd, envDelta=envDelta)
             result.close()
             raise TestScriptException(result.returncode)
         return result
 
-    def runCmd(self, cmd: list[str], exitOnError: bool = True, separateStderr: bool = False, cwd: None|str = None) -> None:
+    def runCmd(self, cmd: list[str], exitOnError: bool = True, separateStderr: bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None) -> None:
         """
         Runs an external program.
 
@@ -817,9 +856,10 @@ class TestScriptContext(object):
         :param exitOnError: name of the color to use.
         :param separateStderr: True if stdout & stderr should be stored into separate file.
         :param cwd: Working directory to use (or None to keep the current one).
+        :param envDelta: Environment variables to modify (or None to use the same as the current process).
         :raises TestScriptException: if the program returned an error and `exitOnError` is True.
         """
-        with self.newCmd(cmd, exitOnError, separateStderr, cwd):
+        with self.newCmd(cmd, exitOnError=exitOnError, separateStderr=separateStderr, cwd=cwd, envDelta=envDelta):
             pass
 
     @property
@@ -844,18 +884,136 @@ class TestScriptContext(object):
         if self._tmpFolder != None:
             shutil.rmtree(self._tmpFolder)
 
-    def _printCmd(self, title: str, cmd: list[str], cwd: None|str, file: "_typeshed.SupportsWrite[str]" = sys.stderr) -> None:
+    def _printCmd(self, title: str, cmd: list[str], cwd: None|str, envDelta: None|dict[str,str], file: "_typeshed.SupportsWrite[str]" = sys.stderr) -> None:
         """
         Print the command.
 
         :param title: Header text printed before the command.
         :param cmd: Full command (program & arguments).
         :param cwd: Working directory of the command.
+        :param envDelta: Environment variables to modify (or None to use the same as the current process).
         :param file: Output file of this function.
         """
         print(f'{title}: {" ".join(cmd)}', file=file)
         if cwd is not None:
             print(f'└> Working dir: {cwd}', file=file)
+        if envDelta is not None:
+            print('└> Modified environment:', file=file)
+            for key,value in envDelta.items():
+                print(f'   └> {key}={value}', file=file)
+
+class Venv(object):
+    """Class to interact with a specific venv of the project."""
+
+    _ctx: BasicTestScriptContext
+    """ Context of the current script. """
+
+    _name: str
+    """ Name of the virtual environment. """
+
+    def __init__(self, ctx: BasicTestScriptContext, name: str, checkExistence: bool = True):
+        """
+        :param ctx: Context of the script using this object.
+        :param name: Name of the venv (defined by Gustave).
+        :param checkExistence: True to ensure the venv exists.
+        :raises ValueError: if `checkExistence`, and the venv does not exists.
+        """
+        self._ctx = ctx
+        self._name = name
+        path = self.path
+        if checkExistence and not os.path.exists(path):
+            raise ValueError(f'"{name}" does not designate a valid venv (expected at "{path}")')
+
+    @property
+    def path(self) -> str:
+        """Path to the venv installation."""
+        return os.path.join(self._ctx.cmakeVars.folders.venvs, self._name)
+
+    @property
+    def name(self) -> str:
+        """Name of this venv (defined by the Gustave)."""
+        return self._name
+
+    @property
+    def _binPath(self) -> str:
+        """Path to the bin/Script folder if this venv."""
+        if platform.system() == "Windows":
+            return os.path.join(self.path, "Scripts")
+        else:
+            return os.path.join(self.path, "bin")
+
+    def runCmd(self, cmd: list[str], exitOnError: bool = True, separateStderr: bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None, prependCmdWithPath: bool = True) -> None:
+        """
+        Runs an external program in this venv.
+
+        :param cmd: program name/path and command line arguments.
+        :param exitOnError: name of the color to use.
+        :param separateStderr: True if stdout & stderr should be stored into separate file.
+        :param cwd: Working directory to use (or None to keep the current one).
+        :param envDelta: Environment variables to modify (or None to use the same as the current process).
+        :param prependCmdWithPath: True to prepend the full "bin" path to the first element of `cmd`.
+        :raises TestScriptException: if the program returned an error and `exitOnError` is True.
+        """
+        binPath = self._binPath
+        cmdEnvDelta = {}
+        if envDelta is not None:
+            cmdEnvDelta = envDelta.copy()
+        cmdEnvDelta["VIRTUAL_ENV"] = self.path
+        cmdEnvDelta["PATH"] = os.pathsep.join([binPath, os.environ["PATH"]])
+        fullCmd = cmd
+        if prependCmdWithPath:
+            fullCmd = cmd.copy()
+            fullCmd[0] = os.path.join(binPath, cmd[0])
+        self._ctx.runCmd(fullCmd, exitOnError=exitOnError, separateStderr=separateStderr, cwd=cwd, envDelta=cmdEnvDelta)
+
+class Venvs(object):
+    """Class to access all venvs of the project."""
+
+    _ctx: BasicTestScriptContext
+    """ Context of the current script."""
+
+    def __init__(self, ctx: BasicTestScriptContext):
+        """
+        :param ctx: Context of the script using this object.
+        """
+        self._ctx = ctx
+
+    def create(self, name: str) -> Venv:
+        """
+        Creates a new empty venv.
+
+        If a venv with the given name already exists, it is erased and rebuilt.
+
+        :param name: Name of the new venv.
+        """
+        builder = venv.EnvBuilder(clear=True, with_pip=True)
+        result = Venv(self._ctx, name, checkExistence=False)
+        builder.create(result.path)
+        return result
+
+    def get(self, name: str) -> Venv:
+        """
+        Get a venv by name.
+
+        :param name: Name of the venv (defined by Gustave).
+        :raises ValueError: if `checkExistence`, and the venv does not exists.
+        """
+        return Venv(self._ctx, name)
+
+class TestScriptContext(BasicTestScriptContext):
+    """Class holding various data/utility useful to run Gustave tests."""
+
+    def __init__(self, cmakeVars: CMakeVariables | None, args: argparse.Namespace):
+        """
+        :param cmakeVars: Value of the `cmakeVars` property.
+        :param args: Parsed command line for the test script.
+        """
+        super().__init__(cmakeVars, args)
+
+    @property
+    def venvs(self) -> Venvs:
+        """Interface to use the project's virtual environments."""
+        return Venvs(self)
 
 class TestScript(abc.ABC):
     """Class to run a test in Gustave's build."""
@@ -890,7 +1048,7 @@ class TestScript(abc.ABC):
         """
         Runs the full test.
 
-        This method parses the command line arguments, read build info from CMake, and calls `self.doRun()`.
+        This method parses the command line arguments, reads build info from CMake, and calls `self.doRun()`.
         """
         argsParser = self.makeArgsParser()
         if self.useCMakeVars():

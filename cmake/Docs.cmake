@@ -22,25 +22,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_path(SET SRC_PATH NORMALIZE "${CMAKE_CURRENT_LIST_DIR}/../../../..")
-set(VCPKG_POLICY_EMPTY_INCLUDE_FOLDER enabled)
+include_guard(GLOBAL)
 
-vcpkg_cmake_configure(
-    SOURCE_PATH "${SRC_PATH}"
-    OPTIONS
-        "-DCMAKE_COMPILE_WARNING_AS_ERROR=OFF"
-        "-DBUILD_TESTING=OFF"
-        "-DGUSTAVE_BUILD_DOCS=OFF"
-        "-DGUSTAVE_BUILD_TOOLS=OFF"
-        "-DGUSTAVE_BUILD_TUTORIALS=OFF"
-)
+include("cmake/Python.cmake")
 
-vcpkg_cmake_install()
+set(mkdocs_working_dir "${CMAKE_SOURCE_DIR}")
+set(mkdocs_output_dir "${CMAKE_BINARY_DIR}/docs/mkdocs-build")
 
-vcpkg_cmake_config_fixup(
-    PACKAGE_NAME "Gustave"
-    CONFIG_PATH "cmake"
-)
+if(GUSTAVE_BUILD_DOCS)
+    add_custom_python_target(TARGET mkdocs-build ALL
+        VENV venv-mkdocs
+        COMMAND "mkdocs" "build" "-d" "${mkdocs_output_dir}" "-s"
+        WORKING_DIRECTORY "${mkdocs_working_dir}"
+        COMMENT "Building documentation at '${mkdocs_output_dir}'"
+    )
 
-file(INSTALL "${CMAKE_CURRENT_LIST_DIR}/usage" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
-vcpkg_install_copyright(FILE_LIST "${SRC_PATH}/LICENSE.txt")
+    add_custom_python_target(TARGET mkdocs-serve
+        VENV venv-mkdocs
+        COMMAND "mkdocs" "serve"
+        WORKING_DIRECTORY "${mkdocs_working_dir}"
+        COMMENT "Serving documentation at 'http://localhost:8000' (!!! WILL RUN UNTIL KILLED !!!)"
+        USES_TERMINAL
+    )
+
+    add_custom_python_target(TARGET mike-deploy
+        VENV venv-mkdocs
+        COMMAND "mike" "deploy" "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
+        WORKING_DIRECTORY "${mkdocs_working_dir}"
+        COMMENT "Deploying documentation to git branch 'gh-pages'"
+    )
+
+    install(DIRECTORY "${mkdocs_output_dir}/"
+        DESTINATION mkdocs
+        COMPONENT MkDocs
+    )
+endif()

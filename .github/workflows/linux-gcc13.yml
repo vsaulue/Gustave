@@ -64,6 +64,9 @@ jobs:
           -D "GUSTAVE_CONAN_HOST_PROFILE=${{ env.conan_pr_host }}"
           -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
 
+      - name: "[build/setup] Install Python venvs"
+        run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target venvs
+
       - name: "[build] Build"
         run: cmake --build --preset ${{ env.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
 
