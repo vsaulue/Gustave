@@ -54,10 +54,10 @@ class TestReport(object):
 
 class TestFolder(object):
     _name: str
-    _ctx: gu.TestScriptContext
+    _ctx: gu.ScriptContext
     _casesFolderPath : str
 
-    def __init__(self, name: str, ctx: gu.TestScriptContext):
+    def __init__(self, name: str, ctx: gu.ScriptContext):
         self._name = name
         self._ctx = ctx
         self._casesFolderPath = os.path.join(ctx.cmakeVars.folders.source, *TestConfig.JsonSamplesPath, name)
@@ -95,7 +95,7 @@ class TestFolder(object):
         return TestReport(numSuccessCases, numFailedCases)
 
 class WorldsFolder(TestFolder):
-    def __init__(self, ctx: gu.TestScriptContext):
+    def __init__(self, ctx: gu.ScriptContext):
         super().__init__(TestConfig.WorldSubFolder, ctx)
 
     def commandList(self, filename) -> list[str]:
@@ -104,7 +104,7 @@ class WorldsFolder(TestFolder):
 class RenderersFolder(TestFolder):
     _defaultWorldPath : str
 
-    def __init__(self, ctx: gu.TestScriptContext):
+    def __init__(self, ctx: gu.ScriptContext):
         super().__init__(TestConfig.RendererSubFolder, ctx)
         self._defaultWorldPath = os.path.join(ctx.cmakeVars.folders.source, *TestConfig.JsonSamplesPath, TestConfig.WorldSubFolder, TestConfig.DefaultWorldFilename)
 
@@ -120,7 +120,7 @@ class TestSvgViewer(gu.TestScript):
         return result
 
     # @typing.override
-    def doRun(self, ctx: gu.TestScriptContext) -> None:
+    def doRun(self, ctx: gu.ScriptContext) -> None:
         folders = [ WorldsFolder(ctx), RenderersFolder(ctx) ]
         reports = TestReport(0,0)
         for folder in folders:
