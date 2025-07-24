@@ -757,7 +757,7 @@ class ScriptException(Exception):
         """
         :param errCode: Error code of the failed command.
         """
-        super().__init__(f'Test script failed with error code {errCode}.')
+        super().__init__(f'Script failed with error code {errCode}.')
         self._errCode = errCode
 
     @property
@@ -783,7 +783,7 @@ class BasicScriptContext(object):
     def __init__(self, cmakeVars: CMakeVariables | None, args: argparse.Namespace):
         """
         :param cmakeVars: Value of the `cmakeVars` property.
-        :param args: Parsed command line for the test script.
+        :param args: Parsed command line for the script.
         """
         self._args = args
         self._cmakeVars = cmakeVars
@@ -873,7 +873,7 @@ class BasicScriptContext(object):
 
     @property
     def verboseLevel(self) -> int:
-        """Verbosity level of the test script."""
+        """Verbosity level of the script."""
         result = self._args.verbose
         if result == None:
             result = 0
@@ -1000,13 +1000,13 @@ class Venvs(object):
         """
         return Venv(self._ctx, name)
 
-class TestScriptContext(BasicScriptContext):
-    """Class holding various data/utility useful to run Gustave tests."""
+class ScriptContext(BasicScriptContext):
+    """Class holding various data/utility useful to run Gustave scripts."""
 
     def __init__(self, cmakeVars: CMakeVariables | None, args: argparse.Namespace):
         """
         :param cmakeVars: Value of the `cmakeVars` property.
-        :param args: Parsed command line for the test script.
+        :param args: Parsed command line for the script.
         """
         super().__init__(cmakeVars, args)
 
@@ -1036,7 +1036,7 @@ class TestScript(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def doRun(self, ctx: TestScriptContext) -> None:
+    def doRun(self, ctx: ScriptContext) -> None:
         """
         Internal implementation of the test.
 
@@ -1058,7 +1058,7 @@ class TestScript(abc.ABC):
         cmakeVars = None
         if self.useCMakeVars():
             cmakeVars = CMakeVariables(json.load(args.cmakeVariables))
-        ctx = TestScriptContext(cmakeVars, args)
+        ctx = ScriptContext(cmakeVars, args)
         try:
             self.doRun(ctx)
         except ScriptException as e:

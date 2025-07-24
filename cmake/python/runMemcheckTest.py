@@ -37,7 +37,7 @@ class RunMemcheckTest(gu.TestScript):
         return result
 
     # @typing.override
-    def doRun(self, ctx: gu.TestScriptContext) -> None:
+    def doRun(self, ctx: gu.ScriptContext) -> None:
         if len(ctx.args.command) == 0:
             print(f'{ctx.coloring("ERROR","red")}: No program name & arguments provided.', file=sys.stderr)
             raise gu.ScriptException()

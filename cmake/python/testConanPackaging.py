@@ -55,7 +55,7 @@ class TestConanPackaging(gu.TestScript):
         return result
 
     # @typing.override
-    def doRun(self, ctx: gu.TestScriptContext) -> None:
+    def doRun(self, ctx: gu.ScriptContext) -> None:
         tmpTestPackagePath = os.path.join(ctx.tmpFolder, 'test_package')
         conanExe = ctx.cmakeVars.executables.conan
 

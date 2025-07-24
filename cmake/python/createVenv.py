@@ -37,7 +37,7 @@ class MakeVenv(gu.TestScript):
         return result
 
     # @typing.override
-    def doRun(self, ctx: gu.TestScriptContext) -> None:
+    def doRun(self, ctx: gu.ScriptContext) -> None:
         venvsSource = ctx.cmakeVars.folders.venvsSource
         requirementPath = os.path.join(venvsSource, ctx.args.name, "requirements.txt")
         if not os.path.isfile(requirementPath):

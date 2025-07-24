@@ -36,7 +36,7 @@ class TestCMakePackaging(gu.TestScript):
         return result
 
     # @typing.override
-    def doRun(self, ctx: gu.TestScriptContext) -> None:
+    def doRun(self, ctx: gu.ScriptContext) -> None:
         testProjectPath = os.path.join(ctx.cmakeVars.folders.source, 'packaging', 'test_package')
         gustaveConfigPath = os.path.join(ctx.cmakeVars.folders.install, 'cmake')
         buildFolder = ctx.tmpFolder

@@ -38,7 +38,7 @@ class UseVenv(gu.TestScript):
         return result
 
     # @typing.override
-    def doRun(self, ctx: gu.TestScriptContext) -> None:
+    def doRun(self, ctx: gu.ScriptContext) -> None:
         env = ctx.venvs.get(ctx.args.venv)
         env.runCmd(ctx.args.command)
 
