@@ -24,5 +24,6 @@
 
 if(GUSTAVE_BUILD_TUTORIALS)
     add_subdirectory("01-getting-started")
-    add_subdirectory("02-world-api")
+    add_subdirectory("02-solver-api")
+    add_subdirectory("03-world-api")
 endif()

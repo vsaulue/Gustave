@@ -46,13 +46,13 @@ nav:
   - Overview: "overview.md"
   - Install: "install.md"
   - Tutorials:
-    - tutorials/index.md      
+    - tutorials/index.md
     - tutorials/01-getting-started/index.md
-    - "2. World API":
-      - tutorials/02-world-api/index.md      
-      - tutorials/02-world-api/01-creating-world/index.md
-      - tutorials/02-world-api/02-world-blocks/index.md
-      - tutorials/02-world-api/03-world-structures/index.md
-      - tutorials/02-world-api/04-world-links/index.md
-    - tutorials/03-solver-api/index.md
+    - tutorials/02-solver-api/index.md
+    - "3. World API":
+      - tutorials/03-world-api/index.md
+      - tutorials/03-world-api/01-creating-world/index.md
+      - tutorials/03-world-api/02-world-blocks/index.md
+      - tutorials/03-world-api/03-world-structures/index.md
+      - tutorials/03-world-api/04-world-links/index.md
   - Lexicon: lexicon.md

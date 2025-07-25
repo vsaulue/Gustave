@@ -1,4 +1,4 @@
-# 2.1. New world
+# 3.1. New world
 
 This section explains how to create a new `SyncWorld` object.
 

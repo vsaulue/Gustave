@@ -1,4 +1,4 @@
-# 3. Solver API
+# 2. Solver API
 
 This section will describe Gustave's low-level API: [Solvers](../../lexicon.md#solver).
 
