@@ -1,4 +1,4 @@
-# 2.2. Blocks
+# 3.2. Blocks
 
 This sections explains how to inspect/add/modify/remove [blocks](../../../lexicon.md#block) in a `SyncWorld`
 

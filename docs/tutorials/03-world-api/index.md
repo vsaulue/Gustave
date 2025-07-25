@@ -1,4 +1,4 @@
-# 2. World API
+# 3. World API
 
 This section will describe Gustave's high-level API: [Worlds](../../lexicon.md#world).
 

@@ -1,4 +1,4 @@
-# 2.3. Structures
+# 3.3. Structures
 
 This sections explains how to inspect [structures](../../../lexicon.md#structure) in a `SyncWorld`.
 
