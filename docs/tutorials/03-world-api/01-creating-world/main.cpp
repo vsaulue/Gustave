@@ -25,29 +25,40 @@
 
 #include <iostream>
 
-
+// -8<- [start:distrib-unitless]
 // Choosing the Std Unitless distribution, with double precision
 #include <gustave/distribs/std/unitless/Gustave.hpp>
 
 using G = gustave::distribs::std::unitless::Gustave<double>;
+// -8<- [end:distrib-unitless]
 
+// -8<- [start:type-aliases]
 using World = G::Worlds::SyncWorld;
+using Solver = World::Solver;
+// -8<- [end:type-aliases]
+
+// -8<- [start:newWorld]
+[[nodiscard]]
+static Solver newSolver() {
+    auto const g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
+    auto const solverPrecision = 0.01; // precision of the force balancer (here 1%).
+    return Solver{ Solver::Config{ g, solverPrecision } };
+}
 
 [[nodiscard]]
 static World newWorld() {
-    auto g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
-    auto solverPrecision = 0.01; // precision of the force balancer (here 1%).
     auto blockSize = G::vector3(1.f, 1.f, 1.f); // block dimension (cube with 1m edge).
-
-    auto solverConfig = World::Solver::Config{ g, solverPrecision };
-    return World{ blockSize, World::Solver{ solverConfig } };
+    return World{ blockSize, newSolver() };
 }
+// -8<- [end:newWorld]
 
 int main() {
+    // -8<- [start:newWorld-usage]
     auto world = newWorld();
 
     std::cout << "Tutorial: creating a new SyncWorld.\n\n";
 
     std::cout << "- number of blocks = " << world.blocks().size() << '\n';
     std::cout << "- number of structures = " << world.structures().size() << '\n';
+    // -8<- [end:newWorld-usage]
 }
