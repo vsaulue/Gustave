@@ -32,23 +32,30 @@
 using G = gustave::distribs::std::unitless::Gustave<double>;
 
 using World = G::Worlds::SyncWorld;
+using Solver = World::Solver;
+
+[[nodiscard]]
+static Solver newSolver() {
+    auto const g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
+    auto const solverPrecision = 0.01; // precision of the force balancer (here 1%).
+    return Solver{ Solver::Config{ g, solverPrecision } };
+}
 
 [[nodiscard]]
 static World newWorld() {
-    auto g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
-    auto solverPrecision = 0.01; // precision of the force balancer (here 1%).
     auto blockSize = G::vector3(1.f, 1.f, 1.f); // block dimension (cube with 1m edge).
-
-    auto solverConfig = World::Solver::Config{ g, solverPrecision };
-    return World{ blockSize, World::Solver{ solverConfig } };
+    return World{ blockSize, newSolver() };
 }
 
 int main() {
+    // -8<- [start:create-world]
     auto world = newWorld();
+    // -8<- [end:create-world]
 
     // { compression, shear, tensile } in pascal
     auto const maxBlockStress = G::Model::PressureStress{ 100'000.0, 50'000.0, 20'000.0 };
 
+    // -8<- [start:add-blocks]
     // kilogram
     auto const foundationMass = 10'0000.0;
     auto const struct1Mass = 1'000.0;
@@ -72,10 +79,12 @@ int main() {
 
         world.modify(tr);
     }
+    // -8<- [end:add-blocks]
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 1: list all structures and their blocks\n";
 
+    // -8<- [start:list-world-structures]
     std::cout << "List of structures (size = " << world.structures().size() << ")\n";
     for (auto const& structure : world.structures()) {
         std::cout << "- structure of " << structure.blocks().size() << " blocks:\n";
@@ -83,10 +92,11 @@ int main() {
             std::cout << "  - " << block.index() << '\n';
         }
     }
+    // -8<- [end:list-world-structures]
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 2: list the structures of a block\n";
-
+    // -8<- [start:list-block-structures]
     auto listStructuresOfBlock = [&world](World::BlockIndex const& blockId) -> void {
         auto const blockRef = world.blocks().at(blockId);
         std::cout << "Structures of block " << blockId << " (size = " << blockRef.structures().size() << "):\n";
@@ -96,10 +106,11 @@ int main() {
     };
     listStructuresOfBlock({ 0,0,0 });
     listStructuresOfBlock({ 7,0,0 });
+    // -8<- [end:list-block-structures]
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 3: structure status (valid, solved)\n";
-
+    // -8<- [start:structure-status]
     auto printStructureStatusOfBlock = [&world](World::BlockIndex const& blockId) -> void {
         auto const structureRef = world.blocks().at(blockId).structures()[0];
         std::cout << "Statut of structure of block " << blockId << ": ";
@@ -115,4 +126,5 @@ int main() {
     };
     printStructureStatusOfBlock({ 0,1,0 });
     printStructureStatusOfBlock({ 7,0,0 });
+    // -8<- [end:structure-status]
 }

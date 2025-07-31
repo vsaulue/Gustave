@@ -10,30 +10,13 @@ Structures are automatically created/deleted by the `SyncWorld` when it is modif
 - [Creating an empty World](../01-creating-world/index.md): we'll reuse the [`newWorld()`](../01-creating-world/index.md#configuring-a-world) function.
 
 ```c++
-auto world = newWorld();
+--8<-- "docs/tutorials/03-world-api/03-world-structures/main.cpp:create-world"
 ```
 
 - [Adding & inspecting world blocks](../02-world-blocks/index.md): we'll add a few blocks for this tutorial:
 
 ```c++
-{
-    auto tr = World::Transaction{};
-    // foundation shared between structure 1 & 2
-    tr.addBlock({ { 0,0,0 }, maxBlockStress, foundationMass, true });
-    // structure 1
-    tr.addBlock({ { 0,1,0 }, maxBlockStress, struct1Mass, false });
-    tr.addBlock({ { 0,2,0 }, maxBlockStress, struct1Mass, false });
-    // structure 2
-    tr.addBlock({ { 1,0,0 }, maxBlockStress, struct2Mass, false });
-    tr.addBlock({ { 2,0,0 }, maxBlockStress, struct2Mass, false });
-    tr.addBlock({ { 3,0,0 }, maxBlockStress, struct2Mass, false });
-    tr.addBlock({ { 4,0,0 }, maxBlockStress, struct2Mass, true });
-    // structure 3 (no foundations)
-    tr.addBlock({ { 7,0,0 }, maxBlockStress, struct3Mass, false });
-    tr.addBlock({ { 8,0,0 }, maxBlockStress, struct3Mass, false });
-
-    world.modify(tr);
-}
+--8<-- "docs/tutorials/03-world-api/03-world-structures/main.cpp:add-blocks"
 ```
 
 Here's a visual representation of this world:
@@ -47,13 +30,7 @@ Here's a visual representation of this world:
 So iterating over all structures and listing their blocks is a simple double loop:
 
 ```c++
-std::cout << "List of structures (size = " << world.structures().size() << ")\n";
-for (auto const& structure : world.structures()) {
-    std::cout << "- structure of " << structure.blocks().size() << " blocks:\n";
-    for (auto const& block : structure.blocks()) {
-        std::cout << "  - " << block.index() << '\n';
-    }
-}
+--8<-- "docs/tutorials/03-world-api/03-world-structures/main.cpp:list-world-structures"
 ```
 
 !!! note
@@ -89,15 +66,7 @@ In the above output:
 A `BlockReference` has a `.structures()` method returning a range of `StructureReference`, similar to `world.structures()`:
 
 ```c++
-auto listStructuresOfBlock = [&world](World::BlockIndex const& blockId) -> void {
-    auto const blockRef = world.blocks().at(blockId);
-    std::cout << "Structures of block " << blockId << " (size = " << blockRef.structures().size() << "):\n";
-    for (auto const& structureRef : blockRef.structures()) {
-        std::cout << "- structure of " << structureRef.blocks().size() << " blocks\n";
-    }
-};
-listStructuresOfBlock({ 0,0,0 });
-listStructuresOfBlock({ 7,0,0 });
+--8<-- "docs/tutorials/03-world-api/03-world-structures/main.cpp:list-block-structures"
 ```
 
 Expected output:
@@ -123,21 +92,7 @@ A `StructureReference` has two important methods about its status:
 Running this test code:
 
 ```c++
-auto printStructureStatusOfBlock = [&world](World::BlockIndex const& blockId) -> void {
-    auto const structureRef = world.blocks().at(blockId).structures()[0];
-    std::cout << "Statut of structure of block " << blockId << ": ";
-    if (structureRef.isValid()) {
-        if (structureRef.isSolved()) {
-            std::cout << "solved\n";
-        } else {
-            std::cout << "not solved\n";
-        }
-    } else {
-        std::cout << "invalid\n";
-    }
-};
-printStructureStatusOfBlock({ 0,1,0 });
-printStructureStatusOfBlock({ 7,0,0 });
+--8<-- "docs/tutorials/03-world-api/03-world-structures/main.cpp:structure-status"
 ```
 
 Should give the following output:
