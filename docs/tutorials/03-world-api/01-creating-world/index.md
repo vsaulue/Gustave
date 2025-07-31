@@ -7,51 +7,34 @@ This section explains how to create a new `SyncWorld` object.
 First, let's choose the `std::unitless` distribution with `double` precision, as explained in [getting started](../../01-getting-started/index.md):
 
 ```c++
-// Choosing the Std Unitless distribution, with double precision
-#include <gustave/distribs/std/unitless/Gustave.hpp>
+--8<-- "docs/tutorials/03-world-api/01-creating-world/main.cpp:distrib-unitless"
+```
 
-using G = gustave::distribs::std::unitless::Gustave<double>;
+We'll also define some type aliases:
+
+```c++
+--8<-- "docs/tutorials/03-world-api/01-creating-world/main.cpp:type-aliases"
 ```
 
 ## Configuring a world
 
-A `SyncWorld` can be created with this helper function:
+A `SyncWorld` can be created with these helper functions:
 
 ```c++
-using World = G::Worlds::SyncWorld;
-
-[[nodiscard]]
-static World newWorld() {
-    auto g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
-    auto solverPrecision = 0.01; // precision of the force balancer (here 1%).
-    auto blockSize = G::vector3(1.f, 1.f, 1.f); // block dimension (cube with 1m edge).
-
-    auto solverConfig = World::Solver::Config{ g, solverPrecision };
-    return World{ blockSize, World::Solver{ solverConfig } };
-}
+--8<-- "docs/tutorials/03-world-api/01-creating-world/main.cpp:newWorld"
 ```
 
-A `SyncWorld` requires some configuration. Here are the key parameters:
+Explanation:
 
-- `g` is the gravity acceleration vector. Here it's `10 m/s²` in the -Y direction.
-- `solverPrecision`: the precision of the [solver](../../../lexicon.md#solver). A lower value gives more accurate solutions (respecting Newton's 1st law of mostion), at a performance cost.
-- `blockSize`: the dimensions of the blocks. Here each block is a `1 m` wide cube.
-
-Currently the only [solver](../../../lexicon.md#solver) available is `F1Solver`. It generates [force distributions](../../../lexicon.md#force-distribution) in which all forces transferred between blocks are collinear with the gravity vector `g`.
+- `newSolver()`: configures the solver used by the world. See [Solver API: configure a solver](../../02-solver-api/index.md#configure-a-solver) for more details.
+- `blockSize`: the dimensions of the blocks. Here each block is a `1 metre` wide cube.
 
 ## Usage
 
 Running this test code:
 
 ```c++
-int main() {
-    auto world = newWorld();
-
-    std::cout << "Tutorial: creating a new SyncWorld.\n\n";
-
-    std::cout << "- number of blocks = " << world.blocks().size() << '\n';
-    std::cout << "- number of structures = " << world.structures().size() << '\n';
-}
+--8<-- "docs/tutorials/03-world-api/01-creating-world/main.cpp:newWorld-usage"
 ```
 
 Should give the following output:
