@@ -50,7 +50,7 @@ class RunMemcheckTest(gu.GustaveScript):
         else:
             print(f'{ctx.coloring("ERROR","red")}: Unknown "memcheckType" value: {memcheckType}.', file=sys.stderr)
 
-        ctx.runCmd(cmd, separateStderr=True)
+        ctx.runCmd(cmd, io=gu.SeparateIO())
 
 
 if __name__ == "__main__":

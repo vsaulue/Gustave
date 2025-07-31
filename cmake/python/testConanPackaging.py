@@ -73,9 +73,8 @@ class TestConanPackaging(gu.GustaveScript):
             '--build=missing',
             '--format=json'
         ]
-        with ctx.newCmd(createCmd, separateStderr=True) as createRun:
-            with open(createRun.outPath) as stdoutFile:
-                gustavePackageRef = self._extractGustaveRef(json.load(stdoutFile))
+        with ctx.newCmd(createCmd, io=gu.SeparateIO()) as createRun:
+            gustavePackageRef = self._extractGustaveRef(json.load(createRun.outFile))
 
         # Cleanup
         cleanupCmd = [ conanExe, 'remove', gustavePackageRef, '--confirm' ]

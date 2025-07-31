@@ -40,7 +40,7 @@ class UseVenv(gu.GustaveScript):
     # @typing.override
     def doRun(self, ctx: gu.ScriptContext) -> None:
         env = ctx.venvs.get(ctx.args.venv)
-        env.runCmd(ctx.args.command)
+        env.runCmd(ctx.args.command, io=gu.ForwardIO())
 
 
 if __name__ == "__main__":
