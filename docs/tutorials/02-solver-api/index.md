@@ -2,41 +2,33 @@
 
 This section will describe Gustave's low-level API: [Solvers](../../lexicon.md#solver).
 
+In this tutorial we'll aim at creating the following structure, and computing its force distribution:
+
+![](world.svg)
+
 !!! note
     In this tutorial, all quantities are interpreted in the metric system. This is not mandatory when using the `unitless` distribution. You can interpret them in another natural system of unit: if you choose to interpret 1 unit of length as an imperial `foot`, 1 unit of mass as an imperial `pound`, and 1 unit of time as a `second`, then 1 unit of force must be interpreted as a `pound.foot/second²`.
 
-## Prerequisites
+## Choosing a distribution
 
-- [Selecting a Gustave configuration](../01-getting-started/index.md)
-
-We'll choose the `std::unitless` distribution with `double` precision:
+First, let's choose the `std::unitless` distribution with `double` precision, as explained in [getting started](../01-getting-started/index.md):
 
 ```c++
-// Choosing the Std Unitless distribution, with double precision
-#include <gustave/distribs/std/unitless/Gustave.hpp>
-
-using G = gustave::distribs::std::unitless::Gustave<double>;
+--8<-- "docs/tutorials/02-solver-api/main.cpp:distrib-unitless"
 ```
 
 We'll also define some convenient type aliases:
 
 ```c++
-using Structure = G::Solvers::Structure;
-using Solver = G::Solvers::F1Solver;
+--8<-- "docs/tutorials/02-solver-api/main.cpp:type-aliases"
 ```
-
-In this tutorial we'll aim at creating the following structure, and computing its force distribution:
-
-![](world.svg)
 
 ## Create a new solver structure
 
 To create an empty `Structure`, just use its default constructor. We'll store ours in a [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr), as it will be required later by the [solver](../../lexicon.md#solver).
 
 ```c++
-auto structure = std::make_shared<Structure>();
-std::cout << "Structure of " << structure->nodes().size() << " blocks\n";
-std::cout << "Structure of " << structure->links().size() << " links\n";
+--8<-- "docs/tutorials/02-solver-api/main.cpp:new-structure"
 ```
 
 Expected output:
@@ -56,17 +48,7 @@ Use `Structure::addNode(...)`. This takes a `Structure::Node` object, whose cons
 It returns a `NodeIndex`, a unique identifier of this block in the structure. These indices are generated sequentially (0,1,2,...).
 
 ```c++
-auto const blockMass = 3'000.0; // kilogram
-//          xy
-auto const n00 = structure->addNode(Structure::Node{ blockMass, true });
-auto const n01 = structure->addNode(Structure::Node{ blockMass, false });
-auto const n02 = structure->addNode(Structure::Node{ blockMass, false });
-auto const n12 = structure->addNode(Structure::Node{ blockMass, false });
-auto const n22 = structure->addNode(Structure::Node{ blockMass, false });
-auto const n21 = structure->addNode(Structure::Node{ blockMass, false });
-auto const n20 = structure->addNode(Structure::Node{ blockMass, true });
-std::cout << "Structure of " << structure->nodes().size() << " blocks\n";
-std::cout << "Structure of " << structure->links().size() << " links\n";
+--8<-- "docs/tutorials/02-solver-api/main.cpp:add-blocks"
 ```
 
 Expected output:
@@ -88,25 +70,7 @@ Use `Structure::addLink(...)`. This takes a `Structure::Link` object, whose cons
 It sequentially returns a `LinkIndex`, which uniquely identifies this link in the structure.
 
 ```c++
-// { compression, shear, tensile } in Newton/metre
-auto const wallConductivity = G::Model::ConductivityStress{ 1'000'000.0, 500'000.0, 200'000.0 };
-auto const roofConductivity = G::Model::ConductivityStress{ 100'000.0, 500'000.0, 100'000.0 };
-
-auto const plusY = G::NormalizedVector3{ 0.0, 1.0, 0.0 };
-auto const plusX = G::NormalizedVector3{ 1.0, 0.0, 0.0 };
-
-// left wall
-auto const l00_01 = structure->addLink(Structure::Link{ n00, n01, plusY, wallConductivity });
-structure->addLink(Structure::Link{ n01, n02, plusY, wallConductivity });
-// right wall
-auto const l20_21 = structure->addLink(Structure::Link{ n20, n21, plusY, wallConductivity });
-structure->addLink(Structure::Link{ n21, n22, plusY, wallConductivity });
-// roof
-structure->addLink(Structure::Link{ n02, n12, plusX, roofConductivity });
-structure->addLink(Structure::Link{ n12, n22, plusX, roofConductivity });
-
-std::cout << "Structure of " << structure->nodes().size() << " blocks\n";
-std::cout << "Structure of " << structure->links().size() << " links\n";
+--8<-- "docs/tutorials/02-solver-api/main.cpp:add-links"
 ```
 
 Here we stored 2 link indices for later use: `l00_01` (between foundation `n00` and block `n01`) and `l20_21` (between foundation `n20` and block `n21`).
@@ -130,12 +94,11 @@ The two mandatory parameters for the solver are:
 - **solverPrecision:** the precision of the solver. The closer to 0 it is, the more accurate the solutions will be according to Newton's 1st law of motion (the net force of non-foundation blocks will be closer to 0).
 
 ```c++
-auto const g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
-auto const solverPrecision = 0.01; // precision of the force balancer (here 1%).
-auto const solver = Solver{ Solver::Config{ g, solverPrecision } };
+--8<-- "docs/tutorials/02-solver-api/main.cpp:newSolver"
+```
 
-std::cout << "Solver gravity vector = " << solver.config().g() << '\n';
-std::cout << "Solver target max error = " << solver.config().targetMaxError() << '\n';
+```c++
+--8<-- "docs/tutorials/02-solver-api/main.cpp:configure-solver"
 ```
 
 Expected output:
@@ -150,8 +113,7 @@ Solver target max error = 0.01
 Simply use `F1Solver::run(structure)`. This returns a `SolverResult` object with a `isSolved()` method, indicating if a solution within the target `solverPrecision` was reached.
 
 ```c++
-    auto const solverResult = solver.run(structure);
-    std::cout << "solution.isSolved() = " << solverResult.isSolved() << '\n';
+--8<-- "docs/tutorials/02-solver-api/main.cpp:solve-structure"
 ```
 
 Expected output:
@@ -168,9 +130,7 @@ solution.isSolved() = 1
 If a `SolverResult` object is solved, the `solution()` method returns a `Solution` object. This object provides convenient methods to inspect nodes, contacts, and forces.
 
 ```c++
-    auto const& solution = solverResult.solution();
-    std::cout << "Force vector on block 00 by 01 = " << solution.contacts().at({l00_01, true}).forceVector() << '\n';
-    std::cout << "Force vector on block 21 by 22 = " << solution.contacts().at({l20_21, false}).forceVector() << '\n';
+--8<-- "docs/tutorials/02-solver-api/main.cpp:inspect-solution"
 ```
 
 A few comments on this block of code:
