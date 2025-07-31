@@ -25,9 +25,12 @@
 
 #include <iostream>
 
+// -8<- [start:include-unitless]
 // One global header per distribution
-#include <gustave/distribs/std/strictUnit/Gustave.hpp>
 #include <gustave/distribs/std/unitless/Gustave.hpp>
+// -8<- [end:include-unitless]
+
+#include <gustave/distribs/std/strictUnit/Gustave.hpp>
 
 static void strictUnitDemo() {
     // Choosing a distribution, with double precision
@@ -50,6 +53,7 @@ static void strictUnitDemo() {
     // std::cout << "wrong_operation = mass + g.y() = " << mass + g.y() << '\n';
 }
 
+// -8<- [start:unitlessDemo]
 static void unitlessDemo() {
     // Choosing a distribution, with double precision
     using G = gustave::distribs::std::unitless::Gustave<double>;
@@ -63,6 +67,7 @@ static void unitlessDemo() {
     std::cout << "weight = mass * g = " << weight << '\n';
     std::cout << "wrong_operation = mass + g.y() = " << mass + g.y() << '\n';
 }
+// -8<- [end:unitlessDemo]
 
 int main() {
     strictUnitDemo();
