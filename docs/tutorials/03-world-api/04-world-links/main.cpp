@@ -32,26 +32,33 @@
 using G = gustave::distribs::std::unitless::Gustave<double>;
 
 using World = G::Worlds::SyncWorld;
+using Solver = World::Solver;
+
+[[nodiscard]]
+static Solver newSolver() {
+    auto const g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
+    auto const solverPrecision = 0.01; // precision of the force balancer (here 1%).
+    return Solver{ Solver::Config{ g, solverPrecision } };
+}
 
 [[nodiscard]]
 static World newWorld() {
-    auto g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
-    auto solverPrecision = 0.01; // precision of the force balancer (here 1%).
     auto blockSize = G::vector3(1.f, 1.f, 1.f); // block dimension (cube with 1m edge).
-
-    auto solverConfig = World::Solver::Config{ g, solverPrecision };
-    return World{ blockSize, World::Solver{ solverConfig } };
+    return World{ blockSize, newSolver() };
 }
 
 int main() {
+    // -8<- [start:create-world]
     auto world = newWorld();
+    // -8<- [end:create-world]
 
+    // -8<- [start:add-blocks]
     // { compression, shear, tensile } in pascal
     auto const strongBlockStress = G::Model::PressureStress{ 500'000.0, 500'000.0, 500'000.0 };
     auto const weakBlockStress = G::Model::PressureStress{ 100'000.0, 100'000.0, 100'000.0 };
-
     // kilogram
     auto const mass = 3'000.0;
+
     {
         auto tr = World::Transaction{};
         // The chair
@@ -81,18 +88,24 @@ int main() {
 
         world.modify(tr);
     }
+    // -8<- [end:add-blocks]
 
+    // -8<- [start:direction-alias]
     using Direction = World::ContactIndex::Direction;
+    // -8<- [end:direction-alias]
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 1: Inspect a specific contact\n";
+    // -8<- [start:inspect-contact]
     {
-        auto const contactRef = world.contacts().at({ {0,4,0}, Direction::plusY() });
-        std::cout << "Contact " << contactRef.index() << ": other block is " << contactRef.otherBlock().index() << '\n';
+        auto const contact = world.contacts().at({ {0,4,0}, Direction::plusY() });
+        std::cout << "Contact " << contact.index() << ": other block is " << contact.otherBlock().index() << '\n';
     }
+    // -8<- [end:inspect-contact]
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 2: Check contact status (valid & solved)\n";
+    // -8<- [start:contact-status]
     {
         auto printContactStatus = [&world](World::ContactIndex const& contactId) -> void {
             auto const contactRef = world.contacts().find(contactId);
@@ -111,9 +124,11 @@ int main() {
         printContactStatus({ {3,8,0}, Direction::plusX() });
         printContactStatus({ {9,9,0}, Direction::minusX() });
     }
+    // -8<- [end:contact-status]
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 3: Contact's force\n";
+    // -8<- [start:contact-force]
     {
         auto printContactForce = [&world](World::ContactIndex const& contactId) -> void {
             auto const cRef = world.contacts().at(contactId);
@@ -124,9 +139,11 @@ int main() {
         printContactForce({ {0,1,0}, Direction::minusY() });
         printContactForce({ {4,1,0}, Direction::minusY() });
     }
+    // -8<- [end:contact-force]
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 4: Link's stressRatio\n";
+    // -8<- [start:link-stress-ratio]
     {
         auto printContactStress = [&world](World::ContactIndex const& contactId) -> void {
             auto const cRef = world.contacts().at(contactId);
@@ -136,15 +153,20 @@ int main() {
         printContactStress({ {0,1,0}, Direction::minusY() });
         printContactStress({ {4,1,0}, Direction::minusY() });
     }
+    // -8<- [end:link-stress-ratio]
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 5: Stress ratio of a structure\n";
+    // -8<- [start:structure-stress-ratio]
     {
         auto printMaxStressOfStructure = [&world](World::BlockIndex const& blockId) -> void {
+            // Gets the StructureReference of a block (unique for a non-foundation).
             auto const structRef = world.blocks().at(blockId).structures()[0];
             std::cout << "Max stress ratio of structure of block " << blockId << " = ";
+            // Ensures that we can access forces & stresses of all links in the structure.
             if (structRef.isSolved()) {
                 auto result = G::Model::StressRatio{ 0.0, 0.0, 0.0 };
+                // Iterate over all links of the structure.
                 for (auto const& linkRef : structRef.links()) {
                     result.mergeMax(linkRef.stressRatio());
                 }
@@ -156,4 +178,5 @@ int main() {
         printMaxStressOfStructure({ 0,1,0 });
         printMaxStressOfStructure({ 3,8,0 });
     }
+    // -8<- [end:structure-stress-ratio]
 }
