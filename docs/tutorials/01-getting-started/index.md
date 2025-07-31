@@ -29,24 +29,9 @@ Currently Gustave either only use `float` or `double`. With 32-bit precision, Gu
 
 This example will just show how to do basic maths with Gustave's `StdUnitless`:
 ```c++
-// One global header per distribution
-#include <gustave/distribs/std/unitless/Gustave.hpp>
+--8<-- "docs/tutorials/01-getting-started/main.cpp:include-unitless"
 
-static void unitlessDemo() {
-    // Choosing a distribution, with double precision
-    using G = gustave::distribs::std::unitless::Gustave<double>;
-
-    std::cout << "Gustave 'Unitless' Demo\n\n";
-    auto g = G::vector3(0, -9.8, 0);
-    auto mass = 1000.0;
-    auto weight = mass * g;
-    std::cout << "g = " << g << '\n';
-    std::cout << "mass = " << mass << '\n';
-    std::cout << "weight = mass * g = " << weight << '\n';
-
-    // the following statement would not compile with StrictUnit, but will work with Unitless.
-    std::cout << "wrong_operation = mass + g.y() = " << mass + g.y() << '\n';
-}
+--8<-- "docs/tutorials/01-getting-started/main.cpp:unitlessDemo"
 ```
 
 Expected output:
