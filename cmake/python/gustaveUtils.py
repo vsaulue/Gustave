@@ -24,6 +24,7 @@
 
 import abc
 import argparse
+import contextlib
 import json
 import os
 import platform
@@ -639,49 +640,223 @@ class CMakeVariables(object):
         """String indicating the type of memchecker ("valgrind" or "drMemory")."""
         return self._memcheckType
 
+class _CommandIOHandler(object):
+    """
+    Handler for the stdout/stderr of a single ScriptCommand.
+
+    This object (optionally) provides file where the stdout/stderr of a sub-command can be stored for later use.
+    """
+
+    def __enter__(self) -> "_CommandIOHandler":
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    @abc.abstractmethod
+    def close(self) -> None:
+        """
+        Closes all resources owned by this object (ex: deletes temporary files).
+        """
+        raise NotImplementedError()
+
+    @property
+    @abc.abstractmethod
+    def outFile(self) -> None|typing.IO:
+        """
+        Gets the file used to store stdout.
+
+        The file is opened with "w+" permissions, reset to the beginning. The same file handle is reused for each call.
+        """
+        raise NotImplementedError()
+
+    @property
+    @abc.abstractmethod
+    def errFile(self) -> None|typing.IO:
+        """
+        Gets the file used to store stderr.
+
+        The file is opened with "w+" permissions, reset to the beginning. The same file handle is reused for each call.
+        """
+        raise NotImplementedError()
+
+
+class _ForwardIOHandler(_CommandIOHandler):
+    """
+    Handler for `ForwardIO`.
+    """
+
+    # @typing.override
+    def close(self) -> None:
+        pass
+
+    @property
+    # @typing.override
+    def outFile(self) -> None:
+        return None
+
+    @property
+    # @typing.override
+    def errFile(self) -> None:
+        return None
+
+class _MergeIOHandler(_CommandIOHandler):
+    """
+    Handler for `MergeIO`.
+    """
+
+    _outFile: None|typing.IO
+    """Stdout file, opened with 'w+'. None if this object was closed."""
+
+    def __init__(self):
+        self._outFile = tempfile.NamedTemporaryFile('w+')
+
+    # @typing.override
+    def close(self) -> None:
+        try:
+            if self._outFile is not None:
+                self._outFile.close()
+                self._outFile = None
+        finally:
+            pass
+
+    @property
+    # @typing.override
+    def outFile(self) -> typing.IO:
+        if self._outFile is None:
+            raise ValueError("The output file is not available anymore")
+        self._outFile.seek(0)
+        return self._outFile
+
+    @property
+    # @typing.override
+    def errFile(self) -> typing.IO:
+        return self.outFile
+
+
+class _SeparateIOHandler(_CommandIOHandler):
+    """
+    Handler for `SeparateIO`.
+    """
+
+    _exitStack: contextlib.ExitStack
+    """Exit stack to delete all owned files."""
+
+    _outFile: None|typing.IO
+    """Stdout file, opened with 'w+'. None if this object was closed."""
+
+    _errFile: None|typing.IO
+    """Stderr file, opened with 'w+'. None if this object was closed."""
+
+    def __init__(self):
+        self._exitStack = contextlib.ExitStack()
+        try:
+            self._outFile = self._exitStack.enter_context(tempfile.NamedTemporaryFile("w+"))
+            self._errFile = self._exitStack.enter_context(tempfile.NamedTemporaryFile("w+"))
+        except Exception:
+            self.close()
+            raise
+
+    # @typing.override
+    def close(self):
+        self._outFile = None
+        self._errFile = None
+        self._exitStack.close()
+
+    @property
+    # @typing.override
+    def outFile(self) -> typing.IO:
+        if self._outFile is None:
+            raise ValueError("The stdout file is not available anymore")
+        self._outFile.seek(0)
+        return self._outFile
+
+    @property
+    # @typing.override
+    def errFile(self) -> typing.IO:
+        if self._errFile is None:
+            raise ValueError("The stderr file is not available anymore")
+        self._errFile.seek(0)
+        return self._errFile
+
+
+class CommandIO(object):
+    """
+    Class describing how the stdout/stderr of a command should be handled.
+    """
+
+    @abc.abstractmethod
+    def newHandler(self) -> _CommandIOHandler:
+        """
+        Creates a new handler for a single command.
+        """
+        raise NotImplementedError()
+
+class ForwardIO(CommandIO):
+    """
+    Forwards the stdout/stderr of the command.
+
+    The output is printed regardless of verbosity levels.
+    It is NOT stored in any file for later use.
+    """
+
+    # @typing.override
+    def newHandler(self) -> _ForwardIOHandler:
+        return _ForwardIOHandler()
+
+class MergeIO(CommandIO):
+    """
+    Merges stdout/stderr in a single file.
+
+    Unless the script is run in verbose mode, the stdout/stderr is printed only if the command fails.
+    """
+
+    # @typing.override
+    def newHandler(self) -> _MergeIOHandler:
+        return _MergeIOHandler()
+
+class SeparateIO(CommandIO):
+    """
+    Stores stdout/stderr into 2 separate files.
+
+    Unless the script is run in verbose mode, the stderr is printed only if the command fails.
+    """
+
+    # @typing.override
+    def newHandler(self) -> _SeparateIOHandler:
+        return _SeparateIOHandler()
+
 class ScriptCommand(object):
     """Class to run an external program and store its results."""
 
     _completedProcess: subprocess.CompletedProcess
     """Result of the underlying `subprocess.run()` call."""
 
-    _outPath : str | None
-    """Value of the `outPath` property."""
+    _ioHandler: _CommandIOHandler
+    """Handler for the stdout/stderr of the command."""
 
-    _separateStderr : bool
-    """Value of the `separateStderr` property."""
-
-    _stderrPath : str | None
-    """(Optional) path to the file storing the program's standard error."""
-
-    def __init__(self, cmd: list[str], separateStderr: bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None):
+    def __init__(self, cmd: list[str], io: CommandIO = MergeIO(), cwd: None|str = None, envDelta: None|dict[str,str] = None):
         """
         :param cmd: Program name & arguments.
-        :param separateStderr: True to store the command's stdout & stderr into separate files.
+        :param io: Describes how to handle the stdout/stderr of the command.
         :param cwd: Working directory to use (or None to keep the current one).
         :param envDelta: Environment variables to modify (or None to use the same as the current process).
         """
-        self._outPath = None
-        self._stderrPath = None
-        self._separateStderr = separateStderr
         env = None
         if envDelta is not None:
             env = os.environ.copy()
             for key,value in envDelta.items():
                 env[key] = value
+        self._ioHandler = io.newHandler()
         try:
-            outFile = tempfile.NamedTemporaryFile('w+', delete = False)
-            self._outPath = outFile.name
-            errFile = outFile
-            if separateStderr:
-                errFile = tempfile.NamedTemporaryFile('w+', delete = False)
-                self._stderrPath = errFile.name
+            outFile = self._ioHandler.outFile
+            errFile = self._ioHandler.errFile
             self._completedProcess = subprocess.run(cmd, cwd=cwd, stdin=subprocess.DEVNULL, stdout=outFile, stderr=errFile, env=env)
         except:
             self.close()
             raise
 
-    def __enter__(self) -> 'ScriptCommand':
+    def __enter__(self) -> "ScriptCommand":
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -703,47 +878,19 @@ class ScriptCommand(object):
         return " ".join(self._completedProcess.args)
 
     @property
-    def outPath(self) -> str:
-        """Path to the output file (containing the command's stdout, and optionally stderr)."""
-        result = self._outPath
-        if result == None:
-            raise ValueError('outPath is not available anymore.')
-        return result
+    def errFile(self) -> None|typing.IO:
+        """File containing stderr (optionally mixed with stdout)."""
+        return self._ioHandler.errFile
 
     @property
-    def separateStderr(self) -> bool:
-        """
-        Flag indicating if the command's stdout and stderr are stored into separate files.
-
-        If False, the `outPath` contains both stdout and stderr. `stderrPath` is invalid.
-        If True, the `outPath` contains stdout. The `stderrPath` contains stderr.
-        """
-        return self._separateStderr
-
-    @property
-    def stderrPath(self) -> str:
-        """
-        Path to the file storing the stderr's command.
-
-        Only available if `separateStderr` was set to True.
-        """
-        result = self._stderrPath
-        if result == None:
-            raise ValueError('stderrPath is not available anymore.')
-        return result
+    def outFile(self) -> None|typing.IO:
+        """File containing stdout (and optionally stderr)."""
+        return self._ioHandler.outFile
 
     def close(self):
         """Releases all resources held by this object."""
         try:
-            if self._outPath != None:
-                os.remove(self._outPath)
-                self._outPath = None
-        except Exception:
-            pass
-        try:
-            if self._stderrPath != None:
-                os.remove(self._stderrPath)
-                self._stderrPath = None
+            self._ioHandler.close()
         except Exception:
             pass
 
@@ -815,7 +962,7 @@ class BasicScriptContext(object):
             self._coloring = result
         return result
 
-    def newCmd(self, cmd: list[str], exitOnError : bool = True, separateStderr : bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None) -> ScriptCommand:
+    def newCmd(self, cmd: list[str], exitOnError : bool = True, io: CommandIO = MergeIO(), cwd: None|str = None, envDelta: None|dict[str,str] = None) -> ScriptCommand:
         """
         Runs an external program.
 
@@ -823,7 +970,7 @@ class BasicScriptContext(object):
 
         :param cmd: program name/path and command line arguments.
         :param exitOnError: name of the color to use.
-        :param separateStderr: True if stdout & stderr should be stored into separate file.
+        :param io: Describes how to handle the stdout/stderr of the command.
         :param cwd: Working directory to use (or None to keep the current one).
         :param envDelta: Environment variables to modify (or None to use the same as the current process).
         :returns: the result of the program run.
@@ -832,15 +979,14 @@ class BasicScriptContext(object):
         cmdInfoPrinted = self.verboseLevel > 0
         if cmdInfoPrinted:
             self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd, envDelta=envDelta)
-        result = ScriptCommand(cmd, separateStderr=separateStderr, cwd=cwd, envDelta=envDelta)
+        result = ScriptCommand(cmd, io=io, cwd=cwd, envDelta=envDelta)
         if (result.returncode != 0) or (self.verboseLevel > 1):
-            errPath = result.stderrPath if separateStderr else result.outPath
-            if os.path.getsize(errPath) > 0:
+            errFile = result.errFile
+            if errFile is not None and os.path.getsize(errFile.fileno()) > 0:
                 if not cmdInfoPrinted:
                     self._printCmd(self.coloring("Running command", "yellow"), cmd=cmd, cwd=cwd, envDelta=envDelta)
                 print('--------------------', file=sys.stderr)
-                with open(errPath) as errFile:
-                    shutil.copyfileobj(fsrc = errFile, fdst = sys.stderr)
+                shutil.copyfileobj(fsrc = errFile, fdst = sys.stderr)
                 print('--------------------\n', file=sys.stderr)
         if result.returncode != 0 and exitOnError:
             self._printCmd(self.coloring("Command FAILED", "red"), cmd=cmd, cwd=cwd, envDelta=envDelta)
@@ -848,18 +994,18 @@ class BasicScriptContext(object):
             raise ScriptException(result.returncode)
         return result
 
-    def runCmd(self, cmd: list[str], exitOnError: bool = True, separateStderr: bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None) -> None:
+    def runCmd(self, cmd: list[str], exitOnError: bool = True, io: CommandIO = MergeIO(), cwd: None|str = None, envDelta: None|dict[str,str] = None) -> None:
         """
         Runs an external program.
 
         :param cmd: program name/path and command line arguments.
         :param exitOnError: name of the color to use.
-        :param separateStderr: True if stdout & stderr should be stored into separate file.
+        :param io: Describes how to handle the stdout/stderr of the command.
         :param cwd: Working directory to use (or None to keep the current one).
         :param envDelta: Environment variables to modify (or None to use the same as the current process).
         :raises ScriptException: if the program returned an error and `exitOnError` is True.
         """
-        with self.newCmd(cmd, exitOnError=exitOnError, separateStderr=separateStderr, cwd=cwd, envDelta=envDelta):
+        with self.newCmd(cmd, exitOnError=exitOnError, io=io, cwd=cwd, envDelta=envDelta):
             pass
 
     @property
@@ -942,13 +1088,13 @@ class Venv(object):
         else:
             return os.path.join(self.path, "bin")
 
-    def runCmd(self, cmd: list[str], exitOnError: bool = True, separateStderr: bool = False, cwd: None|str = None, envDelta: None|dict[str,str] = None, prependCmdWithPath: bool = True) -> None:
+    def runCmd(self, cmd: list[str], exitOnError: bool = True, io: CommandIO = MergeIO(), cwd: None|str = None, envDelta: None|dict[str,str] = None, prependCmdWithPath: bool = True) -> None:
         """
         Runs an external program in this venv.
 
         :param cmd: program name/path and command line arguments.
         :param exitOnError: name of the color to use.
-        :param separateStderr: True if stdout & stderr should be stored into separate file.
+        :param io: Describes how to handle the stdout/stderr of the command.
         :param cwd: Working directory to use (or None to keep the current one).
         :param envDelta: Environment variables to modify (or None to use the same as the current process).
         :param prependCmdWithPath: True to prepend the full "bin" path to the first element of `cmd`.
@@ -964,7 +1110,7 @@ class Venv(object):
         if prependCmdWithPath:
             fullCmd = cmd.copy()
             fullCmd[0] = os.path.join(binPath, cmd[0])
-        self._ctx.runCmd(fullCmd, exitOnError=exitOnError, separateStderr=separateStderr, cwd=cwd, envDelta=cmdEnvDelta)
+        self._ctx.runCmd(fullCmd, exitOnError=exitOnError, io=io, cwd=cwd, envDelta=cmdEnvDelta)
 
 class Venvs(object):
     """Class to access all venvs of the project."""

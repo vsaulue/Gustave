@@ -62,6 +62,7 @@ class TestFolder(object):
         self._ctx = ctx
         self._casesFolderPath = os.path.join(ctx.cmakeVars.folders.source, *TestConfig.JsonSamplesPath, name)
 
+    @abc.abstractmethod
     def commandList(self, filename: str) -> list[str]:
         raise NotImplementedError()
 
@@ -85,7 +86,7 @@ class TestFolder(object):
         print(f'Running "{self._name}" samples folder ({numCases} files found)...\n', file=sys.stderr)
         for case in allCases:
             cmd = self.commandList(case)
-            with self._ctx.newCmd(cmd, exitOnError=False, separateStderr=True) as caseRun:
+            with self._ctx.newCmd(cmd, exitOnError=False, io=gu.SeparateIO()) as caseRun:
                 retCode = caseRun.returncode
                 if retCode != 0:
                     print(f'{self._ctx.coloring("Command failed", "red")} (exit code: {retCode}): {caseRun.cmdStr}', file=sys.stderr)
@@ -98,6 +99,7 @@ class WorldsFolder(TestFolder):
     def __init__(self, ctx: gu.ScriptContext):
         super().__init__(TestConfig.WorldSubFolder, ctx)
 
+    # @typing.override
     def commandList(self, filename) -> list[str]:
         return [ self.svgViewerPath, self.fullCasePath(filename) ]
 
@@ -108,6 +110,7 @@ class RenderersFolder(TestFolder):
         super().__init__(TestConfig.RendererSubFolder, ctx)
         self._defaultWorldPath = os.path.join(ctx.cmakeVars.folders.source, *TestConfig.JsonSamplesPath, TestConfig.WorldSubFolder, TestConfig.DefaultWorldFilename)
 
+    # @typing.override
     def commandList(self, filename) -> list[str]:
         return [ self.svgViewerPath, self._defaultWorldPath, '-r', self.fullCasePath(filename) ]
 
