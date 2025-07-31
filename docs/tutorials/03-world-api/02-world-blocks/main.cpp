@@ -25,28 +25,34 @@
 
 #include <iostream>
 
-
-// Choosing the Std Unitless distribution, with double precision
+ // Choosing the Std Unitless distribution, with double precision
 #include <gustave/distribs/std/unitless/Gustave.hpp>
 
 using G = gustave::distribs::std::unitless::Gustave<double>;
 
 using World = G::Worlds::SyncWorld;
+using Solver = World::Solver;
+
+[[nodiscard]]
+static Solver newSolver() {
+    auto const g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
+    auto const solverPrecision = 0.01; // precision of the force balancer (here 1%).
+    return Solver{ Solver::Config{ g, solverPrecision } };
+}
 
 [[nodiscard]]
 static World newWorld() {
-    auto g = G::vector3(0.f, -10.f, 0.f); // gravity acceleration (metre/second²).
-    auto solverPrecision = 0.01; // precision of the force balancer (here 1%).
     auto blockSize = G::vector3(1.f, 1.f, 1.f); // block dimension (cube with 1m edge).
-
-    auto solverConfig = World::Solver::Config{ g, solverPrecision };
-    return World{ blockSize, World::Solver{ solverConfig } };
+    return World{ blockSize, newSolver() };
 }
 
 int main() {
+    // -8<- [start:create-world]
     auto world = newWorld();
+    // -8<- [end:create-world]
 
-    // Helper function to list blocks.
+    // -8<- [start:printBlocks]
+    // Utility function to list blocks.
     auto printBlocks = [&world]() -> void {
         auto const& blocks = world.blocks();
         std::cout << "List of blocks (size = " << blocks.size() << "):\n";
@@ -54,12 +60,15 @@ int main() {
             std::cout << "- " << block.index() << ": mass = " << block.mass() << ", isFoundation = " << block.isFoundation() << '\n';
         }
     };
+    // -8<- [end:printBlocks]
 
     std::cout << "Step 1: create an empty world\n";
     printBlocks();
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 2: add blocks\n";
+
+    // -8<- [start:block-constants]
     auto const maxBlockStress = G::Model::PressureStress{
         100'000.0, // compression (Pascal)
         50'000.0,  // shear (Pascal)
@@ -67,38 +76,52 @@ int main() {
     };
     auto const heavyMass = 10'000.0;  // kilogram
     auto const lightMass = 1'000.0;   // kilogram
+    // -8<- [end:block-constants]
+
+    // -8<- [start:insert-blocks]
     {
+        // Create a new transaction
         auto tr = World::Transaction{};
-        tr.addBlock({ { 0,0,0 }, maxBlockStress, heavyMass, true }); // foundation block at coordinates {0,0,0}.
+        // Add a single foundation block at coordinates {0,0,0}
+        tr.addBlock({ { 0,0,0 }, maxBlockStress, heavyMass, true });
+        // Add 6 non-foundation blocks above the foundation
         for (int i = 1; i <= 6; ++i) {
-            tr.addBlock({ { 0,i,0 }, maxBlockStress, lightMass, false }); // non-foundation block at coordinates {0,i,0}.
+            tr.addBlock({ { 0,i,0 }, maxBlockStress, lightMass, false });
         }
+        // Run the transaction
         world.modify(tr);
     }
+    // -8<- [end:insert-blocks]
+
     printBlocks();
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 3: delete blocks\n";
+    // -8<- [start:delete-blocks]
     {
         auto tr = World::Transaction{};
         tr.removeBlock({ 0,6,0 });
         tr.removeBlock({ 0,5,0 });
         world.modify(tr);
     }
+    // -8<- [end:delete-blocks]
     printBlocks();
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 4: modify the top block\n";
+    // -8<- [start:modify-blocks]
     {
         auto tr = World::Transaction{};
         tr.removeBlock({ 0,4,0 });
         tr.addBlock({ {0,4,0}, maxBlockStress, heavyMass, false });
         world.modify(tr);
     }
+    // -8<- [end:modify-blocks]
     printBlocks();
 
     std::cout << "\n\n--------------------\n";
     std::cout << "Step 5: inspect a block\n";
+    // -8<- [start:inspect-blocks]
     auto inspectBlock = [&world](World::BlockIndex const& blockId) -> void {
         std::cout << "Block at " << blockId << ": ";
         auto const blockRef = world.blocks().find(blockId);
@@ -112,4 +135,5 @@ int main() {
     inspectBlock({ 0,0,0 });
     inspectBlock({ 0,1,0 });
     inspectBlock({ 9,9,9 });
+    // -8<- [end:inspect-blocks]
 }
