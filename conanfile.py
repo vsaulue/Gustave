@@ -73,12 +73,13 @@ class GustaveRecipe(ConanFile):
 
     def build_requirements(self):
         self.tool_requires("cmake/3.29.0")
-        if self._unitTestsEnabled():
-            self.test_requires("catch2/3.6.0")
-        if self._toolsEnabled():
-            self.test_requires("cli11/2.4.2")
-            self.test_requires("nlohmann_json/3.11.3")
-            self.test_requires("svgwrite/0.2.0")
+        if not self.conf.get("tools.build:skip_test", default=False):
+            if self._unitTestsEnabled():
+                self.test_requires("catch2/3.6.0")
+            if self._toolsEnabled():
+                self.test_requires("cli11/2.4.2")
+                self.test_requires("nlohmann_json/3.11.3")
+                self.test_requires("svgwrite/0.2.0")
 
     def validate(self):
         check_min_cppstd(self, 20)
@@ -102,10 +103,9 @@ class GustaveRecipe(ConanFile):
     def build(self):
         cmake = CMake(self)
         cmake.configure()
-        if not self.conf.get("tools.build:skip_test", default=False):
-            cmake.build()
-            if can_run(self):
-                cmake.ctest(cli_args=["-LE", "packaging-test"])
+        cmake.build()
+        if can_run(self):
+            cmake.ctest(cli_args=["-LE", "packaging-test"])
 
     def package(self):
         copy(self, "LICENSE.txt", src=str(self.recipe_folder), dst=os.path.join(self.package_folder, "licenses"))
