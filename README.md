@@ -49,12 +49,9 @@ Gustave is a **header-only** library that just requires a **C++20** compiler and
 
 <!-- -8<- [end:body] -->
 
-## User guide
+## Documentation
 
-- [Overview](./docs/overview.md)
-- [Install](./docs/install.md)
-- [Tutorials](./docs/tutorials/tutorials.md)
-- [Lexicon](./docs/lexicon.md)
+Here is [Gustave's documentation (stable branch)](https://vsaulue.github.io/Gustave/stable/)
 
 ## Future work
 
