@@ -32,8 +32,11 @@ The [source tree](https://github.com/vsaulue/Gustave) has a valid conanfile that
 
 ```
 git clone https://github.com/vsaulue/Gustave.git
-conan create ./Gustave -s:h build_type=Release -c tools.build:skip_test=True --build=missing
+conan create ./Gustave -s:h build_type=Release -c tools.build:skip_test=True -c user.gustave:build_tutorials=False -c user.gustave:build_docs=False -c user.gustave:build_tools=False --build=missing
 ```
+
+!!! note
+    Repeat the last command line for all `build_type` required by your project (`Debug`, `RelWithDebInfo`, ...)
 
 This package can then be consumed normally by your other local Conan projects.
 
@@ -45,7 +48,8 @@ This package can then be consumed normally by your other local Conan projects.
 
 Gustave's [source tree](https://github.com/vsaulue/Gustave/packaging/vcpkg/overlay) has a vcpkg overlay that can be used by your projects locally.
 
-**Note:** if you're using Visual Studio, use a [standalone installation of vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell#1---set-up-vcpkg) (the one shipped with the IDE seems to have issues with overlays).
+!!! note
+    if you're using Visual Studio, use a [standalone installation of vcpkg](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell#1---set-up-vcpkg) (the one shipped with the IDE seems to have issues with overlays).
 
 1. Clone Gustave somewhere on your machine (and optionally, checkout a specific version):
 
