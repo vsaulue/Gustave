@@ -13,7 +13,7 @@ Official releases of Gustave will be available on the [Conan center](https://con
 Add the gustave dependency in your project's conanfile.txt:
 ```
 [requires]
-gustave/0.1.0
+gustave/0.1.1
 ```
 
 Usage in your project's CMakeLists.txt:

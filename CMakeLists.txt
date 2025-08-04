@@ -24,7 +24,7 @@
 
 cmake_minimum_required(VERSION 3.29)
 
-set(gustave_version "0.1.0")
+set(gustave_version "0.1.1")
 
 project("Gustave" VERSION "${gustave_version}" LANGUAGES "CXX")
 set(CMAKE_CXX_STANDARD 20)
