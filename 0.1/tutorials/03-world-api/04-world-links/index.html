@@ -1,0 +1,1081 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Structural integrity library for video games">
+      
+      
+      
+        <link rel="canonical" href="https://vsaulue.github.io/gustave/0.1/tutorials/03-world-api/04-world-links/">
+      
+      
+        <link rel="prev" href="../03-world-structures/">
+      
+      
+        <link rel="next" href="../../../lexicon/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>3.4. Links, forces and stresses - Gustave</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.342714a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+   <link href="../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../../assets/javascripts/glightbox.min.js"></script></head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#34-links-forces-and-stresses" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Gustave" class="md-header__button md-logo" aria-label="Gustave" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Gustave
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              3.4. Links, forces and stresses
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/vsaulue/Gustave" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vsaulue/Gustave
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../overview/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../install/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Install
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../lexicon/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Lexicon
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Gustave" class="md-nav__button md-logo" aria-label="Gustave" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Gustave
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/vsaulue/Gustave" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vsaulue/Gustave
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Install
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Tutorials
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    1. Getting started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-solver-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2. Solver API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    3. World API
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            3. World API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-creating-world/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    3.1. New world
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-world-blocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    3.2. Blocks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-world-structures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    3.3. Structures
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    3.4. Links, forces and stresses
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    3.4. Links, forces and stresses
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspect-a-specific-contact" class="md-nav__link">
+    <span class="md-ellipsis">
+      Inspect a specific contact
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-a-contacts-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check a contact's status
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contacts-force" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contact's force
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#links-stress-ratio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Link's stress ratio
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stress-ratio-of-a-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Stress ratio of a structure
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../lexicon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lexicon
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="34-links-forces-and-stresses">3.4. Links, forces and stresses</h1>
+<p>This section explains how to inspect <a href="../../../lexicon/#links-and-contacts">links and contacts</a> in a <code>SyncWorld</code>.</p>
+<p>In a world, links and contacts have a force and a stress factor computed by the <a href="../../../lexicon/#solver">solver</a>. They can be used to determine which <a href="../../../lexicon/#block">blocks</a> or <a href="../../../lexicon/#structure">structures</a> are stable (or failing).</p>
+<p>As links and contacts are quite similar, they are both manipulated with the same type: <code>ContactReference</code>.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li><a href="../../01-getting-started/">Selecting a Gustave configuration</a></li>
+<li><a href="../01-creating-world/">Creating an empty World</a>: we'll reuse the <a href="../01-creating-world/#configuring-a-world"><code>newWorld()</code></a> function.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newWorld</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">world</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newWorld</span><span class="p">();</span>
+</code></pre></div>
+<ul>
+<li><a href="../02-world-blocks/">Adding &amp; inspecting world blocks</a>: we'll add a few blocks for this tutorial.</li>
+</ul>
+<p>We'll prepopulate the world:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// { compression, shear, tensile } in pascal</span>
+<span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="o">::</span><span class="n">Model</span><span class="o">::</span><span class="n">PressureStress</span><span class="p">{</span><span class="w"> </span><span class="mf">500&#39;000.0</span><span class="p">,</span><span class="w"> </span><span class="mf">500&#39;000.0</span><span class="p">,</span><span class="w"> </span><span class="mf">500&#39;000.0</span><span class="w"> </span><span class="p">};</span>
+<span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">weakBlockStress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="o">::</span><span class="n">Model</span><span class="o">::</span><span class="n">PressureStress</span><span class="p">{</span><span class="w"> </span><span class="mf">100&#39;000.0</span><span class="p">,</span><span class="w"> </span><span class="mf">100&#39;000.0</span><span class="p">,</span><span class="w"> </span><span class="mf">100&#39;000.0</span><span class="w"> </span><span class="p">};</span>
+<span class="c1">// kilogram</span>
+<span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">mass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3&#39;000.0</span><span class="p">;</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">tr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">World</span><span class="o">::</span><span class="n">Transaction</span><span class="p">{};</span>
+<span class="w">    </span><span class="c1">// The chair</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">weakBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">weakBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">weakBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">weakBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="p">});</span>
+
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">strongBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="p">});</span>
+
+<span class="w">    </span><span class="c1">// Floating blocks</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">weakBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">tr</span><span class="p">.</span><span class="n">addBlock</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="n">weakBlockStress</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">});</span>
+
+<span class="w">    </span><span class="n">world</span><span class="p">.</span><span class="n">modify</span><span class="p">(</span><span class="n">tr</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Which gives a chair and a floating platform:</p>
+<p><a class="glightbox" href="world.svg" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="" src="world.svg" /></a></p>
+<p>Finally, a convenient alias to the <code>Direction</code> type, which holds an axis-aligned direction (plusX, minusX, plusY, ...):</p>
+<div class="highlight"><pre><span></span><code>using Direction = World::ContactIndex::Direction;
+</code></pre></div>
+<h2 id="inspect-a-specific-contact">Inspect a specific contact</h2>
+<p>To get a specific <code>ContactReference</code>, use the method <code>world.contacts().at(...)</code>. The parameter is a <code>ContactIndex</code>, made of:</p>
+<ul>
+<li>the <code>BlockIndex</code> of the block owning the contact surface.</li>
+<li>a <code>Direction</code>, getting a single surface of this block.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">contact</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">contacts</span><span class="p">().</span><span class="n">at</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">plusY</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Contact &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">contact</span><span class="p">.</span><span class="n">index</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;: other block is &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">contact</span><span class="p">.</span><span class="n">otherBlock</span><span class="p">().</span><span class="n">index</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Expected output:</p>
+<div class="highlight"><pre><span></span><code>Contact { &quot;blockIndex&quot;: { &quot;x&quot;: 0, &quot;y&quot;: 4, &quot;z&quot;: 0}, &quot;direction&quot;: &quot;plusY&quot; }: other block is { &quot;x&quot;: 0, &quot;y&quot;: 5, &quot;z&quot;: 0}
+</code></pre></div>
+<h2 id="check-a-contacts-status">Check a contact's status</h2>
+<p>Like structures, a <code>ContactReference</code> has 2 important methods to check its status.</p>
+<ul>
+<li><code>isValid()</code> checks if the contact exists. If false, almost all other operations on this reference will throw.</li>
+<li><code>isSolved()</code> checks if the <a href="../../../lexicon/#solver">solver</a> was able to find a <a href="../../../lexicon/#force-distribution">force distribution</a> for the structure owning this contact. If false, some operations will throw (reading force, pressure or stress). It implies <code>isValid()</code>.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">printContactStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">world</span><span class="p">](</span><span class="n">World</span><span class="o">::</span><span class="n">ContactIndex</span><span class="w"> </span><span class="k">const</span><span class="o">&amp;</span><span class="w"> </span><span class="n">contactId</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">contactRef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">contacts</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">contactId</span><span class="p">);</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Contact &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">contactId</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;: &quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">contactRef</span><span class="p">.</span><span class="n">isValid</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">contactRef</span><span class="p">.</span><span class="n">isSolved</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;solved</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;unsolved</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;invalid</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="n">printContactStatus</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">plusY</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">printContactStatus</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">3</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">plusX</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">printContactStatus</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">minusX</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Expected output:</p>
+<div class="highlight"><pre><span></span><code>Contact { &quot;blockIndex&quot;: { &quot;x&quot;: 0, &quot;y&quot;: 4, &quot;z&quot;: 0}, &quot;direction&quot;: &quot;plusY&quot; }: solved
+Contact { &quot;blockIndex&quot;: { &quot;x&quot;: 3, &quot;y&quot;: 8, &quot;z&quot;: 0}, &quot;direction&quot;: &quot;plusX&quot; }: unsolved
+Contact { &quot;blockIndex&quot;: { &quot;x&quot;: 9, &quot;y&quot;: 9, &quot;z&quot;: 0}, &quot;direction&quot;: &quot;minusX&quot; }: invalid
+</code></pre></div>
+<h2 id="contacts-force">Contact's force</h2>
+<p>For a solved <code>ContactReference</code>, the <code>forceVector()</code> method is available. It returns the force exerced by <code>otherBlock()</code> on <code>localBlock()</code> through this link:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">printContactForce</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">world</span><span class="p">](</span><span class="n">World</span><span class="o">::</span><span class="n">ContactIndex</span><span class="w"> </span><span class="k">const</span><span class="o">&amp;</span><span class="w"> </span><span class="n">contactId</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cRef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">contacts</span><span class="p">().</span><span class="n">at</span><span class="p">(</span><span class="n">contactId</span><span class="p">);</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Force vector by block &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cRef</span><span class="p">.</span><span class="n">otherBlock</span><span class="p">().</span><span class="n">index</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; on block &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cRef</span><span class="p">.</span><span class="n">localBlock</span><span class="p">().</span><span class="n">index</span><span class="p">();</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; = &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cRef</span><span class="p">.</span><span class="n">forceVector</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="n">printContactForce</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">plusY</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">printContactForce</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">minusY</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">printContactForce</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">minusY</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Possible output:</p>
+<div class="highlight"><pre><span></span><code>Force vector by block { &quot;x&quot;: 0, &quot;y&quot;: 5, &quot;z&quot;: 0} on block { &quot;x&quot;: 0, &quot;y&quot;: 4, &quot;z&quot;: 0} = { &quot;x&quot;: 0, &quot;y&quot;: -120000, &quot;z&quot;: 0 }
+Force vector by block { &quot;x&quot;: 0, &quot;y&quot;: 0, &quot;z&quot;: 0} on block { &quot;x&quot;: 0, &quot;y&quot;: 1, &quot;z&quot;: 0} = { &quot;x&quot;: -0, &quot;y&quot;: 244591, &quot;z&quot;: -0 }
+Force vector by block { &quot;x&quot;: 4, &quot;y&quot;: 0, &quot;z&quot;: 0} on block { &quot;x&quot;: 4, &quot;y&quot;: 1, &quot;z&quot;: 0} = { &quot;x&quot;: -0, &quot;y&quot;: 205409, &quot;z&quot;: -0 }
+</code></pre></div>
+<p>A few comment on this output:</p>
+<ul>
+<li><strong>Line 1:</strong> According to Newton's first law of motion, this contact must receive the full weight of the 4 blocks making the "back of the chair". The weight vector of 4 blocks is <code>4 * mass * g = {0, -120'000, 0} Newton</code>.</li>
+<li><strong>Line 2 &amp; 3:</strong> These 2 contacts are on the surface of the 2 foundations blocks supporting the whole chair. How Gustave balance the weight between the 2 feet is implementation defined, but the sum of these two forces must be the <strong>opposite</strong>  of the weight vector of the chair. Chair's weight vector: <code>15 * mass * g = {0, -450'000, 0} Newton</code></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a href="../../../lexicon/#solver">solver</a> doesn't always find an exact solution (regarding Newton's first law). Remember the <code>solverPrecision</code> value from <a href="../../02-solver-api/#configure-a-solver">Tutorial: Configure a solver</a> ? This is where it matters: here the solver is allowed a <code>0.01</code> (1%) error factor. So the Y-value in <strong>line 1</strong> could be between <code>-118'800</code> and <code>-121'200</code> Newton.</p>
+</div>
+<h2 id="links-stress-ratio">Link's stress ratio</h2>
+<p>This is the ratio <code>actual_pressure / max_nominal_pressure</code>, expressed as compression/shear/tensile components. This is an important property to check the link's stability: if all components are below 1, the link is stable. Otherwise, the link is failing.</p>
+<p>A solved <code>ContactReference</code> has a <code>stressRatio()</code> method:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">printContactStress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">world</span><span class="p">](</span><span class="n">World</span><span class="o">::</span><span class="n">ContactIndex</span><span class="w"> </span><span class="k">const</span><span class="o">&amp;</span><span class="w"> </span><span class="n">contactId</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cRef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">contacts</span><span class="p">().</span><span class="n">at</span><span class="p">(</span><span class="n">contactId</span><span class="p">);</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Stress of link &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">contactId</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; = &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">cRef</span><span class="p">.</span><span class="n">stressRatio</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="n">printContactStress</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">plusY</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">printContactStress</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">minusY</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">printContactStress</span><span class="p">({</span><span class="w"> </span><span class="p">{</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">Direction</span><span class="o">::</span><span class="n">minusY</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Possible output:</p>
+<div class="highlight"><pre><span></span><code>Stress of link { &quot;blockIndex&quot;: { &quot;x&quot;: 0, &quot;y&quot;: 4, &quot;z&quot;: 0}, &quot;direction&quot;: &quot;plusY&quot; } = { &quot;compression&quot;: 1.2, &quot;shear&quot;: 0, &quot;tensile&quot;: 0 }
+Stress of link { &quot;blockIndex&quot;: { &quot;x&quot;: 0, &quot;y&quot;: 1, &quot;z&quot;: 0}, &quot;direction&quot;: &quot;minusY&quot; } = { &quot;compression&quot;: 0.489183, &quot;shear&quot;: 0, &quot;tensile&quot;: 0 }
+Stress of link { &quot;blockIndex&quot;: { &quot;x&quot;: 4, &quot;y&quot;: 1, &quot;z&quot;: 0}, &quot;direction&quot;: &quot;minusY&quot; } = { &quot;compression&quot;: 0.410817, &quot;shear&quot;: 0, &quot;tensile&quot;: 0 }
+</code></pre></div>
+<p>So here the 2 feet of the chair are stable, but the link at the base of chair's back is failing.</p>
+<h2 id="stress-ratio-of-a-structure">Stress ratio of a structure</h2>
+<p>As a conclusion to the <code>SyncWorld</code> tutorial, here is how to safely test the stress ratio of a structure (and therefore its stability):</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">printMaxStressOfStructure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="n">world</span><span class="p">](</span><span class="n">World</span><span class="o">::</span><span class="n">BlockIndex</span><span class="w"> </span><span class="k">const</span><span class="o">&amp;</span><span class="w"> </span><span class="n">blockId</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Gets the StructureReference of a block (unique for a non-foundation).</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">structRef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">world</span><span class="p">.</span><span class="n">blocks</span><span class="p">().</span><span class="n">at</span><span class="p">(</span><span class="n">blockId</span><span class="p">).</span><span class="n">structures</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Max stress ratio of structure of block &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">blockId</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; = &quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="c1">// Ensures that we can access forces &amp; stresses of all links in the structure.</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">structRef</span><span class="p">.</span><span class="n">isSolved</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">G</span><span class="o">::</span><span class="n">Model</span><span class="o">::</span><span class="n">StressRatio</span><span class="p">{</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="p">};</span>
+<span class="w">            </span><span class="c1">// Iterate over all links of the structure.</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="k">const</span><span class="o">&amp;</span><span class="w"> </span><span class="n">linkRef</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">structRef</span><span class="p">.</span><span class="n">links</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">result</span><span class="p">.</span><span class="n">mergeMax</span><span class="p">(</span><span class="n">linkRef</span><span class="p">.</span><span class="n">stressRatio</span><span class="p">());</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;unsolved structure</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="n">printMaxStressOfStructure</span><span class="p">({</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="n">printMaxStressOfStructure</span><span class="p">({</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="w"> </span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Possible output:</p>
+<div class="highlight"><pre><span></span><code>Max stress ratio of structure of block { &quot;x&quot;: 0, &quot;y&quot;: 1, &quot;z&quot;: 0} = { &quot;compression&quot;: 1.2, &quot;shear&quot;: 0.169471, &quot;tensile&quot;: 0 }
+Max stress ratio of structure of block { &quot;x&quot;: 3, &quot;y&quot;: 8, &quot;z&quot;: 0} = unsolved structure
+</code></pre></div>
+<ul>
+<li><strong>Line 1</strong> tells us that the chair is failing due to compression constraints. It is also subjected to some shear constraints that don't cause any failure.</li>
+<li><strong>Line 2</strong> tells us that the magically floating platform has no solution.</li>
+</ul>
+<p>This function is easily adaptable to:</p>
+<ul>
+<li>Get the block with the highest stress ratio (the most likely to break).</li>
+<li>Get a list of blocks with any stress component above 1 (= the list of failing blocks).</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright © 2022-2025 Vincent Saulue-Laborde
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.indexes", "navigation.path", "navigation.tabs", "navigation.top", "toc.follow", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  <script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": false, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script></body>
+</html>
