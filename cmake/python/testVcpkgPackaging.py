@@ -31,8 +31,8 @@ import typing
 
 import gustaveUtils as gu
 
-class TestConanPackaging(gu.GustaveScript):
-    """Tests that the conanfile.py packaging works."""
+class TestVcpkgPackaging(gu.GustaveScript):
+    """Tests that the local vcpkg portfile works."""
 
     # @typing.override
     def makeArgsParser(self) -> argparse.ArgumentParser:
@@ -56,4 +56,4 @@ class TestConanPackaging(gu.GustaveScript):
         ctx.runCmd(buildCmd, cwd=tmpTestPackagePath)
 
 if __name__ == "__main__":
-    TestConanPackaging().run()
+    TestVcpkgPackaging().run()
