@@ -859,7 +859,7 @@
 <p>Official releases of Gustave will be available on the <a href="https://conan.io/center">Conan center</a>.</p>
 <p>Add the gustave dependency in your project's conanfile.txt:
 <div class="highlight"><pre><span></span><code>[requires]
-gustave/0.1.0
+gustave/0.1.1
 </code></pre></div></p>
 <p>Usage in your project's CMakeLists.txt:
 <div class="highlight"><pre><span></span><code>find_package(Gustave CONFIG REQUIRED Distrib-Std)
@@ -872,14 +872,21 @@ target_link_libraries(your-binary PRIVATE Gustave::Distrib-Std)
 <h3 id="from-source">From source</h3>
 <p>The <a href="https://github.com/vsaulue/Gustave">source tree</a> has a valid conanfile that can be used to create the package locally on your machine.</p>
 <div class="highlight"><pre><span></span><code>git clone https://github.com/vsaulue/Gustave.git
-conan create ./Gustave -s:h build_type=Release -c tools.build:skip_test=True --build=missing
+conan create ./Gustave -s:h build_type=Release -c tools.build:skip_test=True -c user.gustave:build_tutorials=False -c user.gustave:build_docs=False -c user.gustave:build_tools=False --build=missing
 </code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Repeat the last command line for all <code>build_type</code> required by your project (<code>Debug</code>, <code>RelWithDebInfo</code>, ...)</p>
+</div>
 <p>This package can then be consumed normally by your other local Conan projects.</p>
 <h2 id="vcpkg">Vcpkg</h2>
 <h3 id="official-registry-soontm">Official registry (SOON™)</h3>
 <h3 id="from-source_1">From source</h3>
 <p>Gustave's <a href="https://github.com/vsaulue/Gustave/packaging/vcpkg/overlay">source tree</a> has a vcpkg overlay that can be used by your projects locally.</p>
-<p><strong>Note:</strong> if you're using Visual Studio, use a <a href="https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell#1---set-up-vcpkg">standalone installation of vcpkg</a> (the one shipped with the IDE seems to have issues with overlays).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if you're using Visual Studio, use a <a href="https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell#1---set-up-vcpkg">standalone installation of vcpkg</a> (the one shipped with the IDE seems to have issues with overlays).</p>
+</div>
 <ol>
 <li>
 <p>Clone Gustave somewhere on your machine (and optionally, checkout a specific version):</p>
