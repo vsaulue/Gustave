@@ -32,11 +32,10 @@
 #include <span>
 #include <vector>
 
-namespace gustave::utils {
-    template<typename T>
-    concept cRangeIndex = std::unsigned_integral<T> && !std::is_const_v<T>;
+#include <gustave/utils/cIndex.hpp>
 
-    template<cRangeIndex Index_>
+namespace gustave::utils {
+    template<cIndex Index_>
     class IndexRange {
     public:
         using Index = Index_;
@@ -105,6 +104,6 @@ namespace gustave::utils {
         Index size_;
     };
 
-    template<cRangeIndex Index>
+    template<cIndex Index>
     IndexRange(Index, Index) -> IndexRange<Index>;
 }
