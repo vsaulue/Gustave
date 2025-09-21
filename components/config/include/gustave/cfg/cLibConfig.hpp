@@ -39,5 +39,6 @@ namespace gustave::cfg {
         typename T::template Vector3<T::realTraits.units().one>;
         requires std::integral<typename T::LinkIndex>;
         requires std::integral<typename T::NodeIndex>;
+        requires std::integral<typename T::StructureIndex>;
     };
 }

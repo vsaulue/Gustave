@@ -45,6 +45,9 @@ namespace gustave::cfg {
     template<cLibConfig auto cfg>
     using NodeIndex = typename decltype(cfg)::NodeIndex;
 
+    template<cLibConfig auto cfg>
+    using StructureIndex = typename decltype(cfg)::StructureIndex;
+
     template<cLibConfig auto cfg, auto unit>
     using Vector3 = typename decltype(cfg)::template Vector3<unit>;
 
