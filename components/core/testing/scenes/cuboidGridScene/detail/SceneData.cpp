@@ -40,7 +40,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
     auto scene1 = SceneData{ blockSize };
 
     auto block1 = scene1.blocks.insert({ {1,1,1}, concrete_20m, 1000.f * u.mass, false });
-    auto struct1 = std::make_shared<StructureData>(scene1, block1);
+    auto struct1 = std::make_shared<StructureData>(0, scene1, block1);
     scene1.structures.insert(struct1);
 
     SECTION("// move semantics") {

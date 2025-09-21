@@ -69,7 +69,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::BlockDataReference") {
         }
 
         SECTION(".structure() // mutable") {
-            StructureData structure{ sceneData, b111 };
+            StructureData structure{ 0, sceneData, b111 };
             CHECK(b333.structure() == nullptr);
             b333.structure() = &structure;
             CHECK(b333.structure() == &structure);
