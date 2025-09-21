@@ -33,6 +33,7 @@ add_unit_test(TARGET Comp-Utils-unit-test
         "tests/utils/getter.cpp"
         "tests/utils/HashEquals.cpp"
         "tests/utils/Hasher.cpp"
+        "tests/utils/IndexGenerator.cpp"
         "tests/utils/IndexRange.cpp"
         "tests/utils/NumberHyperscript.cpp"
         "tests/utils/PointerHash.cpp"
