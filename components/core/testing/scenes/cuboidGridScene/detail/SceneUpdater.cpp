@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <stack>
+#include <unordered_set>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -54,6 +55,8 @@ using SolverStructure = gustave::core::solvers::Structure<libCfg>;
 using SolverLink = SolverStructure::Link;
 using SolverNode = SolverStructure::Node;
 
+using StructureIndex = StructureData::StructureIndex;
+
 template<typename Ptr>
 using PtrSet = gustave::utils::PointerHash::Set<Ptr>;
 
@@ -65,13 +68,24 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
     SceneData data{ blockSize };
 
-    auto runTransaction = [&data](Transaction const& transaction) {
+    auto getStructureIds = [&]() {
+        std::unordered_set<StructureIndex> result;
+        for (auto const& structure : data.structures) {
+            auto const insertRes = result.insert(structure->index());
+            REQUIRE(insertRes.second);
+        }
+        return result;
+    };
+
+    auto runTransaction = [&](Transaction const& transaction) {
         PtrSet<std::shared_ptr<StructureData const>> oldStructures = { data.structures.begin(), data.structures.end() };
         auto result = SceneUpdater{ data }.runTransaction(transaction);
         // Check structure diff of the result.
+        auto const newStructureIds = getStructureIds();
         for (auto const& deletedStructure : result.removedStructures) {
             auto it = oldStructures.find(deletedStructure);
             REQUIRE(it != oldStructures.end());
+            REQUIRE_FALSE(newStructureIds.contains(deletedStructure->index()));
             oldStructures.erase(it);
         }
         for (auto const& newStructure : result.newStructures) {
@@ -153,8 +167,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
                     CHECK(link.normal() == normal);
                     selectedLink = &link;
                     break;
-                }
-                else if (link.localNodeId() == dest && link.otherNodeId() == source) {
+                } else if (link.localNodeId() == dest && link.otherNodeId() == source) {
                     CHECK(link.normal() == -normal);
                     selectedLink = &link;
                     break;
@@ -190,6 +203,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(data.structures.size() == 1);
             CHECK(data.blocks.size() == 1);
             StructureData const& structure = structureOf({ 1,0,0 });
+            CHECK(structure.index() == 0);
             NodeIndex blockIndex = getSolverIndex(structure, { 1,0,0 });
             SolverNode const& solverNode = structure.solverStructure().nodes()[blockIndex];
             CHECK_FALSE(solverNode.isFoundation);
@@ -224,21 +238,23 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
 
             CHECK(data.structures.size() == 2);
 
+            StructureData const& structureX = structureOf({ 1,0,0 });
             {
-                StructureData const& structureX = structureOf({ 1,0,0 });
                 NodeIndex const x1 = getSolverIndex(structureX, { 1,0,0 });
                 NodeIndex const origin = getSolverIndex(structureX, { 0,0,0 });
                 CHECK_FALSE(structureX.contains({ 0,1,0 }));
                 checkLink(structureX, origin, x1, Direction::plusX(), concrete_20m);
             }
 
+            StructureData const& structureY = structureOf({ 0,1,0 });
             {
-                StructureData const& structureY = structureOf({ 0,1,0 });
                 NodeIndex y1 = getSolverIndex(structureY, { 0,1,0 });
                 NodeIndex origin = getSolverIndex(structureY, { 0,0,0 });
                 CHECK_FALSE(structureY.contains({ 1,0,0 }));
                 checkLink(structureY, origin, y1, Direction::plusY(), concrete_20m);
             }
+
+            CHECK(structureX.index() != structureY.index());
         }
 
         SECTION("// Transaction{3+}: 2 adjacent foundations, 1 non-fondation.") {
@@ -260,6 +276,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
 
             {
                 StructureData const& structure = structureOf({ 2,0,0 });
+                CHECK(structure.index() == 0);
                 NodeIndex const x1 = getSolverIndex(structure, { 1,0,0 });
                 NodeIndex const x2 = getSolverIndex(structure, { 2,0,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
@@ -279,6 +296,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(data.structures.size() == 1);
 
             StructureData const& structure = structureOf({ 0,1,0 });
+            CHECK(structure.index() == 0);
             for (int i = 0; i < 4; ++i) {
                 NodeIndex const bottom = getSolverIndex(structure, { 0,i,0 });
                 NodeIndex const top = getSolverIndex(structure, { 0,i + 1,0 });
@@ -303,25 +321,29 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
 
             CHECK(data.structures.size() == 2);
 
+            StructureData const& s0 = structureOf({ 0,0,0 });
+            CHECK(s0.index() != 0);
             {
-                StructureData const& structure = structureOf({ 0,0,0 });
-                CHECK_THAT(r2.newStructures, matchers::c2::Contains(&structure, ptrEquals));
-                NodeIndex const y0 = getSolverIndex(structure, { 0,0,0 });
-                NodeIndex const y1 = getSolverIndex(structure, { 0,1,0 });
-                CHECK_FALSE(structure.contains({ 0,3,0 }));
-                CHECK_FALSE(structure.contains({ 0,4,0 }));
-                checkLink(structure, y0, y1, Direction::plusY(), concrete_20m);
+                CHECK_THAT(r2.newStructures, matchers::c2::Contains(&s0, ptrEquals));
+                NodeIndex const y0 = getSolverIndex(s0, { 0,0,0 });
+                NodeIndex const y1 = getSolverIndex(s0, { 0,1,0 });
+                CHECK_FALSE(s0.contains({ 0,3,0 }));
+                CHECK_FALSE(s0.contains({ 0,4,0 }));
+                checkLink(s0, y0, y1, Direction::plusY(), concrete_20m);
             }
 
+            StructureData const& s3 = structureOf({ 0,3,0 });
+            CHECK(s3.index() != 0);
             {
-                StructureData const& structure = structureOf({ 0,3,0 });
-                CHECK_THAT(r2.newStructures, matchers::c2::Contains(&structure, ptrEquals));
-                NodeIndex const y3 = getSolverIndex(structure, { 0,3,0 });
-                NodeIndex const y4 = getSolverIndex(structure, { 0,4,0 });
-                CHECK_FALSE(structure.contains({ 0,0,0 }));
-                CHECK_FALSE(structure.contains({ 0,1,0 }));
-                checkLink(structure, y3, y4, Direction::plusY(), concrete_20m);
+                CHECK_THAT(r2.newStructures, matchers::c2::Contains(&s3, ptrEquals));
+                NodeIndex const y3 = getSolverIndex(s3, { 0,3,0 });
+                NodeIndex const y4 = getSolverIndex(s3, { 0,4,0 });
+                CHECK_FALSE(s3.contains({ 0,0,0 }));
+                CHECK_FALSE(s3.contains({ 0,1,0 }));
+                checkLink(s3, y3, y4, Direction::plusY(), concrete_20m);
             }
+
+            CHECK(s0.index() != s3.index());
         }
 
         SECTION("// Transaction{4+} -> Transaction{1+}: new block causes 2 structures to merge.") {
@@ -342,6 +364,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
 
             CHECK(data.structures.size() == 1);
             StructureData const& structure = structureOf({ 0,0,1 });
+            CHECK(structure.index() == 2);
             CHECK_THAT(r2.newStructures, matchers::c2::Contains(&structure, ptrEquals));
             NodeIndex const z0 = getSolverIndex(structure, { 0,0,0 });
             NodeIndex const z1 = getSolverIndex(structure, { 0,0,1 });

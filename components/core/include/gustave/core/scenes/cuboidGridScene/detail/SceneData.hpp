@@ -31,6 +31,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/utils/IndexGenerator.hpp>
 #include <gustave/utils/PointerHash.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
@@ -47,6 +48,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using Blocks = SceneBlocks<cfg>;
         using StructureData = detail::StructureData<cfg>;
+        using StructureIndex = cfg::StructureIndex<cfg>;
         using Structures = utils::PointerHash::Set<std::shared_ptr<StructureData>>;
 
         [[nodiscard]]
@@ -81,6 +83,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         Blocks blocks;
         Structures structures;
+        utils::IndexGenerator<StructureIndex> structureIdGenerator;
     private:
         void resetSceneDataPtr() {
             for (auto& structure : structures) {

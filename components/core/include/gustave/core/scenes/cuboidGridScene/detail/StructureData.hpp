@@ -70,10 +70,12 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using NodeIndex = cfg::NodeIndex<libCfg>;
         using SceneData = detail::SceneData<libCfg>;
         using SolverIndices = std::unordered_map<BlockIndex, NodeIndex>;
+        using StructureIndex = cfg::StructureIndex<libCfg>;
 
         [[nodiscard]]
-        explicit StructureData(SceneData& sceneData, BlockDataReference root)
-            : scene_{ &sceneData }
+        explicit StructureData(StructureIndex index, SceneData& sceneData, BlockDataReference root)
+            : index_{ index }
+            , scene_{ &sceneData }
             , solverStructure_{ std::make_shared<SolverStructure>() }
         {
             std::stack<BlockDataReference> remainingBlocks;
@@ -118,6 +120,11 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             } else {
                 return false;
             }
+        }
+
+        [[nodiscard]]
+        StructureIndex index() const {
+            return index_;
         }
 
         [[nodiscard]]
@@ -216,6 +223,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return solverIndices_.at(block.index());
         }
 
+        StructureIndex index_;
         utils::prop::Ptr<SceneData> scene_;
         std::shared_ptr<SolverStructure> solverStructure_;
         SolverIndices solverIndices_;
