@@ -46,5 +46,6 @@ namespace gustave::distribs::std::strictUnit {
 
         using LinkIndex = ::std::size_t;
         using NodeIndex = ::std::size_t;
+        using StructureIndex = ::std::size_t;
     };
 }
