@@ -26,6 +26,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_set>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
@@ -40,16 +41,60 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
     template<cfg::cLibConfig auto cfg>
     struct SceneData {
+    public:
+        using StructureData = detail::StructureData<cfg>;
+        using StructureIndex = cfg::StructureIndex<cfg>;
     private:
         static constexpr auto u = cfg::units(cfg);
 
         template<cfg::cUnitOf<cfg> auto unit>
         using Vector3 = cfg::Vector3<cfg, unit>;
+
+        struct StructuresHelper {
+        public:
+            [[nodiscard]]
+            static StructureIndex getIndex(StructureIndex v) {
+                return v;
+            }
+
+            [[nodiscard]]
+            static StructureIndex getIndex(std::shared_ptr<StructureData> const& data) {
+                return data->index();
+            }
+
+            [[nodiscard]]
+            static StructureIndex getIndex(std::shared_ptr<StructureData const> const& data) {
+                return data->index();
+            }
+
+            [[nodiscard]]
+            static StructureIndex getIndex(StructureData const* data) {
+                return data->index();
+            }
+
+            struct Equals {
+                using is_transparent = void;
+
+                [[nodiscard]]
+                bool operator()(auto const& lhs, auto const& rhs) const {
+                    return getIndex(lhs) == getIndex(rhs);
+                }
+            };
+
+            struct Hash {
+                using is_transparent = void;
+
+                [[nodiscard]]
+                std::size_t operator()(auto const& value) const {
+                    return std::hash<StructureIndex>{}(getIndex(value));
+                }
+            };
+
+            using Set = std::unordered_set<std::shared_ptr<StructureData>, Hash, Equals>;
+        };
     public:
         using Blocks = SceneBlocks<cfg>;
-        using StructureData = detail::StructureData<cfg>;
-        using StructureIndex = cfg::StructureIndex<cfg>;
-        using Structures = utils::PointerHash::Set<std::shared_ptr<StructureData>>;
+        using Structures = StructuresHelper::Set;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)
