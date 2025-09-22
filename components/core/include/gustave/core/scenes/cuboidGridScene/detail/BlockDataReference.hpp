@@ -56,6 +56,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using Hasher = utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
         using LinkIndices = typename BlockMappedData<libCfg>::LinkIndices;
         using PressureStress = model::PressureStress<libCfg>;
+        using StructureIndex = BlockMappedData<libCfg>::StructureIndex;
 
         [[nodiscard]]
         static constexpr bool isMutable() {
@@ -105,15 +106,15 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        StructureData<libCfg>*& structure()
+        StructureIndex& structureId()
             requires (isMutable_)
         {
-            return data_->second.structure();
+            return data_->second.structureId();
         }
 
         [[nodiscard]]
-        StructureData<libCfg> const* structure() const {
-            return data_->second.structure();
+        StructureIndex structureId() const {
+            return data_->second.structureId();
         }
 
         [[nodiscard]]

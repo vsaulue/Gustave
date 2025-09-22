@@ -84,16 +84,16 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
                 BlockDataReference curBlock = remainingBlocks.top();
                 remainingBlocks.pop();
                 assert(!curBlock.isFoundation());
-                if (curBlock.structure() != this) {
+                if (curBlock.structureId() != index) {
                     declareBlock(curBlock);
-                    curBlock.structure() = this;
+                    curBlock.structureId() = index;
                     for (DataNeighbour const& neighbour : DataNeighbours{ scene_->blocks, curBlock.index() }) {
                         BlockDataReference nBlock = neighbour.block;
                         if (nBlock.isFoundation()) {
                             declareBlock(nBlock);
                             addContact(curBlock, neighbour);
                         } else {
-                            if (nBlock.structure() != this) {
+                            if (nBlock.structureId() != index) {
                                 remainingBlocks.push(nBlock);
                             } else {
                                 addContact(curBlock, neighbour);

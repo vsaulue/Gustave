@@ -94,6 +94,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         };
     public:
         using Blocks = SceneBlocks<cfg>;
+        using StructureIdGenerator = utils::IndexGenerator<StructureIndex>;
         using Structures = StructuresHelper::Set;
 
         [[nodiscard]]
@@ -126,9 +127,14 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return structure != nullptr && structures.contains(structure);
         }
 
+        [[nodiscard]]
+        bool isStructureIdValid(StructureIndex id) const {
+            return id != structureIdGenerator.invalidIndex() && structures.contains(id);
+        }
+
         Blocks blocks;
         Structures structures;
-        utils::IndexGenerator<StructureIndex> structureIdGenerator;
+        StructureIdGenerator structureIdGenerator;
     private:
         void resetSceneDataPtr() {
             for (auto& structure : structures) {

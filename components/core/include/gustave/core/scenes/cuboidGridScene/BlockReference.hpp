@@ -63,6 +63,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using IndexNeighbours = detail::IndexNeighbours;
         using SceneData = detail::SceneData<libCfg>;
         using StructureData = detail::StructureData<libCfg>;
+        using StructureIndex = StructureData::StructureIndex;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -180,9 +181,9 @@ namespace gustave::core::scenes::cuboidGridScene {
                 , size_{ 0 }
             {
                 auto const& structures = block.sceneData_->structures;
-                auto addValue = [this, &structures](StructureData const* data) {
-                    if (!contains(data)) {
-                        auto sharedStructure = *structures.find(data);
+                auto addValue = [&](StructureIndex structId) {
+                    if (!contains(structId)) {
+                        auto sharedStructure = *structures.find(structId);
                         sceneStructures_[size_] = StructureReference{ std::move(sharedStructure) };
                         ++size_;
                     }
@@ -192,11 +193,11 @@ namespace gustave::core::scenes::cuboidGridScene {
                     for (auto const& neighbour : DataNeighbours{ block.sceneData_->blocks, block.index_ }) {
                         auto const nBlockData = neighbour.block;
                         if (!nBlockData.isFoundation()) {
-                            addValue(nBlockData.structure());
+                            addValue(nBlockData.structureId());
                         }
                     }
                 } else {
-                    addValue(block.data().structure());
+                    addValue(block.data().structureId());
                 }
             }
 
@@ -226,9 +227,9 @@ namespace gustave::core::scenes::cuboidGridScene {
             }
 
             [[nodiscard]]
-            bool contains(StructureData const* data) const {
+            bool contains(StructureIndex structId) const {
                 for (std::size_t id = 0; id < size_; ++id) {
-                    if (data == &detail::structureDataOf(sceneStructures_[id])) {
+                    if (structId == detail::structureDataOf(sceneStructures_[id]).index()) {
                         return true;
                     }
                 }

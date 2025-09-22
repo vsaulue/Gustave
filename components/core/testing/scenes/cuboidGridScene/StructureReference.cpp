@@ -78,9 +78,9 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
     auto structureOf = [&](BlockIndex const& index) -> StructureReference {
         auto const blockDataRef = data.blocks.find(index);
         REQUIRE(blockDataRef);
-        auto const rawStructure = blockDataRef.structure();
-        REQUIRE(rawStructure);
-        auto it = data.structures.find(rawStructure);
+        auto const structId = blockDataRef.structureId();
+        REQUIRE(structId != data.structureIdGenerator.invalidIndex());
+        auto const it = data.structures.find(structId);
         REQUIRE(it != data.structures.end());
         return StructureReference{ *it };
     };

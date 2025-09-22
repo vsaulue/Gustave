@@ -65,6 +65,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using SceneData = detail::SceneData<libCfg>;
         using StructureData = detail::StructureData<libCfg>;
+        using StructureIndex = StructureData::StructureIndex;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -98,7 +99,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             }
             for (BlockDataReference root : ctx.newRoots) {
                 assert(!root.isFoundation());
-                if (!data_->isStructureValid(root.structure())) {
+                if (!data_->isStructureIdValid(root.structureId())) {
                     auto const newStructId = data_->structureIdGenerator();
                     auto newStructure = std::make_shared<StructureData>(newStructId, *data_, root);
                     data_->structures.emplace(newStructure);
@@ -184,9 +185,9 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         void removeStructureOf(TransactionContext& ctx, ConstBlockDataReference block) {
-            StructureData const* structure = block.structure();
-            if (structure != nullptr) {
-                auto it = data_->structures.find(structure);
+            auto const structureId = block.structureId();
+            if (structureId != 0) {
+                auto it = data_->structures.find(structureId);
                 if (it != data_->structures.end()) {
                     // unordered_set::extract() doesn't support Hash::is_transparent before c++23.
                     ctx.removedStructures.push_back(std::move(data_->structures.extract(it).value()));

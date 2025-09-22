@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -52,6 +53,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using BlockDataReference = detail::BlockDataReference<libCfg, false>;
         using SceneData = detail::SceneData<libCfg>;
         using StructureData = detail::StructureData<libCfg>;
+        using StructureIndex = StructureData::StructureIndex;
 
         struct BlockDatas {
             BlockDataReference local;
@@ -63,6 +65,18 @@ namespace gustave::core::scenes::cuboidGridScene {
                     return !local.isFoundation() || !other.isFoundation();
                 }
                 return false;
+            }
+
+            [[nodiscard]]
+            std::optional<StructureIndex> structureId() const {
+                if (!isValid()) {
+                    return {};
+                }
+                if (!local.isFoundation()) {
+                    return local.structureId();
+                } else {
+                    return other.structureId();
+                }
             }
         };
 
@@ -178,15 +192,14 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         StructureReference structure() const {
-            BlockDatas datas = blockDatas();
-            if (!datas.isValid()) {
+            auto const datas = blockDatas();
+            auto const optStructId = datas.structureId();
+            if (!optStructId) {
                 throw std::out_of_range(invalidMessage());
             }
-            StructureData const* localStruct = datas.local.structure();
-            auto rawStruct = (localStruct != nullptr) ? localStruct : datas.other.structure();
-            std::shared_ptr<StructureData const> sharedStruct = *scene_->structures.find(rawStruct);
-            assert(sharedStruct);
-            return StructureReference{ std::move(sharedStruct) };
+            auto sharedStructData = *scene_->structures.find(*optStructId);
+            assert(sharedStructData);
+            return StructureReference{ std::move(sharedStructData) };
         }
 
         [[nodiscard]]
