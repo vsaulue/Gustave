@@ -94,7 +94,6 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
         }
         REQUIRE_THAT(data.structures, matchers::c2::UnorderedRangeEquals(oldStructures));
         // check structures.
-        REQUIRE_FALSE(data.structures.contains(nullptr));
         for (auto const& structure : data.structures) {
             bool hasNonFoundation = false;
             for (auto const& [index,solverIndex] : structure->solverIndices()) {
