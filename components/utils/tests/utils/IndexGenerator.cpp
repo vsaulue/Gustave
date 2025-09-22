@@ -31,22 +31,48 @@
 
 namespace utils = gustave::utils;
 
+using IndexGenerator = utils::IndexGenerator<std::uint32_t>;
+
 TEST_CASE("utils::IndexGenerator") {
-    auto gen = utils::IndexGenerator<std::uint32_t>{};
+    auto gen = IndexGenerator{};
+
+    SECTION("// constructor") {
+        SECTION("- default") {
+            CHECK(gen.readNextIndex() == 1);
+        }
+
+        SECTION("- custom first") {
+            auto gen123 = IndexGenerator{ 123 };
+            CHECK(gen123.readNextIndex() == 123);
+        }
+
+        SECTION("- invalid") {
+            CHECK_THROWS_AS(IndexGenerator{ 0 }, std::invalid_argument);
+        }
+    }
 
     SECTION("operator()()") {
-        CHECK(gen() == 0);
-        CHECK(gen() == 1);
-        CHECK(gen() == 2);
+        SECTION("// valid") {
+            CHECK(gen() == 1);
+            CHECK(gen() == 2);
+            CHECK(gen() == 3);
+        }
+
+        SECTION("// invalid") {
+            static constexpr auto MAX = std::numeric_limits<IndexGenerator::IndexType>::max();
+            auto genMax = IndexGenerator{ MAX };
+            CHECK(genMax() == MAX);
+            CHECK_THROWS_AS(genMax(), std::overflow_error);
+        }
     }
 
     SECTION("readNextIndex()") {
-        CHECK(gen.readNextIndex() == 0);
-        CHECK(gen.readNextIndex() == 0);
-        CHECK(gen() == 0);
+        CHECK(gen.readNextIndex() == 1);
+        CHECK(gen.readNextIndex() == 1);
         CHECK(gen() == 1);
-        CHECK(gen.readNextIndex() == 2);
-        CHECK(gen.readNextIndex() == 2);
         CHECK(gen() == 2);
+        CHECK(gen.readNextIndex() == 3);
+        CHECK(gen.readNextIndex() == 3);
+        CHECK(gen() == 3);
     }
 }

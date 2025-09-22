@@ -25,6 +25,9 @@
 
 #pragma once
 
+#include <sstream>
+#include <stdexcept>
+
 #include <gustave/utils/cIndex.hpp>
 
 namespace gustave::utils {
@@ -34,9 +37,20 @@ namespace gustave::utils {
         using IndexType = IndexType_;
 
         [[nodiscard]]
-        IndexGenerator()
-            : nextIndex_{ 0 }
-        {}
+        static constexpr IndexType invalidIndex() {
+            return 0;
+        }
+
+        [[nodiscard]]
+        IndexGenerator(IndexType firstIndex = 1)
+            : nextIndex_{ firstIndex }
+        {
+            if (firstIndex == invalidIndex()) {
+                std::stringstream msg;
+                msg << "IndexGenerator: invalid firstIndex:" << firstIndex << '.';
+                throw std::invalid_argument(msg.str());
+            }
+        }
 
         [[nodiscard]]
         IndexType readNextIndex() const {
@@ -46,6 +60,9 @@ namespace gustave::utils {
         [[nodiscard]]
         IndexType operator()() {
             auto const result = nextIndex_;
+            if (result == invalidIndex()) {
+                throw std::overflow_error("IndexGenerator overflow");
+            }
             nextIndex_ += 1;
             return result;
         }
