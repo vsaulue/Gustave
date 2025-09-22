@@ -29,7 +29,6 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 
 #include <TestHelpers.hpp>
 
@@ -38,7 +37,6 @@ using BlockData = gustave::core::scenes::cuboidGridScene::detail::BlockData<libC
 using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
 using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
 using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
-using StructureData = gustave::core::scenes::cuboidGridScene::detail::StructureData<libCfg>;
 
 template<bool isMutable>
 using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg, isMutable>;
@@ -54,7 +52,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::BlockDataReference") {
             CHECK(b111.index() == BlockIndex{ 1,1,1 });
             CHECK(b111.mass() == 5.f * u.mass);
             CHECK(b111.isFoundation() == false);
-            CHECK(b111.structure() == nullptr);
+            CHECK(b111.structureId() == sceneData.structureIdGenerator.invalidIndex());
         }
 
         SECTION("operator bool() const") {
@@ -69,10 +67,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::BlockDataReference") {
         }
 
         SECTION(".structure() // mutable") {
-            StructureData structure{ 0, sceneData, b111 };
-            CHECK(b333.structure() == nullptr);
-            b333.structure() = &structure;
-            CHECK(b333.structure() == &structure);
+            b333.structureId() = 64;
+            CHECK(b333.structureId() == 64);
         }
     }
 
@@ -82,7 +78,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::BlockDataReference") {
             CHECK(cRef.index() == BlockIndex{ 1,1,1 });
             CHECK(cRef.mass() == 5.f * u.mass);
             CHECK(cRef.isFoundation() == false);
-            CHECK(cRef.structure() == nullptr);
+            CHECK(cRef.structureId() == sceneData.structureIdGenerator.invalidIndex());
         }
 
         SECTION("::BlockDataReference(BlockDataReference<*,true> const&)") {

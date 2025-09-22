@@ -35,6 +35,8 @@
 using BlockConstructionInfo = gustave::core::scenes::cuboidGridScene::BlockConstructionInfo<libCfg>;
 using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
 
+using IndexGenerator = gustave::utils::IndexGenerator<std::size_t>;
+
 TEST_CASE("core::scenes::cuboidGridScene::detail::BlockMappedData") {
     SECTION("// constructor & getters") {
         const BlockConstructionInfo info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
@@ -48,6 +50,6 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::BlockMappedData") {
         CHECK(data.linkIndices().plusZ == maxLinkId);
         CHECK(data.mass() == 5.f * u.mass);
         CHECK(data.isFoundation() == true);
-        CHECK(data.structure() == nullptr);
+        CHECK(data.structureId() == IndexGenerator::invalidIndex());
     }
 }

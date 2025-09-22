@@ -77,6 +77,13 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
         return result;
     };
 
+    auto getStructureById = [&](StructureIndex structId) -> StructureData const& {
+        auto const blockStructIt = data.structures.find(structId);
+        REQUIRE(blockStructIt != data.structures.end());
+        REQUIRE(*blockStructIt != nullptr);
+        return **blockStructIt;
+    };
+
     auto runTransaction = [&](Transaction const& transaction) {
         PtrSet<std::shared_ptr<StructureData const>> oldStructures = { data.structures.begin(), data.structures.end() };
         auto result = SceneUpdater{ data }.runTransaction(transaction);
@@ -101,7 +108,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
                 REQUIRE(blockRef);
                 if (!blockRef.isFoundation()) {
                     hasNonFoundation = true;
-                    REQUIRE(blockRef.structure() == structure.get());
+                    REQUIRE(blockRef.structureId() == structure->index());
                 }
             }
             REQUIRE(hasNonFoundation);
@@ -109,15 +116,14 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
         // Check blocks.
         for (auto const& blockData : data.blocks) {
             ConstBlockDataReference blockRef{ &blockData };
-            StructureData const* blockStruct = blockRef.structure();
+            auto const blockStructId = blockRef.structureId();
             // structure
             if (blockRef.isFoundation()) {
-                REQUIRE(blockStruct == nullptr);
+                REQUIRE(blockStructId == data.structureIdGenerator.invalidIndex());
             } else {
-                REQUIRE(data.structures.contains(blockStruct));
+                auto const& blockStruct = getStructureById(blockRef.structureId());
                 for (auto const& neighbour : ConstDataNeighbours{ data.blocks, blockRef.index() }) {
-                    REQUIRE(data.structures.contains(blockStruct));
-                    REQUIRE(blockStruct->solverIndices().contains(neighbour.block.index()));
+                    REQUIRE(blockStruct.solverIndices().contains(neighbour.block.index()));
                 }
             }
             // linkIndices
@@ -127,12 +133,15 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
                     auto const neighbourRef = data.blocks.find(*neighbourIndex);
                     if (neighbourRef) {
                         if (!blockRef.isFoundation() || !neighbourRef.isFoundation()) {
-                            StructureData const* structure = (blockStruct != nullptr) ? blockStruct : neighbourRef.structure();
-                            REQUIRE(structure != nullptr);
+                            auto structId = blockStructId;
+                            if (structId == data.structureIdGenerator.invalidIndex()) {
+                                structId = neighbourRef.structureId();
+                            }
+                            auto const& structure = getStructureById(structId);
                             LinkIndex const& linkId = blockRef.linkIndices().*indexField;
-                            SolverLink const& link = structure->solverStructure().links().at(linkId);
-                            CHECK(link.localNodeId() == *structure->solverIndexOf(blockRef.index()));
-                            CHECK(link.otherNodeId() == *structure->solverIndexOf(neighbourRef.index()));
+                            SolverLink const& link = structure.solverStructure().links().at(linkId);
+                            CHECK(link.localNodeId() == *structure.solverIndexOf(blockRef.index()));
+                            CHECK(link.otherNodeId() == *structure.solverIndexOf(neighbourRef.index()));
                         }
                     }
                 }
@@ -145,11 +154,10 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     };
 
     SECTION(".runTransaction(Transaction const&)") {
-        auto structureOf = [&data](BlockIndex const& index) -> StructureData const& {
+        auto structureOf = [&](BlockIndex const& index) -> StructureData const& {
             ConstBlockDataReference ref = data.blocks.find(index);
             REQUIRE(ref);
-            REQUIRE(ref.structure() != nullptr);
-            return *ref.structure();
+            return getStructureById(ref.structureId());
         };
 
         auto getSolverIndex = [](StructureData const& structure, BlockIndex const& index) -> NodeIndex {
@@ -189,7 +197,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(data.structures.size() == 0);
             auto const blockRef = data.blocks.find({ 1,0,0 });
             REQUIRE(blockRef);
-            CHECK(blockRef.structure() == nullptr);
+            CHECK(blockRef.structureId() == data.structureIdGenerator.invalidIndex());
         }
 
         SECTION("// Transaction{1+}: single non-foundation") {
@@ -270,7 +278,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             {
                 auto const blockRef = data.blocks.find({ 0,0,0 });
                 REQUIRE(blockRef);
-                REQUIRE(blockRef.structure() == nullptr);
+                REQUIRE(blockRef.structureId() == data.structureIdGenerator.invalidIndex());
             }
 
             {

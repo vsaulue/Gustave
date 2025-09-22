@@ -188,6 +188,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
             [[nodiscard]]
             ContactReference at(ContactIndex const& index) const {
+                auto const structId = structure_->index();
                 SceneData const& scene = structure_->sceneData();
                 ContactReference result{ scene, index };
                 BlockIndex const& srcId = index.localBlockIndex();
@@ -197,7 +198,7 @@ namespace gustave::core::scenes::cuboidGridScene {
                     if (otherId) {
                         ConstBlockDataReference otherBlock = scene.blocks.find(*otherId);
                         if (otherBlock) {
-                            if ((structure_ == srcBlock.structure()) || (structure_ == otherBlock.structure())) {
+                            if ((structId == srcBlock.structureId()) || (structId == otherBlock.structureId())) {
                                 return result;
                             }
                         }
@@ -260,9 +261,10 @@ namespace gustave::core::scenes::cuboidGridScene {
                 }
             private:
                 void next() {
+                    auto const structId = structure_->index();
                     while (true) {
                         while (linkIndex_ < internalLinks_.size()) {
-                            if ((structure_ == internalLinks_.source().structure()) || (structure_ == internalLinks_[linkIndex_].otherBlock.structure())) {
+                            if ((structId == internalLinks_.source().structureId()) || (structId == internalLinks_[linkIndex_].otherBlock.structureId())) {
                                 return updateValue();
                             }
                             ++linkIndex_;

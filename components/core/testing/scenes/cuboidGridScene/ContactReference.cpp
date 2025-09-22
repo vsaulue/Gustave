@@ -79,9 +79,9 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     auto structureRefAt = [&](BlockIndex const& blockId) -> StructureReference {
         auto blockDataRef = scene.blocks.find(blockId);
         REQUIRE(blockDataRef);
-        auto rawStruct = blockDataRef.structure();
-        REQUIRE(rawStruct != nullptr);
-        auto it = scene.structures.find(rawStruct);
+        auto const structId = blockDataRef.structureId();
+        REQUIRE(structId != scene.structureIdGenerator.invalidIndex());
+        auto const it = scene.structures.find(structId);
         REQUIRE(it != scene.structures.end());
         return StructureReference{ *it };
         };
@@ -172,7 +172,8 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     }
 
     SECTION(".solverIndex()") {
-        auto const& structureData = *scene.blocks.find({ 7,7,7 }).structure();
+        auto const structureId = scene.blocks.find({ 7,7,7 }).structureId();
+        auto const& structureData = **scene.structures.find(structureId);
         auto checkContact = [&](BlockIndex const& localBlockId, Direction direction) {
             ContactReference contact{ scene, ContactIndex{ localBlockId, direction } };
             auto const solverId = contact.solverIndex();

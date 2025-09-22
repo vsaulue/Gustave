@@ -33,11 +33,9 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
+#include <gustave/utils/IndexGenerator.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg>
-    class StructureData;
-
     template<cfg::cLibConfig auto cfg>
     class BlockMappedData {
     private:
@@ -48,6 +46,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using LinkIndex = cfg::LinkIndex<cfg>;
         using PressureStress = model::PressureStress<cfg>;
+        using StructureIndex = cfg::StructureIndex<cfg>;
 
         struct LinkIndices {
             LinkIndex plusX;
@@ -61,7 +60,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             , linkIndices_{ maxLinkId(), maxLinkId(), maxLinkId() }
             , mass_{ info.mass() }
             , isFoundation_{ info.isFoundation() }
-            , structure_{ nullptr }
+            , structureId_{ utils::IndexGenerator<StructureIndex>::invalidIndex() }
         {
             assert(mass_ > 0.f * u.mass);
         }
@@ -92,13 +91,13 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        StructureData<cfg>*& structure() {
-            return structure_;
+        StructureIndex& structureId() {
+            return structureId_;
         }
 
         [[nodiscard]]
-        StructureData<cfg> const* structure() const {
-            return structure_;
+        StructureIndex structureId() const {
+            return structureId_;
         }
     private:
         [[nodiscard]]
@@ -110,6 +109,6 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         LinkIndices linkIndices_;
         Real<u.mass> mass_;
         bool isFoundation_;
-        StructureData<cfg>* structure_;
+        StructureIndex structureId_;
     };
 }
