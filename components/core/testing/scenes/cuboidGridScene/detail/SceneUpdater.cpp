@@ -202,7 +202,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(data.structures.size() == 1);
             CHECK(data.blocks.size() == 1);
             StructureData const& structure = structureOf({ 1,0,0 });
-            CHECK(structure.index() == 0);
+            CHECK(structure.index() == 1);
             NodeIndex blockIndex = getSolverIndex(structure, { 1,0,0 });
             SolverNode const& solverNode = structure.solverStructure().nodes()[blockIndex];
             CHECK_FALSE(solverNode.isFoundation);
@@ -275,7 +275,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
 
             {
                 StructureData const& structure = structureOf({ 2,0,0 });
-                CHECK(structure.index() == 0);
+                CHECK(structure.index() == 1);
                 NodeIndex const x1 = getSolverIndex(structure, { 1,0,0 });
                 NodeIndex const x2 = getSolverIndex(structure, { 2,0,0 });
                 CHECK_FALSE(structure.contains({ 0,0,0 }));
@@ -295,7 +295,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(data.structures.size() == 1);
 
             StructureData const& structure = structureOf({ 0,1,0 });
-            CHECK(structure.index() == 0);
+            CHECK(structure.index() == 1);
             for (int i = 0; i < 4; ++i) {
                 NodeIndex const bottom = getSolverIndex(structure, { 0,i,0 });
                 NodeIndex const top = getSolverIndex(structure, { 0,i + 1,0 });
@@ -321,7 +321,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(data.structures.size() == 2);
 
             StructureData const& s0 = structureOf({ 0,0,0 });
-            CHECK(s0.index() != 0);
+            CHECK(s0.index() > 1);
             {
                 CHECK_THAT(r2.newStructures, matchers::c2::Contains(&s0, ptrEquals));
                 NodeIndex const y0 = getSolverIndex(s0, { 0,0,0 });
@@ -332,7 +332,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             }
 
             StructureData const& s3 = structureOf({ 0,3,0 });
-            CHECK(s3.index() != 0);
+            CHECK(s3.index() > 1);
             {
                 CHECK_THAT(r2.newStructures, matchers::c2::Contains(&s3, ptrEquals));
                 NodeIndex const y3 = getSolverIndex(s3, { 0,3,0 });
@@ -363,7 +363,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
 
             CHECK(data.structures.size() == 1);
             StructureData const& structure = structureOf({ 0,0,1 });
-            CHECK(structure.index() == 2);
+            CHECK(structure.index() == 3);
             CHECK_THAT(r2.newStructures, matchers::c2::Contains(&structure, ptrEquals));
             NodeIndex const z0 = getSolverIndex(structure, { 0,0,0 });
             NodeIndex const z1 = getSolverIndex(structure, { 0,0,1 });
