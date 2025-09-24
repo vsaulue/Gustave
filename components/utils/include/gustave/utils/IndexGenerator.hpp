@@ -31,7 +31,7 @@
 #include <gustave/utils/cIndex.hpp>
 
 namespace gustave::utils {
-    template<typename IndexType_>
+    template<cIndex IndexType_>
     class IndexGenerator {
     public:
         using IndexType = IndexType_;
