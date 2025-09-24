@@ -33,12 +33,50 @@
 #include <vector>
 
 #include <gustave/utils/cIndex.hpp>
+#include <gustave/utils/EndIterator.hpp>
+#include <gustave/utils/ForwardIterator.hpp>
 
 namespace gustave::utils {
     template<cIndex Index_>
     class IndexRange {
     public:
         using Index = Index_;
+    private:
+        class Enumerator {
+        public:
+            [[nodiscard]]
+            constexpr Enumerator() {}
+
+            [[nodiscard]]
+            constexpr explicit Enumerator(Index start, Index size)
+                : current_{ start }
+                , endValue_{ start + size }
+            {}
+
+            constexpr Enumerator& operator++() {
+                assert(!isEnd());
+                ++current_;
+                return *this;
+            }
+
+            [[nodiscard]]
+            constexpr bool operator==(Enumerator const&) const = default;
+
+            [[nodiscard]]
+            constexpr Index const& operator*() const {
+                return current_;
+            }
+
+            [[nodiscard]]
+            constexpr bool isEnd() const {
+                return current_ == endValue_;
+            }
+        private:
+            Index current_;
+            Index endValue_;
+        };
+    public:
+        using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         constexpr IndexRange()
@@ -74,6 +112,16 @@ namespace gustave::utils {
             assert(value >= 0);
             assert(start_ <= std::numeric_limits<Index>::max() - value);
             size_ = value;
+        }
+
+        [[nodiscard]]
+        constexpr Iterator begin() const {
+            return Iterator{ start_, size_ };
+        }
+
+        [[nodiscard]]
+        constexpr utils::EndIterator end() const {
+            return {};
         }
 
         template<typename T>
