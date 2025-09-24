@@ -24,15 +24,22 @@
  */
 
 #include <cstdint>
+#include <ranges>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
 
 #include <gustave/utils/IndexRange.hpp>
 
 namespace utils = gustave::utils;
 
+using IndexRange = utils::IndexRange<std::uint32_t>;
+
+static_assert(std::ranges::forward_range<IndexRange>);
+
 TEST_CASE("utils::IndexRange") {
-    auto ir = utils::IndexRange<std::uint32_t>{ 2,3 };
+    auto ir = IndexRange{ 2,3 };
 
     SECTION(".setSize()") {
         ir.setSize(7);
@@ -50,6 +57,15 @@ TEST_CASE("utils::IndexRange") {
 
     SECTION(".start()") {
         CHECK(ir.start() == 2);
+    }
+
+    SECTION(".begin() // & .end()") {
+        auto result = std::vector<IndexRange::Index>{};
+        for (auto const& v : ir) {
+            result.push_back(v);
+        }
+        auto const expected = std::vector<IndexRange::Index>{ 2,3,4 };
+        CHECK_THAT(result, Catch::Matchers::RangeEquals(expected));
     }
 
     SECTION(".subSpanOf(std::span)") {
