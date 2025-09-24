@@ -34,10 +34,6 @@ namespace utils = gustave::utils;
 TEST_CASE("utils::IndexRange") {
     auto ir = utils::IndexRange<std::uint32_t>{ 2,3 };
 
-    SECTION(".end()") {
-        CHECK(ir.end() == 5);
-    }
-
     SECTION(".setSize()") {
         ir.setSize(7);
         CHECK(ir.size() == 7);

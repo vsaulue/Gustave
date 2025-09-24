@@ -61,11 +61,6 @@ namespace gustave::utils {
         }
 
         [[nodiscard]]
-        constexpr Index end() const {
-            return start_ + size_;
-        }
-
-        [[nodiscard]]
         constexpr Index size() const {
             return size_;
         }
