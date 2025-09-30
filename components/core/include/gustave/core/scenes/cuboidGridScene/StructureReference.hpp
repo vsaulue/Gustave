@@ -69,6 +69,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         using BlockIndex = typename BlockReference::BlockIndex;
         using ContactIndex = typename ContactReference::ContactIndex;
+        using StructureIndex = cfg::StructureIndex<cfg>;
 
         class Blocks {
         private:
@@ -318,13 +319,18 @@ namespace gustave::core::scenes::cuboidGridScene {
         [[nodiscard]]
         explicit StructureReference(std::shared_ptr<StructureData const> data)
             : data_{ std::move(data) }
-        {
-            assert(data_);
-        }
+            , index_{ initIndex(data_.get()) }
+        {}
+
+        [[nodiscard]]
+        explicit StructureReference(SceneData const& scene, StructureIndex index)
+            : data_{ initData(scene, index) }
+            , index_{ index }
+        {}
 
         [[nodiscard]]
         explicit StructureReference(utils::NoInit)
-            : data_{ nullptr }
+            : StructureReference{ nullptr }
         {}
 
         [[nodiscard]]
@@ -335,6 +341,25 @@ namespace gustave::core::scenes::cuboidGridScene {
         [[nodiscard]]
         Contacts contacts() const {
             return Contacts{ *data_ };
+        }
+
+        [[nodiscard]]
+        StructureIndex index() const {
+            if (index_ == invalidIndex()) {
+                throw invalidError();
+            }
+            return data_->index();
+        }
+
+        [[nodiscard]]
+        std::out_of_range invalidError() const {
+            std::stringstream msg;
+            if (index_ == invalidIndex()) {
+                msg << "Invalid structure (invalid index).";
+            } else {
+                msg << "Invalid structure at index " << index_ << '.';
+            }
+            return std::out_of_range{ msg.str() };
         }
 
         [[nodiscard]]
@@ -359,7 +384,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         bool isValid() const {
-            return data_->isValid();
+            return data_ != nullptr && data_->isValid();
         }
 
         [[nodiscard]]
@@ -369,6 +394,31 @@ namespace gustave::core::scenes::cuboidGridScene {
         friend detail::StructureData<libCfg_> const& detail::structureDataOf(StructureReference<libCfg_> const&);
     private:
         std::shared_ptr<StructureData const> data_;
+        StructureIndex index_;
+
+        [[nodiscard]]
+        static constexpr StructureIndex invalidIndex() {
+            return SceneData::StructureIdGenerator::invalidIndex();
+        }
+
+        [[nodiscard]]
+        static std::shared_ptr<StructureData const> initData(SceneData const& scene, StructureIndex index) {
+            auto const it = scene.structures.find(index);
+            if (it != scene.structures.end()) {
+                return *it;
+            } else {
+                return nullptr;
+            }
+        }
+
+        [[nodiscard]]
+        static StructureIndex initIndex(StructureData const* data) {
+            if (data == nullptr) {
+                return invalidIndex();
+            } else {
+                return data->index();
+            }
+        }
     public:
         using Hasher = utils::Hasher<StructureReference, &StructureReference::data_>;
     };
