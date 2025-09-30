@@ -85,8 +85,7 @@ namespace gustave::core::scenes {
         CuboidGridScene& operator=(CuboidGridScene&&) = default;
 
         TransactionResult modify(Transaction const& transaction) {
-            auto upResult = SceneUpdater{ data_ }.runTransaction(transaction);
-            return TransactionResult{ asReferences(std::move(upResult.newStructures)), asReferences(std::move(upResult.removedStructures)) };
+            return SceneUpdater{ data_ }.runTransaction(transaction);
         }
 
         [[nodiscard]]
@@ -124,16 +123,6 @@ namespace gustave::core::scenes {
             return data_.blocks.thicknessAlong(direction);
         }
     private:
-        [[nodiscard]]
-        std::vector<StructureReference> asReferences(std::vector<std::shared_ptr<StructureData const>>&& structures) {
-            std::vector<StructureReference> result;
-            result.reserve(structures.size());
-            for (auto&& structurePtr : structures) {
-                result.emplace_back(std::move(structurePtr));
-            }
-            return result;
-        }
-
         SceneData data_;
     };
 }

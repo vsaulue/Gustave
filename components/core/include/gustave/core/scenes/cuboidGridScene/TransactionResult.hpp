@@ -26,24 +26,24 @@
 #pragma once
 
 #include <vector>
+#include <utility>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
+#include <gustave/cfg/LibTraits.hpp>
+#include <gustave/utils/IndexRange.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto libcfg>
     class TransactionResult {
-    private:
-        using StructureData = detail::StructureData<cfg>;
     public:
-        using StructureReference = cuboidGridScene::StructureReference<cfg>;
+        using StructureIndex = cfg::StructureIndex<libcfg>;
 
-        using DeletedSet = std::vector<StructureReference>;
-        using NewSet = std::vector<StructureReference>;
+        using DeletedSet = std::vector<StructureIndex>;
+        using NewSet = utils::IndexRange<StructureIndex>;
 
         [[nodiscard]]
-        TransactionResult(NewSet newStructures, DeletedSet deletedStructures)
-            : newStructures_{ std::move(newStructures) }
+        explicit TransactionResult(NewSet const& newStructures, DeletedSet deletedStructures)
+            : newStructures_{ newStructures }
             , deletedStructures_{ std::move(deletedStructures) }
         {}
 

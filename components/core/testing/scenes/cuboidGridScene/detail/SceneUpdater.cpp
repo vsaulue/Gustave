@@ -61,21 +61,11 @@ template<typename Ptr>
 using PtrSet = gustave::utils::PointerHash::Set<Ptr>;
 
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
-static constexpr gustave::utils::PointerHash::Equals ptrEquals;
 
 TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
     SceneData data{ blockSize };
-
-    auto getStructureIds = [&]() {
-        std::unordered_set<StructureIndex> result;
-        for (auto const& structure : data.structures) {
-            auto const insertRes = result.insert(structure->index());
-            REQUIRE(insertRes.second);
-        }
-        return result;
-    };
 
     auto getStructureById = [&](StructureIndex structId) -> StructureData const& {
         auto const blockStructIt = data.structures.find(structId);
@@ -85,18 +75,19 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     };
 
     auto runTransaction = [&](Transaction const& transaction) {
-        PtrSet<std::shared_ptr<StructureData const>> oldStructures = { data.structures.begin(), data.structures.end() };
-        auto result = SceneUpdater{ data }.runTransaction(transaction);
+        auto oldStructures = data.structures;
+        auto const result = SceneUpdater{ data }.runTransaction(transaction);
         // Check structure diff of the result.
-        auto const newStructureIds = getStructureIds();
-        for (auto const& deletedStructure : result.removedStructures) {
-            auto it = oldStructures.find(deletedStructure);
+        for (auto const& deletedStructureId : result.deletedStructures()) {
+            auto const it = oldStructures.find(deletedStructureId);
             REQUIRE(it != oldStructures.end());
-            REQUIRE_FALSE(newStructureIds.contains(deletedStructure->index()));
+            REQUIRE_FALSE(data.structures.contains(deletedStructureId));
             oldStructures.erase(it);
         }
-        for (auto const& newStructure : result.newStructures) {
-            auto insertResult = oldStructures.insert(newStructure);
+        for (auto const& newStructureId : result.newStructures()) {
+            auto const it = data.structures.find(newStructureId);
+            REQUIRE(it != data.structures.end());
+            auto const insertResult = oldStructures.insert(*it);
             REQUIRE(insertResult.second);
         }
         REQUIRE_THAT(data.structures, matchers::c2::UnorderedRangeEquals(oldStructures));
@@ -191,8 +182,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             Transaction t;
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, true });
             auto const result = runTransaction(t);
-            CHECK(result.newStructures.size() == 0);
-            CHECK(result.removedStructures.size() == 0);
+            CHECK(result.newStructures().size() == 0);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(data.structures.size() == 0);
             auto const blockRef = data.blocks.find({ 1,0,0 });
@@ -204,8 +195,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             Transaction t;
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
             auto const result = runTransaction(t);
-            CHECK(result.newStructures.size() == 1);
-            CHECK(result.removedStructures.size() == 0);
+            CHECK(result.newStructures().size() == 1);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(data.structures.size() == 1);
             CHECK(data.blocks.size() == 1);
@@ -221,14 +212,14 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             Transaction t;
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, true });
             auto const r1 = runTransaction(t);
-            CHECK(r1.newStructures.size() == 0);
-            CHECK(r1.removedStructures.size() == 0);
+            CHECK(r1.newStructures().size() == 0);
+            CHECK(r1.deletedStructures().size() == 0);
 
             t.clear();
             t.removeBlock({ 1,0,0 });
             auto const r2 = runTransaction(t);
-            CHECK(r2.newStructures.size() == 0);
-            CHECK(r2.removedStructures.size() == 0);
+            CHECK(r2.newStructures().size() == 0);
+            CHECK(r2.deletedStructures().size() == 0);
 
             CHECK(data.structures.size() == 0);
             CHECK(data.blocks.size() == 0);
@@ -240,8 +231,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
             t.addBlock({ {0,1,0}, concrete_20m, blockMass, false });
             auto const result = runTransaction(t);
-            CHECK(result.newStructures.size() == 2);
-            CHECK(result.removedStructures.size() == 0);
+            CHECK(result.newStructures().size() == 2);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(data.structures.size() == 2);
 
@@ -270,8 +261,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, true });
             t.addBlock({ {2,0,0}, concrete_20m, blockMass, false });
             auto const result = runTransaction(t);
-            CHECK(result.newStructures.size() == 1);
-            CHECK(result.removedStructures.size() == 0);
+            CHECK(result.newStructures().size() == 1);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(data.structures.size() == 1);
 
@@ -297,8 +288,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
                 t.addBlock({ {0,i,0}, concrete_20m, blockMass, i == 0 });
             }
             auto const result = runTransaction(t);
-            CHECK(result.newStructures.size() == 1);
-            CHECK(result.removedStructures.size() == 0);
+            CHECK(result.newStructures().size() == 1);
+            CHECK(result.deletedStructures().size() == 0);
 
             CHECK(data.structures.size() == 1);
 
@@ -317,21 +308,21 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
                 t.addBlock({ {0,i,0}, concrete_20m, blockMass, false });
             }
             auto const r1 = runTransaction(t);
-            CHECK(r1.newStructures.size() == 1);
-            CHECK(r1.removedStructures.size() == 0);
+            CHECK(r1.newStructures().size() == 1);
+            CHECK(r1.deletedStructures().size() == 0);
 
             t.clear();
             t.removeBlock({ 0,2,0 });
             auto const r2 = runTransaction(t);
-            CHECK(r2.newStructures.size() == 2);
-            CHECK_THAT(r2.removedStructures, matchers::c2::UnorderedRangeEquals(r1.newStructures, ptrEquals));
+            CHECK(r2.newStructures().size() == 2);
+            CHECK_THAT(r2.deletedStructures(), matchers::c2::UnorderedRangeEquals(r1.newStructures()));
 
             CHECK(data.structures.size() == 2);
 
             StructureData const& s0 = structureOf({ 0,0,0 });
             CHECK(s0.index() > 1);
             {
-                CHECK_THAT(r2.newStructures, matchers::c2::Contains(&s0, ptrEquals));
+                CHECK_THAT(r2.newStructures(), matchers::c2::Contains(s0.index()));
                 NodeIndex const y0 = getSolverIndex(s0, { 0,0,0 });
                 NodeIndex const y1 = getSolverIndex(s0, { 0,1,0 });
                 CHECK_FALSE(s0.contains({ 0,3,0 }));
@@ -342,7 +333,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             StructureData const& s3 = structureOf({ 0,3,0 });
             CHECK(s3.index() > 1);
             {
-                CHECK_THAT(r2.newStructures, matchers::c2::Contains(&s3, ptrEquals));
+                CHECK_THAT(r2.newStructures(), matchers::c2::Contains(s3.index()));
                 NodeIndex const y3 = getSolverIndex(s3, { 0,3,0 });
                 NodeIndex const y4 = getSolverIndex(s3, { 0,4,0 });
                 CHECK_FALSE(s3.contains({ 0,0,0 }));
@@ -360,19 +351,19 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             t.addBlock({ {0,0,3}, concrete_20m, blockMass, false });
             t.addBlock({ {0,0,4}, concrete_20m, blockMass, true });
             auto const r1 = runTransaction(t);
-            CHECK(r1.newStructures.size() == 2);
-            CHECK(r1.removedStructures.size() == 0);
+            CHECK(r1.newStructures().size() == 2);
+            CHECK(r1.deletedStructures().size() == 0);
 
             t.clear();
             t.addBlock({ { 0,0,2 }, concrete_20m, blockMass, false });
             auto const r2 = runTransaction(t);
-            CHECK(r2.newStructures.size() == 1);
-            CHECK_THAT(r2.removedStructures, matchers::c2::UnorderedRangeEquals(r1.newStructures, ptrEquals));
+            CHECK(r2.newStructures().size() == 1);
+            CHECK_THAT(r2.deletedStructures(), matchers::c2::UnorderedRangeEquals(r1.newStructures()));
 
             CHECK(data.structures.size() == 1);
             StructureData const& structure = structureOf({ 0,0,1 });
             CHECK(structure.index() == 3);
-            CHECK_THAT(r2.newStructures, matchers::c2::Contains(&structure, ptrEquals));
+            CHECK_THAT(r2.newStructures(), matchers::c2::Contains(structure.index()));
             NodeIndex const z0 = getSolverIndex(structure, { 0,0,0 });
             NodeIndex const z1 = getSolverIndex(structure, { 0,0,1 });
             NodeIndex const z2 = getSolverIndex(structure, { 0,0,2 });
@@ -390,18 +381,18 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             t.addBlock({ {0,1,0}, concrete_20m, blockMass, false });
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
             auto const r1 = runTransaction(t);
-            CHECK(r1.newStructures.size() == 2);
-            CHECK(r1.removedStructures.size() == 0);
+            CHECK(r1.newStructures().size() == 2);
+            CHECK(r1.deletedStructures().size() == 0);
 
             StructureData const& structureOfX1 = structureOf({ 1,0,0 });
-            StructureData const& structureOfY1 = structureOf({ 0,1,0 });
+            auto const structIdOfY1 = structureOf({ 0,1,0 }).index();
 
             t.clear();
             t.removeBlock({ 0,1,0 });
             auto const r2 = runTransaction(t);
-            CHECK(r2.newStructures.size() == 0);
-            CHECK(r2.removedStructures.size() == 1);
-            CHECK_THAT(r2.removedStructures, matchers::c2::Contains(&structureOfY1, ptrEquals));
+            CHECK(r2.newStructures().size() == 0);
+            CHECK(r2.deletedStructures().size() == 1);
+            CHECK_THAT(r2.deletedStructures(), matchers::c2::Contains(structIdOfY1));
 
             CHECK(data.structures.size() == 1);
             CHECK(&structureOfX1 == &structureOf({ 1,0,0 }));

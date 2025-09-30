@@ -49,11 +49,11 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldData") {
     REQUIRE(b1Structs.size() == 1);
     auto const sceneS1 = b1Structs[0];
     auto worldS1 = std::make_shared<StructureData>(world1, sceneS1);
-    world1.structures[sceneS1] = worldS1;
+    world1.structures[sceneS1.index()] = worldS1;
 
     SECTION("// move") {
         auto const expectedStructs = WorldData::Structures{
-            { sceneS1, worldS1 },
+            { sceneS1.index(), worldS1},
         };
 
         auto checkMovedWorld = [&](WorldData const& movedWorld) {

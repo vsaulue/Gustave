@@ -210,7 +210,7 @@ namespace gustave::core::worlds::syncWorld {
             private:
                 void updateValue() {
                     if (!isEnd()) {
-                        auto const& structureData = structures_->world_->structures.at(*sceneIterator_);
+                        auto const& structureData = structures_->world_->structures.at(sceneIterator_->index());
                         value_ = StructureReference{ structureData };
                     }
                 }
@@ -230,7 +230,7 @@ namespace gustave::core::worlds::syncWorld {
 
             [[nodiscard]]
             StructureReference operator[](std::size_t index) const {
-                return StructureReference{ world_->structures.at(sceneStructures_[index]) };
+                return StructureReference{ world_->structures.at(sceneStructures_[index].index()) };
             }
 
             [[nodiscard]]

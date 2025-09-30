@@ -297,7 +297,7 @@ TEST_CASE("core::worlds::syncWorld::ContactReference") {
     SECTION(".structure()") {
         SECTION("// valid") {
             auto sceneStructure = world.scene.blocks().at({ 2,2,2 }).structures()[0];
-            CHECK(contact.structure() == StructureReference{ world.structures.at(sceneStructure) });
+            CHECK(contact.structure() == StructureReference{ world.structures.at(sceneStructure.index()) });
         }
     }
 }
