@@ -41,6 +41,8 @@ using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
 using Structures = cuboid::Structures<libCfg>;
 using Transaction = cuboid::Transaction<libCfg>;
 
+using BlockIndex = cuboid::BlockIndex;
+
 static_assert(std::ranges::forward_range<Structures>);
 
 TEST_CASE("core::scenes::cuboidGridScene::Structures") {
@@ -54,6 +56,26 @@ TEST_CASE("core::scenes::cuboidGridScene::Structures") {
     t.addBlock({ {5,1,0}, concrete_20m, 51000.0f * u.mass, true });
     t.addBlock({ {5,2,0}, concrete_20m, 52000.0f * u.mass, false });
     SceneUpdater{ sceneData }.runTransaction(t);
+
+    auto structureIdOf = [&](BlockIndex const& blockId) {
+        auto const blockDataRef = sceneData.blocks.find(blockId);
+        REQUIRE(blockDataRef);
+        return blockDataRef.structureId();
+    };
+
+    SECTION(".at()") {
+        SECTION("// valid") {
+            auto const blockId = BlockIndex{ 0,2,0 };
+            auto const structId = structureIdOf(blockId);
+            auto const result = structures.at(structId);
+            REQUIRE(result.isValid());
+            REQUIRE(result.blocks().contains(blockId));
+        }
+
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(structures.at(10), std::out_of_range);
+        }
+    }
 
     SECTION(".begin() // & end()") {
         bool has1 = false;
@@ -81,6 +103,21 @@ TEST_CASE("core::scenes::cuboidGridScene::Structures") {
         SceneUpdater{ sceneData }.runTransaction(t);
 
         CHECK_FALSE(structures.contains(structRef));
+    }
+
+    SECTION(".find()") {
+        SECTION("// valid") {
+            auto const blockId = BlockIndex{ 0,2,0 };
+            auto const structId = structureIdOf(blockId);
+            auto const result = structures.find(structId);
+            REQUIRE(result.isValid());
+            REQUIRE(result.blocks().contains(blockId));
+        }
+
+        SECTION("// invalid") {
+            auto const structRef = structures.find(10);
+            CHECK_FALSE(structRef.isValid());
+        }
     }
 
     SECTION(".size()") {

@@ -27,7 +27,6 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
@@ -38,9 +37,9 @@ namespace gustave::core::scenes::cuboidGridScene {
     class Structures {
     public:
         using StructureReference = cuboidGridScene::StructureReference<libCfg>;
+        using StructureIndex = StructureReference::StructureIndex;
     private:
         using SceneData = detail::SceneData<libCfg>;
-        using StructureData = detail::StructureData<libCfg>;
 
         class Enumerator {
         public:
@@ -101,6 +100,20 @@ namespace gustave::core::scenes::cuboidGridScene {
         [[nodiscard]]
         Iterator begin() const {
             return Iterator{ *data_ };
+        }
+
+        [[nodiscard]]
+        StructureReference at(StructureIndex const& index) const {
+            auto result = StructureReference{ *data_, index };
+            if (!result.isValid()) {
+                throw result.invalidError();
+            }
+            return result;
+        }
+
+        [[nodiscard]]
+        StructureReference find(StructureIndex const& index) const {
+            return StructureReference{ *data_, index };
         }
 
         [[nodiscard]]
