@@ -164,6 +164,26 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         }
     }
 
+    SECTION(".index()") {
+        SECTION("// valid") {
+            auto const res = s1.index();
+            CHECK(res > 0);
+        }
+
+        SECTION("// invalidated") {
+            auto const expected = s1.index();
+            Transaction t;
+            t.removeBlock({ 1,0,0 });
+            SceneUpdater{ data }.runTransaction(t);
+            CHECK(s1.index() == expected);
+        }
+
+        SECTION("// invalid index") {
+            auto const invalidStructure = StructureReference{ gustave::utils::NO_INIT };
+            CHECK_THROWS_AS(invalidStructure.index(), std::out_of_range);
+        }
+    }
+
     SECTION(".isValid()") {
         SECTION("// true") {
             CHECK(s1.isValid());
