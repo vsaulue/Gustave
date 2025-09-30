@@ -48,16 +48,16 @@ namespace gustave::core::worlds::syncWorld::detail {
 
         void runTransaction(Transaction const& transaction) {
             SceneTransactionResult const trResult = data_.scene.modify(transaction);
-            for (SceneStructure const& sceneStructure : trResult.deletedStructures()) {
-                auto node = data_.structures.extract(sceneStructure);
+            for (auto const& structureId : trResult.deletedStructures()) {
+                auto node = data_.structures.extract(structureId);
                 assert(!node.empty());
                 node.mapped()->invalidate();
             }
-            for (SceneStructure const& sceneStructure : trResult.newStructures()) {
-                std::shared_ptr<StructureData> worldStructure = std::make_shared<StructureData>(data_, sceneStructure);
+            for (auto const& structureId : trResult.newStructures()) {
+                std::shared_ptr<StructureData> worldStructure = std::make_shared<StructureData>(data_, data_.scene.structures().at(structureId));
                 auto const result = data_.solver.run(worldStructure->sceneStructure().solverStructurePtr());
                 worldStructure->solve(result.solutionPtr());
-                [[maybe_unused]] auto const insertResult = data_.structures.insert({ worldStructure->sceneStructure(), std::move(worldStructure) });
+                [[maybe_unused]] auto const insertResult = data_.structures.insert({ structureId, std::move(worldStructure) });
                 assert(insertResult.second);
             }
         }

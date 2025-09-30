@@ -101,7 +101,7 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         Vector3<u.force> forceVector() const {
             auto const sContact = sceneContact();
-            auto const& structureData = *world_->structures.at(sContact.structure());
+            auto const& structureData = *world_->structures.at(sContact.structure().index());
             return structureData.solution().contacts().at(sContact.solverIndex()).forceVector();
         }
 
@@ -119,7 +119,7 @@ namespace gustave::core::worlds::syncWorld {
         bool isSolved() const {
             auto const sContact = world_->scene.contacts().find(index_);
             if (sContact.isValid()) {
-                return world_->structures.at(sContact.structure())->state() == StructureData::State::Solved;
+                return world_->structures.at(sContact.structure().index())->state() == StructureData::State::Solved;
             } else {
                 return false;
             }
@@ -175,7 +175,7 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         StructureReference structure() const {
             SceneStructure sceneStructure = sceneContact().structure();
-            return StructureReference{ world_->structures.at(sceneStructure) };
+            return StructureReference{ world_->structures.at(sceneStructure.index()) };
         }
 
         [[nodiscard]]

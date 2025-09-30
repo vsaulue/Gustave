@@ -48,9 +48,10 @@ namespace gustave::core::worlds::syncWorld::detail {
         using Scene = scenes::CuboidGridScene<libCfg>;
         using Solver = solvers::Force1Solver<libCfg>;
         using StructureData = detail::StructureData<libCfg>;
+        using StructureIndex = StructureData::StructureIndex;
 
         using SceneStructure = typename Scene::StructureReference;
-        using Structures = std::unordered_map<SceneStructure, std::shared_ptr<StructureData>>;
+        using Structures = std::unordered_map<StructureIndex, std::shared_ptr<StructureData>>;
 
         [[nodiscard]]
         explicit WorldData(Vector3<u.length> const& blockSize, Solver solver_)

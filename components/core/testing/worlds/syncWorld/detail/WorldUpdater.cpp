@@ -55,14 +55,14 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
         WorldUpdater{ world }.runTransaction(transaction);
         // Check new structures are solved.
         for (auto const& sceneStructure : world.scene.structures()) {
-            auto const it = world.structures.find(sceneStructure);
+            auto const it = world.structures.find(sceneStructure.index());
             REQUIRE(it != world.structures.end());
             auto const& worldStructure = it->second;
             CHECK(worldStructure->state() == StructureData::State::Solved);
         }
         // Check structure removed from scenes are invalidated.
-        for (auto const& [sceneStruct, worldStruct] : oldStructures) {
-            if (sceneStruct.isValid()) {
+        for (auto const& [structId, worldStruct] : oldStructures) {
+            if (worldStruct->sceneStructure().isValid()) {
                 CHECK(worldStruct->state() == StructureData::State::Solved);
             } else {
                 CHECK(worldStruct->state() == StructureData::State::Invalid);
@@ -77,7 +77,7 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
     };
 
     auto checkForce = [&](BlockIndex const& to, BlockIndex const& from, Vector3<u.force> const& expectedForce) {
-        auto const worldStruct = world.structures.at(sceneStructureOf(from));
+        auto const worldStruct = world.structures.at(sceneStructureOf(from).index());
 
         auto const idTo = worldStruct->sceneStructure().solverIndexOf(to);
         auto const idFrom = worldStruct->sceneStructure().solverIndexOf(from);
@@ -106,7 +106,7 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
             t.addBlock({ {0,2,0}, concrete_20m, blockMass, false });
             runTransaction(t);
 
-            auto const oldStruct = world.structures.at(sceneStructureOf({ 0,2,0 }));
+            auto const oldStruct = world.structures.at(sceneStructureOf({ 0,2,0 }).index());
             REQUIRE(oldStruct->state() == StructureData::State::Solved);
 
             t.clear();

@@ -47,6 +47,8 @@ namespace gustave::core::worlds::syncWorld::detail {
         using Solution = typename Solver::Solution;
         using SolverStructure = typename Solver::Structure;
 
+        using StructureIndex = SceneStructure::StructureIndex;
+
         [[nodiscard]]
         explicit StructureData(WorldData const& world, SceneStructure sceneStructure)
             : world_{ &world }

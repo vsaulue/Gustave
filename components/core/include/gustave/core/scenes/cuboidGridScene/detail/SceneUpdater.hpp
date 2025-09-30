@@ -45,6 +45,7 @@
 #include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 #include <gustave/core/scenes/cuboidGridScene/TransactionResult.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/utils/IndexRange.hpp>
 #include <gustave/utils/prop/Ptr.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
@@ -72,23 +73,18 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         struct TransactionContext {
             std::unordered_set<BlockDataReference> newRoots;
-            std::vector<std::shared_ptr<StructureData const>> newStructures;
-            std::vector<std::shared_ptr<StructureData const>> removedStructures;
+            std::vector<StructureIndex> removedStructures;
         };
     public:
         using Transaction = cuboidGridScene::Transaction<libCfg>;
-
-        struct Result {
-            std::vector<std::shared_ptr<StructureData const>> newStructures;
-            std::vector<std::shared_ptr<StructureData const>> removedStructures;
-        };
+        using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
 
         [[nodiscard]]
         explicit SceneUpdater(SceneData& data)
             : data_{ &data }
         {}
 
-        Result runTransaction(Transaction const& transaction) {
+        TransactionResult runTransaction(Transaction const& transaction) {
             checkTransaction(transaction);
             TransactionContext ctx;
             for (BlockIndex const& delIndex : transaction.deletedBlocks()) {
@@ -97,16 +93,18 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             for (BlockConstructionInfo const& newInfo : transaction.newBlocks()) {
                 addBlock(ctx, newInfo);
             }
+            auto const newIdStart = data_->structureIdGenerator.readNextIndex();
             for (BlockDataReference root : ctx.newRoots) {
                 assert(!root.isFoundation());
                 if (!data_->isStructureIdValid(root.structureId())) {
                     auto const newStructId = data_->structureIdGenerator();
                     auto newStructure = std::make_shared<StructureData>(newStructId, *data_, root);
                     data_->structures.emplace(newStructure);
-                    ctx.newStructures.emplace_back(std::move(newStructure));
                 }
             }
-            return generateResult(std::move(ctx));
+            auto newIdEnd = data_->structureIdGenerator.readNextIndex();
+            auto const newStructureIds = utils::IndexRange<StructureIndex>{ newIdStart, newIdEnd - newIdStart };
+            return TransactionResult{ newStructureIds, std::move(ctx.removedStructures) };
         }
     private:
         void addBlock(TransactionContext& ctx, BlockConstructionInfo const& newInfo) {
@@ -158,11 +156,6 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        static Result generateResult(TransactionContext&& ctx) {
-            return Result{ std::move(ctx.newStructures), std::move(ctx.removedStructures) };
-        }
-
-        [[nodiscard]]
         DataNeighbours neighbours(BlockDataReference source) {
             return DataNeighbours{ data_->blocks, source.index() };
         }
@@ -186,11 +179,12 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         void removeStructureOf(TransactionContext& ctx, ConstBlockDataReference block) {
             auto const structureId = block.structureId();
-            if (structureId != 0) {
+            if (structureId != data_->structureIdGenerator.invalidIndex()) {
                 auto it = data_->structures.find(structureId);
                 if (it != data_->structures.end()) {
                     // unordered_set::extract() doesn't support Hash::is_transparent before c++23.
-                    ctx.removedStructures.push_back(std::move(data_->structures.extract(it).value()));
+                    data_->structures.erase(it);
+                    ctx.removedStructures.push_back(structureId);
                 }
             }
         }
