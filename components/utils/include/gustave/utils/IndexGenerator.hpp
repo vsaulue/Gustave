@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <limits>
 #include <sstream>
 #include <stdexcept>
 
@@ -38,19 +39,13 @@ namespace gustave::utils {
 
         [[nodiscard]]
         static constexpr IndexType invalidIndex() {
-            return 0;
+            return std::numeric_limits<IndexType>::max();
         }
 
         [[nodiscard]]
         IndexGenerator(IndexType firstIndex = 1)
             : nextIndex_{ firstIndex }
-        {
-            if (firstIndex == invalidIndex()) {
-                std::stringstream msg;
-                msg << "IndexGenerator: invalid firstIndex:" << firstIndex << '.';
-                throw std::invalid_argument(msg.str());
-            }
-        }
+        {}
 
         [[nodiscard]]
         IndexType readNextIndex() const {

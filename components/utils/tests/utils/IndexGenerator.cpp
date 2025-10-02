@@ -45,10 +45,6 @@ TEST_CASE("utils::IndexGenerator") {
             auto gen123 = IndexGenerator{ 123 };
             CHECK(gen123.readNextIndex() == 123);
         }
-
-        SECTION("- invalid") {
-            CHECK_THROWS_AS(IndexGenerator{ 0 }, std::invalid_argument);
-        }
     }
 
     SECTION("operator()()") {
@@ -60,8 +56,8 @@ TEST_CASE("utils::IndexGenerator") {
 
         SECTION("// invalid") {
             static constexpr auto MAX = std::numeric_limits<IndexGenerator::IndexType>::max();
-            auto genMax = IndexGenerator{ MAX };
-            CHECK(genMax() == MAX);
+            auto genMax = IndexGenerator{ MAX-1 };
+            CHECK(genMax() == MAX-1);
             CHECK_THROWS_AS(genMax(), std::overflow_error);
         }
     }
