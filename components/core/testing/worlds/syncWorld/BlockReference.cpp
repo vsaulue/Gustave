@@ -177,8 +177,8 @@ TEST_CASE("core::worlds::syncWorld::BlockReference") {
 
     SECTION(".structures()") {
         auto structureOf = [&](BlockIndex const& index) {
-            auto const sceneStructure = world.scene.blocks().at(index).structures()[0];
-            return StructureReference{ world.structures.at(sceneStructure.index()) };
+            auto const structId = world.scene.blocks().at(index).structures()[0].index();
+            return StructureReference{ world, structId };
         };
 
         SECTION("// empty") {

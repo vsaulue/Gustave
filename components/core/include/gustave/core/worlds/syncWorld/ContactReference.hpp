@@ -175,7 +175,7 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         StructureReference structure() const {
             SceneStructure sceneStructure = sceneContact().structure();
-            return StructureReference{ world_->structures.at(sceneStructure.index()) };
+            return StructureReference{ *world_, sceneStructure.index() };
         }
 
         [[nodiscard]]
