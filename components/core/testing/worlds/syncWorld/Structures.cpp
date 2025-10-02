@@ -57,6 +57,8 @@ TEST_CASE("core::worlds::syncWorld::Structures") {
         Transaction t;
         t.addBlock({ {0,0,0}, concrete_20m, blockMass, false });
         t.addBlock({ {0,1,0}, concrete_20m, blockMass, true });
+        WorldUpdater{ world }.runTransaction(t);
+        t.clear();
         t.addBlock({ {0,2,0}, concrete_20m, blockMass, false });
         WorldUpdater{ world }.runTransaction(t);
     }
@@ -70,6 +72,19 @@ TEST_CASE("core::worlds::syncWorld::Structures") {
     SECTION(".begin() // & .end()") {
         std::vector<StructureReference> expected = { structureOf({0,0,0}), structureOf({0,2,0}) };
         CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));
+    }
+
+    SECTION(".find()") {
+        SECTION("// invalid") {
+            auto const structure = structures.find(10);
+            CHECK_FALSE(structure.isValid());
+        }
+
+        SECTION("// valid") {
+            auto const s000 = structures.find(1);
+            REQUIRE(s000.isValid());
+            CHECK(s000.blocks().contains({ 0,0,0 }));
+        }
     }
 
     SECTION(".size()") {

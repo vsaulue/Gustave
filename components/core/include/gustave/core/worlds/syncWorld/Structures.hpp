@@ -39,6 +39,8 @@ namespace gustave::core::worlds::syncWorld {
     class Structures {
     public:
         using StructureReference = syncWorld::StructureReference<libCfg>;
+
+        using StructureIndex = StructureReference::StructureIndex;
     private:
         using WorldData = detail::WorldData<libCfg>;
 
@@ -107,6 +109,11 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         constexpr utils::EndIterator end() const {
             return {};
+        }
+
+        [[nodiscard]]
+        StructureReference find(StructureIndex index) const {
+            return StructureReference{ *world_, index };
         }
 
         [[nodiscard]]
