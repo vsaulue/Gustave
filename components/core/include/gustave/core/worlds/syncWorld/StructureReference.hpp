@@ -303,6 +303,14 @@ namespace gustave::core::worlds::syncWorld {
         }
 
         [[nodiscard]]
+        StructureIndex index() const {
+            if (data_ == nullptr) {
+                throw invalidError();
+            }
+            return data_->sceneStructure().index();
+        }
+
+        [[nodiscard]]
         std::out_of_range invalidError() const {
             if (data_ == nullptr) {
                 return SceneStructureReference{ utils::NO_INIT }.invalidError();

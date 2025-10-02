@@ -199,6 +199,23 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
         }
     }
 
+    SECTION(".index()") {
+        auto const s010index = world.scene.blocks().at({ 0,1,0 }).structures()[0].index();
+
+        SECTION("// valid") {
+            CHECK(s010.index() == s010index);
+        }
+
+        SECTION("// deleted structure") {
+            removeBlock({ 0,0,0 });
+            CHECK(s010.index() == s010index);
+        }
+
+        SECTION("// invalid structure") {
+            CHECK_THROWS_AS(sInvalid.index(), std::out_of_range);
+        }
+    }
+
     SECTION(".isSolved()") {
         SECTION("// true") {
             CHECK(s010.isSolved());
