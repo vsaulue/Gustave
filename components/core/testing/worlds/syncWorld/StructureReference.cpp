@@ -73,7 +73,7 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
     auto structureOf = [&](BlockIndex const& index) {
         auto const sceneBlockStructures = world.scene.blocks().at(index).structures();
         REQUIRE(sceneBlockStructures.size() == 1);
-        return StructureReference{ world.structures.at(sceneBlockStructures[0].index()) };
+        return StructureReference{ world, sceneBlockStructures[0].index() };
     };
 
     auto removeBlock = [&](BlockIndex const& index) {

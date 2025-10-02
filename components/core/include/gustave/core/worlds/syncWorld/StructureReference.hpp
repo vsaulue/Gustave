@@ -268,6 +268,11 @@ namespace gustave::core::worlds::syncWorld {
         {}
 
         [[nodiscard]]
+        explicit StructureReference(WorldData const& world, StructureIndex index)
+            : data_{ initData(world, index) }
+        {}
+
+        [[nodiscard]]
         explicit StructureReference(utils::NoInit)
             : data_{ nullptr }
         {}
@@ -348,6 +353,16 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         bool operator==(StructureReference const&) const = default;
     private:
+        [[nodiscard]]
+        static std::shared_ptr<StructureData const> initData(WorldData const& data, StructureIndex index) {
+            auto const it = data.structures.find(index);
+            if (it != data.structures.end()) {
+                return it->second;
+            } else {
+                return nullptr;
+            }
+        }
+
         std::shared_ptr<StructureData const> data_;
     };
 }
