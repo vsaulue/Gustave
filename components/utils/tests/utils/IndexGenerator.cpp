@@ -38,7 +38,7 @@ TEST_CASE("utils::IndexGenerator") {
 
     SECTION("// constructor") {
         SECTION("- default") {
-            CHECK(gen.readNextIndex() == 1);
+            CHECK(gen.readNextIndex() == 0);
         }
 
         SECTION("- custom first") {
@@ -49,9 +49,9 @@ TEST_CASE("utils::IndexGenerator") {
 
     SECTION("operator()()") {
         SECTION("// valid") {
+            CHECK(gen() == 0);
             CHECK(gen() == 1);
             CHECK(gen() == 2);
-            CHECK(gen() == 3);
         }
 
         SECTION("// invalid") {
@@ -63,12 +63,12 @@ TEST_CASE("utils::IndexGenerator") {
     }
 
     SECTION("readNextIndex()") {
-        CHECK(gen.readNextIndex() == 1);
-        CHECK(gen.readNextIndex() == 1);
+        CHECK(gen.readNextIndex() == 0);
+        CHECK(gen.readNextIndex() == 0);
+        CHECK(gen() == 0);
         CHECK(gen() == 1);
+        CHECK(gen.readNextIndex() == 2);
+        CHECK(gen.readNextIndex() == 2);
         CHECK(gen() == 2);
-        CHECK(gen.readNextIndex() == 3);
-        CHECK(gen.readNextIndex() == 3);
-        CHECK(gen() == 3);
     }
 }

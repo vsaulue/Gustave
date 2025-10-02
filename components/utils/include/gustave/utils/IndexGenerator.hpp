@@ -43,7 +43,7 @@ namespace gustave::utils {
         }
 
         [[nodiscard]]
-        IndexGenerator(IndexType firstIndex = 1)
+        IndexGenerator(IndexType firstIndex = 0)
             : nextIndex_{ firstIndex }
         {}
 

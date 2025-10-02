@@ -167,7 +167,7 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
     SECTION(".index()") {
         SECTION("// valid") {
             auto const res = s1.index();
-            CHECK(res > 0);
+            CHECK(res != data.structureIdGenerator.invalidIndex());
         }
 
         SECTION("// invalidated") {

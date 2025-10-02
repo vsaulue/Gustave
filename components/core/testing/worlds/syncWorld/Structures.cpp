@@ -75,7 +75,7 @@ TEST_CASE("core::worlds::syncWorld::Structures") {
         }
 
         SECTION("// valid") {
-            auto const s000 = structures.at(1);
+            auto const s000 = structures.at(0);
             REQUIRE(s000.isValid());
             CHECK(s000.blocks().contains({ 0,0,0 }));
         }
@@ -93,7 +93,7 @@ TEST_CASE("core::worlds::syncWorld::Structures") {
         }
 
         SECTION("// valid") {
-            auto const s000 = structures.find(1);
+            auto const s000 = structures.find(0);
             REQUIRE(s000.isValid());
             CHECK(s000.blocks().contains({ 0,0,0 }));
         }
