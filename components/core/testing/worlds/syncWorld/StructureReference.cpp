@@ -39,6 +39,7 @@ using ContactIndex = WorldData::Scene::ContactIndex;
 using ContactReference = StructureReference::ContactReference;
 using Direction = ContactIndex::Direction;
 using Solver = WorldData::Solver;
+using State = StructureReference::State;
 using Transaction = WorldData::Scene::Transaction;
 
 static constexpr auto blockSize = vector3(3.f, 2.f, 1.f, u.length);
@@ -81,11 +82,21 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
         WorldUpdater{ world }.runTransaction(t);
     };
 
-    StructureReference const s010 = structureOf({ 0,1,0 });
-    StructureReference const s040 = structureOf({ 0,4,0 });
-    StructureReference const s202 = structureOf({ 2,0,2 });
+    auto const s010 = structureOf({ 0,1,0 });
+    auto const s040 = structureOf({ 0,4,0 });
+    auto const s202 = structureOf({ 2,0,2 });
+    auto const sInvalid = StructureReference{ gustave::utils::NO_INIT };
 
     SECTION(".blocks()") {
+        SECTION("// invalid structure") {
+            CHECK_THROWS_AS(sInvalid.blocks(), std::out_of_range);
+        }
+
+        SECTION("// deleted structure") {
+            removeBlock({ 0,0,0 });
+            CHECK_THROWS_AS(s010.blocks(), std::out_of_range);
+        }
+
         SECTION(".at()") {
             SECTION("// valid") {
                 BlockReference block = s010.blocks().at({ 0,0,0 });
@@ -130,6 +141,15 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
     }
 
     SECTION(".contacts()") {
+        SECTION("// invalid structure") {
+            CHECK_THROWS_AS(sInvalid.contacts(), std::out_of_range);
+        }
+
+        SECTION("// deleted structure") {
+            removeBlock({ 0,0,0 });
+            CHECK_THROWS_AS(s010.contacts(), std::out_of_range);
+        }
+
         SECTION(".at()") {
             SECTION("// valid") {
                 auto const id = ContactIndex{ {0,0,0}, Direction::plusY() };
@@ -145,6 +165,10 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
     }
 
     SECTION(".forceVector()") {
+        SECTION("// invalid structure") {
+            CHECK_FALSE(sInvalid.forceVector({ 0,0,0 }, { 0,1,0 }));
+        }
+
         SECTION("// invalid contact") {
             removeBlock({ 0,3,0 });
             CHECK_FALSE(s010.forceVector({ 0,0,0 }, { 0,1,0 }));
@@ -183,6 +207,15 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
         SECTION("// false") {
             CHECK_FALSE(s202.isSolved());
         }
+
+        SECTION("// invalid structure") {
+            CHECK_FALSE(sInvalid.isSolved());
+        }
+
+        SECTION("// deleted structure") {
+            removeBlock({ 0,0,0 });
+            CHECK_FALSE(s010.isSolved());
+        }
     }
 
     SECTION(".isValid()") {
@@ -194,9 +227,27 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
             removeBlock({ 0,0,0 });
             CHECK_FALSE(s010.isValid());
         }
+
+        SECTION("// invalid") {
+            CHECK_FALSE(sInvalid.isValid());
+        }
+
+        SECTION("// invalidated") {
+            removeBlock({ 0,0,0 });
+            CHECK_FALSE(s010.isValid());
+        }
     }
 
     SECTION(".links()") {
+        SECTION("// invalid structure") {
+            CHECK_THROWS_AS(sInvalid.links(), std::out_of_range);
+        }
+
+        SECTION("// deleted structure") {
+            removeBlock({ 0,0,0 });
+            CHECK_THROWS_AS(s010.links(), std::out_of_range);
+        }
+
         SECTION(".begin() // .end()") {
             std::vector<ContactReference> expected = {
                 ContactReference{ world, ContactIndex{ {0,0,0}, Direction::plusY() } },
@@ -209,12 +260,16 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
 
     SECTION(".state()") {
         SECTION("// solved") {
-            CHECK(s010.state() == StructureReference::State::Solved);
+            CHECK(s010.state() == State::Solved);
         }
 
-        SECTION("// invalid") {
+        SECTION("// deleted structure") {
             removeBlock({ 0,0,0 });
-            CHECK(s010.state() == StructureReference::State::Invalid);
+            CHECK(s010.state() == State::Invalid);
+        }
+
+        SECTION("// invalid structure") {
+            CHECK(sInvalid.state() == State::Invalid);
         }
     }
 }

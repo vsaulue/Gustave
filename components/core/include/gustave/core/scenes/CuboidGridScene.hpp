@@ -68,6 +68,7 @@ namespace gustave::core::scenes {
         using ContactIndex = typename Contacts::ContactIndex;
         using ContactReference = typename Contacts::ContactReference;
         using Direction = typename Contacts::ContactIndex::Direction;
+        using StructureIndex = Structures::StructureIndex;
         using StructureReference = typename Structures::StructureReference;
 
 

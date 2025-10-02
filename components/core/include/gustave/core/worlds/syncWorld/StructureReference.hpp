@@ -56,12 +56,14 @@ namespace gustave::core::worlds::syncWorld {
         using WorldData = detail::WorldData<libCfg>;
 
         using SceneContactReference = typename WorldData::Scene::ContactReference;
+        using SceneStructureReference = WorldData::Scene::StructureReference;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
         using BlockReference = syncWorld::BlockReference<libCfg>;
         using ContactIndex = typename WorldData::Scene::ContactIndex;
         using ContactReference = syncWorld::ContactReference<libCfg>;
         using State = typename StructureData::State;
+        using StructureIndex = WorldData::Scene::StructureIndex;
 
         class Blocks {
         private:
@@ -263,9 +265,7 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         explicit StructureReference(std::shared_ptr<StructureData const> data)
             : data_{ std::move(data) }
-        {
-            assert(data_);
-        }
+        {}
 
         [[nodiscard]]
         explicit StructureReference(utils::NoInit)
@@ -274,20 +274,23 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         Blocks blocks() const {
-            if (data_->state() == State::Invalid) {
-                throw std::logic_error("This structure has been invalidated.");
+            if (!isValid()) {
+                throw invalidError();
             }
             return Blocks{ *data_ };
         }
 
         [[nodiscard]]
         Contacts contacts() const {
+            if (!isValid()) {
+                throw invalidError();
+            }
             return Contacts{ *data_ };
         }
 
         [[nodiscard]]
         std::optional<Vector3<u.force>> forceVector(BlockIndex const& to, BlockIndex const& from) const {
-            if (data_->state() != State::Solved) {
+            if (!isSolved()) {
                 return {};
             }
             auto const toIndex = data_->sceneStructure().solverIndexOf(to);
@@ -300,22 +303,37 @@ namespace gustave::core::worlds::syncWorld {
         }
 
         [[nodiscard]]
+        std::out_of_range invalidError() const {
+            if (data_ == nullptr) {
+                return SceneStructureReference{ utils::NO_INIT }.invalidError();
+            } else {
+                return data_->sceneStructure().invalidError();
+            }
+        }
+
+        [[nodiscard]]
         bool isSolved() const {
-            return data_->state() == State::Solved;
+            return data_ != nullptr && data_->state() == State::Solved;
         }
 
         [[nodiscard]]
         bool isValid() const {
-            return data_->state() != State::Invalid;
+            return data_!= nullptr && data_->state() != State::Invalid;
         }
 
         [[nodiscard]]
         Links links() const {
+            if (!isValid()) {
+                throw invalidError();
+            }
             return Links{ *data_ };
         }
 
         [[nodiscard]]
         State state() const {
+            if (data_ == nullptr) {
+                return State::Invalid;
+            }
             return data_->state();
         }
 
