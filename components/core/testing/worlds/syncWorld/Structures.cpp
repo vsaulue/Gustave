@@ -69,6 +69,18 @@ TEST_CASE("core::worlds::syncWorld::Structures") {
         return StructureReference{ world, sceneStructures[0].index() };
     };
 
+    SECTION(".at()") {
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(structures.at(10), std::out_of_range);
+        }
+
+        SECTION("// valid") {
+            auto const s000 = structures.at(1);
+            REQUIRE(s000.isValid());
+            CHECK(s000.blocks().contains({ 0,0,0 }));
+        }
+    }
+
     SECTION(".begin() // & .end()") {
         std::vector<StructureReference> expected = { structureOf({0,0,0}), structureOf({0,2,0}) };
         CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));

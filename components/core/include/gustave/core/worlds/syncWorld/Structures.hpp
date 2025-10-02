@@ -102,6 +102,15 @@ namespace gustave::core::worlds::syncWorld {
         {}
 
         [[nodiscard]]
+        StructureReference at(StructureIndex index) const {
+            auto const result = StructureReference{ *world_, index };
+            if (!result.isValid()) {
+                throw result.invalidError();
+            }
+            return result;
+        }
+
+        [[nodiscard]]
         Iterator begin() const {
             return Iterator{ *world_ };
         }
