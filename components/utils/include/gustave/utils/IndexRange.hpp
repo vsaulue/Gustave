@@ -27,9 +27,12 @@
 
 #include <cassert>
 #include <concepts>
+#include <format>
 #include <limits>
 #include <type_traits>
 #include <span>
+#include <sstream>
+#include <stdexcept>
 #include <vector>
 
 #include <gustave/utils/cIndex.hpp>
@@ -97,6 +100,14 @@ namespace gustave::utils {
         constexpr Index operator[](Index offset) const {
             assert(offset >= 0);
             assert(offset < size_);
+            return start_ + offset;
+        }
+
+        [[nodiscard]]
+        constexpr Index at(Index offset) const {
+            if (offset < 0 || offset >= size_) {
+                throw std::out_of_range(std::format("IndexRange: invalid offset: {} (size: {})", offset, size_));
+            }
             return start_ + offset;
         }
 

@@ -47,6 +47,22 @@ TEST_CASE("utils::IndexRange") {
         CHECK(ir[2] == 4);
     }
 
+    SECTION(".at()") {
+        SECTION("// valid") {
+            CHECK(ir.at(0) == 2);
+            CHECK(ir.at(1) == 3);
+            CHECK(ir.at(2) == 4);
+        }
+
+        SECTION("// invalid (== size)") {
+            CHECK_THROWS_AS(ir.at(3), std::out_of_range);
+        }
+
+        SECTION("// invalid (> size)") {
+            CHECK_THROWS_AS(ir.at(4), std::out_of_range);
+        }
+    }
+
     SECTION(".setSize()") {
         ir.setSize(7);
         CHECK(ir.size() == 7);
