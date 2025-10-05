@@ -52,15 +52,14 @@ int main() {
     auto world = newWorld();
     // -8<- [end:create-world]
 
-    // { compression, shear, tensile } in pascal
-    auto const maxBlockStress = G::Model::PressureStress{ 100'000.0, 50'000.0, 20'000.0 };
-
     // -8<- [start:add-blocks]
     // kilogram
     auto const foundationMass = 10'0000.0;
     auto const struct1Mass = 1'000.0;
     auto const struct2Mass = 2'000.0;
     auto const struct3Mass = 3'000.0;
+    // { compression, shear, tensile } in pascal
+    auto const maxBlockStress = G::Model::PressureStress{ 100'000.0, 50'000.0, 20'000.0 };
     {
         auto tr = World::Transaction{};
         // foundation shared between structure 1 & 2
