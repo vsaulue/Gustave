@@ -37,7 +37,7 @@ namespace gustave::core::worlds::syncWorld::detail {
         using WorldData = detail::WorldData<libCfg>;
 
         using SceneStructure = typename WorldData::Scene::StructureReference;
-        using SceneTransactionResult = typename WorldData::Scene::TransactionResult;
+        using TransactionResult = typename WorldData::Scene::TransactionResult;
         using StructureData = typename WorldData::StructureData;
         using Transaction = typename WorldData::Scene::Transaction;
 
@@ -46,20 +46,21 @@ namespace gustave::core::worlds::syncWorld::detail {
             : data_{ data }
         {}
 
-        void runTransaction(Transaction const& transaction) {
-            SceneTransactionResult const trResult = data_.scene.modify(transaction);
-            for (auto const& structureId : trResult.deletedStructures()) {
+        TransactionResult runTransaction(Transaction const& transaction) {
+            TransactionResult const result = data_.scene.modify(transaction);
+            for (auto const& structureId : result.deletedStructures()) {
                 auto node = data_.structures.extract(structureId);
                 assert(!node.empty());
                 node.mapped()->invalidate();
             }
-            for (auto const& structureId : trResult.newStructures()) {
+            for (auto const& structureId : result.newStructures()) {
                 std::shared_ptr<StructureData> worldStructure = std::make_shared<StructureData>(data_, data_.scene.structures().at(structureId));
                 auto const result = data_.solver.run(worldStructure->sceneStructure().solverStructurePtr());
                 worldStructure->solve(result.solutionPtr());
                 [[maybe_unused]] auto const insertResult = data_.structures.insert({ structureId, std::move(worldStructure) });
                 assert(insertResult.second);
             }
+            return result;
         }
     private:
         WorldData& data_;

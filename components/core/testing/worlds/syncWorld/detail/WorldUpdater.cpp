@@ -52,7 +52,7 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
 
     auto runTransaction = [&](Transaction const& transaction) {
         auto oldStructures = world.structures;
-        WorldUpdater{ world }.runTransaction(transaction);
+        auto const result = WorldUpdater{ world }.runTransaction(transaction);
         // Check new structures are solved.
         for (auto const& sceneStructure : world.scene.structures()) {
             auto const it = world.structures.find(sceneStructure.index());
@@ -68,6 +68,7 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
                 CHECK(worldStruct->state() == StructureData::State::Invalid);
             }
         }
+        return result;
     };
 
     auto sceneStructureOf = [&](BlockIndex const& blockIndex) {
@@ -93,7 +94,10 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
             t.addBlock({ {0,0,0}, concrete_20m, blockMass, true });
             t.addBlock({ {0,1,0}, concrete_20m, blockMass, false });
             t.addBlock({ {0,2,0}, concrete_20m, blockMass, false });
-            runTransaction(t);
+            auto const trResult = runTransaction(t);
+
+            REQUIRE(trResult.deletedStructures().size() == 0);
+            REQUIRE(trResult.newStructures().size() == 1);
 
             checkForce({ 0,0,0 }, { 0,1,0 }, 2.f * blockMass * g);
             checkForce({ 0,1,0 }, { 0,2,0 }, blockMass * g);
@@ -104,15 +108,20 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
             t.addBlock({ {0,0,0}, concrete_20m, blockMass, true });
             t.addBlock({ {0,1,0}, concrete_20m, blockMass, false });
             t.addBlock({ {0,2,0}, concrete_20m, blockMass, false });
-            runTransaction(t);
+            auto const trRes1 = runTransaction(t);
 
-            auto const oldStruct = world.structures.at(sceneStructureOf({ 0,2,0 }).index());
+            CHECK(trRes1.deletedStructures().size() == 0);
+            REQUIRE(trRes1.newStructures().size() == 1);
+            auto const oldStruct = world.structures.at(trRes1.newStructures().at(0));
             REQUIRE(oldStruct->state() == StructureData::State::Solved);
 
             t.clear();
             t.removeBlock({ 0,2,0 });
-            runTransaction(t);
+            auto const trRes2 = runTransaction(t);
 
+            REQUIRE(trRes2.deletedStructures().size() == 1);
+            CHECK(trRes2.deletedStructures().at(0) == oldStruct->sceneStructure().index());
+            CHECK(trRes2.newStructures().size() == 1);
             CHECK(oldStruct->state() == StructureData::State::Invalid);
             checkForce({ 0,0,0 }, { 0,1,0 }, blockMass * g);
         }
