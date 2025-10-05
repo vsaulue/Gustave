@@ -41,6 +41,12 @@ static_assert(std::ranges::forward_range<IndexRange>);
 TEST_CASE("utils::IndexRange") {
     auto ir = IndexRange{ 2,3 };
 
+    SECTION(".operator[](Index)") {
+        CHECK(ir[0] == 2);
+        CHECK(ir[1] == 3);
+        CHECK(ir[2] == 4);
+    }
+
     SECTION(".setSize()") {
         ir.setSize(7);
         CHECK(ir.size() == 7);

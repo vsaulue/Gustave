@@ -94,6 +94,13 @@ namespace gustave::utils {
         }
 
         [[nodiscard]]
+        constexpr Index operator[](Index offset) const {
+            assert(offset >= 0);
+            assert(offset < size_);
+            return start_ + offset;
+        }
+
+        [[nodiscard]]
         constexpr Index start() const {
             return start_;
         }
