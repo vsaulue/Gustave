@@ -49,12 +49,16 @@ static SyncWorld makeWorld() {
 
 TEST_CASE("core::worlds::SyncWorld") {
     SyncWorld world = makeWorld();
-    {
-        SyncWorld::Transaction transaction;
-        for (int i = 0; i < 10; ++i) {
-            transaction.addBlock({ {0,i,0}, concrete_20m, blockMass, i == 0 });
-        }
-        world.modify(transaction);
+
+    SyncWorld::Transaction transaction;
+    for (int i = 0; i < 10; ++i) {
+        transaction.addBlock({ {0,i,0}, concrete_20m, blockMass, i == 0 });
+    }
+    auto const trRes = world.modify(transaction);
+
+    SECTION(".modify()") {
+        CHECK(trRes.newStructures().size() == 1);
+        CHECK(trRes.deletedStructures().size() == 0);
     }
 
     SECTION(".blocks()") {

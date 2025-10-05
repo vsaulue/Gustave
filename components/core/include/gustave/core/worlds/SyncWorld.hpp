@@ -67,6 +67,7 @@ namespace gustave::core::worlds {
         using Solver = typename WorldData::Solver;
         using StructureReference = typename Structures::StructureReference;
         using Transaction = typename WorldData::Scene::Transaction;
+        using TransactionResult = typename WorldData::Scene::TransactionResult;
 
         [[nodiscard]]
         explicit SyncWorld(Vector3<u.length> const& blockSize, Solver solver)
@@ -100,8 +101,8 @@ namespace gustave::core::worlds {
             return Links{ data_ };
         }
 
-        void modify(Transaction const& transaction) {
-            WorldUpdater{ data_ }.runTransaction(transaction);
+        TransactionResult modify(Transaction const& transaction) {
+            return WorldUpdater{ data_ }.runTransaction(transaction);
         }
 
         [[nodiscard]]
