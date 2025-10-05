@@ -4,6 +4,8 @@ This sections explains how to inspect [structures](../../../lexicon.md#structure
 
 Structures are automatically created/deleted by the `SyncWorld` when it is modified, so users can't directly edit structures. They can be inspected by getting a `StructureReference` object.
 
+For a given `SyncWorld`, all structures have a unique auto-generated index. An index is never reused by a `SyncWorld`.
+
 ## Prerequisites
 
 - [Selecting a Gustave configuration](../../01-getting-started/index.md)
@@ -22,6 +24,48 @@ Structures are automatically created/deleted by the `SyncWorld` when it is modif
 Here's a visual representation of this world:
 
 ![](world.svg)
+
+## Transaction: list the indices of modified structures
+
+Note that in the previous code block, the result of the transaction was stored in a `trResult` variable. This `TransactionResult` objects holds 2 containers:
+
+- The indices of the new structures
+- The indices of the deleted structures
+
+The transaction's result contains exactly all the modified structures of a transaction. If a structure isn't in any of these 2 containers, it has not been changed.
+
+```c++
+--8<-- "docs/tutorials/03-world-api/03-world-structures/main.cpp:transaction-result"
+```
+
+Possible output:
+
+```
+List of created structure indices (size = 3):
+- 0
+- 1
+- 2
+List of deleted structure indices (size = 0):
+```
+
+## Get a structure reference by index
+
+`world.structures()` provides 2 methods to get a `StructureReference` by index:
+
+- `.at(index)`: returns a reference if the index is valid, throws otherwise.
+- `.find(index)`: always returns a reference, which must be tested for validity before usage.
+
+```c++
+--8<-- "docs/tutorials/03-world-api/03-world-structures/main.cpp:structure-by-id"
+```
+
+Possible output:
+
+```
+Structure (index = 0) has 3 blocks
+Structure (index = 1) has 5 blocks
+Structure (index = 2) has 2 blocks
+```
 
 ## List all structures and their blocks
 

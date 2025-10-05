@@ -60,28 +60,48 @@ int main() {
     auto const struct3Mass = 3'000.0;
     // { compression, shear, tensile } in pascal
     auto const maxBlockStress = G::Model::PressureStress{ 100'000.0, 50'000.0, 20'000.0 };
-    {
-        auto tr = World::Transaction{};
-        // foundation shared between structure 1 & 2
-        tr.addBlock({ { 0,0,0 }, maxBlockStress, foundationMass, true });
-        // structure 1
-        tr.addBlock({ { 0,1,0 }, maxBlockStress, struct1Mass, false });
-        tr.addBlock({ { 0,2,0 }, maxBlockStress, struct1Mass, false });
-        // structure 2
-        tr.addBlock({ { 1,0,0 }, maxBlockStress, struct2Mass, false });
-        tr.addBlock({ { 2,0,0 }, maxBlockStress, struct2Mass, false });
-        tr.addBlock({ { 3,0,0 }, maxBlockStress, struct2Mass, false });
-        tr.addBlock({ { 4,0,0 }, maxBlockStress, struct2Mass, true });
-        // structure 3 (no foundations)
-        tr.addBlock({ { 7,0,0 }, maxBlockStress, struct3Mass, false });
-        tr.addBlock({ { 8,0,0 }, maxBlockStress, struct3Mass, false });
 
-        world.modify(tr);
-    }
+    auto tr = World::Transaction{};
+    // foundation shared between structure 1 & 2
+    tr.addBlock({ { 0,0,0 }, maxBlockStress, foundationMass, true });
+    // structure 1
+    tr.addBlock({ { 0,1,0 }, maxBlockStress, struct1Mass, false });
+    tr.addBlock({ { 0,2,0 }, maxBlockStress, struct1Mass, false });
+    // structure 2
+    tr.addBlock({ { 1,0,0 }, maxBlockStress, struct2Mass, false });
+    tr.addBlock({ { 2,0,0 }, maxBlockStress, struct2Mass, false });
+    tr.addBlock({ { 3,0,0 }, maxBlockStress, struct2Mass, false });
+    tr.addBlock({ { 4,0,0 }, maxBlockStress, struct2Mass, true });
+    // structure 3 (no foundations)
+    tr.addBlock({ { 7,0,0 }, maxBlockStress, struct3Mass, false });
+    tr.addBlock({ { 8,0,0 }, maxBlockStress, struct3Mass, false });
+    auto const trResult = world.modify(tr);
     // -8<- [end:add-blocks]
 
     std::cout << "\n\n--------------------\n";
-    std::cout << "Step 1: list all structures and their blocks\n";
+    std::cout << "Step 1: List of modified structures by a transaction\n";
+    // -8<- [start:transaction-result]
+    std::cout << "List of created structure indices (size = " << trResult.newStructures().size() << "):\n";
+    for (auto const& newStructId : trResult.newStructures()) {
+        std::cout << "- " << newStructId << '\n';
+    }
+    std::cout << "List of deleted structure indices (size = " << trResult.deletedStructures().size() << "):\n";
+    for (auto const& delStructId : trResult.deletedStructures()) {
+        std::cout << "- " << delStructId << '\n';
+    }
+    // -8<- [end:transaction-result]
+
+    std::cout << "\n\n--------------------\n";
+    std::cout << "Step 2: get a structure by its index\n";
+    // -8<- [start:structure-by-id]
+    for (auto const& newStructId : trResult.newStructures()) {
+        auto const newStruct = world.structures().at(newStructId);
+        std::cout << "Structure (index = " << newStruct.index() << ") has " << newStruct.blocks().size() << " blocks\n";
+    }
+    // -8<- [end:structure-by-id]
+
+    std::cout << "\n\n--------------------\n";
+    std::cout << "Step 3: list all structures and their blocks\n";
 
     // -8<- [start:list-world-structures]
     std::cout << "List of structures (size = " << world.structures().size() << ")\n";
@@ -94,7 +114,7 @@ int main() {
     // -8<- [end:list-world-structures]
 
     std::cout << "\n\n--------------------\n";
-    std::cout << "Step 2: list the structures of a block\n";
+    std::cout << "Step 4: list the structures of a block\n";
     // -8<- [start:list-block-structures]
     auto listStructuresOfBlock = [&world](World::BlockIndex const& blockId) -> void {
         auto const blockRef = world.blocks().at(blockId);
@@ -108,7 +128,7 @@ int main() {
     // -8<- [end:list-block-structures]
 
     std::cout << "\n\n--------------------\n";
-    std::cout << "Step 3: structure status (valid, solved)\n";
+    std::cout << "Step 5: structure status (valid, solved)\n";
     // -8<- [start:structure-status]
     auto printStructureStatusOfBlock = [&world](World::BlockIndex const& blockId) -> void {
         auto const structureRef = world.blocks().at(blockId).structures()[0];
