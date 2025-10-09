@@ -100,7 +100,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         friend std::ostream& operator<<(std::ostream& stream, BlockIndex const& index) {
-            return stream << "{ \"x\": " << index.x << ", \"y\": " << index.y << ", \"z\": " << index.z << '}';
+            return stream << "{ \"x\": " << index.x << ", \"y\": " << index.y << ", \"z\": " << index.z << " }";
         }
 
         Coord x;
