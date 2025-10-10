@@ -26,21 +26,41 @@ include_guard(GLOBAL)
 
 include("cmake/Python.cmake")
 
-set(mkdocs_working_dir "${CMAKE_SOURCE_DIR}")
-set(mkdocs_output_dir "${CMAKE_BINARY_DIR}/docs/mkdocs-build")
+set(mkdocs_working_dir "${CMAKE_BINARY_DIR}/mkdocs/$<CONFIG>/src")
+set(mkdocs_output_dir "${CMAKE_BINARY_DIR}/mkdocs/$<CONFIG>/build")
+set(mkdocs_generated_snippets_dir "${mkdocs_working_dir}/generated-snippets")
 
 if(GUSTAVE_BUILD_DOCS)
+    add_custom_command(OUTPUT "${mkdocs_working_dir}/mkdocs.yml"
+        COMMAND Python::Interpreter "${python_scripts_dir}/createMkdocsWorkdir.py"
+            "--cmakeVariables" "${cmake_variables_json}"
+        DEPENDS
+            "${python_scripts_dir}/gustaveUtils.py"
+            "${python_scripts_dir}/createMkdocsWorkdir.py"
+        COMMENT "Mkdocs: creating working directory in '${mkdocs_working_dir}'"
+    )
+    add_custom_target(mkdocs-workdir
+        DEPENDS "${mkdocs_working_dir}/mkdocs.yml"
+        COMMENT "Mkdocs: creating working directory in '${mkdocs_working_dir}'"
+    )
+    add_custom_target(mkdocs-sources
+        DEPENDS mkdocs-workdir
+        COMMENT "Mkdocs: populating source files in '${mkdocs_working_dir}'"
+    )
+
     add_custom_python_target(TARGET mkdocs-build ALL
         VENV venv-mkdocs
         COMMAND "mkdocs" "build" "-d" "${mkdocs_output_dir}" "-s"
         WORKING_DIRECTORY "${mkdocs_working_dir}"
+        DEPENDS mkdocs-sources
         COMMENT "Building documentation at '${mkdocs_output_dir}'"
     )
 
     add_custom_python_target(TARGET mkdocs-serve
         VENV venv-mkdocs
-        COMMAND "mkdocs" "serve"
+        COMMAND "mkdocs" "serve" "--livereload"
         WORKING_DIRECTORY "${mkdocs_working_dir}"
+        DEPENDS mkdocs-sources
         COMMENT "Serving documentation at 'http://localhost:8000' (!!! WILL RUN UNTIL KILLED !!!)"
         USES_TERMINAL
     )
@@ -49,6 +69,7 @@ if(GUSTAVE_BUILD_DOCS)
         VENV venv-mkdocs
         COMMAND "mike" "deploy" "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
         WORKING_DIRECTORY "${mkdocs_working_dir}"
+        DEPENDS mkdocs-sources
         COMMENT "Deploying documentation to git branch 'gh-pages'"
     )
 
@@ -57,3 +78,31 @@ if(GUSTAVE_BUILD_DOCS)
         COMPONENT MkDocs
     )
 endif()
+
+function(docs_epilogue)
+    if (GUSTAVE_BUILD_DOCS)
+        set(snippet_script "${python_scripts_dir}/tutoSnippet.py")
+        set(snippets)
+        foreach(tuto IN LISTS tutorials)
+            set(output_file "${mkdocs_generated_snippets_dir}/${tuto}.txt")
+            add_custom_command(OUTPUT "${output_file}"
+                COMMAND Python::Interpreter "${snippet_script}"
+                    "--cmakeVariables" "${cmake_variables_json}"
+                    "--name" "${tuto}"
+                    "--exe" "$<TARGET_FILE:${tuto}>"
+                DEPENDS
+                    "${tuto}"
+                    "${python_scripts_dir}/gustaveUtils.py"
+                    "${snippet_script}"
+                    mkdocs-workdir
+                COMMENT "Mkdocs: generating snippets of ${tuto}"
+            )
+            list(APPEND snippets "${output_file}")
+        endforeach()
+        add_custom_target(mkdocs-tuto-snippets
+            DEPENDS ${snippets}
+            COMMENT "Mkdocs: generating snippets from tutorial's stdout"
+        )
+        add_dependencies(mkdocs-sources mkdocs-tuto-snippets)
+    endif()
+endfunction()

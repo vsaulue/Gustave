@@ -44,13 +44,16 @@ class GustaveRecipe(ConanFile):
     test_package_folder = "packaging/test_package"
 
     def _memcheckTestsEnabled(self) -> bool:
-        return self.conf.get("user.gustave:enable_memcheck_tests", default=True, check_type=bool)
+        return self._testsEnabled() or self.conf.get("user.gustave:enable_memcheck_tests", default=True, check_type=bool)
 
     def _packagingTestsEnabled(self) -> bool:
-        return self.conf.get("user.gustave:enable_packaging_tests", default=True, check_type=bool)
+        return self._testsEnabled() or self.conf.get("user.gustave:enable_packaging_tests", default=True, check_type=bool)
 
     def _docsEnabled(self) -> bool:
         return self.conf.get("user.gustave:build_docs", default=True, check_type=bool)
+
+    def _testsEnabled(self) -> bool:
+        return self.conf.get("tools.build:skip_test", default=False)
 
     def _toolsEnabled(self) -> bool:
         return self.conf.get("user.gustave:build_tools", default=True, check_type=bool)
@@ -59,7 +62,7 @@ class GustaveRecipe(ConanFile):
         return self.conf.get("user.gustave:build_tutorials", default=True, check_type=bool)
 
     def _unitTestsEnabled(self) -> bool:
-        return self.conf.get("user.gustave:enable_unit_tests", default=True, check_type=bool)
+        return self._testsEnabled() or self.conf.get("user.gustave:enable_unit_tests", default=True, check_type=bool)
 
     def set_version(self):
         cmakeFilePath = os.path.join(self.recipe_folder, 'CMakeLists.txt')
@@ -73,13 +76,13 @@ class GustaveRecipe(ConanFile):
 
     def build_requirements(self):
         self.tool_requires("cmake/3.29.0")
-        if not self.conf.get("tools.build:skip_test", default=False):
-            if self._unitTestsEnabled():
-                self.test_requires("catch2/3.6.0")
-            if self._toolsEnabled():
-                self.test_requires("cli11/2.4.2")
-                self.test_requires("nlohmann_json/3.11.3")
-                self.test_requires("svgwrite/0.2.0")
+        if self._unitTestsEnabled():
+            self.test_requires("catch2/3.6.0")
+        if self._toolsEnabled():
+            self.test_requires("nlohmann_json/3.11.3")
+            self.test_requires("svgwrite/0.2.0")
+        if self._toolsEnabled() or self._tutorialsEnabled():
+            self.test_requires("cli11/2.4.2")
 
     def validate(self):
         check_min_cppstd(self, 20)

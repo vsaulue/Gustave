@@ -81,3 +81,6 @@ add_subdirectory("distribs")
 add_subdirectory("docs")
 add_subdirectory("packaging")
 add_subdirectory("tools")
+
+docs_epilogue()
+variables_json_epilogue()

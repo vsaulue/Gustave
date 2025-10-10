@@ -22,6 +22,8 @@
     "folders":  {
         "build": "${Gustave_BINARY_DIR}",
         "install": "${CMAKE_INSTALL_PREFIX}",
+        "mkdocsGeneratedSnippets": ${json_mkdocs_snippets},
+        "mkdocsWorkdir": ${json_mkdocs_workdir},
         "source": "${Gustave_SOURCE_DIR}",
         "vcpkgRoot": ${json_vcpkg_root}
     },

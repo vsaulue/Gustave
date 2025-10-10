@@ -408,8 +408,20 @@ class CMakeFolders(object):
     _install : str
     """Value of the `install` property."""
 
-    _installChecked : str
+    _installChecked : bool
     """Flag set when `_install` was checked to be a path to a folder."""
+
+    _mkdocsGeneratedSnippets: str
+    """Value of the `mkdocsGeneratedSnippets` property."""
+
+    _mkdocsGeneratedSnippetsChecked: bool
+    """Flag set when `_mkdocsGeneratedSnippets` was checked to be a path to a folder."""
+
+    _mkdocsWorkdir: str
+    """Value of the `mkdocsWorkdir` property."""
+
+    _mkdocsWorkdirChecked: bool
+    """Flag set when `_mkdocsWorkdir` was checked to be a path to a folder."""
 
     _source : str
     """Value of the `source` property."""
@@ -438,6 +450,10 @@ class CMakeFolders(object):
         self._buildChecked = False
         self._install = JsonUtils.getStr(jsonObject, 'install')
         self._installChecked = False
+        self._mkdocsGeneratedSnippets = JsonUtils.getStr(jsonObject, "mkdocsGeneratedSnippets")
+        self._mkdocsGeneratedSnippetsChecked = False
+        self._mkdocsWorkdir = JsonUtils.getStr(jsonObject, "mkdocsWorkdir")
+        self._mkdocsWorkdirChecked = False
         self._source = JsonUtils.getStr(jsonObject, 'source')
         self._sourceChecked = False
         self._testPackageChecked = False
@@ -472,6 +488,33 @@ class CMakeFolders(object):
                 raise ValueError(f'"install" property is not a valid directory: {result}.')
             self._installChecked = True
         return result
+
+    def mkdocsGeneratedSnippets(self, checked: bool = True) -> str:
+        """
+        Path to the folder containing generated snippets for Mkdocs.
+
+        :raises ValueError: The value is not the path to a folder and `checked` is False.
+        """
+        result = self._mkdocsGeneratedSnippets
+        if checked and not self._mkdocsGeneratedSnippetsChecked:
+            if not DirectoryParser.isValid(result):
+                raise ValueError(f'"mkdocsGeneratedSnippets" property is not a valid directory: {result}.')
+            self._mkdocsGeneratedSnippetsChecked = True
+        return result
+
+    def mkdocsWorkdir(self, checked: bool = True) -> str:
+        """
+        Path to the folder used as working directory for Mkdocs.
+
+        :raises ValueError: The value is not the path to a folder and `checked` is False.
+        """
+        result = self._mkdocsWorkdir
+        if checked and not self._mkdocsWorkdirChecked:
+            if not DirectoryParser.isValid(result):
+                raise ValueError(f'"mkdocsWorkdir" property is not a valid directory: {result}.')
+            self._mkdocsWorkdirChecked = True
+        return result
+
 
     @property
     def source(self) -> str:
@@ -779,6 +822,52 @@ class _SeparateIOHandler(_CommandIOHandler):
         self._errFile.seek(0)
         return self._errFile
 
+class _StoreIOHandler(_CommandIOHandler):
+    """
+    Handler for `StoreIO`.
+    """
+
+    _exitStack: contextlib.ExitStack
+    """Exit stack to delete all owned files."""
+
+    _outFile: None|typing.IO
+    """Stdout file, opened with 'w+'. None if this object was closed."""
+
+    _errFile: None|typing.IO
+    """Stderr file, opened with 'w+'. None if this object was closed."""
+
+    def __init__(self, stdoutFilename : str):
+        """:param stdoutFilename: Path to the file generated stdout file."""
+        self._exitStack = contextlib.ExitStack()
+        try:
+            self._outFile = self._exitStack.enter_context(open(stdoutFilename, "w+"))
+            self._errFile = self._exitStack.enter_context(tempfile.NamedTemporaryFile("w+"))
+        except Exception:
+            self.close()
+            raise
+
+    # @typing.override
+    def close(self):
+        self._outFile = None
+        self._errFile = None
+        self._exitStack.close()
+
+    @property
+    # @typing.override
+    def outFile(self) -> typing.IO:
+        if self._outFile is None:
+            raise ValueError("The stdout file is not available anymore")
+        self._outFile.seek(0)
+        return self._outFile
+
+    @property
+    # @typing.override
+    def errFile(self) -> typing.IO:
+        if self._errFile is None:
+            raise ValueError("The stderr file is not available anymore")
+        self._errFile.seek(0)
+        return self._errFile
+
 
 class CommandIO(object):
     """
@@ -825,6 +914,20 @@ class SeparateIO(CommandIO):
     # @typing.override
     def newHandler(self) -> _SeparateIOHandler:
         return _SeparateIOHandler()
+
+class StoreIO(CommandIO):
+    """
+    Stores stdout at a specific location
+
+    Unless the script is run in verbose mode, the stderr is printed only if the command fails.
+    """
+
+    def __init__(self, stdoutFilename: str):
+        self._stdoutFilename = stdoutFilename
+
+    # @typing.override
+    def newHandler(self) -> _StoreIOHandler:
+        return _StoreIOHandler(self._stdoutFilename)
 
 class ScriptCommand(object):
     """Class to run an external program and store its results."""
