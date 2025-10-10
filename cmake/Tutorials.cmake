@@ -27,8 +27,20 @@ include_guard(GLOBAL)
 include("cmake/CompilerOptions.cmake")
 include("cmake/MemcheckTests.cmake")
 
+set(tutorials "" CACHE INTERNAL "List of tutorial targets")
+
 if(GUSTAVE_BUILD_TUTORIALS)
     add_custom_target(run-tutorials)
+
+    find_package(CLI11 CONFIG REQUIRED)
+
+    add_library(Tutorial INTERFACE)
+    target_include_directories(Tutorial
+        INTERFACE "${CMAKE_SOURCE_DIR}/docs/tutorials/include"
+    )
+    target_link_libraries(Tutorial
+        INTERFACE CLI11::CLI11
+    )
 endif()
 
 function(add_tutorial_executable)
@@ -49,12 +61,15 @@ function(add_tutorial_executable)
         )
         target_link_libraries("${ARG_TARGET}"
             PRIVATE Gustave::Distrib-Std
+            PRIVATE Tutorial
         )
         add_custom_target("run-${ARG_TARGET}"
             COMMAND ${ARG_TARGET}
             DEPENDS ${ARG_TARGET}
         )
         add_dependencies(run-tutorials "run-${ARG_TARGET}")
+        list(APPEND tutorials "${ARG_TARGET}")
+        set(tutorials "${tutorials}" CACHE INTERNAL "List of tutorial targets")
         add_test(NAME "${ARG_TARGET}"
             COMMAND "${ARG_TARGET}"
         )

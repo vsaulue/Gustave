@@ -25,6 +25,8 @@
 
 #include <iostream>
 
+#include <Tutorial.hpp>
+
 // -8<- [start:include-unitless]
 // One global header per distribution
 #include <gustave/distribs/std/unitless/Gustave.hpp>
@@ -41,7 +43,6 @@ static void strictUnitDemo() {
     // `G::Real<u.length>` is a float representing a distance (in metre).
     // `G::Vector3<u.force>` is a force vector (in Newton).
 
-    std::cout << "Gustave 'StrictUnit' Demo\n\n";
     auto g = G::vector3(0, -9.8, 0, u.acceleration); // metre / second²
     auto mass = 1000.0 * u.mass; // kilogram
     G::Vector3<u.force> weight = mass * g; // Converted into Newton
@@ -58,7 +59,6 @@ static void unitlessDemo() {
     // Choosing a distribution, with double precision
     using G = gustave::distribs::std::unitless::Gustave<double>;
 
-    std::cout << "Gustave 'Unitless' Demo\n\n";
     auto g = G::vector3(0, -9.8, 0);
     auto mass = 1000.0;
     auto weight = mass * g;
@@ -69,8 +69,16 @@ static void unitlessDemo() {
 }
 // -8<- [end:unitlessDemo]
 
-int main() {
+int main(int argc, char** argv) {
+    auto tuto = Tutorial{ "Getting started", argc, argv };
+    if (tuto.earlyExitCode()) {
+        return *tuto.earlyExitCode();
+    }
+
+    tuto.section("strict-unit-demo", "Gustave 'StrictUnit' Demo");
     strictUnitDemo();
-    std::cout << "\n--------\n\n";
+
+    tuto.section("unitless-demo", "Gustave 'Unitless' Demo");
     unitlessDemo();
+    tuto.endSection();
 }

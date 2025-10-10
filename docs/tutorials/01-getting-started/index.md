@@ -28,6 +28,7 @@ Currently Gustave either only use `float` or `double`. With 32-bit precision, Gu
 ## Getting started: basic maths
 
 This example will just show how to do basic maths with Gustave's `StdUnitless`:
+
 ```c++
 --8<-- "docs/tutorials/01-getting-started/main.cpp:include-unitless"
 
@@ -35,13 +36,9 @@ This example will just show how to do basic maths with Gustave's `StdUnitless`:
 ```
 
 Expected output:
-```
-Gustave 'Unitless' Demo
 
-g = { "x": 0, "y": -9.8, "z": 0 }
-mass = 1000
-weight = mass * g = { "x": 0, "y": -9800, "z": 0 }
-wrong_operation = mass + g.y() = 990.2
+```
+--8<-- "generated-snippets/tuto-01.txt:unitless-demo"
 ```
 
 See the [full code example](main.cpp), which also contains the equivalent demonstration for `StdStrictUnit`.
