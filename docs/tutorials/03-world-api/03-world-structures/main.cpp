@@ -25,6 +25,7 @@
 
 #include <iostream>
 
+#include <Tutorial.hpp>
 
 // Choosing the Std Unitless distribution, with double precision
 #include <gustave/distribs/std/unitless/Gustave.hpp>
@@ -47,7 +48,9 @@ static World newWorld() {
     return World{ blockSize, newSolver() };
 }
 
-int main() {
+int main(int argc, char** argv) {
+    auto tuto = Tutorial{ "World structures", argc, argv };
+
     // -8<- [start:create-world]
     auto world = newWorld();
     // -8<- [end:create-world]
@@ -78,8 +81,8 @@ int main() {
     auto const trResult = world.modify(tr);
     // -8<- [end:add-blocks]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 1: List of modified structures by a transaction\n";
+
+    tuto.section("transaction-result", "List of modified structures by a transaction");
     // -8<- [start:transaction-result]
     std::cout << "List of created structure indices (size = " << trResult.newStructures().size() << "):\n";
     for (auto const& newStructId : trResult.newStructures()) {
@@ -91,8 +94,8 @@ int main() {
     }
     // -8<- [end:transaction-result]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 2: get a structure by its index\n";
+
+    tuto.section("structure-by-id", "Get a structure by its index");
     // -8<- [start:structure-by-id]
     for (auto const& newStructId : trResult.newStructures()) {
         auto const newStruct = world.structures().at(newStructId);
@@ -100,9 +103,8 @@ int main() {
     }
     // -8<- [end:structure-by-id]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 3: list all structures and their blocks\n";
 
+    tuto.section("list-world-structures", "List all structures and their blocks");
     // -8<- [start:list-world-structures]
     std::cout << "List of structures (size = " << world.structures().size() << ")\n";
     for (auto const& structure : world.structures()) {
@@ -113,8 +115,8 @@ int main() {
     }
     // -8<- [end:list-world-structures]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 4: list the structures of a block\n";
+
+    tuto.section("list-block-structures", "List the structures of a block");
     // -8<- [start:list-block-structures]
     auto listStructuresOfBlock = [&world](World::BlockIndex const& blockId) -> void {
         auto const blockRef = world.blocks().at(blockId);
@@ -127,8 +129,8 @@ int main() {
     listStructuresOfBlock({ 7,0,0 });
     // -8<- [end:list-block-structures]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 5: structure status (valid, solved)\n";
+
+    tuto.section("structure-status", "Structure status (valid, solved)");
     // -8<- [start:structure-status]
     auto printStructureStatusOfBlock = [&world](World::BlockIndex const& blockId) -> void {
         auto const structureRef = world.blocks().at(blockId).structures()[0];
@@ -146,4 +148,5 @@ int main() {
     printStructureStatusOfBlock({ 0,1,0 });
     printStructureStatusOfBlock({ 7,0,0 });
     // -8<- [end:structure-status]
+    tuto.endSection();
 }
