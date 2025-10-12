@@ -48,7 +48,7 @@ To get a specific `ContactReference`, use the method `world.contacts().at(...)`.
 Expected output:
 
 ```
-Contact { "blockIndex": { "x": 0, "y": 4, "z": 0}, "direction": "plusY" }: other block is { "x": 0, "y": 5, "z": 0}
+--8<-- "generated-snippets/tuto-03-04.txt:inspect-contact"
 ```
 
 ## Check a contact's status
@@ -65,9 +65,7 @@ Like structures, a `ContactReference` has 2 important methods to check its statu
 Expected output:
 
 ```
-Contact { "blockIndex": { "x": 0, "y": 4, "z": 0}, "direction": "plusY" }: solved
-Contact { "blockIndex": { "x": 3, "y": 8, "z": 0}, "direction": "plusX" }: unsolved
-Contact { "blockIndex": { "x": 9, "y": 9, "z": 0}, "direction": "minusX" }: invalid
+--8<-- "generated-snippets/tuto-03-04.txt:contact-status"
 ```
 
 ## Contact's force
@@ -81,9 +79,7 @@ For a solved `ContactReference`, the `forceVector()` method is available. It ret
 Possible output:
 
 ```
-Force vector by block { "x": 0, "y": 5, "z": 0} on block { "x": 0, "y": 4, "z": 0} = { "x": 0, "y": -120000, "z": 0 }
-Force vector by block { "x": 0, "y": 0, "z": 0} on block { "x": 0, "y": 1, "z": 0} = { "x": -0, "y": 244591, "z": -0 }
-Force vector by block { "x": 4, "y": 0, "z": 0} on block { "x": 4, "y": 1, "z": 0} = { "x": -0, "y": 205409, "z": -0 }
+--8<-- "generated-snippets/tuto-03-04.txt:contact-force"
 ```
 
 A few comment on this output:
@@ -107,9 +103,7 @@ A solved `ContactReference` has a `stressRatio()` method:
 Possible output:
 
 ```
-Stress of link { "blockIndex": { "x": 0, "y": 4, "z": 0}, "direction": "plusY" } = { "compression": 1.2, "shear": 0, "tensile": 0 }
-Stress of link { "blockIndex": { "x": 0, "y": 1, "z": 0}, "direction": "minusY" } = { "compression": 0.489183, "shear": 0, "tensile": 0 }
-Stress of link { "blockIndex": { "x": 4, "y": 1, "z": 0}, "direction": "minusY" } = { "compression": 0.410817, "shear": 0, "tensile": 0 }
+--8<-- "generated-snippets/tuto-03-04.txt:link-stress-ratio"
 ```
 
 So here the 2 feet of the chair are stable, but the link at the base of chair's back is failing.
@@ -125,8 +119,7 @@ As a conclusion to the `SyncWorld` tutorial, here is how to safely test the stre
 Possible output:
 
 ```
-Max stress ratio of structure of block { "x": 0, "y": 1, "z": 0} = { "compression": 1.2, "shear": 0.169471, "tensile": 0 }
-Max stress ratio of structure of block { "x": 3, "y": 8, "z": 0} = unsolved structure
+--8<-- "generated-snippets/tuto-03-04.txt:structure-stress-ratio"
 ```
 
 - **Line 1** tells us that the chair is failing due to compression constraints. It is also subjected to some shear constraints that don't cause any failure.
