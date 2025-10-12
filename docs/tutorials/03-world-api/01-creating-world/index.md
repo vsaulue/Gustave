@@ -40,10 +40,7 @@ Running this test code:
 Should give the following output:
 
 ```
-Tutorial: creating a new SyncWorld.
-
-- number of blocks = 0
-- number of structures = 0
+--8<-- "generated-snippets/tuto-03-01.txt:new-world-usage"
 ```
 
 `world.blocks()` and `world.structures()` are [forward ranges](https://en.cppreference.com/w/cpp/ranges/forward_range) which can be used to inspect the content of our world. As expected for an empty world, they have a size of 0.

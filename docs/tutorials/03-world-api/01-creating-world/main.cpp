@@ -25,6 +25,8 @@
 
 #include <iostream>
 
+#include <Tutorial.hpp>
+
 // -8<- [start:distrib-unitless]
 // Choosing the Std Unitless distribution, with double precision
 #include <gustave/distribs/std/unitless/Gustave.hpp>
@@ -52,13 +54,17 @@ static World newWorld() {
 }
 // -8<- [end:newWorld]
 
-int main() {
+int main(int argc, char** argv) {
+    auto tuto = Tutorial{ "Creating a new SyncWorld", argc, argv };
+    if (tuto.earlyExitCode()) {
+        return *tuto.earlyExitCode();
+    }
+
+    tuto.section("new-world-usage", "Creating a new SyncWorld");
     // -8<- [start:newWorld-usage]
     auto world = newWorld();
-
-    std::cout << "Tutorial: creating a new SyncWorld.\n\n";
-
     std::cout << "- number of blocks = " << world.blocks().size() << '\n';
     std::cout << "- number of structures = " << world.structures().size() << '\n';
     // -8<- [end:newWorld-usage]
+    tuto.endSection();
 }
