@@ -41,11 +41,7 @@ The transaction's result contains exactly all the modified structures of a trans
 Possible output:
 
 ```
-List of created structure indices (size = 3):
-- 0
-- 1
-- 2
-List of deleted structure indices (size = 0):
+--8<-- "generated-snippets/tuto-03-03.txt:transaction-result"
 ```
 
 ## Get a structure reference by index
@@ -62,9 +58,7 @@ List of deleted structure indices (size = 0):
 Possible output:
 
 ```
-Structure (index = 0) has 3 blocks
-Structure (index = 1) has 5 blocks
-Structure (index = 2) has 2 blocks
+--8<-- "generated-snippets/tuto-03-03.txt:structure-by-id"
 ```
 
 ## List all structures and their blocks
@@ -83,20 +77,7 @@ So iterating over all structures and listing their blocks is a simple double loo
 Possible output:
 
 ```
-List of structures (size = 3)
-- structure of 2 blocks:
-  - { "x": 8, "y": 0, "z": 0}
-  - { "x": 7, "y": 0, "z": 0}
-- structure of 5 blocks:
-  - { "x": 4, "y": 0, "z": 0}
-  - { "x": 3, "y": 0, "z": 0}
-  - { "x": 2, "y": 0, "z": 0}
-  - { "x": 0, "y": 0, "z": 0}
-  - { "x": 1, "y": 0, "z": 0}
-- structure of 3 blocks:
-  - { "x": 0, "y": 2, "z": 0}
-  - { "x": 0, "y": 0, "z": 0}
-  - { "x": 0, "y": 1, "z": 0}
+--8<-- "generated-snippets/tuto-03-03.txt:list-world-structures"
 ```
 
 In the above output:
@@ -116,11 +97,7 @@ A `BlockReference` has a `.structures()` method returning a range of `StructureR
 Expected output:
 
 ```
-Structures of block { "x": 0, "y": 0, "z": 0} (size = 2):
-- structure of 5 blocks
-- structure of 3 blocks
-Structures of block { "x": 7, "y": 0, "z": 0} (size = 1):
-- structure of 2 blocks
+--8<-- "generated-snippets/tuto-03-03.txt:list-block-structures"
 ```
 
 !!! note
@@ -142,6 +119,5 @@ Running this test code:
 Should give the following output:
 
 ```
-Statut of structure of block { "x": 0, "y": 1, "z": 0}: solved
-Statut of structure of block { "x": 7, "y": 0, "z": 0}: not solved
+--8<-- "generated-snippets/tuto-03-03.txt:structure-status"
 ```
