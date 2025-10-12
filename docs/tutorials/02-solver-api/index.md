@@ -34,8 +34,7 @@ To create an empty `Structure`, just use its default constructor. We'll store ou
 Expected output:
 
 ```
-Structure of 0 blocks
-Structure of 0 links
+--8<-- "generated-snippets/tuto-02.txt:new-structure"
 ```
 
 ## Add blocks to a structure
@@ -54,8 +53,7 @@ It returns a `NodeIndex`, a unique identifier of this block in the structure. Th
 Expected output:
 
 ```
-Structure of 7 blocks
-Structure of 0 links
+--8<-- "generated-snippets/tuto-02.txt:add-blocks"
 ```
 
 ## Add links to a structure
@@ -78,8 +76,7 @@ Here we stored 2 link indices for later use: `l00_01` (between foundation `n00` 
 Expected output:
 
 ```
-Structure of 7 blocks
-Structure of 6 links
+--8<-- "generated-snippets/tuto-02.txt:add-links"
 ```
 
 **Note:** It is possible to mix calls to `Structure::addLink()` and `Structure::addNode()`. The only requirement is that when `addLink()` is called, the nodes in the new link are already declared.
@@ -104,8 +101,7 @@ The two mandatory parameters for the solver are:
 Expected output:
 
 ```
-Solver gravity vector = { "x": 0, "y": -10, "z": 0 }
-Solver target max error = 0.01
+--8<-- "generated-snippets/tuto-02.txt:configure-solver"
 ```
 
 ## Solve a structure
@@ -119,7 +115,7 @@ Simply use `F1Solver::run(structure)`. This returns a `SolverResult` object with
 Expected output:
 
 ```
-solution.isSolved() = 1
+--8<-- "generated-snippets/tuto-02.txt:solve-structure"
 ```
 
 !!! warning
@@ -142,8 +138,7 @@ A few comments on this block of code:
 Possible output:
 
 ```
-Force vector on block 00 by 01 = { "x": 0, "y": -75000, "z": 0 }
-Force vector on block 21 by 22 = { "x": -0, "y": 75000, "z": -0 }
+--8<-- "generated-snippets/tuto-02.txt:inspect-solution"
 ```
 
 Comments about this output:

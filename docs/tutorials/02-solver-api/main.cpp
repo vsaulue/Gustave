@@ -26,6 +26,8 @@
 #include <iostream>
 #include <memory>
 
+#include <Tutorial.hpp>
+
 // -8<- [start:distrib-unitless]
 // Choosing the Std Unitless distribution, with double precision
 #include <gustave/distribs/std/unitless/Gustave.hpp>
@@ -47,10 +49,14 @@ static Solver newSolver() {
 }
 // -8<- [end:newSolver]
 
-int main() {
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 1: New empty solver structure\n";
+int main(int argc, char** argv) {
+    auto tuto = Tutorial{ "Solver API", argc, argv };
+    if (tuto.earlyExitCode()) {
+        return *tuto.earlyExitCode();
+    }
 
+
+    tuto.section("new-structure", "New empty solver structure");
     // -8<- [start:new-structure]
     auto structure = std::make_shared<Structure>();
     std::cout << "Structure of " << structure->nodes().size() << " blocks\n";
@@ -58,10 +64,7 @@ int main() {
     // -8<- [end:new-structure]
 
 
-
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 2: Add nodes (= blocks)\n";
-
+    tuto.section("add-blocks", "Add nodes (= blocks)");
     // -8<- [start:add-blocks]
     auto const blockMass = 3'000.0; // kilogram
     //          xy
@@ -77,10 +80,7 @@ int main() {
     // -8<- [end:add-blocks]
 
 
-
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 3: Add links\n";
-
+    tuto.section("add-links", "Add links");
     // -8<- [start:add-links]
     // { compression, shear, tensile } in Newton/metre
     auto const wallConductivity = G::Model::ConductivityStress{ 1'000'000.0, 500'000.0, 200'000.0 };
@@ -104,10 +104,7 @@ int main() {
     // -8<- [end:add-links]
 
 
-
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 4: Configure a solver\n";
-
+    tuto.section("configure-solver", "Configure a solver");
     // -8<- [start:configure-solver]
     auto const solver = newSolver();
 
@@ -116,23 +113,18 @@ int main() {
     // -8<- [end:configure-solver]
 
 
-
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 5: Solve a structure\n";
-
+    tuto.section("solve-structure", "Solve a structure");
     // -8<- [start:solve-structure]
     auto const solverResult = solver.run(structure);
     std::cout << "solution.isSolved() = " << solverResult.isSolved() << '\n';
     // -8<- [end:solve-structure]
 
 
-
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 6: Inspect a solution's forces\n";
-
+    tuto.section("inspect-solution", "Inspect a solution's forces");
     // -8<- [start:inspect-solution]
     auto const& solution = solverResult.solution();
     std::cout << "Force vector on block 00 by 01 = " << solution.contacts().at({l00_01, true}).forceVector() << '\n';
     std::cout << "Force vector on block 21 by 22 = " << solution.contacts().at({l20_21, false}).forceVector() << '\n';
     // -8<- [end:inspect-solution]
+    tuto.endSection();
 }
