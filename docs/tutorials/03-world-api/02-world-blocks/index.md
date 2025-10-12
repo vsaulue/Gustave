@@ -56,14 +56,7 @@ The key method is `World::Transaction::addBlock(BlockConstructionInfo const&)`. 
 Possible output of [`printBlocks()`](#list-all-blocks):
 
 ```
-List of blocks (size = 7):
-- { "x": 0, "y": 0, "z": 0}: mass = 10000, isFoundation = 1
-- { "x": 0, "y": 1, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 3, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 2, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 4, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 5, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 6, "z": 0}: mass = 1000, isFoundation = 0
+--8<-- "generated-snippets/tuto-03-02.txt:insert-blocks"
 ```
 
 ## Delete blocks
@@ -79,12 +72,7 @@ This transaction will remove the 2 blocks at the top of the tower.
 Possible output of [`printBlocks()`](#list-all-blocks):
 
 ```
-List of blocks (size = 5):
-- { "x": 0, "y": 0, "z": 0}: mass = 10000, isFoundation = 1
-- { "x": 0, "y": 1, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 3, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 2, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 4, "z": 0}: mass = 1000, isFoundation = 0
+--8<-- "generated-snippets/tuto-03-02.txt:delete-blocks"
 ```
 
 ## Modify blocks
@@ -100,12 +88,7 @@ This transaction replaced the block at the top of the tower with a block of mass
 Possible output of [`printBlocks()`](#list-all-blocks):
 
 ```
-List of blocks (size = 5):
-- { "x": 0, "y": 0, "z": 0}: mass = 10000, isFoundation = 1
-- { "x": 0, "y": 1, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 3, "z": 0}: mass = 1000, isFoundation = 0
-- { "x": 0, "y": 4, "z": 0}: mass = 10000, isFoundation = 0
-- { "x": 0, "y": 2, "z": 0}: mass = 1000, isFoundation = 0
+--8<-- "generated-snippets/tuto-03-02.txt:modify-blocks"
 ```
 
 ## Inspect a block
@@ -124,7 +107,5 @@ The following example shows how to safely inspect a block using `find()`:
 Expected output:
 
 ```
-Block at { "x": 0, "y": 0, "z": 0}: mass =  10000, isFoundation = 1
-Block at { "x": 0, "y": 1, "z": 0}: mass =  1000, isFoundation = 0
-Block at { "x": 9, "y": 9, "z": 9}: invalid
+--8<-- "generated-snippets/tuto-03-02.txt:inspect-blocks"
 ```
