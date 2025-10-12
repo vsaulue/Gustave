@@ -25,6 +25,8 @@
 
 #include <iostream>
 
+#include <Tutorial.hpp>
+
  // Choosing the Std Unitless distribution, with double precision
 #include <gustave/distribs/std/unitless/Gustave.hpp>
 
@@ -46,7 +48,12 @@ static World newWorld() {
     return World{ blockSize, newSolver() };
 }
 
-int main() {
+int main(int argc, char** argv) {
+    auto tuto = Tutorial{ "World blocks", argc, argv };
+    if (tuto.earlyExitCode()) {
+        return *tuto.earlyExitCode();
+    }
+
     // -8<- [start:create-world]
     auto world = newWorld();
     // -8<- [end:create-world]
@@ -62,12 +69,11 @@ int main() {
     };
     // -8<- [end:printBlocks]
 
-    std::cout << "Step 1: create an empty world\n";
+    tuto.section("empty-world", "Create an empty world");
     printBlocks();
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 2: add blocks\n";
 
+    tuto.section("insert-blocks", "Add blocks");
     // -8<- [start:block-constants]
     auto const maxBlockStress = G::Model::PressureStress{
         100'000.0, // compression (Pascal)
@@ -95,8 +101,7 @@ int main() {
 
     printBlocks();
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 3: delete blocks\n";
+    tuto.section("delete-blocks", "Delete blocks");
     // -8<- [start:delete-blocks]
     {
         auto tr = World::Transaction{};
@@ -107,8 +112,7 @@ int main() {
     // -8<- [end:delete-blocks]
     printBlocks();
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 4: modify the top block\n";
+    tuto.section("modify-blocks", "Modify the top block");
     // -8<- [start:modify-blocks]
     {
         auto tr = World::Transaction{};
@@ -119,8 +123,7 @@ int main() {
     // -8<- [end:modify-blocks]
     printBlocks();
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 5: inspect a block\n";
+    tuto.section("inspect-blocks", "Inspect a block");
     // -8<- [start:inspect-blocks]
     auto inspectBlock = [&world](World::BlockIndex const& blockId) -> void {
         std::cout << "Block at " << blockId << ": ";
@@ -136,4 +139,5 @@ int main() {
     inspectBlock({ 0,1,0 });
     inspectBlock({ 9,9,9 });
     // -8<- [end:inspect-blocks]
+    tuto.endSection();
 }
