@@ -25,6 +25,7 @@
 
 #include <iostream>
 
+#include <Tutorial.hpp>
 
 // Choosing the Std Unitless distribution, with double precision
 #include <gustave/distribs/std/unitless/Gustave.hpp>
@@ -47,7 +48,12 @@ static World newWorld() {
     return World{ blockSize, newSolver() };
 }
 
-int main() {
+int main(int argc, char** argv) {
+    auto tuto = Tutorial{ "World links", argc, argv };
+    if (tuto.earlyExitCode()) {
+        return *tuto.earlyExitCode();
+    }
+
     // -8<- [start:create-world]
     auto world = newWorld();
     // -8<- [end:create-world]
@@ -94,8 +100,8 @@ int main() {
     using Direction = World::ContactIndex::Direction;
     // -8<- [end:direction-alias]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 1: Inspect a specific contact\n";
+
+    tuto.section("inspect-contact", "Inspect a specific contact");
     // -8<- [start:inspect-contact]
     {
         auto const contact = world.contacts().at({ {0,4,0}, Direction::plusY() });
@@ -103,8 +109,8 @@ int main() {
     }
     // -8<- [end:inspect-contact]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 2: Check contact status (valid & solved)\n";
+
+    tuto.section("contact-status", "Check contact status (valid & solved)");
     // -8<- [start:contact-status]
     {
         auto printContactStatus = [&world](World::ContactIndex const& contactId) -> void {
@@ -126,8 +132,8 @@ int main() {
     }
     // -8<- [end:contact-status]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 3: Contact's force\n";
+
+    tuto.section("contact-force", "Contact's force");
     // -8<- [start:contact-force]
     {
         auto printContactForce = [&world](World::ContactIndex const& contactId) -> void {
@@ -141,8 +147,8 @@ int main() {
     }
     // -8<- [end:contact-force]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 4: Link's stressRatio\n";
+
+    tuto.section("link-stress-ratio", "Link's stressRatio");
     // -8<- [start:link-stress-ratio]
     {
         auto printContactStress = [&world](World::ContactIndex const& contactId) -> void {
@@ -155,8 +161,8 @@ int main() {
     }
     // -8<- [end:link-stress-ratio]
 
-    std::cout << "\n\n--------------------\n";
-    std::cout << "Step 5: Stress ratio of a structure\n";
+
+    tuto.section("structure-stress-ratio", "Stress ratio of a structure");
     // -8<- [start:structure-stress-ratio]
     {
         auto printMaxStressOfStructure = [&world](World::BlockIndex const& blockId) -> void {
@@ -179,4 +185,5 @@ int main() {
         printMaxStressOfStructure({ 3,8,0 });
     }
     // -8<- [end:structure-stress-ratio]
+    tuto.endSection();
 }
