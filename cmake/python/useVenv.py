@@ -32,7 +32,7 @@ class UseVenv(gu.GustaveScript):
 
     # @typing.override
     def makeArgsParser(self) -> argparse.ArgumentParser:
-        result = argparse.ArgumentParser(description="")
+        result = argparse.ArgumentParser(description="Launch a command in a specific virtual environment")
         result.add_argument("command", type=str, nargs="+", help="Command to launch")
         result.add_argument("--venv", type=str, required=True, help="Name of the virtual environment")
         return result
