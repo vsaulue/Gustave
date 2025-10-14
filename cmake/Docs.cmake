@@ -56,15 +56,6 @@ if(GUSTAVE_BUILD_DOCS)
         COMMENT "Building documentation at '${mkdocs_output_dir}'"
     )
 
-    add_custom_python_target(TARGET mkdocs-serve
-        VENV venv-mkdocs
-        COMMAND "mkdocs" "serve" "--livereload"
-        WORKING_DIRECTORY "${mkdocs_working_dir}"
-        DEPENDS mkdocs-sources
-        COMMENT "Serving documentation at 'http://localhost:8000' (!!! WILL RUN UNTIL KILLED !!!)"
-        USES_TERMINAL
-    )
-
     add_custom_python_target(TARGET mike-deploy
         VENV venv-mkdocs
         COMMAND "mike" "deploy" "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
