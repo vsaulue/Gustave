@@ -14,7 +14,7 @@ A structure can have multiple valid [force distributions](lexicon.md#force-distr
 
 The first example is a simple tower: a 1-wide column of blocks. Here there is only a single correct [force distribution](lexicon.md#force-distribution): any block in the stack receives the weight of all the blocks above it.
 
-Gustave's internal visualisation tool provides mainly two ways to display forces/stresses. You're free to use similar visualisations for your project, or to implement your own.
+Gustave's internal visualisation tool provides mainly two ways to display forces/stresses.
 
 ### Contact stress
 
@@ -107,7 +107,7 @@ About the results: concrete has a much higher compression strength than tensile 
 - The top-right to bottom-left diagonals are subjected to **compression** & shear stress: they transfer more force without failing.
 
 !!! note
-    You can click on images to zoom-in.
+    Click on images to zoom-in.
 
 ![DNA Helix](images/dnaHelix.svg)
 
