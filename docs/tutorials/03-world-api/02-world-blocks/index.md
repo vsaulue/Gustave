@@ -3,7 +3,7 @@
 This sections explains how to inspect/add/modify/remove [blocks](../../../lexicon.md#block) in a `SyncWorld`
 
 !!! note
-    All world modifications are done through a `Transaction`. A transaction can do multiple insertions/modifications/deletions at once. For performance reasons, always try to group your modifications in as few transactions as possible.
+    All world modifications are done through a `Transaction`. A transaction can do multiple insertions/modifications/deletions at once. For performance reasons, always try to group modifications in as few transactions as possible.
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ This sections explains how to inspect/add/modify/remove [blocks](../../../lexico
 
 ## List all blocks
 
-`world.blocks()` is a [forward range](https://en.cppreference.com/w/cpp/ranges/forward_range). You can iterate over it using a [range-based for loop](https://en.cppreference.com/w/cpp/language/range-for):
+`world.blocks()` is a [forward range](https://en.cppreference.com/w/cpp/ranges/forward_range). They can be iterated over using a [range-based for loop](https://en.cppreference.com/w/cpp/language/range-for):
 
 ```c++
 --8<-- "docs/tutorials/03-world-api/02-world-blocks/main.cpp:printBlocks"

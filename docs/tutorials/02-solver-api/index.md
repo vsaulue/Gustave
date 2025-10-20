@@ -7,7 +7,7 @@ In this tutorial we'll aim at creating the following structure, and computing it
 ![](world.svg)
 
 !!! note
-    In this tutorial, all quantities are interpreted in the metric system. This is not mandatory when using the `unitless` distribution. You can interpret them in another natural system of unit: if you choose to interpret 1 unit of length as an imperial `foot`, 1 unit of mass as an imperial `pound`, and 1 unit of time as a `second`, then 1 unit of force must be interpreted as a `pound.foot/second²`.
+    In this tutorial, all quantities are interpreted in the metric system. This is not mandatory when using the `unitless` distribution. Quantities can be interpreted in another natural system of unit: if 1 unit of length is an imperial `foot`, 1 unit of mass is an imperial `pound`, and 1 unit of time is a `second`, then 1 unit of force must be interpreted as a `pound.foot/second²`.
 
 ## Choosing a distribution
 
