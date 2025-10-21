@@ -290,12 +290,17 @@ namespace gustave::math3d {
 
         [[nodiscard]]
         Coord norm() const {
-            using T2 = Real<unit() * unit(), RealRep>;
-            auto result = T2::zero();
+            return RealTraits::sqrt(normSquared());
+        }
+
+        [[nodiscard]]
+        auto normSquared() const {
+            using ResType = Real<unit()* unit(), RealRep>;
+            auto result = ResType::zero();
             for (auto const coord : coords_) {
                 result = result + coord * coord;
             }
-            return RealTraits::sqrt(result);
+            return result;
         }
 
         [[nodiscard]]

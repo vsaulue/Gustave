@@ -103,6 +103,12 @@ TEST_CASE("Vector3") {
         CHECK_THAT(norm, matchers::WithinRel(3.f * kg, epsilon));
     }
 
+    SECTION(".normSquared()") {
+        auto const vec = vector3(4.f, -2.f, -1.f, newton);
+        cRealHasRep<float> auto n2 = vec.normSquared();
+        CHECK(n2 == 21.f * (newton * newton));
+    }
+
     SECTION(".dot()") {
         constexpr auto lhs = vector3(1.f, 2.f, 3.f, acc);
         constexpr auto rhs = vector3(1.f, -2.f, 4.f, kg);
