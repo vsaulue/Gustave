@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
     // -8<- [start:list-world-structures]
     std::cout << "List of structures (size = " << world.structures().size() << ")\n";
     for (auto const& structure : world.structures()) {
-        std::cout << "- structure of " << structure.blocks().size() << " blocks:\n";
+        std::cout << "Structure (index = " << structure.index() << ") has " << structure.blocks().size() << " blocks:\n";
         for (auto const& block : structure.blocks()) {
             std::cout << "  - " << block.index() << '\n';
         }
@@ -120,9 +120,10 @@ int main(int argc, char** argv) {
     // -8<- [start:list-block-structures]
     auto listStructuresOfBlock = [&world](World::BlockIndex const& blockId) -> void {
         auto const blockRef = world.blocks().at(blockId);
-        std::cout << "Structures of block " << blockId << " (size = " << blockRef.structures().size() << "):\n";
+        std::cout << "Structures of block " << blockId << ":\n";
         for (auto const& structureRef : blockRef.structures()) {
-            std::cout << "- structure of " << structureRef.blocks().size() << " blocks\n";
+            std::cout << "- structure (index = " << structureRef.index() << ") of ";
+            std::cout << structureRef.blocks().size() << " blocks\n";
         }
     };
     listStructuresOfBlock({ 0,0,0 });
@@ -134,15 +135,16 @@ int main(int argc, char** argv) {
     // -8<- [start:structure-status]
     auto printStructureStatusOfBlock = [&world](World::BlockIndex const& blockId) -> void {
         auto const structureRef = world.blocks().at(blockId).structures()[0];
-        std::cout << "Statut of structure of block " << blockId << ": ";
+        std::cout << "Block " << blockId << ": structure ";
         if (structureRef.isValid()) {
+            std::cout << "(index = " << structureRef.index() << ") ";
             if (structureRef.isSolved()) {
-                std::cout << "solved\n";
+                std::cout << "is solved\n";
             } else {
-                std::cout << "not solved\n";
+                std::cout << "is not solved\n";
             }
         } else {
-            std::cout << "invalid\n";
+            std::cout << "is invalid\n";
         }
     };
     printStructureStatusOfBlock({ 0,1,0 });
