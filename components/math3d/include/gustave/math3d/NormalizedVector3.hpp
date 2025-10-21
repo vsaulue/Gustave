@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <limits>
 #include <type_traits>
 
 #include <gustave/cfg/cRealOf.hpp>
@@ -169,11 +170,13 @@ namespace gustave::math3d {
 
         [[nodiscard]]
         static Vector normalize(cVector3 auto const& other) {
-            const cfg::cRealOf<rt> auto norm = other.norm();
-            if (norm.value() < 0.00001) {
+            cfg::cRealOf<rt> auto const n2 = other.normSquared();
+            using N2 = decltype(n2)::Rep;
+            static constexpr auto minSqrNorm = std::numeric_limits<N2>::min();
+            if (n2.value() < minSqrNorm) {
                 throw std::domain_error("Cannot normalize: vector is almost zero.");
             }
-            return other / norm;
+            return other / rt.sqrt(n2);
         }
 
         struct UncheckedInit {};
