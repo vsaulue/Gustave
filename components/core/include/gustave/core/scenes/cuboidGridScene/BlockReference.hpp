@@ -36,7 +36,6 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/structureDataOf.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
@@ -229,7 +228,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             [[nodiscard]]
             bool contains(StructureIndex structId) const {
                 for (std::size_t id = 0; id < size_; ++id) {
-                    if (structId == detail::structureDataOf(sceneStructures_[id]).index()) {
+                    if (structId == sceneStructures_[id].index()) {
                         return true;
                     }
                 }
