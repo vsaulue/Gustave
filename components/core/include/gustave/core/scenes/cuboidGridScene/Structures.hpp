@@ -118,7 +118,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         bool contains(StructureReference const& structure) const {
-            return data_->structures.contains(&detail::structureDataOf(structure));
+            return data_->structures.contains(structure.index());
         }
 
         [[nodiscard]]

@@ -37,7 +37,6 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/structureDataOf.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
@@ -389,9 +388,6 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         bool operator==(StructureReference const&) const = default;
-
-        template<cfg::cLibConfig auto libCfg_>
-        friend detail::StructureData<libCfg_> const& detail::structureDataOf(StructureReference<libCfg_> const&);
     private:
         std::shared_ptr<StructureData const> data_;
         StructureIndex index_;
@@ -422,13 +418,6 @@ namespace gustave::core::scenes::cuboidGridScene {
     public:
         using Hasher = utils::Hasher<StructureReference, &StructureReference::data_>;
     };
-
-    namespace detail {
-        template<cfg::cLibConfig auto libCfg>
-        detail::StructureData<libCfg> const& structureDataOf(StructureReference<libCfg> const& ref) {
-            return *ref.data_;
-        }
-    }
 }
 
 template<gustave::cfg::cLibConfig auto libCfg>
