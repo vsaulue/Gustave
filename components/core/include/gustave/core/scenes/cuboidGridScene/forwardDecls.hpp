@@ -26,7 +26,7 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/core/scenes/cSceneUserdata.hpp>
+#include <gustave/core/scenes/cSceneUserData.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
     namespace detail {
