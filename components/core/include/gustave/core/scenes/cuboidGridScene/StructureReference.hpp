@@ -34,7 +34,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/scenes/cSceneUserdata.hpp>
+#include <gustave/core/scenes/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>

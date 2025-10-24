@@ -26,7 +26,7 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/core/scenes/cSceneUserdata.hpp>
+#include <gustave/core/scenes/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
