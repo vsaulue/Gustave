@@ -26,6 +26,7 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/core/scenes/cSceneUserdata.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
@@ -34,15 +35,15 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg>
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
     class Links {
     public:
-        using ContactReference = cuboidGridScene::ContactReference<libCfg>;
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_>;
         using ContactIndex = typename ContactReference::ContactIndex;
     private:
-        using SceneData = detail::SceneData<libCfg>;
+        using SceneData = detail::SceneData<libCfg, UserData_>;
         using BlockDataIterator = typename SceneData::Blocks::const_iterator;
-        using InternalLinks = detail::InternalLinks<libCfg>;
+        using InternalLinks = detail::InternalLinks<libCfg, UserData_>;
         using LinkIterator = typename InternalLinks::Iterator;
 
         class Enumerator {

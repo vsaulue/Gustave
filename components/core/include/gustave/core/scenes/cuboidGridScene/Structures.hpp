@@ -26,6 +26,7 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/core/scenes/cSceneUserdata.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
 #include <gustave/utils/EndIterator.hpp>
@@ -33,13 +34,13 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg>
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
     class Structures {
     public:
-        using StructureReference = cuboidGridScene::StructureReference<libCfg>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_>;
         using StructureIndex = StructureReference::StructureIndex;
     private:
-        using SceneData = detail::SceneData<libCfg>;
+        using SceneData = detail::SceneData<libCfg, UserData_>;
 
         class Enumerator {
         public:

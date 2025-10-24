@@ -26,6 +26,7 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/core/scenes/cSceneUserdata.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/utils/EndIterator.hpp>
@@ -33,13 +34,13 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg>
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
     class Blocks {
     public:
-        using BlockReference = cuboidGridScene::BlockReference<libCfg>;
+        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_>;
         using BlockIndex = typename BlockReference::BlockIndex;
     private:
-        using SceneData = detail::SceneData<libCfg>;
+        using SceneData = detail::SceneData<libCfg, UserData_>;
 
         using DataIterator = typename SceneData::Blocks::BlockMap::const_iterator;
 

@@ -31,9 +31,9 @@
 
 #include <TestHelpers.hpp>
 
-using Contacts = gustave::core::scenes::cuboidGridScene::Contacts<libCfg>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
-using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
+using Contacts = gustave::core::scenes::cuboidGridScene::Contacts<libCfg, void>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, void>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, void>;
 
 using ContactIndex = Contacts::ContactIndex;
 using ContactReference = Contacts::ContactReference;

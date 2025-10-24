@@ -31,20 +31,19 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
-#include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 
 #include <TestHelpers.hpp>
 
-using ContactReference = gustave::core::scenes::cuboidGridScene::ContactReference<libCfg>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
-using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
-using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg>;
+using ContactReference = gustave::core::scenes::cuboidGridScene::ContactReference<libCfg,void>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg,void>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg,void>;
+using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,void>;
 
 using BlockIndex = ContactReference::BlockIndex;
 using BlockReference = ContactReference::BlockReference;
 using ContactIndex = ContactReference::ContactIndex;
 using Direction = ContactIndex::Direction;
-using Transaction = gustave::core::scenes::cuboidGridScene::Transaction<libCfg>;
+using Transaction = SceneUpdater::Transaction;
 
 TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);

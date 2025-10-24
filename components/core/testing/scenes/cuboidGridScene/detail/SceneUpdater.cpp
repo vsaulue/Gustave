@@ -35,7 +35,6 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 
 #include <TestHelpers.hpp>
 
@@ -46,10 +45,10 @@ using ConstBlockDataReference = cuboid::detail::BlockDataReference<libCfg, false
 using ConstDataNeighbours = cuboid::detail::DataNeighbours<libCfg, false>;
 using Direction = gustave::math3d::BasicDirection;
 using LinkIndices = ConstBlockDataReference::LinkIndices;
-using SceneData = cuboid::detail::SceneData<libCfg>;
-using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
-using StructureData = cuboid::detail::StructureData<libCfg>;
-using Transaction = cuboid::Transaction<libCfg>;
+using SceneData = cuboid::detail::SceneData<libCfg, void>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, void>;
+using StructureData = cuboid::detail::StructureData<libCfg, void>;
+using Transaction = SceneUpdater::Transaction;
 
 using SolverStructure = gustave::core::solvers::Structure<libCfg>;
 using SolverLink = SolverStructure::Link;

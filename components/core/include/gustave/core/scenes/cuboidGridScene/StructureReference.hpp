@@ -34,35 +34,31 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/scenes/cSceneUserdata.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/core/solvers/Structure.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto cfg>
-    class BlockReference;
-
-    template<cfg::cLibConfig auto cfg>
-    class ContactReference;
-
-    template<cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
     class StructureReference {
     private:
         using BlockData = detail::BlockData<cfg>;
         using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
-        using StructureData = detail::StructureData<cfg>;
 
-        using SceneData = typename StructureData::SceneData;
+        using SceneData = detail::SceneData<cfg, UserData_>;
+        using StructureData = SceneData::StructureData;
     public:
-        using BlockReference = cuboidGridScene::BlockReference<cfg>;
-        using ContactReference = cuboidGridScene::ContactReference<cfg>;
+        using BlockReference = cuboidGridScene::BlockReference<cfg, UserData_>;
+        using ContactReference = cuboidGridScene::ContactReference<cfg, UserData_>;
         using SolverStructure = solvers::Structure<cfg>;
         using NodeIndex = cfg::NodeIndex<cfg>;
 
@@ -214,7 +210,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         class Links {
         private:
-            using InternalLinks = detail::InternalLinks<cfg>;
+            using InternalLinks = detail::InternalLinks<cfg, UserData_>;
             using SolverIndexIterator = typename StructureData::SolverIndices::const_iterator;
 
             class Enumerator {
@@ -420,7 +416,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     };
 }
 
-template<gustave::cfg::cLibConfig auto libCfg>
-struct std::hash<gustave::core::scenes::cuboidGridScene::StructureReference<libCfg>>
-    : public gustave::core::scenes::cuboidGridScene::StructureReference<libCfg>::Hasher
+template<gustave::cfg::cLibConfig auto libCfg, gustave::core::scenes::cSceneUserData UserData>
+struct std::hash<gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,UserData>>
+    : public gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,UserData>::Hasher
 {};
