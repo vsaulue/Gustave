@@ -36,9 +36,9 @@
 #include <TestHelpers.hpp>
 
 using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
-using BlockReference = gustave::core::scenes::cuboidGridScene::BlockReference<libCfg>;
-using Blocks = gustave::core::scenes::cuboidGridScene::Blocks<libCfg>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
+using BlockReference = gustave::core::scenes::cuboidGridScene::BlockReference<libCfg,void>;
+using Blocks = gustave::core::scenes::cuboidGridScene::Blocks<libCfg,void>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg,void>;
 
 static_assert(std::ranges::forward_range<Blocks>);
 

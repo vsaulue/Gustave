@@ -34,9 +34,9 @@
 
 #include <TestHelpers.hpp>
 
-using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
-using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg>;
+using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg, void>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, void>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, void>;
 
 using BlockIndex = StructureReference::BlockIndex;
 using BlockReference = StructureReference::BlockReference;

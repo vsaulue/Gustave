@@ -26,39 +26,23 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
+#include <gustave/core/scenes/cSceneUserdata.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
+    namespace detail {
+        template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
+        class StructureData;
+
+        template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
+        struct SceneData;
+    }
+
     template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
-    class Contacts {
-    private:
-        using SceneData = detail::SceneData<libCfg, UserData_>;
-    public:
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_>;
+    class BlockReference;
 
-        using ContactIndex = typename ContactReference::ContactIndex;
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
+    class StructureReference;
 
-        [[nodiscard]]
-        explicit Contacts(SceneData const& scene)
-            : scene_{ &scene }
-        {}
-
-        [[nodiscard]]
-        ContactReference find(ContactIndex const& index) const {
-            return ContactReference{ *scene_, index };
-        }
-
-        [[nodiscard]]
-        ContactReference at(ContactIndex const& index) const {
-            ContactReference result{ *scene_, index };
-            if (!result.isValid()) {
-                throw std::out_of_range(result.invalidMessage());
-            }
-            return result;
-        }
-    private:
-        SceneData const* scene_;
-    };
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
+    class ContactReference;
 }

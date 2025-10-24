@@ -36,9 +36,9 @@
 
 namespace cuboidGrid = gustave::core::scenes::cuboidGridScene;
 
-using BlockReference = cuboidGrid::BlockReference<libCfg>;
-using SceneData = cuboidGrid::detail::SceneData<libCfg>;
-using SceneUpdater = cuboidGrid::detail::SceneUpdater<libCfg>;
+using BlockReference = cuboidGrid::BlockReference<libCfg,void>;
+using SceneData = cuboidGrid::detail::SceneData<libCfg,void>;
+using SceneUpdater = cuboidGrid::detail::SceneUpdater<libCfg,void>;
 
 using BlockIndex = BlockReference::BlockIndex;
 using ContactIndex = BlockReference::ContactReference::ContactIndex;

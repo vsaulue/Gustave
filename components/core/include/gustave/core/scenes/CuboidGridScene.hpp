@@ -42,14 +42,14 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes {
-    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData = void>
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_ = void>
     class CuboidGridScene {
     private:
         static constexpr auto u = cfg::units(libCfg);
 
-        using SceneData = cuboidGridScene::detail::SceneData<libCfg>;
-        using SceneUpdater = cuboidGridScene::detail::SceneUpdater<libCfg>;
-        using StructureData = cuboidGridScene::detail::StructureData<libCfg>;
+        using SceneData = cuboidGridScene::detail::SceneData<libCfg, UserData_>;
+        using SceneUpdater = cuboidGridScene::detail::SceneUpdater<libCfg, UserData_>;
+        using StructureData = cuboidGridScene::detail::StructureData<libCfg, UserData_>;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -57,10 +57,10 @@ namespace gustave::core::scenes {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Blocks = cuboidGridScene::Blocks<libCfg>;
-        using Contacts = cuboidGridScene::Contacts<libCfg>;
-        using Links = cuboidGridScene::Links<libCfg>;
-        using Structures = cuboidGridScene::Structures<libCfg>;
+        using Blocks = cuboidGridScene::Blocks<libCfg, UserData_>;
+        using Contacts = cuboidGridScene::Contacts<libCfg, UserData_>;
+        using Links = cuboidGridScene::Links<libCfg, UserData_>;
+        using Structures = cuboidGridScene::Structures<libCfg, UserData_>;
         using Transaction = cuboidGridScene::Transaction<libCfg>;
         using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
 

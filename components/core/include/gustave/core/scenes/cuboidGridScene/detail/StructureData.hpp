@@ -34,18 +34,17 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/scenes/cSceneUserdata.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/core/solvers/Structure.hpp>
 #include <gustave/utils/prop/Ptr.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg>
-    struct SceneData;
-
-    template<cfg::cLibConfig auto libCfg>
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
     class StructureData {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -68,7 +67,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using BlockDataReference = detail::BlockDataReference<libCfg, true>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
-        using SceneData = detail::SceneData<libCfg>;
+        using SceneData = detail::SceneData<libCfg, UserData_>;
         using SolverIndices = std::unordered_map<BlockIndex, NodeIndex>;
         using StructureIndex = cfg::StructureIndex<libCfg>;
 

@@ -31,9 +31,9 @@
 
 namespace cuboid = ::gustave::core::scenes::cuboidGridScene;
 
-using InternalLinks = cuboid::detail::InternalLinks<libCfg>;
-using SceneData = cuboid::detail::SceneData<libCfg>;
-using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
+using InternalLinks = cuboid::detail::InternalLinks<libCfg,void>;
+using SceneData = cuboid::detail::SceneData<libCfg,void>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg,void>;
 
 using BlockIndex = SceneData::Blocks::BlockIndex;
 using ConstBlockDataReference = InternalLinks::ConstBlockDataReference;

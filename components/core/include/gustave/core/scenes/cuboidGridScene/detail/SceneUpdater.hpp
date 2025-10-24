@@ -49,7 +49,7 @@
 #include <gustave/utils/prop/Ptr.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto libCfg>
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
     class SceneUpdater {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -64,8 +64,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using Direction = math3d::BasicDirection;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
-        using SceneData = detail::SceneData<libCfg>;
-        using StructureData = detail::StructureData<libCfg>;
+        using SceneData = detail::SceneData<libCfg, UserData_>;
+        using StructureData = SceneData::StructureData;
         using StructureIndex = StructureData::StructureIndex;
 
         template<cfg::cUnitOf<libCfg> auto unit>

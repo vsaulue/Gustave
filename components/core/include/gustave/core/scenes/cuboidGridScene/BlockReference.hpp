@@ -32,12 +32,14 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
+
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/utils/EndIterator.hpp>
@@ -45,13 +47,7 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg>
-    class ContactReference;
-
-    template<cfg::cLibConfig auto libCfg>
-    class StructureReference;
-
-    template<cfg::cLibConfig auto libCfg>
+    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
     class BlockReference {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -60,8 +56,8 @@ namespace gustave::core::scenes::cuboidGridScene {
         using DataNeighbours = detail::DataNeighbours<libCfg, false>;
         using IndexNeighbour = detail::IndexNeighbour;
         using IndexNeighbours = detail::IndexNeighbours;
-        using SceneData = detail::SceneData<libCfg>;
-        using StructureData = detail::StructureData<libCfg>;
+        using SceneData = detail::SceneData<libCfg, UserData_>;
+        using StructureData = SceneData::StructureData;
         using StructureIndex = StructureData::StructureIndex;
 
         template<cfg::cUnitOf<libCfg> auto unit>
@@ -72,9 +68,9 @@ namespace gustave::core::scenes::cuboidGridScene {
     public:
         using BlockIndex = cuboidGridScene::BlockIndex;
         using Direction = math3d::BasicDirection;
-        using ContactReference = cuboidGridScene::ContactReference<libCfg>;
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_>;
         using PressureStress = model::PressureStress<libCfg>;
-        using StructureReference = cuboidGridScene::StructureReference<libCfg>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_>;
 
         class Contacts {
         private:

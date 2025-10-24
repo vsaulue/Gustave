@@ -30,16 +30,15 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Structures.hpp>
-#include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 
 #include <TestHelpers.hpp>
 
 namespace cuboid = ::gustave::core::scenes::cuboidGridScene;
 
-using SceneData = cuboid::detail::SceneData<libCfg>;
-using SceneUpdater = cuboid::detail::SceneUpdater<libCfg>;
-using Structures = cuboid::Structures<libCfg>;
-using Transaction = cuboid::Transaction<libCfg>;
+using SceneData = cuboid::detail::SceneData<libCfg, void>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, void>;
+using Structures = cuboid::Structures<libCfg, void>;
+using Transaction = SceneUpdater::Transaction;
 
 using BlockIndex = cuboid::BlockIndex;
 

@@ -36,7 +36,7 @@ using BlockConstructionInfo = gustave::core::scenes::cuboidGridScene::BlockConst
 using BlockData = gustave::core::scenes::cuboidGridScene::detail::BlockData<libCfg>;
 using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
 using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg,void>;
 
 template<bool isMutable>
 using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg, isMutable>;

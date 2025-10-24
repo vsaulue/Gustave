@@ -29,7 +29,7 @@
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
-using SceneData = cuboid::detail::SceneData<libCfg>;
+using SceneData = cuboid::detail::SceneData<libCfg, void>;
 
 using BlockConstructionInfo = SceneData::Blocks::BlockConstructionInfo;
 using SceneBlocks = SceneData::Blocks;

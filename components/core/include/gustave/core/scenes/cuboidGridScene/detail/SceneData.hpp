@@ -30,19 +30,20 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/scenes/cSceneUserdata.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/utils/IndexGenerator.hpp>
 #include <gustave/utils/PointerHash.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg>
-    class StructureData;
-
-    template<cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
     struct SceneData {
     public:
-        using StructureData = detail::StructureData<cfg>;
+        using UserData = UserData_;
+
+        using StructureData = detail::StructureData<cfg, UserData_>;
         using StructureIndex = cfg::StructureIndex<cfg>;
     private:
         static constexpr auto u = cfg::units(cfg);
