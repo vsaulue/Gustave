@@ -34,8 +34,8 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/common/UserDataTraits.hpp>
-#include <gustave/core/scenes/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
@@ -45,7 +45,7 @@
 #include <gustave/utils/prop/Ptr.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
     class StructureData {
     private:
         static constexpr auto u = cfg::units(libCfg);

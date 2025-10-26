@@ -26,23 +26,23 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/core/scenes/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
     namespace detail {
-        template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
+        template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
         class StructureData;
 
-        template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
+        template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
         struct SceneData;
     }
 
-    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
     class BlockReference;
 
-    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
     class StructureReference;
 
-    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
     class ContactReference;
 }

@@ -28,6 +28,7 @@
 #include <array>
 #include <optional>
 
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
@@ -35,7 +36,7 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
     class InternalLinks {
     public:
         using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;

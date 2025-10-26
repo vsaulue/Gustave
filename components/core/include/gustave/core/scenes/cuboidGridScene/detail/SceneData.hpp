@@ -30,7 +30,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/scenes/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
@@ -38,7 +38,7 @@
 #include <gustave/utils/PointerHash.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
     struct SceneData {
     public:
         using UserData = UserData_;
