@@ -40,4 +40,17 @@ namespace gustave::meta {
     consteval std::remove_cvref_t<T> value(T&&) {
         static_assert(detail::alwaysFalse<T>, "Meta::value() cannot be used in an evaluated context.");
     }
+
+    /**
+    * Simple type wrapper.
+    *
+    * It can be used to return any type (with possibly cvref qualifiers) from a consteval function.
+    */
+    template<typename T>
+    struct TypeWrapper {
+        using Type = T;
+    };
+
+    template<typename T>
+    concept cTypeWrapper = std::is_same_v<T, TypeWrapper<typename T::Type>>;
 }
