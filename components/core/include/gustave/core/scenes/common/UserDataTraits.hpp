@@ -27,12 +27,12 @@
 
 #include <type_traits>
 
-#include <gustave/core/scenes/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 
 namespace gustave::core::scenes::common {
     struct EmptyUserData {};
 
-    template<cSceneUserData UserDatas_>
+    template<common::cSceneUserData UserDatas_>
     struct UserDataTraits {
     private:
         [[nodiscard]]

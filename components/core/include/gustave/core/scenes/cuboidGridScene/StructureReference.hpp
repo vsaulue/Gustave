@@ -34,8 +34,8 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/common/UserDataTraits.hpp>
-#include <gustave/core/scenes/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
@@ -49,7 +49,7 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto cfg, cSceneUserData UserData_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
     class StructureReference {
     private:
         using BlockData = detail::BlockData<cfg>;
@@ -430,7 +430,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     };
 }
 
-template<gustave::cfg::cLibConfig auto libCfg, gustave::core::scenes::cSceneUserData UserData>
+template<gustave::cfg::cLibConfig auto libCfg, gustave::core::scenes::common::cSceneUserData UserData>
 struct std::hash<gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,UserData>>
     : public gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,UserData>::Hasher
 {};

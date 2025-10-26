@@ -29,7 +29,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/scenes/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
@@ -42,7 +42,7 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes {
-    template<cfg::cLibConfig auto libCfg, cSceneUserData UserData_ = void>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_ = void>
     class CuboidGridScene {
     private:
         static constexpr auto u = cfg::units(libCfg);

@@ -27,7 +27,7 @@
 
 #include <type_traits>
 
-namespace gustave::core::scenes {
+namespace gustave::core::scenes::common {
     namespace detail {
         template<typename T>
         concept cUserData = std::is_void_v<T> || std::is_default_constructible_v<T>;
