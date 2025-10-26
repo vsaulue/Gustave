@@ -34,6 +34,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
@@ -64,12 +65,20 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
     public:
+        using UDTraits = common::UserDataTraits<UserData_>;
+
         using BlockDataReference = detail::BlockDataReference<libCfg, true>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
         using SceneData = detail::SceneData<libCfg, UserData_>;
         using SolverIndices = std::unordered_map<BlockIndex, NodeIndex>;
         using StructureIndex = cfg::StructureIndex<libCfg>;
+        using UserDataMember = UDTraits::StructureMember;
+
+        [[nodiscard]]
+        static constexpr bool hasUserData() {
+            return UDTraits::hasStructureUserData();
+        }
 
         [[nodiscard]]
         explicit StructureData(StructureIndex index, SceneData& sceneData, BlockDataReference root)
@@ -174,6 +183,20 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         std::shared_ptr<SolverStructure const> solverStructurePtr() const {
             return solverStructure_;
         }
+
+        [[nodiscard]]
+        UserDataMember const& userData() const
+            requires (hasUserData())
+        {
+            return userData_;
+        }
+
+        [[nodiscard]]
+        UserDataMember& userData()
+            requires (hasUserData())
+        {
+            return userData_;
+        }
     private:
         void declareBlock(ConstBlockDataReference block) {
             assert(block);
@@ -226,5 +249,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         utils::prop::Ptr<SceneData> scene_;
         std::shared_ptr<SolverStructure> solverStructure_;
         SolverIndices solverIndices_;
+
+        [[no_unique_address]]
+        UserDataMember userData_;
     };
 }
