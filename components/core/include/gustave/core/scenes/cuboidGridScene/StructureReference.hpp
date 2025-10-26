@@ -34,6 +34,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
@@ -57,10 +58,13 @@ namespace gustave::core::scenes::cuboidGridScene {
         using SceneData = detail::SceneData<cfg, UserData_>;
         using StructureData = SceneData::StructureData;
     public:
+        using UDTraits = common::UserDataTraits<UserData_>;
+
         using BlockReference = cuboidGridScene::BlockReference<cfg, UserData_>;
         using ContactReference = cuboidGridScene::ContactReference<cfg, UserData_>;
         using SolverStructure = solvers::Structure<cfg>;
         using NodeIndex = cfg::NodeIndex<cfg>;
+        using UserDataMember = UDTraits::StructureMember;
 
         using BlockIndex = typename BlockReference::BlockIndex;
         using ContactIndex = typename ContactReference::ContactIndex;
@@ -380,6 +384,16 @@ namespace gustave::core::scenes::cuboidGridScene {
         [[nodiscard]]
         bool isValid() const {
             return data_ != nullptr && data_->isValid();
+        }
+
+        [[nodiscard]]
+        UserDataMember const& userData() const
+            requires (UDTraits::hasStructureUserData())
+        {
+            if (data_ == nullptr) {
+                throw invalidError();
+            }
+            return data_->userData();
         }
 
         [[nodiscard]]
