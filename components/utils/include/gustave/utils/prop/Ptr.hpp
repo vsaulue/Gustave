@@ -76,6 +76,11 @@ namespace gustave::utils::prop {
         constexpr T const& operator*() const {
             return *value_;
         }
+
+        [[nodiscard]]
+        T const* asImmutable() const {
+            return value_;
+        }
     private:
         T* value_;
     };
