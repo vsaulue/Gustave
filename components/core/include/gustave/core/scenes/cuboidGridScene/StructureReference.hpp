@@ -47,16 +47,23 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/prop/SharedPtr.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_, bool isMutable_>
     class StructureReference {
     private:
+        template<cfg::cLibConfig auto, common::cSceneUserData, bool>
+        friend class StructureReference;
+
         using BlockData = detail::BlockData<cfg>;
         using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
 
         using SceneData = detail::SceneData<cfg, UserData_>;
         using StructureData = SceneData::StructureData;
+
+        template<typename T>
+        using SharedPtrMember = utils::prop::SharedPtrMember<isMutable_, T>;
     public:
         using UDTraits = common::UserDataTraits<UserData_>;
 
@@ -316,7 +323,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         };
 
         [[nodiscard]]
-        explicit StructureReference(std::shared_ptr<StructureData const> data)
+        explicit StructureReference(SharedPtrMember<StructureData> data)
             : data_{ std::move(data) }
             , index_{ initIndex(data_.get()) }
         {}
@@ -331,6 +338,52 @@ namespace gustave::core::scenes::cuboidGridScene {
         explicit StructureReference(utils::NoInit)
             : StructureReference{ nullptr }
         {}
+
+        [[nodiscard]]
+        StructureReference(StructureReference const&)
+            requires (not isMutable_)
+        = default;
+
+        [[nodiscard]]
+        StructureReference(meta::cCvRefOf<StructureReference<cfg, UserData_, true>> auto&& v)
+            requires (not isMutable_)
+            : data_{ std::forward<decltype(v)>(v).asImmutable() }
+        {}
+
+        [[nodiscard]]
+        StructureReference(StructureReference&)
+            requires (isMutable_)
+        = default;
+
+        [[nodiscard]]
+        StructureReference(StructureReference&&) = default;
+
+        StructureReference& operator=(StructureReference const&)
+            requires (not isMutable_)
+        = default;
+
+        StructureReference& operator=(StructureReference&)
+            requires (isMutable_)
+        = default;
+
+        StructureReference& operator=(meta::cCvRefOf<StructureReference<cfg, UserData_, true>> auto&& v)
+            requires (not isMutable_)
+        {
+            *this = std::forward<decltype(v)>(v).asImmutable();
+            return *this;
+        }
+
+        StructureReference& operator=(StructureReference&&) = default;
+
+        [[nodiscard]]
+        StructureReference<cfg, UserData_, false> asImmutable() const& {
+            return StructureReference<cfg, UserData_, false>{ data_ };
+        }
+
+        [[nodiscard]]
+        StructureReference<cfg, UserData_, false> asImmutable() && {
+            return StructureReference<cfg, UserData_, false>{ std::move(data_) };
+        }
 
         [[nodiscard]]
         Blocks blocks() const {
@@ -362,6 +415,11 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
+        static constexpr bool isMutable() {
+            return isMutable_;
+        }
+
+        [[nodiscard]]
         Links links() const {
             return Links{ *data_ };
         }
@@ -387,20 +445,35 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        UserDataMember const& userData() const
-            requires (UDTraits::hasStructureUserData())
+        UserDataMember& userData()
+            requires (UDTraits::hasStructureUserData() && isMutable_)
         {
-            if (data_ == nullptr) {
-                throw invalidError();
-            }
-            return data_->userData();
+            return getUserData(*this);
         }
 
         [[nodiscard]]
-        bool operator==(StructureReference const&) const = default;
+        UserDataMember const& userData() const
+            requires (UDTraits::hasStructureUserData())
+        {
+            return getUserData(*this);
+        }
+
+        template<bool rhsMutable>
+        [[nodiscard]]
+        bool operator==(StructureReference<cfg, UserData_, rhsMutable> const& rhs) const {
+            return data_ == rhs.data_;
+        }
     private:
-        std::shared_ptr<StructureData const> data_;
+        SharedPtrMember<StructureData> data_;
         StructureIndex index_;
+
+        [[nodiscard]]
+        static decltype(auto) getUserData(meta::cCvRefOf<StructureReference> auto&& self) {
+            if (self.data_ == nullptr) {
+                throw self.invalidError();
+            }
+            return self.data_->userData();
+        }
 
         [[nodiscard]]
         static constexpr StructureIndex invalidIndex() {
@@ -408,7 +481,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        static std::shared_ptr<StructureData const> initData(SceneData const& scene, StructureIndex index) {
+        static SharedPtrMember<StructureData> initData(SceneData const& scene, StructureIndex index) {
             auto const it = scene.structures.find(index);
             if (it != scene.structures.end()) {
                 return *it;

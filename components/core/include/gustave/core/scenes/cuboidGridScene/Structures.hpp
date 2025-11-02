@@ -37,7 +37,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
     class Structures {
     public:
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, false>;
         using StructureIndex = StructureReference::StructureIndex;
     private:
         using SceneData = detail::SceneData<libCfg, UserData_>;

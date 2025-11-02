@@ -86,7 +86,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using PressureStress = model::PressureStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using SolverContactIndex = typename solvers::Structure<libCfg>::ContactIndex;
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, false>;
 
         [[nodiscard]]
         explicit ContactReference(utils::NoInit NO_INIT)
