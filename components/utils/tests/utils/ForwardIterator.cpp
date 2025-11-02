@@ -51,7 +51,7 @@ namespace {
             {}
 
             [[nodiscard]]
-            Coord const& operator*() const {
+            Coord& operator*() const {
                 return value_;
             }
 
@@ -68,7 +68,7 @@ namespace {
             bool operator==(Enumerator const&) const = default;
         private:
             Steps const* container_;
-            Coord value_;
+            mutable Coord value_;
         };
     public:
         using Iterator = utils::ForwardIterator<Enumerator>;
@@ -105,7 +105,14 @@ TEST_CASE("utils::ForwardIterator") {
     Steps::Iterator it = steps.begin();
 
     SECTION("::operator*()") {
-        CHECK(*it == Coord{ 1 });
+        SECTION("// read-only") {
+            CHECK(*it == Coord{ 1 });
+        }
+
+        SECTION("// mutable") {
+            *it = Coord{ 5 };
+            CHECK(it->value == 5);
+        }
     }
 
     SECTION("::operator->()") {

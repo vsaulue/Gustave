@@ -26,6 +26,7 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -37,7 +38,9 @@ namespace gustave::utils {
     class ForwardIterator {
     public:
         using difference_type = std::ptrdiff_t;
-        using value_type = std::remove_cvref_t<decltype(*std::declval<Enumerator&>())>;
+        using reference = decltype(*std::declval<Enumerator const&>());
+        using value_type = std::remove_cvref_t<reference>;
+        using pointer = std::remove_reference_t<reference>*;
 
         template<typename... Args>
         [[nodiscard]]
@@ -46,13 +49,13 @@ namespace gustave::utils {
         {}
 
         [[nodiscard]]
-        value_type const& operator*() const {
+        reference operator*() const {
             return *enumerator_;
         }
 
         [[nodiscard]]
-        value_type const* operator->() const {
-            return &*enumerator_;
+        pointer operator->() const {
+            return std::addressof(*enumerator_);
         }
 
         ForwardIterator& operator++() {
