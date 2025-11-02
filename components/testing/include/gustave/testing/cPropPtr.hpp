@@ -25,6 +25,9 @@
 
 #pragma once
 
+#include <concepts>
+#include <utility>
+
 #include <gustave/meta/Meta.hpp>
 
 namespace gustave::testing {
@@ -32,9 +35,19 @@ namespace gustave::testing {
     using AsImmutable = decltype(std::declval<T const&>().asImmutable());
 
     template<typename T>
+    [[nodiscard]]
+    consteval bool isPropEqualitySymmetric() {
+        if (std::equality_comparable<T>) {
+            return std::equality_comparable_with<T, AsImmutable<T>>;
+        }
+        return true;
+    }
+
+    template<typename T>
     concept cPropPtr = requires(T & mv, T const& cmv) {
         requires meta::cNotCvRef<T>;
         { cmv.asImmutable() } -> meta::cNotCvRef;
+        requires isPropEqualitySymmetric<T>();
         requires requires (AsImmutable<T>&iv, AsImmutable<T> const& civ) {
             T{ mv };
             requires (not requires { T{ cmv }; });
