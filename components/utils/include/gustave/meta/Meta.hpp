@@ -48,6 +48,9 @@ namespace gustave::meta {
     template<typename T>
     concept cNotCvRef = std::same_as<T, std::remove_cvref_t<T>>;
 
+    template<bool condition, typename T>
+    using MutableIf = std::conditional_t<condition, T, T const>;
+
     /**
     * Simple type wrapper.
     *

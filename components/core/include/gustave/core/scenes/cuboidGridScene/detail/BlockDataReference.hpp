@@ -34,7 +34,7 @@
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/meta/MutableIf.hpp>
+#include <gustave/meta/Meta.hpp>
 #include <gustave/utils/HashEquals.hpp>
 #include <gustave/utils/NoInit.hpp>
 
