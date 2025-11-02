@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <type_traits>
 
 namespace gustave::meta {
@@ -40,6 +41,12 @@ namespace gustave::meta {
     consteval std::remove_cvref_t<T> value(T&&) {
         static_assert(detail::alwaysFalse<T>, "Meta::value() cannot be used in an evaluated context.");
     }
+
+    template<typename T, typename Desired>
+    concept cCvRefOf = std::same_as<Desired, std::remove_cvref_t<T>>;
+
+    template<typename T>
+    concept cNotCvRef = std::same_as<T, std::remove_cvref_t<T>>;
 
     /**
     * Simple type wrapper.
