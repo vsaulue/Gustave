@@ -30,7 +30,7 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
-#include <gustave/meta/MutableIf.hpp>
+#include <gustave/meta/Meta.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
