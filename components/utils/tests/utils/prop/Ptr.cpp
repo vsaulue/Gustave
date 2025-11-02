@@ -104,4 +104,10 @@ TEST_CASE("utils::prop::Ptr") {
         CHECK(rawPtr == &d1);
         CHECK_FALSE(rawPtr->isCalledAsConst());
     }
+
+    SECTION("asImmutable()") {
+        auto res = cPtr.asImmutable();
+        CHECK(res == &d1);
+        CHECK(res->isCalledAsConst());
+    }
 }
