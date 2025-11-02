@@ -29,27 +29,14 @@
 
 #include <gustave/utils/prop/Ptr.hpp>
 #include <gustave/testing/ConstDetector.hpp>
-
-namespace {
-    template<typename T>
-    concept cConstCopiable = requires (T const& cv) {
-        T(cv);
-    };
-
-    template<typename T>
-    concept cConstAssignable = requires (T& v, T const& cv) {
-        v = cv;
-    };
-}
+#include <gustave/testing/cPropPtr.hpp>
 
 template<typename T>
 using Ptr = gustave::utils::prop::Ptr<T>;
 
 using ConstDetector = gustave::testing::ConstDetector<int>;
 
-static_assert(!cConstAssignable<Ptr<int>>);
-static_assert(!cConstCopiable<Ptr<int>>);
-static_assert(!std::convertible_to<Ptr<int> const, int*>);
+static_assert(gustave::testing::cPropPtr<Ptr<int>>);
 
 TEST_CASE("utils::prop::Ptr") {
     ConstDetector d1{ 1 };
