@@ -37,7 +37,7 @@
 using ContactReference = gustave::core::scenes::cuboidGridScene::ContactReference<libCfg,void>;
 using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg,void>;
 using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg,void>;
-using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,void>;
+using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,void,false>;
 
 using BlockIndex = ContactReference::BlockIndex;
 using BlockReference = ContactReference::BlockReference;

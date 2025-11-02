@@ -70,7 +70,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using Direction = math3d::BasicDirection;
         using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_>;
         using PressureStress = model::PressureStress<libCfg>;
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, false>;
 
         class Contacts {
         private:

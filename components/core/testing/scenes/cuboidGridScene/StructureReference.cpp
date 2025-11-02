@@ -31,22 +31,31 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
+#include <gustave/testing/ConstDetector.hpp>
+#include <gustave/testing/cPropPtr.hpp>
 
 #include <TestHelpers.hpp>
 
-using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg, void>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, void>;
-using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, void>;
+struct UserData {
+    using Structure = gustave::testing::ConstDetector<int>;
+};
 
-using BlockIndex = StructureReference::BlockIndex;
-using BlockReference = StructureReference::BlockReference;
-using ContactIndex = StructureReference::ContactIndex;
-using ContactReference = StructureReference::ContactReference;
-using Direction = StructureReference::ContactIndex::Direction;
+template<bool isMutable>
+using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg, UserData, isMutable>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, UserData>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, UserData>;
+
+using BlockIndex = StructureReference<true>::BlockIndex;
+using BlockReference = StructureReference<true>::BlockReference;
+using ContactIndex = StructureReference<true>::ContactIndex;
+using ContactReference = StructureReference<true>::ContactReference;
+using Direction = StructureReference<true>::ContactIndex::Direction;
 using Transaction = SceneUpdater::Transaction;
 
-static_assert(std::ranges::forward_range<StructureReference::Blocks>);
-static_assert(std::ranges::forward_range<StructureReference::Links>);
+static_assert(std::ranges::forward_range<StructureReference<true>::Blocks>);
+static_assert(std::ranges::forward_range<StructureReference<true>::Links>);
+
+static_assert(gustave::testing::cPropPtr<StructureReference<true>>);
 
 TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
@@ -75,23 +84,24 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         SceneUpdater{ data }.runTransaction(t);
     }
 
-    auto structureOf = [&](BlockIndex const& index) -> StructureReference {
+    auto structureOf = [&](BlockIndex const& index) -> StructureReference<true> {
         auto const blockDataRef = data.blocks.find(index);
         REQUIRE(blockDataRef);
         auto const structId = blockDataRef.structureId();
         REQUIRE(structId != data.structureIdGenerator.invalidIndex());
         auto const it = data.structures.find(structId);
         REQUIRE(it != data.structures.end());
-        return StructureReference{ *it };
+        return StructureReference<true>{ *it };
     };
 
     auto makeContactRef = [&](BlockIndex const& source, Direction direction) {
         return ContactReference{ data, ContactIndex{ source, direction } };
     };
 
-    auto const s1 = structureOf({ 1,0,0 });
-    auto const s3 = structureOf({ 3,0,0 });
-    auto const s666 = structureOf({ 6,6,6, });
+    auto s1 = structureOf({ 1,0,0 });
+    auto s3 = structureOf({ 3,0,0 });
+    auto s666 = structureOf({ 6,6,6, });
+    auto sInvalid = StructureReference<true>{ gustave::utils::NO_INIT };
 
     SECTION(".blocks()") {
         SECTION(".at()") {
@@ -179,7 +189,7 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         }
 
         SECTION("// invalid index") {
-            auto const invalidStructure = StructureReference{ gustave::utils::NO_INIT };
+            auto const invalidStructure = StructureReference<true>{ gustave::utils::NO_INIT };
             CHECK_THROWS_AS(invalidStructure.index(), std::out_of_range);
         }
     }
@@ -231,6 +241,49 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
             CHECK(solver3.nodes()[*optIndex2].mass() == 2000.f * u.mass);
             CHECK(solver3.nodes()[*optIndex3].mass() == 3000.f * u.mass);
             CHECK(solver3.nodes()[*optIndex4].mass() == 4000.f * u.mass);
+        }
+    }
+
+    SECTION(".userData()") {
+        SECTION("// invalid - mutable") {
+            CHECK_THROWS_AS(sInvalid.userData(), std::out_of_range);
+        }
+
+        SECTION("// invalid - const") {
+            auto const& asConst = sInvalid;
+            CHECK_THROWS_AS(asConst.userData(), std::out_of_range);
+        }
+
+        SECTION("// invalid - immutable") {
+            auto asImmutable = sInvalid.asImmutable();
+            CHECK_THROWS_AS(asImmutable.userData(), std::out_of_range);
+        }
+
+        SECTION("// valid") {
+            auto const& cs1 = s1;
+            CHECK_FALSE(s1.userData().isCalledAsConst());
+            CHECK(cs1.userData().isCalledAsConst());
+            s1.userData().tag = 5;
+            CHECK(cs1.userData().tag == 5);
+            CHECK(s3.userData().tag == 0);
+        }
+    }
+
+    SECTION(".operator==()") {
+        auto const is3 = s3.asImmutable();
+        auto const is1 = s1.asImmutable();
+        SECTION("// mutable == immutable") {
+            CHECK(is3 == s3);
+            CHECK(s3 == is3);
+            CHECK(is3 != sInvalid);
+        }
+
+        SECTION("// immutable == immutable") {
+            CHECK(is3 != is1);
+        }
+
+        SECTION("// mutable == mutable") {
+            CHECK(s1 != s3);
         }
     }
 }
