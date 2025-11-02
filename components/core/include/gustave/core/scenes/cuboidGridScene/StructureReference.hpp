@@ -425,12 +425,5 @@ namespace gustave::core::scenes::cuboidGridScene {
                 return data->index();
             }
         }
-    public:
-        using Hasher = utils::Hasher<StructureReference, &StructureReference::data_>;
     };
 }
-
-template<gustave::cfg::cLibConfig auto libCfg, gustave::core::scenes::common::cSceneUserData UserData>
-struct std::hash<gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,UserData>>
-    : public gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,UserData>::Hasher
-{};
