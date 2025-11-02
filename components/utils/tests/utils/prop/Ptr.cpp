@@ -28,28 +28,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/utils/prop/Ptr.hpp>
+#include <gustave/testing/ConstDetector.hpp>
 
 namespace {
-    struct ConstDetector {
-    public:
-        [[nodiscard]]
-        explicit ConstDetector(int tagValue)
-            : tag{ tagValue }
-        {}
-
-        [[nodiscard]]
-        bool isCalledAsConst() {
-            return false;
-        }
-
-        [[nodiscard]]
-        bool isCalledAsConst() const {
-            return true;
-        }
-
-        int tag;
-    };
-
     template<typename T>
     concept cConstCopiable = requires (T const& cv) {
         T(cv);
@@ -63,6 +44,8 @@ namespace {
 
 template<typename T>
 using Ptr = gustave::utils::prop::Ptr<T>;
+
+using ConstDetector = gustave::testing::ConstDetector<int>;
 
 static_assert(!cConstAssignable<Ptr<int>>);
 static_assert(!cConstCopiable<Ptr<int>>);

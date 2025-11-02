@@ -41,5 +41,7 @@ add_unit_test(TARGET Comp-Utils-unit-test
         "tests/utils/SizedString.cpp"
         "tests/utils/SizedStringView.cpp"
     INCLUDE_DIRECTORIES "tests/include"
-    LINK_LIBRARIES Comp-Utils
+    LINK_LIBRARIES
+        Comp-Utils
+        Comp-Testing
 )
