@@ -38,6 +38,7 @@ add_unit_test(TARGET Comp-Utils-unit-test
         "tests/utils/NumberHyperscript.cpp"
         "tests/utils/PointerHash.cpp"
         "tests/utils/prop/Ptr.cpp"
+        "tests/utils/prop/SharedPtr.cpp"
         "tests/utils/SizedString.cpp"
         "tests/utils/SizedStringView.cpp"
     INCLUDE_DIRECTORIES "tests/include"
