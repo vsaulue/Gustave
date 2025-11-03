@@ -100,7 +100,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
                 if (!data_->isStructureIdValid(root.structureId())) {
                     auto const newStructId = data_->structureIdGenerator();
                     auto newStructure = std::make_shared<StructureData>(newStructId, *data_, root);
-                    data_->structures.emplace(newStructure);
+                    data_->structures.insert(std::move(newStructure));
                 }
             }
             auto newIdEnd = data_->structureIdGenerator.readNextIndex();
@@ -181,10 +181,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         void removeStructureOf(TransactionContext& ctx, ConstBlockDataReference block) {
             auto const structureId = block.structureId();
             if (structureId != data_->structureIdGenerator.invalidIndex()) {
-                auto it = data_->structures.find(structureId);
-                if (it != data_->structures.end()) {
-                    // unordered_set::extract() doesn't support Hash::is_transparent before c++23.
-                    data_->structures.erase(it);
+                auto const didDelete = data_->structures.erase(structureId);
+                if (didDelete) {
                     ctx.removedStructures.push_back(structureId);
                 }
             }

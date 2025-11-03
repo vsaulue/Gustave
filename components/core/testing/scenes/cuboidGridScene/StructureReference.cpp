@@ -89,9 +89,7 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         REQUIRE(blockDataRef);
         auto const structId = blockDataRef.structureId();
         REQUIRE(structId != data.structureIdGenerator.invalidIndex());
-        auto const it = data.structures.find(structId);
-        REQUIRE(it != data.structures.end());
-        return StructureReference<true>{ *it };
+        return StructureReference<true>{ data.structures.atShared(structId) };
     };
 
     auto makeContactRef = [&](BlockIndex const& source, Direction direction) {

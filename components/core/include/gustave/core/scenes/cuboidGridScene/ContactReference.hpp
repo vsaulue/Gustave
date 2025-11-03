@@ -193,9 +193,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             if (!optStructId) {
                 throw std::out_of_range(invalidMessage());
             }
-            auto sharedStructData = *scene_->structures.find(*optStructId);
-            assert(sharedStructData);
-            return StructureReference{ std::move(sharedStructData) };
+            return StructureReference{ scene_->structures.atShared(*optStructId) };
         }
 
         [[nodiscard]]

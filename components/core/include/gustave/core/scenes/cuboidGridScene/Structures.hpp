@@ -87,7 +87,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             }
 
             SceneData const* data_;
-            typename SceneData::Structures::const_iterator dataIterator_;
+            typename SceneData::Structures::ConstIterator dataIterator_;
             StructureReference value_;
         };
     public:

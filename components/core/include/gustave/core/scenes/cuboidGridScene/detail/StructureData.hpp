@@ -137,7 +137,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         [[nodiscard]]
         bool isValid() const {
-            return scene_->structures.contains(this);
+            return scene_->structures.contains(index_);
         }
 
         [[nodiscard]]

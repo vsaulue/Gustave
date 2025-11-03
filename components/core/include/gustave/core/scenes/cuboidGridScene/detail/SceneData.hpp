@@ -32,6 +32,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneStructures.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/utils/IndexGenerator.hpp>
@@ -50,53 +51,10 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         template<cfg::cUnitOf<cfg> auto unit>
         using Vector3 = cfg::Vector3<cfg, unit>;
-
-        struct StructuresHelper {
-        public:
-            [[nodiscard]]
-            static StructureIndex getIndex(StructureIndex v) {
-                return v;
-            }
-
-            [[nodiscard]]
-            static StructureIndex getIndex(std::shared_ptr<StructureData> const& data) {
-                return data->index();
-            }
-
-            [[nodiscard]]
-            static StructureIndex getIndex(std::shared_ptr<StructureData const> const& data) {
-                return data->index();
-            }
-
-            [[nodiscard]]
-            static StructureIndex getIndex(StructureData const* data) {
-                return data->index();
-            }
-
-            struct Equals {
-                using is_transparent = void;
-
-                [[nodiscard]]
-                bool operator()(auto const& lhs, auto const& rhs) const {
-                    return getIndex(lhs) == getIndex(rhs);
-                }
-            };
-
-            struct Hash {
-                using is_transparent = void;
-
-                [[nodiscard]]
-                std::size_t operator()(auto const& value) const {
-                    return std::hash<StructureIndex>{}(getIndex(value));
-                }
-            };
-
-            using Set = std::unordered_set<std::shared_ptr<StructureData>, Hash, Equals>;
-        };
     public:
         using Blocks = SceneBlocks<cfg>;
         using StructureIdGenerator = utils::IndexGenerator<StructureIndex>;
-        using Structures = StructuresHelper::Set;
+        using Structures = SceneStructures<cfg, UserData_>;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)
