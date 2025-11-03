@@ -151,6 +151,11 @@ TEST_CASE("utils::prop::SharedPtr") {
         }
     }
 
+    SECTION(".unprop()") {
+        auto const& unprop = ptr.unprop();
+        CHECK(unprop.get() == ptr.get());
+    }
+
     SECTION(".operator==(std::shared_ptr)") {
         auto const iPtr = std::shared_ptr<ConstDetector const>{ ptr };
         CHECK(iPtr == ptr);

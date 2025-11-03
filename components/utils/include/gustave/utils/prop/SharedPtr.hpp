@@ -139,6 +139,11 @@ namespace gustave::utils::prop {
         }
 
         [[nodiscard]]
+        std::shared_ptr<T> const& unprop() {
+            return value_;
+        }
+
+        [[nodiscard]]
         bool operator==(cSharedPtr auto const& rhs) const
             requires requires { get() == rhs.get(); }
         {
