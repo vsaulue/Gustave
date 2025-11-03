@@ -110,6 +110,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         SceneData(SceneData&& other)
             : blocks{ std::move(other.blocks) }
             , structures{ std::move(other.structures) }
+            , structureIdGenerator{ other.structureIdGenerator }
         {
             resetSceneDataPtr();
         }
@@ -118,6 +119,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             if (&other != this) {
                 blocks = std::move(other.blocks);
                 structures = std::move(other.structures);
+                structureIdGenerator = other.structureIdGenerator;
                 resetSceneDataPtr();
             }
             return *this;

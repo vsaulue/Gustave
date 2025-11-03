@@ -40,18 +40,20 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
     auto scene1 = SceneData{ blockSize };
 
     auto block1 = scene1.blocks.insert({ {1,1,1}, concrete_20m, 1000.f * u.mass, false });
-    auto struct1 = std::make_shared<StructureData>(0, scene1, block1);
+    auto struct1 = std::make_shared<StructureData>(scene1.structureIdGenerator(), scene1, block1);
     scene1.structures.insert(struct1);
 
     SECTION("// move semantics") {
         auto const expectedStructs = std::vector<std::shared_ptr<StructureData>>{
             struct1,
         };
+        auto const expectedNextStructId = scene1.structureIdGenerator.readNextIndex();
 
         auto checkMovedScene = [&](SceneData const& movedScene) {
             CHECK_THAT(movedScene.structures, matchers::c2::UnorderedRangeEquals(expectedStructs));
             CHECK(&struct1->sceneData() == &movedScene);
             CHECK(movedScene.blocks.blockSize() == blockSize);
+            CHECK(movedScene.structureIdGenerator.readNextIndex() == expectedNextStructId);
         };
 
         SECTION("// assign") {
