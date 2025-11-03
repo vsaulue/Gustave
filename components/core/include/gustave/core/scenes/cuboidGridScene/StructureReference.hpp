@@ -330,7 +330,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         explicit StructureReference(SceneData const& scene, StructureIndex index)
-            : data_{ initData(scene, index) }
+            : data_{ scene.structures.findShared(index) }
             , index_{ index }
         {}
 
@@ -478,16 +478,6 @@ namespace gustave::core::scenes::cuboidGridScene {
         [[nodiscard]]
         static constexpr StructureIndex invalidIndex() {
             return SceneData::StructureIdGenerator::invalidIndex();
-        }
-
-        [[nodiscard]]
-        static SharedPtrMember<StructureData> initData(SceneData const& scene, StructureIndex index) {
-            auto const it = scene.structures.find(index);
-            if (it != scene.structures.end()) {
-                return *it;
-            } else {
-                return nullptr;
-            }
         }
 
         [[nodiscard]]

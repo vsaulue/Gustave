@@ -35,6 +35,9 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
         struct SceneData;
+
+        template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
+        class SceneStructures;
     }
 
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>

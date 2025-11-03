@@ -55,6 +55,7 @@ using SolverLink = SolverStructure::Link;
 using SolverNode = SolverStructure::Node;
 
 using StructureIndex = StructureData::StructureIndex;
+using Structures = SceneData::Structures;
 
 template<typename Ptr>
 using PtrSet = gustave::utils::PointerHash::Set<Ptr>;
@@ -66,30 +67,27 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
     SceneData data{ blockSize };
 
-    auto getStructureById = [&](StructureIndex structId) -> StructureData const& {
-        auto const blockStructIt = data.structures.find(structId);
-        REQUIRE(blockStructIt != data.structures.end());
-        REQUIRE(*blockStructIt != nullptr);
-        return **blockStructIt;
+    auto structureIds = [&]() {
+        auto result = std::unordered_set<StructureIndex>{};
+        for (auto const& structPtr : data.structures) {
+            result.insert(structPtr->index());
+        }
+        return result;
     };
 
     auto runTransaction = [&](Transaction const& transaction) {
-        auto oldStructures = data.structures;
+        auto oldStructureIds = structureIds();
         auto const result = SceneUpdater{ data }.runTransaction(transaction);
         // Check structure diff of the result.
         for (auto const& deletedStructureId : result.deletedStructures()) {
-            auto const it = oldStructures.find(deletedStructureId);
-            REQUIRE(it != oldStructures.end());
+            auto const didDelete = oldStructureIds.erase(deletedStructureId);
+            REQUIRE(didDelete);
             REQUIRE_FALSE(data.structures.contains(deletedStructureId));
-            oldStructures.erase(it);
         }
         for (auto const& newStructureId : result.newStructures()) {
-            auto const it = data.structures.find(newStructureId);
-            REQUIRE(it != data.structures.end());
-            auto const insertResult = oldStructures.insert(*it);
-            REQUIRE(insertResult.second);
+            oldStructureIds.insert(newStructureId);
         }
-        REQUIRE_THAT(data.structures, matchers::c2::UnorderedRangeEquals(oldStructures));
+        REQUIRE_THAT(structureIds(), matchers::c2::UnorderedRangeEquals(oldStructureIds));
         // check structures.
         for (auto const& structure : data.structures) {
             bool hasNonFoundation = false;
@@ -111,7 +109,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             if (blockRef.isFoundation()) {
                 REQUIRE(blockStructId == data.structureIdGenerator.invalidIndex());
             } else {
-                auto const& blockStruct = getStructureById(blockRef.structureId());
+                auto const& blockStruct = data.structures.at(blockRef.structureId());
                 for (auto const& neighbour : ConstDataNeighbours{ data.blocks, blockRef.index() }) {
                     REQUIRE(blockStruct.solverIndices().contains(neighbour.block.index()));
                 }
@@ -127,7 +125,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
                             if (structId == data.structureIdGenerator.invalidIndex()) {
                                 structId = neighbourRef.structureId();
                             }
-                            auto const& structure = getStructureById(structId);
+                            auto const& structure = data.structures.at(structId);
                             LinkIndex const& linkId = blockRef.linkIndices().*indexField;
                             SolverLink const& link = structure.solverStructure().links().at(linkId);
                             CHECK(link.localNodeId() == *structure.solverIndexOf(blockRef.index()));
@@ -147,7 +145,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
         auto structureOf = [&](BlockIndex const& index) -> StructureData const& {
             ConstBlockDataReference ref = data.blocks.find(index);
             REQUIRE(ref);
-            return getStructureById(ref.structureId());
+            return data.structures.at(ref.structureId());
         };
 
         auto getSolverIndex = [](StructureData const& structure, BlockIndex const& index) -> NodeIndex {

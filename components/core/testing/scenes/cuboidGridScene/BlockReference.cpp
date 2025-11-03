@@ -167,9 +167,7 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
             REQUIRE(blockDataRef);
             auto const structureId = blockDataRef.structureId();
             REQUIRE(structureId != sceneData.structureIdGenerator.invalidIndex());
-            auto const iterator =  sceneData.structures.find(structureId);
-            REQUIRE(iterator != sceneData.structures.end());
-            return StructureReference{ *iterator };
+            return StructureReference{ sceneData.structures.atShared(structureId) };
         };
         SECTION("// non-foundation") {
             auto const structures = b111.structures();

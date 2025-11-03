@@ -178,8 +178,7 @@ namespace gustave::core::scenes::cuboidGridScene {
                 auto const& structures = block.sceneData_->structures;
                 auto addValue = [&](StructureIndex structId) {
                     if (!contains(structId)) {
-                        auto sharedStructure = *structures.find(structId);
-                        sceneStructures_[size_] = StructureReference{ std::move(sharedStructure) };
+                        sceneStructures_[size_] = StructureReference{ structures.atShared(structId) };
                         ++size_;
                     }
                 };
