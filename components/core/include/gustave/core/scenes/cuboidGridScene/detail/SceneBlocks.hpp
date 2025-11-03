@@ -26,6 +26,8 @@
 #pragma once
 
 #include <unordered_map>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include <gustave/cfg/cLibConfig.hpp>
@@ -35,6 +37,7 @@
 #include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/meta/Meta.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg>
@@ -68,6 +71,16 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             if (blockSize.z() <= 0.f * u.length) {
                 throw std::invalid_argument{ blockSizeError('z', blockSize.z()) };
             }
+        }
+
+        [[nodiscard]]
+        BlockDataReference<libCfg, true> at(BlockIndex const& index) {
+            return doAt(*this, index);
+        }
+
+        [[nodiscard]]
+        BlockDataReference<libCfg, false> at(BlockIndex const& index) const {
+            return doAt(*this, index);
         }
 
         [[nodiscard]]
@@ -157,6 +170,15 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
     private:
         [[nodiscard]]
+        static auto doAt(meta::cCvRefOf<SceneBlocks> auto&& self, BlockIndex const& index) -> decltype(self.at(index)) {
+            auto it = self.blocks_.find(index);
+            if (it == self.blocks_.end()) {
+                throw invalidIndexError(index);
+            }
+            return { &(*it) };
+        }
+
+        [[nodiscard]]
         static auto doFind(auto&& self, BlockIndex const& index) -> decltype(self.find(index)) {
             auto it = self.blocks_.find(index);
             if (it != self.blocks_.end()) {
@@ -171,6 +193,13 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             std::stringstream result;
             result << "blocksize." << coordSymbol << " must be strictly positive (passed: " << value << ").";
             return result.str();
+        }
+
+        [[nodiscard]]
+        static std::out_of_range invalidIndexError(BlockIndex const& blockIndex) {
+            std::stringstream msg;
+            msg << "Block at index " << blockIndex << " does not exists.";
+            return std::out_of_range(msg.str());
         }
 
         Vector3<u.length> blockSize_;

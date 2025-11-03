@@ -41,6 +41,17 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneBlocks") {
     BlockDataReference b1 = sceneBlocks.insert({ {2,3,4}, concrete_20m, 10.f * u.mass, true });
     BlockDataReference b2 = sceneBlocks.insert({ {4,6,9}, concrete_20m, 25.f * u.mass, false });
 
+    SECTION(".at()") {
+        SECTION("// valid") {
+            auto const res = sceneBlocks.at({ 4,6,9 });
+            CHECK(res == b2);
+        }
+
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(sceneBlocks.at({ 0,0,0 }), std::out_of_range);
+        }
+    }
+
     SECTION(".contactAreaAlong(BasicDirection)") {
         CHECK(sceneBlocks.contactAreaAlong(Direction::minusX()) == 6.f * u.area);
         CHECK(sceneBlocks.contactAreaAlong(Direction::plusX()) == 6.f * u.area);
