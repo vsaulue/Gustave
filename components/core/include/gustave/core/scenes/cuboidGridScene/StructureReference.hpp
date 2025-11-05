@@ -47,7 +47,7 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
-#include <gustave/utils/prop/SharedPtr.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
     template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_, bool isMutable_>
@@ -63,7 +63,10 @@ namespace gustave::core::scenes::cuboidGridScene {
         using StructureData = SceneData::StructureData;
 
         template<typename T>
-        using SharedPtrMember = utils::prop::SharedPtrMember<isMutable_, T>;
+        using PropSharedPtr = utils::PropSharedPtr<isMutable_, T>;
+
+        template<typename T>
+        using Prop = utils::Prop<isMutable_, T>;
     public:
         using UDTraits = common::UserDataTraits<UserData_>;
 
@@ -323,13 +326,13 @@ namespace gustave::core::scenes::cuboidGridScene {
         };
 
         [[nodiscard]]
-        explicit StructureReference(SharedPtrMember<StructureData> data)
+        explicit StructureReference(PropSharedPtr<StructureData> data)
             : data_{ std::move(data) }
             , index_{ initIndex(data_.get()) }
         {}
 
         [[nodiscard]]
-        explicit StructureReference(meta::MutableIf<isMutable_, SceneData>& scene, StructureIndex index)
+        explicit StructureReference(Prop<SceneData>& scene, StructureIndex index)
             : data_{ scene.structures.findShared(index) }
             , index_{ index }
         {}
@@ -464,7 +467,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             return data_ == rhs.data_;
         }
     private:
-        SharedPtrMember<StructureData> data_;
+        PropSharedPtr<StructureData> data_;
         StructureIndex index_;
 
         [[nodiscard]]

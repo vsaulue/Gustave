@@ -84,7 +84,4 @@ namespace gustave::utils::prop {
     private:
         T* value_;
     };
-
-    template<bool isMutable, typename T>
-    using PtrMember = std::conditional_t<isMutable, Ptr<T>, T const*>;
 }

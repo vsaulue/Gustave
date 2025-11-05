@@ -30,16 +30,18 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
-#include <gustave/meta/Meta.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto cfg, bool isMutable_>
     class DataNeighbours {
     private:
-        using QualifiedSceneBlocks = meta::MutableIf<isMutable_, SceneBlocks<cfg>>;
+        template<typename T>
+        using Prop = utils::Prop<isMutable_, T>;
+
         using IndexIterator = IndexNeighbours::Iterator;
 
         class Enumerator {
@@ -87,7 +89,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
             void next() {
                 while (indexIterator_ != indices().end()) {
-                    if (BlockDataReference<cfg, isMutable_> neighbour = neighbours_->blocks_.find(indexIterator_->index)) {
+                    if (BlockDataReference<cfg, isMutable_> neighbour = neighbours_->blocks_->find(indexIterator_->index)) {
                         value_ = { indexIterator_->direction, neighbour };
                         break;
                     }
@@ -103,8 +105,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
-        explicit DataNeighbours(QualifiedSceneBlocks& blocks, BlockIndex const& source)
-            : blocks_{ blocks }
+        explicit DataNeighbours(Prop<SceneBlocks<cfg>>& blocks, BlockIndex const& source)
+            : blocks_{ &blocks }
             , indices_{ source }
         {}
 
@@ -118,7 +120,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return {};
         }
     private:
-        QualifiedSceneBlocks& blocks_;
+        Prop<SceneBlocks<cfg>>* blocks_;
         IndexNeighbours indices_;
     };
 }

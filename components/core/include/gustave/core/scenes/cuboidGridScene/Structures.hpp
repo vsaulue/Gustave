@@ -34,6 +34,7 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
     namespace structures::detail {
@@ -41,9 +42,11 @@ namespace gustave::core::scenes::cuboidGridScene {
         class Enumerator {
         private:
             using SceneStructures = cuboidGridScene::detail::SceneData<libCfg_, UserData_>::Structures;
-            using DataIterator = std::conditional_t<isMut_, typename SceneStructures::Iterator, typename SceneStructures::ConstIterator>;
+            using DataIterator = utils::PropIterator<isMut_, SceneStructures>;
+
+            template<typename T>
+            using Prop = utils::Prop<isMut_, T>;
         public:
-            using SceneStructsMember = meta::MutableIf<isMut_, SceneStructures>;
             using Value = StructureReference<libCfg_, UserData_, isMut_>;
 
             [[nodiscard]]
@@ -51,6 +54,7 @@ namespace gustave::core::scenes::cuboidGridScene {
                 :  dataIterator_{}
                 , value_{ utils::NO_INIT }
             {}
+
             [[nodiscard]]
             Enumerator(Enumerator const& other)
                 // needed for MSVC, which doesn't auto-generate
@@ -59,7 +63,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             {}
 
             [[nodiscard]]
-            explicit Enumerator(SceneStructsMember& structures)
+            explicit Enumerator(Prop<SceneStructures>& structures)
                 : dataIterator_{ structures.begin() }
                 , value_{ utils::NO_INIT }
             {
@@ -106,14 +110,16 @@ namespace gustave::core::scenes::cuboidGridScene {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
     class Structures {
     private:
+        template<typename T>
+        using Prop = utils::Prop<isMut_, T>;
+
+        template<typename T>
+        using PropPtr = utils::PropPtr<isMut_, T>;
+
         using SceneData = detail::SceneData<libCfg, UserData_>;
-        using SceneDataMember = meta::MutableIf<isMut_, SceneData>;
 
         template<bool mut>
         using Enumerator = structures::detail::Enumerator<libCfg, UserData_, mut>;
-
-        template<typename T>
-        using PtrMember = utils::prop::PtrMember<isMut_, T>;
     public:
         template<bool mut>
         using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
@@ -123,7 +129,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using ConstIterator = utils::ForwardIterator<Enumerator<false>>;
 
         [[nodiscard]]
-        explicit Structures(SceneDataMember& data)
+        explicit Structures(Prop<SceneData>& data)
             : data_{ &data }
         {}
 
@@ -188,6 +194,6 @@ namespace gustave::core::scenes::cuboidGridScene {
             return result;
         }
 
-        PtrMember<SceneData> data_;
+        PropPtr<SceneData> data_;
     };
 }

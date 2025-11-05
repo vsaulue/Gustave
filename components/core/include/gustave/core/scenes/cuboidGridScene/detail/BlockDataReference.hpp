@@ -34,9 +34,9 @@
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/meta/Meta.hpp>
 #include <gustave/utils/HashEquals.hpp>
 #include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg, bool isMutable_>
@@ -44,14 +44,15 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     private:
         static constexpr auto u = cfg::units(libCfg);
 
-        using QualifiedBlockData = meta::MutableIf<isMutable_, BlockData<libCfg>>;
+        template<typename T>
+        using Prop = utils::Prop<isMutable_, T>;
 
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
 
-        QualifiedBlockData* data_;
+        Prop<BlockData<libCfg>>* data_;
     public:
         using Hasher = utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
         using LinkIndices = typename BlockMappedData<libCfg>::LinkIndices;
@@ -64,7 +65,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        BlockDataReference(QualifiedBlockData* data)
+        BlockDataReference(Prop<BlockData<libCfg>>* data)
             : data_{ data }
         {}
 
@@ -101,7 +102,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        meta::MutableIf<isMutable_,LinkIndices>& linkIndices() const {
+        Prop<LinkIndices>& linkIndices() const {
             return data_->second.linkIndices();
         }
 
