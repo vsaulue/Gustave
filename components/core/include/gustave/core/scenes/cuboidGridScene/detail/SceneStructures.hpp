@@ -34,9 +34,9 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
-#include <gustave/utils/prop/SharedPtr.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/EndIterator.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg_, common::cSceneUserData UserData_>
@@ -53,9 +53,9 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<bool isMut_>
         class Enumerator {
         private:
-            using PairIterator = std::conditional_t<isMut_, typename StructuresMap::iterator, typename StructuresMap::const_iterator>;
+            using PairIterator = utils::PropIterator<isMut_, StructuresMap>;
         public:
-            using StructuresMember = meta::MutableIf<isMut_, StructuresMap>;
+            using StructuresMember = utils::Prop<isMut_, StructuresMap>;
             using Value = std::conditional_t<isMut_, std::shared_ptr<StructureData>, SharedPtr<StructureData>>;
             using Reference =  Value const&;
 

@@ -158,7 +158,4 @@ namespace gustave::utils::prop {
             return value_ == rhs;
         }
     };
-
-    template<bool isMutable, meta::cNotCvRef T>
-    using SharedPtrMember = std::conditional_t<isMutable, SharedPtr<T>, std::shared_ptr<T const>>;
 }

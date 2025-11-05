@@ -25,39 +25,24 @@
 
 #pragma once
 
-#include <concepts>
+#include <gustave/meta/Meta.hpp>
+#include <gustave/utils/prop/Ptr.hpp>
+#include <gustave/utils/prop/SharedPtr.hpp>
+
+#include <memory>
+#include <ranges>
 #include <type_traits>
 
-namespace gustave::meta {
-    namespace detail {
-        template<typename T>
-        constexpr bool alwaysFalse = false;
-    }
+namespace gustave::utils {
+    template<bool isMut, meta::cNotCvRef T>
+    using Prop = std::conditional_t<isMut, T, T const>;
 
-    /**
-    * Metaprograming tool to remove cvref qualifiers in unevaluated context.
-    */
-    template<typename T>
-    consteval std::remove_cvref_t<T> value(T&&) {
-        static_assert(detail::alwaysFalse<T>, "Meta::value() cannot be used in an evaluated context.");
-    }
+    template<bool isMut, meta::cNotCvRef T>
+    using PropIterator = decltype(std::ranges::begin(std::declval<Prop<isMut,T>&>()));
 
-    template<typename T, typename Desired>
-    concept cCvRefOf = std::same_as<Desired, std::remove_cvref_t<T>>;
+    template<bool isMut, meta::cNotCvRef T>
+    using PropPtr = std::conditional_t<isMut, prop::Ptr<T>, T const*>;
 
-    template<typename T>
-    concept cNotCvRef = std::same_as<T, std::remove_cvref_t<T>>;
-
-    /**
-    * Simple type wrapper.
-    *
-    * It can be used to return any type (with possibly cvref qualifiers) from a consteval function.
-    */
-    template<typename T>
-    struct TypeWrapper {
-        using Type = T;
-    };
-
-    template<typename T>
-    concept cTypeWrapper = std::is_same_v<T, TypeWrapper<typename T::Type>>;
+    template<bool isMut, meta::cNotCvRef T>
+    using PropSharedPtr = std::conditional_t<isMut, prop::SharedPtr<T>, std::shared_ptr<T const>>;
 }
