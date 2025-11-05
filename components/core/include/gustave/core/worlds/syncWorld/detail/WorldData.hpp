@@ -50,7 +50,7 @@ namespace gustave::core::worlds::syncWorld::detail {
         using StructureData = detail::StructureData<libCfg>;
         using StructureIndex = StructureData::StructureIndex;
 
-        using SceneStructure = typename Scene::StructureReference;
+        using SceneStructure = typename Scene::template StructureReference<false>;
         using Structures = std::unordered_map<StructureIndex, std::shared_ptr<StructureData>>;
 
         [[nodiscard]]

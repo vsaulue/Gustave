@@ -36,7 +36,7 @@ namespace gustave::core::worlds::syncWorld::detail {
     public:
         using WorldData = detail::WorldData<libCfg>;
 
-        using SceneStructure = typename WorldData::Scene::StructureReference;
+        using SceneStructure = typename WorldData::Scene::template StructureReference<false>;
         using TransactionResult = typename WorldData::Scene::TransactionResult;
         using StructureData = typename WorldData::StructureData;
         using Transaction = typename WorldData::Scene::Transaction;

@@ -329,7 +329,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         {}
 
         [[nodiscard]]
-        explicit StructureReference(SceneData const& scene, StructureIndex index)
+        explicit StructureReference(meta::MutableIf<isMutable_, SceneData>& scene, StructureIndex index)
             : data_{ scene.structures.findShared(index) }
             , index_{ index }
         {}
@@ -347,7 +347,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         [[nodiscard]]
         StructureReference(meta::cCvRefOf<StructureReference<cfg, UserData_, true>> auto&& v)
             requires (not isMutable_)
-            : data_{ std::forward<decltype(v)>(v).asImmutable() }
+            : StructureReference{ std::forward<decltype(v)>(v).asImmutable() }
         {}
 
         [[nodiscard]]

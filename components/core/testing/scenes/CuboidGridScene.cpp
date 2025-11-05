@@ -108,7 +108,7 @@ TEST_CASE("core::scenes::CuboidGridScene") {
     }
 
     SECTION(".structures() const") {
-        Scene::Structures structures = scene.structures();
+        auto structures = scene.structures();
 
         SECTION("// empty") {
             CHECK(structures.size() == 0);

@@ -43,7 +43,7 @@ namespace gustave::core::worlds::syncWorld::detail {
         using Solver = typename WorldData::Solver;
         using State = StructureState;
 
-        using SceneStructure = typename Scene::StructureReference;
+        using SceneStructure = typename Scene::template StructureReference<false>;
         using Solution = typename Solver::Solution;
         using SolverStructure = typename Solver::Structure;
 

@@ -60,7 +60,13 @@ namespace gustave::core::scenes {
         using Blocks = cuboidGridScene::Blocks<libCfg, UserData_>;
         using Contacts = cuboidGridScene::Contacts<libCfg, UserData_>;
         using Links = cuboidGridScene::Links<libCfg, UserData_>;
-        using Structures = cuboidGridScene::Structures<libCfg, UserData_>;
+
+        template<bool mut>
+        using Structures = cuboidGridScene::Structures<libCfg, UserData_, mut>;
+
+        template<bool mut>
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
+
         using Transaction = cuboidGridScene::Transaction<libCfg>;
         using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
 
@@ -69,8 +75,7 @@ namespace gustave::core::scenes {
         using ContactIndex = typename Contacts::ContactIndex;
         using ContactReference = typename Contacts::ContactReference;
         using Direction = typename Contacts::ContactIndex::Direction;
-        using StructureIndex = Structures::StructureIndex;
-        using StructureReference = typename Structures::StructureReference;
+        using StructureIndex = StructureReference<false>::StructureIndex;
 
 
         [[nodiscard]]
@@ -116,8 +121,8 @@ namespace gustave::core::scenes {
         }
 
         [[nodiscard]]
-        Structures structures() const {
-            return Structures{ data_ };
+        Structures<false> structures() const {
+            return Structures<false>{ data_ };
         }
 
         [[nodiscard]]
