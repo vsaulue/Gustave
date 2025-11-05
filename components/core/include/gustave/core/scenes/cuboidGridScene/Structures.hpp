@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
@@ -34,35 +36,45 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
-    class Structures {
-    public:
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, false>;
-        using StructureIndex = StructureReference::StructureIndex;
-    private:
-        using SceneData = detail::SceneData<libCfg, UserData_>;
-
+    namespace structures::detail {
+        template<cfg::cLibConfig auto libCfg_, common::cSceneUserData UserData_, bool isMut_>
         class Enumerator {
+        private:
+            using SceneStructures = cuboidGridScene::detail::SceneData<libCfg_, UserData_>::Structures;
+            using DataIterator = std::conditional_t<isMut_, typename SceneStructures::Iterator, typename SceneStructures::ConstIterator>;
         public:
+            using SceneStructsMember = meta::MutableIf<isMut_, SceneStructures>;
+            using Value = StructureReference<libCfg_, UserData_, isMut_>;
+
             [[nodiscard]]
             Enumerator()
-                : data_{ nullptr }
-                , dataIterator_{}
+                :  dataIterator_{}
                 , value_{ utils::NO_INIT }
+            {}
+            [[nodiscard]]
+            Enumerator(Enumerator const& other)
+                // needed for MSVC, which doesn't auto-generate
+                : dataIterator_{ other.dataIterator_ }
+                , value_{ other.value_ }
             {}
 
             [[nodiscard]]
-            explicit Enumerator(SceneData const& data)
-                : data_{ &data }
-                , dataIterator_{ data.structures.begin() }
+            explicit Enumerator(SceneStructsMember& structures)
+                : dataIterator_{ structures.begin() }
                 , value_{ utils::NO_INIT }
             {
                 updateValue();
             }
 
+            Enumerator& operator=(Enumerator const& other) {
+                // needed for MSVC, which doesn't auto-generate
+                dataIterator_ = other.dataIterator_;
+                value_ = other.value;
+            }
+
             [[nodiscard]]
             bool isEnd() const {
-                return dataIterator_ == data_->structures.end();
+                return dataIterator_ == utils::EndIterator{};
             }
 
             void operator++() {
@@ -71,7 +83,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             }
 
             [[nodiscard]]
-            StructureReference const& operator*() const {
+            Value& operator*() const {
                 return value_;
             }
 
@@ -82,43 +94,77 @@ namespace gustave::core::scenes::cuboidGridScene {
         private:
             void updateValue() {
                 if (!isEnd()) {
-                    value_ = StructureReference{ *dataIterator_ };
+                    value_ = Value{ *dataIterator_ };
                 }
             }
 
-            SceneData const* data_;
-            typename SceneData::Structures::ConstIterator dataIterator_;
-            StructureReference value_;
+            DataIterator dataIterator_;
+            mutable Value value_;
         };
+    }
+
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
+    class Structures {
+    private:
+        using SceneData = detail::SceneData<libCfg, UserData_>;
+        using SceneDataMember = meta::MutableIf<isMut_, SceneData>;
+
+        template<bool mut>
+        using Enumerator = structures::detail::Enumerator<libCfg, UserData_, mut>;
+
+        template<typename T>
+        using PtrMember = utils::prop::PtrMember<isMut_, T>;
     public:
-        using Iterator = utils::ForwardIterator<Enumerator>;
+        template<bool mut>
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
+        using StructureIndex = StructureReference<false>::StructureIndex;
+
+        using Iterator = utils::ForwardIterator<Enumerator<isMut_>>;
+        using ConstIterator = utils::ForwardIterator<Enumerator<false>>;
 
         [[nodiscard]]
-        explicit Structures(SceneData const& data)
+        explicit Structures(SceneDataMember& data)
             : data_{ &data }
         {}
 
         [[nodiscard]]
-        Iterator begin() const {
-            return Iterator{ *data_ };
+        Iterator begin()
+            requires (isMut_)
+        {
+            return Iterator{ data_->structures };
         }
 
         [[nodiscard]]
-        StructureReference at(StructureIndex const& index) const {
-            auto result = StructureReference{ *data_, index };
-            if (!result.isValid()) {
-                throw result.invalidError();
-            }
-            return result;
+        ConstIterator begin() const {
+            return ConstIterator{ data_->structures };
         }
 
         [[nodiscard]]
-        StructureReference find(StructureIndex const& index) const {
-            return StructureReference{ *data_, index };
+        StructureReference<true> at(StructureIndex index)
+            requires (isMut_)
+        {
+            return doAt(*this, index);
         }
 
         [[nodiscard]]
-        bool contains(StructureReference const& structure) const {
+        StructureReference<false> at(StructureIndex index) const {
+            return doAt(*this, index);
+        }
+
+        [[nodiscard]]
+        StructureReference<true> find(StructureIndex index)
+            requires (isMut_)
+        {
+            return StructureReference<true>{ *data_, index };
+        }
+
+        [[nodiscard]]
+        StructureReference<false> find(StructureIndex index) const {
+            return StructureReference<false>{ *data_, index };
+        }
+
+        [[nodiscard]]
+        bool contains(StructureReference<false> const& structure) const {
             return data_->structures.contains(structure.index());
         }
 
@@ -132,6 +178,16 @@ namespace gustave::core::scenes::cuboidGridScene {
             return data_->structures.size();
         }
     private:
-        SceneData const* data_;
+        [[nodiscard]]
+        static auto doAt(meta::cCvRefOf<Structures> auto&& self, StructureIndex index) {
+            using Result = decltype(self.at(index));
+            auto result = Result{ *self.data_, index};
+            if (!result.isValid()) {
+                throw result.invalidError();
+            }
+            return result;
+        }
+
+        PtrMember<SceneData> data_;
     };
 }
