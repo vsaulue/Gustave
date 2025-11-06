@@ -23,68 +23,126 @@
  * SOFTWARE.
  */
 
+#include <array>
 #include <ranges>
-#include <vector>
 
-#include <catch2/catch_test_macros.hpp>
-
-#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Blocks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/testing/ConstDetector.hpp>
 
 #include <TestHelpers.hpp>
 
-using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
-using BlockReference = gustave::core::scenes::cuboidGridScene::BlockReference<libCfg, void, false>;
-using Blocks = gustave::core::scenes::cuboidGridScene::Blocks<libCfg,void>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg,void>;
+namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
-static_assert(std::ranges::forward_range<Blocks>);
+namespace {
+    struct UserData {
+        using Structure = gustave::testing::ConstDetector<int>;
+    };
+}
+
+template<bool mut>
+using Blocks = cuboid::Blocks<libCfg, UserData, mut>;
+
+using BlockIndex = Blocks<false>::BlockIndex;
+using SceneData = cuboid::detail::SceneData<libCfg, UserData>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, UserData>;
+
+using Transaction = SceneUpdater::Transaction;
+
+static_assert(std::ranges::forward_range<Blocks<false>>);
+static_assert(std::ranges::forward_range<Blocks<true>>);
 
 TEST_CASE("core::scenes::cuboidGridScene::Blocks") {
-    Vector3<u.length> const blockSize = vector3(1.f, 2.f, 3.f, u.length);
-    SceneData sceneData{ blockSize };
-    Blocks const blocks{ sceneData };
+    auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
+    auto scene = SceneData{ blockSize };
+
+    Transaction t;
+    t.addBlock({ {0,0,0}, concrete_20m, 1000.f * u.mass, true });
+    t.addBlock({ {0,1,0}, concrete_20m, 2000.f * u.mass, false });
+    t.addBlock({ {0,2,0}, concrete_20m, 3000.f * u.mass, false });
+    SceneUpdater{ scene }.runTransaction(t);
+
+    auto mBlocks = Blocks<true>{ scene };
+    auto const& cmBlocks = mBlocks;
+    auto iBlocks = Blocks<false>{ scene };
 
     SECTION(".at()") {
-        sceneData.blocks.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
+        auto runValidTest = [&](auto&& blocks, bool expectedConst) {
+            auto ref = blocks.at({ 0,1,0 });
+            REQUIRE(ref.isValid());
+            CHECK(ref.mass() == 2000.f * u.mass);
+            CHECK(expectedConst == ref.structures()[0].userData().isCalledAsConst());
+        };
 
-        SECTION("// valid") {
-            BlockReference ref = blocks.at({ 1,0,0 });
-            CHECK(ref.mass() == 1000.f * u.mass);
+        SECTION("// mutable") {
+            runValidTest(mBlocks, false);
+        }
+
+        SECTION("// const") {
+            runValidTest(cmBlocks, true);
+        }
+
+        SECTION("// immutable") {
+            runValidTest(iBlocks, true);
         }
 
         SECTION("// invalid") {
-            CHECK_THROWS_AS(blocks.at({ 0,0,8 }), std::out_of_range);
+            CHECK_THROWS_AS(iBlocks.at({ 0,0,8 }), std::out_of_range);
         }
     }
 
     SECTION(".find()") {
-        BlockReference ref = blocks.find({ 3,2,1 });
-        CHECK_FALSE(ref.isValid());
+        auto runValidTest = [&](auto&& blocks, bool expectedConst) {
+            auto ref = blocks.find({ 0,2,0 });
+            REQUIRE(ref.isValid());
+            CHECK(ref.mass() == 3000.f * u.mass);
+            CHECK(expectedConst == ref.structures()[0].userData().isCalledAsConst());
+        };
+
+        SECTION("// mutable") {
+            runValidTest(mBlocks, false);
+        }
+
+        SECTION("// const") {
+            runValidTest(cmBlocks, true);
+        }
+
+        SECTION("// immutable") {
+            runValidTest(iBlocks, true);
+        }
+
+        SECTION("// invalid") {
+            auto ref = iBlocks.find({ 2,2,2 });
+            CHECK_FALSE(ref.isValid());
+        }
     }
 
     SECTION(".begin() // & .end()") {
-        SECTION(": empty") {
-            CHECK(blocks.begin() == blocks.end());
+        auto runTest = [&](auto&& blocks, bool expectedConst) {
+            auto const expectedIds = std::array{
+                BlockIndex{0,0,0}, BlockIndex{0,1,0}, BlockIndex{0,2,0}
+            };
+            auto ids = blocks | std::views::transform([](auto&& b) { return b.index(); });
+            REQUIRE_THAT(ids, matchers::c2::UnorderedRangeEquals(expectedIds));
+            bool isConst = (*blocks.begin()).structures()[0].userData().isCalledAsConst();
+            CHECK(expectedConst == isConst);
+        };
+
+        SECTION("// mutable") {
+            runTest(mBlocks, false);
         }
 
-        SECTION(": non-empty") {
-            sceneData.blocks.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
-            sceneData.blocks.insert({ {3,0,0}, concrete_20m, 1000.f * u.mass, false });
+        SECTION("// const") {
+            runTest(cmBlocks, true);
+        }
 
-            std::vector<BlockIndex> indices;
-            for (auto const& block : blocks) {
-                indices.push_back(block.index());
-            }
-            std::vector<BlockIndex> const expected = { {1,0,0},{3,0,0} };
-            CHECK_THAT(indices, matchers::c2::UnorderedEquals(expected));
+        SECTION("// immutable") {
+            runTest(iBlocks, true);
         }
     }
 
     SECTION(".size()") {
-        sceneData.blocks.insert({ {1,0,0}, concrete_20m, 1000.f * u.mass, false });
-        CHECK(blocks.size() == 1);
+        CHECK(iBlocks.size() == 3);
     }
 }

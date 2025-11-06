@@ -29,38 +29,36 @@
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
+#include <gustave/meta/Meta.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
-    class Blocks {
-    public:
-        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, false>;
-        using BlockIndex = typename BlockReference::BlockIndex;
-    private:
-        using SceneData = detail::SceneData<libCfg, UserData_>;
-
-        using DataIterator = typename SceneData::Blocks::BlockMap::const_iterator;
-
+    namespace blocks::detail {
+        template<cfg::cLibConfig auto cfg_, common::cSceneUserData UD_, bool isMut_>
         class Enumerator {
+        private:
+            template<typename T>
+            using Prop = utils::Prop<isMut_, T>;
+
+            using SceneData = cuboidGridScene::detail::SceneData<cfg_, UD_>;
+
+            using DataIterator = SceneData::Blocks::BlockMap::const_iterator;
         public:
+            using Value = BlockReference<cfg_, UD_, isMut_>;
+
             [[nodiscard]]
             Enumerator()
                 : sceneData_{ nullptr }
                 , dataIterator_{}
-                , value_{ utils::NO_INIT }
             {}
 
             [[nodiscard]]
-            explicit Enumerator(SceneData const& sceneData)
+            explicit Enumerator(Prop<SceneData>& sceneData)
                 : sceneData_{ &sceneData }
                 , dataIterator_{ sceneData.blocks.begin() }
-                , value_{ utils::NO_INIT }
-            {
-                updateValue();
-            }
+            {}
 
             [[nodiscard]]
             bool isEnd() const {
@@ -69,12 +67,11 @@ namespace gustave::core::scenes::cuboidGridScene {
 
             void operator++() {
                 ++dataIterator_;
-                updateValue();
             }
 
             [[nodiscard]]
-            BlockReference const& operator*() const {
-                return value_;
+            Value operator*() const {
+                return Value{ *sceneData_, dataIterator_->first };
             }
 
             [[nodiscard]]
@@ -82,27 +79,88 @@ namespace gustave::core::scenes::cuboidGridScene {
                 return dataIterator_ == other.dataIterator_;
             }
         private:
-            void updateValue() {
-                if (!isEnd()) {
-                    value_ = BlockReference{ *sceneData_, dataIterator_->first };
-                }
-            }
-
-            SceneData const* sceneData_;
+            Prop<SceneData>* sceneData_;
             DataIterator dataIterator_;
-            BlockReference value_;
         };
+    }
+
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
+    class Blocks {
+    private:
+        template<typename T>
+        using Prop = utils::Prop<isMut_, T>;
+
+        template<typename T>
+        using PropPtr = utils::PropPtr<isMut_, T>;
+
+        using SceneData = detail::SceneData<libCfg, UserData_>;
+
+        template<bool mut>
+        using Enumerator = blocks::detail::Enumerator<libCfg, UserData_, mut>;
     public:
-        using Iterator = utils::ForwardIterator<Enumerator>;
+        template<bool mut>
+        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, mut>;
+
+        using BlockIndex = BlockReference<false>::BlockIndex;
+
+        using Iterator = utils::ForwardIterator<Enumerator<isMut_>>;
+        using ConstIterator = utils::ForwardIterator<Enumerator<false>>;
 
         [[nodiscard]]
-        explicit Blocks(SceneData const& sceneData)
+        explicit Blocks(Prop<SceneData>& sceneData)
             : sceneData_{ &sceneData }
         {}
 
         [[nodiscard]]
-        BlockReference at(BlockIndex const& index) const {
-            BlockReference result{ *sceneData_, index };
+        BlockReference<true> at(BlockIndex const& index)
+            requires (isMut_)
+        {
+            return doAt(*this, index);
+        }
+
+        [[nodiscard]]
+        BlockReference<false> at(BlockIndex const& index) const {
+            return doAt(*this, index);
+        }
+
+        [[nodiscard]]
+        Iterator begin()
+            requires (isMut_)
+        {
+            return Iterator{ *sceneData_ };
+        }
+
+        [[nodiscard]]
+        ConstIterator begin() const {
+            return ConstIterator{ *sceneData_ };
+        }
+
+        [[nodiscard]]
+        constexpr utils::EndIterator end() const {
+            return {};
+        }
+
+        [[nodiscard]]
+        BlockReference<true> find(BlockIndex const& index)
+            requires (isMut_)
+        {
+            return BlockReference<true>{ *sceneData_, index };
+        }
+
+        [[nodiscard]]
+        BlockReference<false> find(BlockIndex const& index) const {
+            return BlockReference<false>{ *sceneData_, index };
+        }
+
+        [[nodiscard]]
+        std::size_t size() const {
+            return sceneData_->blocks.size();
+        }
+    private:
+        [[nodiscard]]
+        static auto doAt(meta::cCvRefOf<Blocks> auto&& self, BlockIndex const& index) {
+            using Result = decltype(self.at(index));
+            auto result = Result{ *self.sceneData_, index };
             if (!result.isValid()) {
                 std::stringstream msg;
                 msg << "No block at index " << index << ".";
@@ -111,26 +169,6 @@ namespace gustave::core::scenes::cuboidGridScene {
             return result;
         }
 
-        [[nodiscard]]
-        BlockReference find(BlockIndex const& index) const {
-            return BlockReference{ *sceneData_, index };
-        }
-
-        [[nodiscard]]
-        std::size_t size() const {
-            return sceneData_->blocks.size();
-        }
-
-        [[nodiscard]]
-        Iterator begin() const {
-            return Iterator{ *sceneData_ };
-        }
-
-        [[nodiscard]]
-        constexpr utils::EndIterator end() const {
-            return {};
-        }
-    private:
-        SceneData const* sceneData_;
+        PropPtr<SceneData> sceneData_;
     };
 }
