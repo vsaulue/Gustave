@@ -31,7 +31,7 @@
 namespace gustave::utils {
     namespace detail {
         template<typename T>
-        concept cCanReference = std::is_reference_v<T>;
+        concept cCanReference = not std::is_void_v<T>;
     }
 
     template<typename T>
