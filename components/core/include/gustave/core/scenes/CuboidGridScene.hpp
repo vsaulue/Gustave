@@ -36,6 +36,7 @@
 #include <gustave/core/scenes/cuboidGridScene/Blocks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Contacts.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Links.hpp>
+#include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Structures.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 #include <gustave/core/scenes/cuboidGridScene/TransactionResult.hpp>
@@ -118,6 +119,11 @@ namespace gustave::core::scenes {
         [[nodiscard]]
         Links links() const {
             return Links{ data_ };
+        }
+
+        [[nodiscard]]
+        Structures<true> structures() {
+            return Structures<true>{ data_ };
         }
 
         [[nodiscard]]
