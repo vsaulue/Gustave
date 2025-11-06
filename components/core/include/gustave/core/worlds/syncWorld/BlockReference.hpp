@@ -57,7 +57,7 @@ namespace gustave::core::worlds::syncWorld {
         using WorldData = detail::WorldData<libCfg>;
         using Scene = typename WorldData::Scene;
 
-        using SceneBlock = typename Scene::BlockReference;
+        using SceneBlock = Scene::template BlockReference<false>;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
         using ContactReference = syncWorld::ContactReference<libCfg>;
@@ -67,7 +67,7 @@ namespace gustave::core::worlds::syncWorld {
 
         class Contacts {
         private:
-            using SceneContacts = typename Scene::BlockReference::Contacts;
+            using SceneContacts = SceneBlock::Contacts;
 
             class Enumerator {
             private:
@@ -167,8 +167,8 @@ namespace gustave::core::worlds::syncWorld {
 
         class Structures {
         private:
-            using SceneStructures = typename SceneBlock::Structures;
-            using SceneIterator = typename SceneStructures::Iterator;
+            using SceneStructures = typename SceneBlock::template Structures<false>;
+            using SceneIterator = typename SceneStructures::ConstIterator;
 
             class Enumerator {
             public:

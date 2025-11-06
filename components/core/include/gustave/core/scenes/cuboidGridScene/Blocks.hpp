@@ -37,7 +37,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
     class Blocks {
     public:
-        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_>;
+        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, false>;
         using BlockIndex = typename BlockReference::BlockIndex;
     private:
         using SceneData = detail::SceneData<libCfg, UserData_>;
