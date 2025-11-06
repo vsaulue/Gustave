@@ -28,10 +28,17 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <gustave/core/scenes/CuboidGridScene.hpp>
+#include <gustave/testing/ConstDetector.hpp>
 
 #include <TestHelpers.hpp>
 
-using Scene = gustave::core::scenes::CuboidGridScene<libCfg>;
+namespace {
+    struct UserData {
+        using Structure = gustave::testing::ConstDetector<int>;
+    };
+}
+
+using Scene = gustave::core::scenes::CuboidGridScene<libCfg, UserData>;
 
 using BlockIndex = Scene::BlockIndex;
 using Direction = Scene::Direction;
@@ -44,6 +51,7 @@ TEST_CASE("core::scenes::CuboidGridScene") {
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
 
     Scene scene{blockSize};
+    auto const& cScene = scene;
 
     SECTION(".blocks() const") {
         Scene::Blocks blocks = scene.blocks();
@@ -107,28 +115,26 @@ TEST_CASE("core::scenes::CuboidGridScene") {
         CHECK_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
     }
 
-    SECTION(".structures() const") {
-        auto structures = scene.structures();
+    SECTION(".structures()") {
+        auto runTest = [&](auto&& structs, bool expectedConst) {
+            CHECK(structs.size() == 0);
 
-        SECTION("// empty") {
-            CHECK(structures.size() == 0);
-            CHECK(structures.begin() == structures.end());
-        }
-
-        SECTION("// not empty") {
             Transaction t;
             t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
             t.addBlock({ {2,0,0}, concrete_20m, blockMass, true });
             t.addBlock({ {3,0,0}, concrete_20m, blockMass, false });
             scene.modify(t);
 
-            CHECK(structures.size() == 2);
-            int count = 0;
-            for (auto const& structure : structures) {
-                CHECK(structure.blocks().contains({ 2,0,0 }));
-                ++count;
-            }
-            CHECK(count == 2);
+            REQUIRE(structs.size() == 2);
+            CHECK(expectedConst == structs.begin()->userData().isCalledAsConst());
+        };
+
+        SECTION("// mutable") {
+            runTest(scene.structures(), false);
+        }
+
+        SECTION("// const") {
+            runTest(cScene.structures(), true);
         }
     }
 }
