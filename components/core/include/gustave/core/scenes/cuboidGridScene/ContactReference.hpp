@@ -80,7 +80,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using Real = cfg::Real<libCfg, unit>;
     public:
         using BlockIndex = cuboidGridScene::BlockIndex;
-        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_>;
+        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, false>;
         using ContactIndex = cuboidGridScene::ContactIndex;
         using Direction = math3d::BasicDirection;
         using PressureStress = model::PressureStress<libCfg>;

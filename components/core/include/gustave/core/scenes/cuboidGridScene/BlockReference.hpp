@@ -33,6 +33,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/blockReference/Structures.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
@@ -42,15 +43,23 @@
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/meta/Meta.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
     class BlockReference {
     private:
         static constexpr auto u = cfg::units(libCfg);
+
+        template<typename T>
+        using Prop = utils::Prop<isMut_, T>;
+
+        template<typename T>
+        using PropPtr = utils::PropPtr<isMut_, T>;
 
         using BlockDataReference = detail::BlockDataReference<libCfg, false>;
         using DataNeighbours = detail::DataNeighbours<libCfg, false>;
@@ -70,7 +79,12 @@ namespace gustave::core::scenes::cuboidGridScene {
         using Direction = math3d::BasicDirection;
         using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_>;
         using PressureStress = model::PressureStress<libCfg>;
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, false>;
+
+        template<bool mut>
+        using Structures = blockReference::Structures<libCfg, UserData_, mut>;
+
+        template<bool mut>
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
 
         class Contacts {
         private:
@@ -134,7 +148,8 @@ namespace gustave::core::scenes::cuboidGridScene {
 
             [[nodiscard]]
             explicit Contacts(BlockReference const& source)
-                : source_{ source }
+                : scene_{ source.sceneData_ }
+                , index_{ source.index_ }
             {}
 
             [[nodiscard]]
@@ -158,84 +173,15 @@ namespace gustave::core::scenes::cuboidGridScene {
         private:
             [[nodiscard]]
             ContactReference alongUnchecked(Direction direction) const {
-                return ContactReference{ *source_.sceneData_, ContactIndex{ source_.index_, direction } };
+                return ContactReference{ *scene_, ContactIndex{ index_, direction } };
             }
 
-            BlockReference source_;
-        };
-
-        class Structures {
-        private:
-            using Values = std::array<StructureReference, 6>;
-        public:
-            using Iterator = typename Values::const_iterator;
-
-            [[nodiscard]]
-            explicit Structures(BlockReference const& block)
-                : sceneStructures_{ NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT() }
-                , size_{ 0 }
-            {
-                auto const& structures = block.sceneData_->structures;
-                auto addValue = [&](StructureIndex structId) {
-                    if (!contains(structId)) {
-                        sceneStructures_[size_] = StructureReference{ structures.atShared(structId) };
-                        ++size_;
-                    }
-                };
-
-                if (block.isFoundation()) {
-                    for (auto const& neighbour : DataNeighbours{ block.sceneData_->blocks, block.index_ }) {
-                        auto const nBlockData = neighbour.block;
-                        if (!nBlockData.isFoundation()) {
-                            addValue(nBlockData.structureId());
-                        }
-                    }
-                } else {
-                    addValue(block.data().structureId());
-                }
-            }
-
-            [[nodiscard]]
-            StructureReference const& operator[](std::size_t index) const {
-                return sceneStructures_[index];
-            }
-
-            [[nodiscard]]
-            Iterator begin() const {
-                return sceneStructures_.begin();
-            }
-
-            [[nodiscard]]
-            Iterator end() const {
-                return begin() + size_;
-            }
-
-            [[nodiscard]]
-            std::size_t size() const {
-                return size_;
-            }
-        private:
-            [[nodiscard]]
-            static StructureReference NO_INIT() {
-                return StructureReference{ utils::NO_INIT };
-            }
-
-            [[nodiscard]]
-            bool contains(StructureIndex structId) const {
-                for (std::size_t id = 0; id < size_; ++id) {
-                    if (structId == sceneStructures_[id].index()) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            Values sceneStructures_;
-            std::size_t size_;
+            SceneData const* scene_;
+            BlockIndex index_;
         };
 
         [[nodiscard]]
-        explicit BlockReference(SceneData const& sceneData, BlockIndex const& index)
+        explicit BlockReference(Prop<SceneData>& sceneData, BlockIndex const& index)
             : sceneData_{ &sceneData }
             , index_{ index }
         {}
@@ -244,6 +190,42 @@ namespace gustave::core::scenes::cuboidGridScene {
         explicit BlockReference(utils::NoInit NO_INIT)
             : index_{ NO_INIT }
         {}
+
+        [[nodiscard]]
+        BlockReference(BlockReference&)
+            requires (isMut_)
+        = default;
+
+        [[nodiscard]]
+        BlockReference(BlockReference const&)
+            requires (not isMut_)
+        = default;
+
+        [[nodiscard]]
+        BlockReference(meta::cCvRefOf<BlockReference<libCfg, UserData_, true>> auto&& other)
+            requires (not isMut_)
+            : BlockReference{ std::forward<decltype(other)>(other).asImmutable()}
+        {}
+
+        BlockReference& operator=(BlockReference&)
+            requires (isMut_)
+        = default;
+
+        BlockReference& operator=(BlockReference const&)
+            requires (not isMut_)
+        = default;
+
+        BlockReference& operator=(meta::cCvRefOf<BlockReference<libCfg, UserData_, true>> auto&& other)
+            requires (not isMut_)
+        {
+            *this = std::forward<decltype(other)>(other).asImmutable();
+            return *this;
+        }
+
+        [[nodiscard]]
+        BlockReference<libCfg, UserData_, false> asImmutable() const {
+            return BlockReference<libCfg, UserData_, false>{ *sceneData_, index_ };
+        }
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
@@ -291,14 +273,21 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        Structures structures() const {
-            return Structures{ *this };
+        Structures<true> structures()
+            requires (isMut_)
+        {
+            return Structures<true>{ *sceneData_, data() };
+        }
+
+        [[nodiscard]]
+        Structures<false> structures() const {
+            return Structures<false>{ *sceneData_, data() };
         }
 
         [[nodiscard]]
         bool operator==(BlockReference const&) const = default;
     private:
-        SceneData const* sceneData_;
+        PropPtr<SceneData> sceneData_;
         BlockIndex index_;
 
         [[nodiscard]]

@@ -33,6 +33,7 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Blocks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Contacts.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Links.hpp>
@@ -63,6 +64,9 @@ namespace gustave::core::scenes {
         using Links = cuboidGridScene::Links<libCfg, UserData_>;
 
         template<bool mut>
+        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, mut>;
+
+        template<bool mut>
         using Structures = cuboidGridScene::Structures<libCfg, UserData_, mut>;
 
         template<bool mut>
@@ -72,7 +76,6 @@ namespace gustave::core::scenes {
         using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
 
         using BlockIndex = typename Blocks::BlockIndex;
-        using BlockReference = typename Blocks::BlockReference;
         using ContactIndex = typename Contacts::ContactIndex;
         using ContactReference = typename Contacts::ContactReference;
         using Direction = typename Contacts::ContactIndex::Direction;
