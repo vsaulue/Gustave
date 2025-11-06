@@ -54,7 +54,9 @@ namespace gustave::utils {
         }
 
         [[nodiscard]]
-        pointer operator->() const {
+        pointer operator->() const
+            requires (std::is_reference_v<reference>)
+        {
             return std::addressof(*enumerator_);
         }
 
