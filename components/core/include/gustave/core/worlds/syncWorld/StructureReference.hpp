@@ -55,7 +55,7 @@ namespace gustave::core::worlds::syncWorld {
         using StructureData = detail::StructureData<libCfg>;
         using WorldData = detail::WorldData<libCfg>;
 
-        using SceneContactReference = typename WorldData::Scene::ContactReference;
+        using SceneContactReference = WorldData::Scene::template ContactReference<false>;
         using SceneStructureReference = WorldData::Scene::template StructureReference<false>;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;

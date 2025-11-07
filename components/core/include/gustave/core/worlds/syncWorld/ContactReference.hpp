@@ -45,7 +45,7 @@ namespace gustave::core::worlds::syncWorld {
     class ContactReference {
     private:
         using WorldData = detail::WorldData<libCfg>;
-        using SceneContact = typename WorldData::Scene::ContactReference;
+        using SceneContact = WorldData::Scene::template ContactReference<false>;
         using SceneStructure = typename WorldData::Scene::template StructureReference<false>;
         using StructureData = typename WorldData::StructureData;
 
