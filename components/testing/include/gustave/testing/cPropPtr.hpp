@@ -44,17 +44,19 @@ namespace gustave::testing {
     }
 
     template<typename T>
-    concept cPropPtr = requires(T & mv, T const& cmv) {
+    concept cPropPtr = requires(T& mv, T const& cmv, T&& xv) {
         requires meta::cNotCvRef<T>;
         { cmv.asImmutable() } -> meta::cNotCvRef;
         requires isPropEqualitySymmetric<T>();
         requires requires (AsImmutable<T>&iv, AsImmutable<T> const& civ) {
             T{ mv };
+            T{ std::move(xv) };
             requires (not requires { T{ cmv }; });
             AsImmutable<T>{ cmv };
             AsImmutable<T>{ civ };
 
             mv = mv;
+            mv = std::move(xv);
             requires (not requires { mv = cmv; });
             iv = cmv;
             iv = civ;

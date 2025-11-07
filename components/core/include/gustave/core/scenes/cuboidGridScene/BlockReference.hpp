@@ -207,6 +207,9 @@ namespace gustave::core::scenes::cuboidGridScene {
             : BlockReference{ std::forward<decltype(other)>(other).asImmutable()}
         {}
 
+        [[nodiscard]]
+        BlockReference(BlockReference&&) = default;
+
         BlockReference& operator=(BlockReference&)
             requires (isMut_)
         = default;
@@ -221,6 +224,8 @@ namespace gustave::core::scenes::cuboidGridScene {
             *this = std::forward<decltype(other)>(other).asImmutable();
             return *this;
         }
+
+        BlockReference& operator=(BlockReference&&) = default;
 
         [[nodiscard]]
         BlockReference<libCfg, UserData_, false> asImmutable() const {
