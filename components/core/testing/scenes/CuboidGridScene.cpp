@@ -80,14 +80,24 @@ TEST_CASE("core::scenes::CuboidGridScene") {
     }
 
     SECTION(".contacts()") {
-        auto contacts = scene.contacts();
-        auto contact = contacts.at({ {1,0,0}, Direction::plusX() });
-        CHECK(contact.maxPressureStress() == concrete_20m);
-        CHECK(contact.otherBlock().mass() == 3.f * blockMass);
+        auto runTest = [&](auto&& contacts, bool expectedConst) {
+            auto contact = contacts.at({ {1,0,0}, Direction::plusX() });
+            CHECK(contact.maxPressureStress() == concrete_20m);
+            CHECK(contact.otherBlock().mass() == 3.f * blockMass);
+            CHECK(expectedConst == contact.structure().userData().isCalledAsConst());
+        };
+
+        SECTION("// mutable") {
+            runTest(scene.contacts(), false);
+        }
+
+        SECTION("// const") {
+            runTest(cScene.contacts(), true);
+        }
     }
 
     SECTION(".links()") {
-        Scene::Links links = scene.links();
+        auto links = scene.links();
 
         auto const expected = std::array{
             scene.contacts().at({ {0,0,0}, Direction::plusX() }),

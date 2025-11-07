@@ -35,6 +35,7 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Blocks.hpp>
+#include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Contacts.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Links.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
@@ -59,7 +60,6 @@ namespace gustave::core::scenes {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Contacts = cuboidGridScene::Contacts<libCfg, UserData_, false>;
         using Links = cuboidGridScene::Links<libCfg, UserData_>;
 
         template<bool mut>
@@ -67,6 +67,12 @@ namespace gustave::core::scenes {
 
         template<bool mut>
         using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, mut>;
+
+        template<bool mut>
+        using Contacts = cuboidGridScene::Contacts<libCfg, UserData_, mut>;
+
+        template<bool mut>
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, mut>;
 
         template<bool mut>
         using Structures = cuboidGridScene::Structures<libCfg, UserData_, mut>;
@@ -78,9 +84,8 @@ namespace gustave::core::scenes {
         using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
 
         using BlockIndex = BlockReference<false>::BlockIndex;
-        using ContactIndex = typename Contacts::ContactIndex;
-        using ContactReference = Contacts::template ContactReference<false>;
-        using Direction = typename Contacts::ContactIndex::Direction;
+        using ContactIndex = ContactReference<false>::ContactIndex;
+        using Direction = ContactIndex::Direction;
         using StructureIndex = StructureReference<false>::StructureIndex;
 
 
@@ -117,8 +122,13 @@ namespace gustave::core::scenes {
         }
 
         [[nodiscard]]
-        Contacts contacts() const {
-            return Contacts{ data_ };
+        Contacts<true> contacts() {
+            return Contacts<true>{ data_ };
+        }
+
+        [[nodiscard]]
+        Contacts<false> contacts() const {
+            return Contacts<false>{ data_ };
         }
 
         [[nodiscard]]
