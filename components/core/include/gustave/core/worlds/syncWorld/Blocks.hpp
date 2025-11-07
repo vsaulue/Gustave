@@ -40,7 +40,7 @@ namespace gustave::core::worlds::syncWorld {
     private:
         using WorldData = detail::WorldData<libCfg>;
 
-        using SceneBlocks = typename WorldData::Scene::Blocks;
+        using SceneBlocks = typename WorldData::Scene::template Blocks<false>;
     public:
         using BlockIndex = typename WorldData::Scene::BlockIndex;
         using BlockReference = syncWorld::BlockReference<libCfg>;
