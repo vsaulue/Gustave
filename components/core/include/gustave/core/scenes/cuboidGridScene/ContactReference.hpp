@@ -134,6 +134,9 @@ namespace gustave::core::scenes::cuboidGridScene {
             : ContactReference{ std::forward<decltype(other)>(other).asImmutable() }
         {}
 
+        [[nodiscard]]
+        ContactReference(ContactReference&&) = default;
+
         ContactReference& operator=(ContactReference&)
             requires (isMut_)
         = default;
@@ -148,6 +151,8 @@ namespace gustave::core::scenes::cuboidGridScene {
             *this = std::forward<decltype(rhs)>(rhs).asImmutable();
             return *this;
         }
+
+        ContactReference& operator=(ContactReference&&) = default;
 
         [[nodiscard]]
         Real<u.area> area() const {

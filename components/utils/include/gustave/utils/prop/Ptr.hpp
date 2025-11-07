@@ -40,7 +40,12 @@ namespace gustave::utils::prop {
         [[nodiscard]]
         constexpr Ptr(Ptr&) = default;
 
+        [[nodiscard]]
+        constexpr Ptr(Ptr&&) = default;
+
         constexpr Ptr& operator=(Ptr&) = default;
+
+        constexpr Ptr& operator=(Ptr&&) = default;
 
         constexpr Ptr& operator=(T* value) {
             value_ = value;
