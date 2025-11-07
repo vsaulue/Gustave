@@ -38,7 +38,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
     class Links {
     public:
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_>;
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, false>;
         using ContactIndex = typename ContactReference::ContactIndex;
     private:
         using SceneData = detail::SceneData<libCfg, UserData_>;

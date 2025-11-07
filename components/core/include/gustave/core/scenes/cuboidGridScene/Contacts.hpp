@@ -37,7 +37,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     private:
         using SceneData = detail::SceneData<libCfg, UserData_>;
     public:
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_>;
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, false>;
 
         using ContactIndex = typename ContactReference::ContactIndex;
 
@@ -55,7 +55,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         ContactReference at(ContactIndex const& index) const {
             ContactReference result{ *scene_, index };
             if (!result.isValid()) {
-                throw std::out_of_range(result.invalidMessage());
+                throw result.invalidError();
             }
             return result;
         }

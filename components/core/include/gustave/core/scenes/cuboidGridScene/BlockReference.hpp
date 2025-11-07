@@ -77,7 +77,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     public:
         using BlockIndex = cuboidGridScene::BlockIndex;
         using Direction = math3d::BasicDirection;
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_>;
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, false>;
         using PressureStress = model::PressureStress<libCfg>;
 
         template<bool mut>
@@ -156,7 +156,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             ContactReference along(Direction direction) const {
                 ContactReference result = alongUnchecked(direction);
                 if (!result.isValid()) {
-                    throw std::out_of_range(result.invalidMessage());
+                    throw result.invalidError();
                 }
                 return result;
             }
@@ -173,7 +173,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         private:
             [[nodiscard]]
             ContactReference alongUnchecked(Direction direction) const {
-                return ContactReference{ *scene_, ContactIndex{ index_, direction } };
+                return ContactReference{ *scene_, { index_, direction } };
             }
 
             SceneData const* scene_;
