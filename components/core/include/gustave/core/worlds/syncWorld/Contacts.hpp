@@ -47,7 +47,7 @@ namespace gustave::core::worlds::syncWorld {
         ContactReference at(ContactIndex const& index) const {
             ContactReference result{ *world_, index };
             if (!result.isValid()) {
-                throw std::out_of_range(result.invalidMessage());
+                throw result.invalidError();
             }
             return result;
         }

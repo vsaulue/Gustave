@@ -111,8 +111,8 @@ namespace gustave::core::worlds::syncWorld {
         }
 
         [[nodiscard]]
-        std::string invalidMessage() const {
-            return sceneContact().invalidMessage();
+        std::out_of_range invalidError() {
+            return sceneContact().invalidError();
         }
 
         [[nodiscard]]

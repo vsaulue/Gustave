@@ -71,7 +71,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using UDTraits = common::UserDataTraits<UserData_>;
 
         using BlockReference = cuboidGridScene::BlockReference<cfg, UserData_, false>;
-        using ContactReference = cuboidGridScene::ContactReference<cfg, UserData_>;
+        using ContactReference = cuboidGridScene::ContactReference<cfg, UserData_, false>;
         using SolverStructure = solvers::Structure<cfg>;
         using NodeIndex = cfg::NodeIndex<cfg>;
         using UserDataMember = UDTraits::StructureMember;

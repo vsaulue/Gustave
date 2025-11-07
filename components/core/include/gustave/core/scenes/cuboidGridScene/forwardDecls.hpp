@@ -51,6 +51,6 @@ namespace gustave::core::scenes::cuboidGridScene {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMutable_>
     class StructureReference;
 
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
     class ContactReference;
 }

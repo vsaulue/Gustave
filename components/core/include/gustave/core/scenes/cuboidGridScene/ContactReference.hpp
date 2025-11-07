@@ -37,13 +37,26 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
+#include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
+#include <gustave/utils/Prop.hpp>
+#include <gustave/meta/Meta.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
     class ContactReference {
     private:
+        template<cfg::cLibConfig auto, common::cSceneUserData, bool>
+        friend class ContactReference;
+
+        template<typename T>
+        using Prop = utils::Prop<isMut_, T>;
+
+        template<typename T>
+        using PropPtr = utils::PropPtr<isMut_, T>;
+
         static constexpr auto u = cfg::units(libCfg);
 
         using BlockDataReference = detail::BlockDataReference<libCfg, false>;
@@ -79,14 +92,19 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
     public:
+        using AsImmutable = ContactReference<libCfg, UserData_, false>;
         using BlockIndex = cuboidGridScene::BlockIndex;
-        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, false>;
         using ContactIndex = cuboidGridScene::ContactIndex;
         using Direction = math3d::BasicDirection;
         using PressureStress = model::PressureStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using SolverContactIndex = typename solvers::Structure<libCfg>::ContactIndex;
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, false>;
+
+        template<bool mut>
+        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, mut>;
+
+        template<bool mut>
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
 
         [[nodiscard]]
         explicit ContactReference(utils::NoInit NO_INIT)
@@ -95,14 +113,52 @@ namespace gustave::core::scenes::cuboidGridScene {
         {}
 
         [[nodiscard]]
-        explicit ContactReference(SceneData const& scene, ContactIndex const& index)
+        explicit ContactReference(Prop<SceneData>& scene, ContactIndex const& index)
             : scene_{ &scene }
             , index_{ index }
         {}
 
         [[nodiscard]]
+        ContactReference(ContactReference&)
+            requires (isMut_)
+        = default;
+
+        [[nodiscard]]
+        ContactReference(ContactReference const&)
+            requires (not isMut_)
+        = default;
+
+        [[nodiscard]]
+        ContactReference(meta::cCvRefOf<ContactReference<libCfg, UserData_, true>> auto&& other)
+            requires (not isMut_)
+            : ContactReference{ std::forward<decltype(other)>(other).asImmutable() }
+        {}
+
+        ContactReference& operator=(ContactReference&)
+            requires (isMut_)
+        = default;
+
+        ContactReference& operator=(ContactReference const&)
+            requires (not isMut_)
+        = default;
+
+        ContactReference& operator=(meta::cCvRefOf<ContactReference<libCfg, UserData_, true>> auto&& rhs)
+            requires (not isMut_)
+        {
+            *this = std::forward<decltype(rhs)>(rhs).asImmutable();
+            return *this;
+        }
+
+        [[nodiscard]]
         Real<u.area> area() const {
             return scene_->blocks.contactAreaAlong(index_.direction());
+        }
+
+        [[nodiscard]]
+        AsImmutable asImmutable() const
+            requires (isMut_)
+        {
+            return AsImmutable{ scene_, index_ };
         }
 
         [[nodiscard]]
@@ -111,10 +167,10 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        std::string invalidMessage() const {
+        std::out_of_range invalidError() const {
             std::stringstream msg;
             msg << "Invalid contact at index " << index_ << '.';
-            return msg.str();
+            return std::out_of_range(msg.str());
         }
 
         [[nodiscard]]
@@ -123,19 +179,22 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        BlockReference localBlock() const {
-            BlockReference result{ *scene_, index_.localBlockIndex() };
-            if (!result.isValid()) {
-                throw std::out_of_range(invalidMessage());
-            }
-            return result;
+        BlockReference<true> localBlock()
+            requires (isMut_)
+        {
+            return doLocalBlock(*this);
+        }
+
+        [[nodiscard]]
+        BlockReference<false> localBlock() const {
+            return doLocalBlock(*this);
         }
 
         [[nodiscard]]
         PressureStress maxPressureStress() const {
             BlockDatas blocks = blockDatas();
             if (!blocks.isValid()) {
-                throw std::out_of_range(invalidMessage());
+                throw invalidError();
             }
             return PressureStress::minStress(blocks.local.maxPressureStress(), blocks.other.maxPressureStress());
         }
@@ -146,28 +205,34 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        ContactReference opposite() const {
-            BlockDatas blocks = blockDatas();
-            if (!blocks.isValid()) {
-                throw std::out_of_range(invalidMessage());
-            }
-            return ContactReference{ *scene_, ContactIndex{ blocks.other.index(), index_.direction().opposite()}};
+        ContactReference opposite()
+            requires (isMut_)
+        {
+            return doOpposite(*this);
         }
 
         [[nodiscard]]
-        BlockReference otherBlock() const {
-            std::optional<BlockIndex> blockId = index_.otherBlockIndex();
-            if (!blockId || !scene_->blocks.contains(*blockId)) {
-                throw std::out_of_range(invalidMessage());
-            }
-            return BlockReference{ *scene_, *blockId };
+        AsImmutable opposite() const {
+            return doOpposite(*this);
+        }
+
+        [[nodiscard]]
+        BlockReference<true> otherBlock()
+            requires (isMut_)
+        {
+            return doOtherBlock(*this);
+        }
+
+        [[nodiscard]]
+        BlockReference<false> otherBlock() const {
+            return doOtherBlock(*this);
         }
 
         [[nodiscard]]
         SolverContactIndex solverIndex() const {
             BlockDatas datas = blockDatas();
             if (!datas.isValid()) {
-                throw std::out_of_range(invalidMessage());
+                throw invalidError();
             }
             switch (index_.direction().id()) {
             case Direction::Id::plusX:
@@ -187,13 +252,15 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        StructureReference structure() const {
-            auto const datas = blockDatas();
-            auto const optStructId = datas.structureId();
-            if (!optStructId) {
-                throw std::out_of_range(invalidMessage());
-            }
-            return StructureReference{ scene_->structures.atShared(*optStructId) };
+        StructureReference<true> structure()
+            requires (isMut_)
+        {
+            return doStructure(*this);
+        }
+
+        [[nodiscard]]
+        StructureReference<false> structure() const {
+            return doStructure(*this);
         }
 
         [[nodiscard]]
@@ -201,8 +268,11 @@ namespace gustave::core::scenes::cuboidGridScene {
             return scene_->blocks.thicknessAlong(index_.direction());
         }
 
+        template<bool mut>
         [[nodiscard]]
-        bool operator==(ContactReference const&) const = default;
+        bool operator==(ContactReference<libCfg, UserData_, mut> const& rhs) const {
+            return (scene_ == rhs.scene_) && (index_ == rhs.index_);
+        }
     private:
         [[nodiscard]]
         BlockDatas blockDatas() const {
@@ -214,7 +284,48 @@ namespace gustave::core::scenes::cuboidGridScene {
             return BlockDatas{ local, other };
         }
 
-        SceneData const* scene_;
+        [[nodiscard]]
+        static auto doLocalBlock(meta::cCvRefOf<ContactReference> auto&& self) {
+            using Result = decltype(self.localBlock());
+            auto result = Result{ *self.scene_, self.index_.localBlockIndex() };
+            if (!result.isValid()) {
+                throw self.invalidError();
+            }
+            return result;
+        }
+
+        [[nodiscard]]
+        static auto doOpposite(meta::cCvRefOf<ContactReference> auto&& self) {
+            using Result = decltype(self.opposite());
+            BlockDatas blocks = self.blockDatas();
+            if (!blocks.isValid()) {
+                throw self.invalidError();
+            }
+            return Result{ *self.scene_, { blocks.other.index(), self.index_.direction().opposite()} };
+        }
+
+        [[nodiscard]]
+        static auto doOtherBlock(meta::cCvRefOf<ContactReference> auto&& self) {
+            using Result = decltype(self.otherBlock());
+            std::optional<BlockIndex> blockId = self.index_.otherBlockIndex();
+            if (!blockId || !self.scene_->blocks.contains(*blockId)) {
+                throw self.invalidError();
+            }
+            return Result{ *self.scene_, *blockId };
+        }
+
+        [[nodiscard]]
+        static auto doStructure(meta::cCvRefOf<ContactReference> auto&& self) {
+            using Result = decltype(self.structure());
+            auto const datas = self.blockDatas();
+            auto const optStructId = datas.structureId();
+            if (!optStructId) {
+                throw self.invalidError();
+            }
+            return Result{ self.scene_->structures.atShared(*optStructId) };
+        }
+
+        PropPtr<SceneData> scene_;
         ContactIndex index_;
     };
 }

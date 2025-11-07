@@ -30,20 +30,37 @@
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
-#include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
+#include <gustave/testing/ConstDetector.hpp>
+#include <gustave/testing/cPropPtr.hpp>
 
 #include <TestHelpers.hpp>
 
-using ContactReference = gustave::core::scenes::cuboidGridScene::ContactReference<libCfg,void>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg,void>;
-using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg,void>;
-using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg,void,false>;
+namespace {
+    struct UserData {
+        using Structure = gustave::testing::ConstDetector<int>;
+    };
+}
 
-using BlockIndex = ContactReference::BlockIndex;
-using BlockReference = ContactReference::BlockReference;
-using ContactIndex = ContactReference::ContactIndex;
-using Direction = ContactIndex::Direction;
+namespace cuboid = gustave::core::scenes::cuboidGridScene;
+
+template<bool mut>
+using ContactReference = cuboid::ContactReference<libCfg, UserData, mut>;
+
+using SceneData = cuboid::detail::SceneData<libCfg, UserData>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg,UserData>;
+
+using BlockIndex = ContactReference<false>::BlockIndex;
+using ContactIndex = ContactReference<false>::ContactIndex;
+using Direction = ContactReference<false>::Direction;
 using Transaction = SceneUpdater::Transaction;
+
+template<bool mut>
+using BlockReference = ContactReference<false>::BlockReference<mut>;
+
+template<bool mut>
+using StructureReference = ContactReference<false>::StructureReference<mut>;
+
+static_assert(gustave::testing::cPropPtr<ContactReference<true>>);
 
 TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
@@ -56,82 +73,98 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     };
 
     Transaction t;
-    auto newBlock = [&](BlockIndex const& index, PressureStress const& material, bool isFoundation) {
-        t.addBlock({ index, material, 1000.f * u.mass, isFoundation });
-        return BlockReference{ scene, index };
-    };
-    BlockReference b122 = newBlock({ 1,2,2 }, highTensile, false);
-    BlockReference b222 = newBlock({ 2,2,2 }, concrete_20m, true);
-    newBlock({ 2,3,2 }, concrete_20m, true);
-    newBlock({ 7,7,7 }, concrete_20m, false);
-    newBlock({ 6,7,7 }, concrete_20m, true);
-    newBlock({ 7,6,7 }, concrete_20m, false);
-    newBlock({ 7,7,6 }, concrete_20m, false);
+    t.addBlock({ {1,2,2}, highTensile, 1000.f * u.mass, false });
+    t.addBlock({ {2,2,2}, concrete_20m, 1000.f * u.mass, true });
+    t.addBlock({ {2,3,2}, concrete_20m, 1000.f * u.mass, true });
+    t.addBlock({ {7,7,7}, concrete_20m, 1000.f * u.mass, false });
+    t.addBlock({ {6,7,7}, concrete_20m, 1000.f * u.mass, true });
+    t.addBlock({ {7,6,7}, concrete_20m, 1000.f * u.mass, false });
+    t.addBlock({ {7,7,6}, concrete_20m, 1000.f * u.mass, false });
     SceneUpdater{ scene }.runTransaction(t);
 
-    auto contactReference = [&](BlockIndex const& localBlockId, Direction direction) {
-        return ContactReference{ scene, ContactIndex{ localBlockId, direction } };
+    auto blockRef = [&](BlockIndex const& blockId) {
+        auto result = BlockReference<false>{ scene, blockId };
+        REQUIRE(result.isValid());
+        return result;
     };
 
-    auto invalidContact = contactReference({ 0,0,0 }, Direction::minusZ());
+    auto structRef = [&](BlockIndex const& blockId) {
+        auto const structId = scene.blocks.at(blockId).structureId();
+        return StructureReference<false>{ scene.structures.atShared(structId) };
+    };
 
-    auto structureRefAt = [&](BlockIndex const& blockId) -> StructureReference {
-        auto blockDataRef = scene.blocks.find(blockId);
-        REQUIRE(blockDataRef);
-        auto const structId = blockDataRef.structureId();
-        REQUIRE(structId != scene.structureIdGenerator.invalidIndex());
-        return StructureReference{ scene.structures.atShared(structId) };
-        };
+    auto mutContactRef = [&](BlockIndex const& localBlockId, Direction direction) {
+        return ContactReference<true>{ scene, { localBlockId, direction } };
+    };
+
+    auto immContactRef = [&](BlockIndex const& localBlockId, Direction direction) {
+        return ContactReference<false>{ scene, { localBlockId, direction } };
+    };
+
+    auto mContact222minusX = mutContactRef({ 2,2,2 }, Direction::minusX());
+    auto const& cmContact222minusX = mContact222minusX;
+    auto iContact222minusX = immContactRef({ 2,2,2 }, Direction::minusX());
+
+    auto invalidContact = immContactRef({ 0,0,0 }, Direction::minusZ());
 
     SECTION(".area()") {
-        ContactReference contact = contactReference({ 2,2,2 }, Direction::minusX());
-        CHECK(contact.area() == 3.f * u.area);
+        CHECK(iContact222minusX.area() == 3.f * u.area);
     }
 
     SECTION(".index()") {
-        ContactIndex id{ { 2,2,2 }, Direction::minusX() };
-        ContactReference contact{ scene, id };
-        CHECK(contact.index() == id);
+        auto const expected = ContactIndex{ { 2,2,2 }, Direction::minusX() };
+        CHECK(iContact222minusX.index() == expected);
     }
 
     SECTION(".isValid()") {
         SECTION("// true") {
-            ContactReference contact = contactReference({ 2,2,2 }, Direction::minusX());
-            CHECK(contact.isValid());
+            CHECK(iContact222minusX.isValid());
         }
 
         SECTION("// false: no local block") {
-            ContactReference contact = contactReference({ 2,1,2 }, Direction::plusY());
+            auto const contact = immContactRef({ 2,1,2 }, Direction::plusY());
             CHECK_FALSE(contact.isValid());
         }
 
         SECTION("// false: no other block") {
-            ContactReference contact = contactReference({ 2,2,2 }, Direction::minusY());
+            auto contact = immContactRef({ 2,2,2 }, Direction::minusY());
             CHECK_FALSE(contact.isValid());
         }
 
         SECTION("// false: both foundations") {
-            ContactReference contact = contactReference({ 2,2,2 }, Direction::plusY());
+            auto contact = immContactRef({ 2,2,2 }, Direction::plusY());
             CHECK_FALSE(contact.isValid());
         }
     }
 
     SECTION(".localBlock()") {
-        SECTION("// valid") {
-            ContactReference contact = contactReference({ 1,2,2 }, Direction::plusX());
-            CHECK(contact.localBlock() == b122);
+        auto runValidTest = [&](auto&& contactRef, bool expectedConst) {
+            auto res = contactRef.localBlock();
+            auto const expected = blockRef({ 2,2,2 });
+            CHECK(res == expected);
+            CHECK(expectedConst == res.structures()[0].userData().isCalledAsConst());
+        };
+
+        SECTION("// valid - mutable") {
+            runValidTest(mContact222minusX, false);
+        }
+
+        SECTION("// valid - const") {
+            runValidTest(cmContact222minusX, true);
+        }
+
+        SECTION("// valid - immutable") {
+            runValidTest(iContact222minusX, true);
         }
 
         SECTION("// invalid") {
-            ContactReference contact = contactReference({ 0,2,2 }, Direction::plusX());
-            CHECK_THROWS_AS(contact.localBlock(), std::out_of_range);
+            CHECK_THROWS_AS(invalidContact.localBlock(), std::out_of_range);
         }
     }
 
     SECTION(".maxPressureStress()") {
         SECTION("// valid") {
-            ContactReference contact = contactReference({ 1,2,2 }, Direction::plusX());
-            CHECK(contact.maxPressureStress() == PressureStress::minStress(concrete_20m, highTensile));
+            CHECK(iContact222minusX.maxPressureStress() == PressureStress::minStress(concrete_20m, highTensile));
         }
 
         SECTION("// invalid") {
@@ -140,15 +173,27 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     }
 
     SECTION(".normal()") {
-        ContactReference contact = contactReference({ 2,2,2 }, Direction::minusX());
-        CHECK(contact.normal() == -Normals::x);
+        CHECK(iContact222minusX.normal() == -Normals::x);
     }
 
     SECTION(".opposite()") {
-        SECTION("// valid") {
-            ContactReference contact = contactReference({ 2,2,2 }, Direction::minusX());
-            ContactReference expected = contactReference({ 1,2,2 }, Direction::plusX());
-            CHECK(contact.opposite() == expected);
+        auto runValidTest = [&](auto&& contactRef, bool expectedConst) {
+            auto result = contactRef.opposite();
+            auto const expected = immContactRef({ 1,2,2 }, Direction::plusX());
+            CHECK(result == expected);
+            CHECK(expectedConst == result.structure().userData().isCalledAsConst());
+        };
+
+        SECTION("// valid - mutable") {
+            runValidTest(mContact222minusX, false);
+        }
+
+        SECTION("// valid - const") {
+            runValidTest(cmContact222minusX, true);
+        }
+
+        SECTION("// valid - immutable") {
+            runValidTest(iContact222minusX, true);
         }
 
         SECTION("// invalid") {
@@ -157,14 +202,27 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     }
 
     SECTION(".otherBlock()") {
-        SECTION("// valid") {
-            ContactReference contact = contactReference({ 1,2,2 }, Direction::plusX());
-            CHECK(contact.otherBlock() == b222);
+        auto runValidTest = [&](auto&& contactRef, bool expectedConst) {
+            auto result = contactRef.otherBlock();
+            auto const expected = blockRef({ 1,2,2 });
+            CHECK(result == expected);
+            CHECK(expectedConst == result.structures()[0].userData().isCalledAsConst());
+        };
+
+        SECTION("// valid - mutable") {
+            runValidTest(mContact222minusX, false);
+        }
+
+        SECTION("// valid - const") {
+            runValidTest(cmContact222minusX, true);
+        }
+
+        SECTION("// valid - immutable") {
+            runValidTest(iContact222minusX, true);
         }
 
         SECTION("// invalid") {
-            ContactReference contact = contactReference({ 1,2,2 }, Direction::minusX());
-            CHECK_THROWS_AS(contact.otherBlock(), std::out_of_range);
+            CHECK_THROWS_AS(invalidContact.otherBlock(), std::out_of_range);
         }
     }
 
@@ -172,18 +230,17 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         auto const structureId = scene.blocks.find({ 7,7,7 }).structureId();
         auto const& structureData = scene.structures.at(structureId);
         auto checkContact = [&](BlockIndex const& localBlockId, Direction direction) {
-            ContactReference contact{ scene, ContactIndex{ localBlockId, direction } };
-            auto const solverId = contact.solverIndex();
-            auto const& link = structureData.solverStructure().links().at(solverId.linkIndex);
+            auto const result = immContactRef(localBlockId, direction).solverIndex();
+            auto const& solverLink = structureData.solverStructure().links().at(result.linkIndex);
             std::optional<BlockIndex> otherBlockId = localBlockId.neighbourAlong(direction);
             auto const& solverIndices = structureData.solverIndices();
             REQUIRE(otherBlockId);
-            if (solverId.isOnLocalNode) {
-                CHECK(link.localNodeId() == solverIndices.at(localBlockId));
-                CHECK(link.otherNodeId() == solverIndices.at(*otherBlockId));
+            if (result.isOnLocalNode) {
+                CHECK(solverLink.localNodeId() == solverIndices.at(localBlockId));
+                CHECK(solverLink.otherNodeId() == solverIndices.at(*otherBlockId));
             } else {
-                CHECK(link.otherNodeId() == solverIndices.at(localBlockId));
-                CHECK(link.localNodeId() == solverIndices.at(*otherBlockId));
+                CHECK(solverLink.otherNodeId() == solverIndices.at(localBlockId));
+                CHECK(solverLink.localNodeId() == solverIndices.at(*otherBlockId));
             }
         };
 
@@ -210,17 +267,40 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         SECTION("// direction: minusZ") {
             checkContact({ 7,7,7 }, Direction::minusZ());
         }
+
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(invalidContact.solverIndex(), std::out_of_range);
+        }
     }
 
     SECTION(".structure()") {
-        ContactReference c1 = contactReference({ 1,2,2 }, Direction::plusX());
-        CHECK(c1.structure() == structureRefAt({ 1,2,2 }));
-        ContactReference c2 = contactReference({ 2,2,2 }, Direction::minusX());
-        CHECK(c2.structure() == structureRefAt({ 1,2,2 }));
+        auto runValidTest = [&](auto&& contactRef, bool expectedConst) {
+            auto result = contactRef.structure();
+            auto const s122 = structRef({ 1,2,2 });
+            auto const s777 = structRef({ 7,7,7 });
+            CHECK(result == s122);
+            CHECK(result != s777);
+            CHECK(expectedConst == result.userData().isCalledAsConst());
+        };
+
+        SECTION("// valid - mutable") {
+            runValidTest(mContact222minusX, false);
+        }
+
+        SECTION("// valid - const") {
+            runValidTest(cmContact222minusX, true);
+        }
+
+        SECTION("// valid - immutable") {
+            runValidTest(iContact222minusX, true);
+        }
+
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(invalidContact.structure(), std::out_of_range);
+        }
     }
 
     SECTION(".thickness()") {
-        ContactReference c = contactReference({ 7,7,7 }, Direction::minusX());
-        CHECK(c.thickness() == blockSize.x());
+        CHECK(iContact222minusX.thickness() == blockSize.x());
     }
 }
