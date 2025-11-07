@@ -74,7 +74,7 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
     auto sceneStructureOf = [&](BlockIndex const& blockIndex) {
         auto const sceneStructs = world.scene.blocks().at(blockIndex).structures();
         REQUIRE(sceneStructs.size() == 1);
-        return sceneStructs[0];
+        return sceneStructs[0].asImmutable();
     };
 
     auto checkForce = [&](BlockIndex const& to, BlockIndex const& from, Vector3<u.force> const& expectedForce) {

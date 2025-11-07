@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 
+#include <array>
 #include <stdexcept>
 
 #include <catch2/catch_test_macros.hpp>
@@ -53,32 +54,24 @@ TEST_CASE("core::scenes::CuboidGridScene") {
     Scene scene{blockSize};
     auto const& cScene = scene;
 
-    SECTION(".blocks() const") {
-        Scene::Blocks blocks = scene.blocks();
+    Transaction t;
+    t.addBlock({ {0,0,0}, concrete_20m, 1.f * blockMass, false });
+    t.addBlock({ {1,0,0}, concrete_20m, 2.f * blockMass, true });
+    t.addBlock({ {2,0,0}, concrete_20m, 3.f * blockMass, false });
+    scene.modify(t);
 
-        SECTION("// empty") {
-            CHECK(blocks.size() == 0);
-            CHECK(blocks.begin() == blocks.end());
+    SECTION(".blocks()") {
+        auto runTest = [&](auto&& blocks, bool expectedConst) {
+            REQUIRE(blocks.size() == 3);
+            CHECK(expectedConst == blocks.at({ 0,0,0 }).structures()[0].userData().isCalledAsConst());
+        };
+
+        SECTION("// mutable") {
+            runTest(scene.blocks(), false);
         }
 
-        SECTION("// not empty") {
-            Transaction t;
-            t.addBlock({ {1,0,0}, concrete_20m, blockMass, true });
-            t.addBlock({ {2,0,0}, concrete_20m, blockMass, false });
-            scene.modify(t);
-
-            CHECK(blocks.size() == 2);
-            CHECK(blocks.at({1,0,0}).isFoundation());
-            CHECK_FALSE(blocks.at({ 2,0,0 }).isFoundation());
-
-            {
-                std::vector<BlockIndex> indices;
-                for (auto const& block : blocks) {
-                    indices.push_back(block.index());
-                }
-                std::vector<BlockIndex> expected{ {1,0,0}, {2,0,0} };
-                CHECK_THAT(indices, matchers::c2::UnorderedEquals(expected));
-            }
+        SECTION("// const") {
+            runTest(cScene.blocks(), true);
         }
     }
 
@@ -87,44 +80,24 @@ TEST_CASE("core::scenes::CuboidGridScene") {
     }
 
     SECTION(".contacts()") {
-        Scene::Contacts contacts = scene.contacts();
-
-        Transaction t;
-        t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
-        t.addBlock({ {2,0,0}, concrete_20m, 5.f * blockMass, false });
-        scene.modify(t);
-
-        Scene::ContactReference contact = contacts.at(Scene::ContactIndex{ {1,0,0}, Direction::plusX() });
+        auto contacts = scene.contacts();
+        auto contact = contacts.at({ {1,0,0}, Direction::plusX() });
         CHECK(contact.maxPressureStress() == concrete_20m);
-        CHECK(contact.otherBlock().mass() == 5.f * blockMass);
+        CHECK(contact.otherBlock().mass() == 3.f * blockMass);
     }
 
     SECTION(".links()") {
         Scene::Links links = scene.links();
 
-        Transaction t;
-        t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
-        t.addBlock({ {2,0,0}, concrete_20m, blockMass, false });
-        t.addBlock({ {3,0,0}, concrete_20m, blockMass, false });
-        scene.modify(t);
-
-        std::vector<Scene::ContactReference> const expected = {
-            scene.contacts().at(Scene::ContactIndex{ {1,0,0}, Direction::plusX() }),
-            scene.contacts().at(Scene::ContactIndex{ {2,0,0}, Direction::plusX() }),
+        auto const expected = std::array{
+            scene.contacts().at({ {0,0,0}, Direction::plusX() }),
+            scene.contacts().at({ {1,0,0}, Direction::plusX() }),
         };
         CHECK_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
     }
 
     SECTION(".structures()") {
         auto runTest = [&](auto&& structs, bool expectedConst) {
-            CHECK(structs.size() == 0);
-
-            Transaction t;
-            t.addBlock({ {1,0,0}, concrete_20m, blockMass, false });
-            t.addBlock({ {2,0,0}, concrete_20m, blockMass, true });
-            t.addBlock({ {3,0,0}, concrete_20m, blockMass, false });
-            scene.modify(t);
-
             REQUIRE(structs.size() == 2);
             CHECK(expectedConst == structs.begin()->userData().isCalledAsConst());
         };
