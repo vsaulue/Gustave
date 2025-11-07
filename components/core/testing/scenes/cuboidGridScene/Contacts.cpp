@@ -28,15 +28,26 @@
 #include <gustave/core/scenes/cuboidGridScene/Contacts.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
+#include <gustave/testing/ConstDetector.hpp>
 
 #include <TestHelpers.hpp>
 
-using Contacts = gustave::core::scenes::cuboidGridScene::Contacts<libCfg, void>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, void>;
-using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, void>;
+namespace {
+    struct UserData {
+        using Structure = gustave::testing::ConstDetector<int>;
+    };
+}
 
-using ContactIndex = Contacts::ContactIndex;
-using ContactReference = Contacts::ContactReference;
+template<bool mut>
+using Contacts = gustave::core::scenes::cuboidGridScene::Contacts<libCfg, UserData, mut>;
+
+template<bool mut>
+using ContactReference = Contacts<false>::ContactReference<mut>;
+
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, UserData>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, UserData>;
+
+using ContactIndex = Contacts<false>::ContactIndex;
 using Direction = ContactIndex::Direction;
 using Transaction = SceneUpdater::Transaction;
 
@@ -49,23 +60,61 @@ TEST_CASE("core::scenes::cuboidGridScene::Contacts") {
     t.addBlock({ {0,2,0}, concrete_20m, 1000.f * u.mass, false });
     SceneUpdater{ scene }.runTransaction(t);
 
-    Contacts contacts{ scene };
+    auto mContacts = Contacts<true>{ scene };
+    auto const& cmContacts = mContacts;
+    auto iContacts = Contacts<false>{ scene };
 
     SECTION(".at()") {
-        SECTION("// valid") {
-            ContactIndex id{ {0,1,0}, Direction::plusY() };
-            CHECK(contacts.at(id) == ContactReference{ scene, id });
+        auto runValidTest = [&](auto&& contacts, bool expectedConst) {
+            auto const id = ContactIndex{ {0,1,0}, Direction::plusY() };
+            auto result = contacts.at(id);
+            CHECK(result == ContactReference<false>{ scene, id });
+            CHECK(expectedConst == result.structure().userData().isCalledAsConst());
+        };
+
+        SECTION("// valid - mutable") {
+            runValidTest(mContacts, false);
+        }
+
+        SECTION("// valid - const") {
+            runValidTest(cmContacts, true);
+        }
+
+        SECTION("// valid - immutable") {
+            runValidTest(iContacts, true);
         }
 
         SECTION("// invalid") {
-            ContactIndex id{ {0,0,0}, Direction::plusY() };
-            CHECK_THROWS_AS(contacts.at(id), std::out_of_range);
+            auto const id = ContactIndex{ {0,0,0}, Direction::plusY() };
+            CHECK_THROWS_AS(iContacts.at(id), std::out_of_range);
         }
     }
 
     SECTION(".find()") {
-        ContactIndex id{ {0,2,0}, Direction::minusY() };
-        ContactReference ref = contacts.find(id);
-        CHECK(ref == ContactReference{ scene, id });
+        auto runValidTest = [&](auto&& contacts, bool expectedConst) {
+            ContactIndex id{ {0,2,0}, Direction::minusY() };
+            auto result = contacts.find(id);
+            REQUIRE(result.isValid());
+            CHECK(result == ContactReference<false>{ scene, id });
+            CHECK(expectedConst == result.structure().userData().isCalledAsConst());
+        };
+
+        SECTION("// valid - mutable") {
+            runValidTest(mContacts, false);
+        }
+
+        SECTION("// valid - const") {
+            runValidTest(cmContacts, true);
+        }
+
+        SECTION("// valid - immutable") {
+            runValidTest(iContacts, true);
+        }
+
+        SECTION("// invalid") {
+            auto const id = ContactIndex{ {0,0,0}, Direction::plusY() };
+            auto result = iContacts.find(id);
+            CHECK_FALSE(result.isValid());
+        }
     }
 }

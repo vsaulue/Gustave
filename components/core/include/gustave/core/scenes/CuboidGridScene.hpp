@@ -59,7 +59,7 @@ namespace gustave::core::scenes {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Contacts = cuboidGridScene::Contacts<libCfg, UserData_>;
+        using Contacts = cuboidGridScene::Contacts<libCfg, UserData_, false>;
         using Links = cuboidGridScene::Links<libCfg, UserData_>;
 
         template<bool mut>
@@ -79,7 +79,7 @@ namespace gustave::core::scenes {
 
         using BlockIndex = BlockReference<false>::BlockIndex;
         using ContactIndex = typename Contacts::ContactIndex;
-        using ContactReference = typename Contacts::ContactReference;
+        using ContactReference = Contacts::template ContactReference<false>;
         using Direction = typename Contacts::ContactIndex::Direction;
         using StructureIndex = StructureReference<false>::StructureIndex;
 

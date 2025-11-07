@@ -30,36 +30,61 @@
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
     class Contacts {
     private:
+        template<typename T>
+        using Prop = utils::Prop<isMut_, T>;
+
         using SceneData = detail::SceneData<libCfg, UserData_>;
     public:
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, false>;
+        template<bool mut>
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, mut>;
 
-        using ContactIndex = typename ContactReference::ContactIndex;
+        using ContactIndex = typename ContactReference<false>::ContactIndex;
 
         [[nodiscard]]
-        explicit Contacts(SceneData const& scene)
+        explicit Contacts(Prop<SceneData>& scene)
             : scene_{ &scene }
         {}
 
         [[nodiscard]]
-        ContactReference find(ContactIndex const& index) const {
-            return ContactReference{ *scene_, index };
+        ContactReference<true> at(ContactIndex const& index)
+            requires (isMut_)
+        {
+            return doAt(*this, index);
         }
 
         [[nodiscard]]
-        ContactReference at(ContactIndex const& index) const {
-            ContactReference result{ *scene_, index };
+        ContactReference<false> at(ContactIndex const& index) const {
+            return doAt(*this, index);
+        }
+
+        [[nodiscard]]
+        ContactReference<true> find(ContactIndex const& index)
+            requires (isMut_)
+        {
+            return ContactReference<true>{ *scene_, index };
+        }
+
+        [[nodiscard]]
+        ContactReference<false> find(ContactIndex const& index) const {
+            return ContactReference<false>{ *scene_, index };
+        }
+    private:
+        [[nodiscard]]
+        static auto doAt(meta::cCvRefOf<Contacts> auto&& self, ContactIndex const& index) {
+            using Result = decltype(self.at(index));
+            auto result = Result{ *self.scene_, index };
             if (!result.isValid()) {
                 throw result.invalidError();
             }
             return result;
         }
-    private:
-        SceneData const* scene_;
+
+        Prop<SceneData>* scene_;
     };
 }
