@@ -60,7 +60,7 @@ namespace gustave::core::scenes {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Links = cuboidGridScene::Links<libCfg, UserData_>;
+        using Links = cuboidGridScene::Links<libCfg, UserData_, false>;
 
         template<bool mut>
         using Blocks = cuboidGridScene::Blocks<libCfg, UserData_, mut>;

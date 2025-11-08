@@ -23,25 +23,29 @@
  * SOFTWARE.
  */
 
-#include <vector>
+#include <array>
 
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Links.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 namespace cuboid = ::gustave::core::scenes::cuboidGridScene;
 
-using Links = cuboid::Links<libCfg,void>;
-using SceneData = cuboid::detail::SceneData<libCfg,void>;
-using SceneUpdater = cuboid::detail::SceneUpdater<libCfg,void>;
+template<bool mut>
+using Links = cuboid::Links<libCfg, SceneUserData,mut>;
+
+using SceneData = cuboid::detail::SceneData<libCfg, SceneUserData>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, SceneUserData>;
+
+template<bool mut>
+using ContactReference = Links<false>::ContactReference<mut>;
 
 using BlockIndex = cuboid::BlockIndex;
-using ContactIndex = Links::ContactReference::ContactIndex;
-using ContactReference = Links::ContactReference;
-using Direction = ContactReference::Direction;
+using Direction = ContactReference<false>::Direction;
 using Transaction = SceneUpdater::Transaction;
 
 TEST_CASE("core::scenes::cuboidGridScene::Links") {
@@ -55,19 +59,36 @@ TEST_CASE("core::scenes::cuboidGridScene::Links") {
     t.addBlock({ {2,3,3}, concrete_20m, 1000.f * u.mass, true });
     SceneUpdater{ scene }.runTransaction(t);
 
-    Links links{ scene };
+    auto mLinks = Links<true>{ scene };
+    auto const& cmLinks = mLinks;
+    auto iLinks = Links<false>{ scene };
 
-    auto makeContact = [&](BlockIndex const& index, Direction direction) {
-        return ContactReference{ scene, ContactIndex{ index, direction} };
+    auto makeContact = [&](BlockIndex const& localBlockId, Direction direction) {
+        return ContactReference<false>{ scene, { localBlockId, direction} };
     };
 
     SECTION(".begin() // & .end()") {
-        std::vector<ContactReference> const expected = {
-            makeContact({2,2,2}, Direction::plusX()),
-            makeContact({2,2,2}, Direction::plusY()),
-            makeContact({2,2,2}, Direction::plusZ()),
-            makeContact({2,3,2}, Direction::plusZ()),
+        auto runTest = [&](auto&& links, bool expectedConst) {
+            auto const expected = std::array{
+                makeContact({2,2,2}, Direction::plusX()),
+                makeContact({2,2,2}, Direction::plusY()),
+                makeContact({2,2,2}, Direction::plusZ()),
+                makeContact({2,3,2}, Direction::plusZ()),
+            };
+            REQUIRE_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
+            CHECK(expectedConst == (*links.begin()).structure().userData().isCalledAsConst());
         };
-        CHECK_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
+
+        SECTION("// mutable") {
+            runTest(mLinks, false);
+        }
+
+        SECTION("// const") {
+            runTest(cmLinks, true);
+        }
+
+        SECTION("// immutable") {
+            runTest(iLinks, true);
+        }
     }
 }
