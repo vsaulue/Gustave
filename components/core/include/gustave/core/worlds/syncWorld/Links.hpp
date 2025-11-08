@@ -84,7 +84,7 @@ namespace gustave::core::worlds::syncWorld {
         private:
             void updateValue() {
                 if (!isEnd()) {
-                    value_ = ContactReference{ *links_->world_, sceneIt_->index() };
+                    value_ = ContactReference{ *links_->world_, (*sceneIt_).index() };
                 }
             }
 

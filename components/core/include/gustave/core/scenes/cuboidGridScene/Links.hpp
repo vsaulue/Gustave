@@ -33,21 +33,23 @@
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
-    class Links {
-    public:
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, false>;
-        using ContactIndex = typename ContactReference::ContactIndex;
-    private:
-        using SceneData = detail::SceneData<libCfg, UserData_>;
-        using BlockDataIterator = typename SceneData::Blocks::const_iterator;
-        using InternalLinks = detail::InternalLinks<libCfg, UserData_>;
-        using LinkIterator = typename InternalLinks::Iterator;
-
+    namespace links::detail {
+        template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_, bool isMut_>
         class Enumerator {
+        private:
+            template<typename T>
+            using Prop = utils::Prop<isMut_, T>;
+
+            using InternalLinks = cuboidGridScene::detail::InternalLinks<libCfg, UD_>;
+            using SceneData = cuboidGridScene::detail::SceneData<libCfg, UD_>;
+
+            using BlockDataIterator = typename SceneData::Blocks::const_iterator;
         public:
+            using Value  = cuboidGridScene::ContactReference<libCfg, UD_, isMut_>;
+
             [[nodiscard]]
             Enumerator()
                 : blockIt_{}
@@ -56,12 +58,11 @@ namespace gustave::core::scenes::cuboidGridScene {
             {}
 
             [[nodiscard]]
-            explicit Enumerator(SceneData const& scene)
+            explicit Enumerator(Prop<SceneData>& scene)
                 : scene_{ &scene }
                 , blockIt_{ scene.blocks.begin() }
                 , blockLinks_{ utils::NO_INIT }
                 , internalLinkId_{ 0 }
-                , value_{ utils::NO_INIT }
             {
                 if (blockIt_ != scene_->blocks.end()) {
                     blockLinks_ = InternalLinks{ *scene_, blockIt_->first };
@@ -75,8 +76,9 @@ namespace gustave::core::scenes::cuboidGridScene {
             }
 
             [[nodiscard]]
-            ContactReference const& operator*() const {
-                return value_;
+            Value operator*() const {
+                assert(not isEnd());
+                return Value{ *scene_, { blockIt_->first, blockLinks_[internalLinkId_].direction } };;
             }
 
             [[nodiscard]]
@@ -90,15 +92,12 @@ namespace gustave::core::scenes::cuboidGridScene {
             }
         private:
             void next() {
-                if (internalLinkId_ < blockLinks_.size()) {
-                    updateValue();
-                } else {
+                if (internalLinkId_ >= blockLinks_.size()) {
                     ++blockIt_;
+                    internalLinkId_ = 0;
                     while (blockIt_ != scene_->blocks.end()) {
                         blockLinks_ = InternalLinks{ *scene_, blockIt_->first };
                         if (blockLinks_.size() > 0) {
-                            internalLinkId_ = 0;
-                            updateValue();
                             return;
                         }
                         ++blockIt_;
@@ -106,27 +105,48 @@ namespace gustave::core::scenes::cuboidGridScene {
                 }
             }
 
-            void updateValue() {
-                value_ = ContactReference{ *scene_, ContactIndex{ blockIt_->first, blockLinks_[internalLinkId_].direction } };
-            }
-
-            SceneData const* scene_;
+            Prop<SceneData>* scene_;
             BlockDataIterator blockIt_;
             InternalLinks blockLinks_;
             std::size_t internalLinkId_;
-            ContactReference value_;
         };
+    }
+
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
+    class Links {
     public:
-        using Iterator = utils::ForwardIterator<Enumerator>;
+        template<typename T>
+        using Prop = utils::Prop<isMut_, T>;
+
+        template<typename T>
+        using PropPtr = utils::PropPtr<isMut_, T>;
+
+        template<bool mut>
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, mut>;
+
+        using ContactIndex = ContactReference<false>::ContactIndex;
+    private:
+        using SceneData = detail::SceneData<libCfg, UserData_>;
+
+        template<bool mut>
+        using Enumerator = links::detail::Enumerator<libCfg, UserData_, mut>;
+    public:
+        using ConstIterator = utils::ForwardIterator<Enumerator<false>>;
+        using Iterator = utils::ForwardIterator<Enumerator<isMut_>>;
 
         [[nodiscard]]
-        explicit Links(SceneData const& scene)
+        explicit Links(Prop<SceneData>& scene)
             : scene_{ &scene }
         {}
 
         [[nodiscard]]
-        Iterator begin() const {
+        Iterator begin() {
             return Iterator{ *scene_ };
+        }
+
+        [[nodiscard]]
+        ConstIterator begin() const {
+            return ConstIterator{ *scene_ };
         }
 
         [[nodiscard]]
@@ -134,6 +154,6 @@ namespace gustave::core::scenes::cuboidGridScene {
             return {};
         }
     private:
-        SceneData const* scene_;
+        PropPtr<SceneData> scene_;
     };
 }
