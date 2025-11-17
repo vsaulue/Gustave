@@ -97,13 +97,22 @@ TEST_CASE("core::scenes::CuboidGridScene") {
     }
 
     SECTION(".links()") {
-        auto links = scene.links();
-
-        auto const expected = std::array{
-            scene.contacts().at({ {0,0,0}, Direction::plusX() }),
-            scene.contacts().at({ {1,0,0}, Direction::plusX() }),
+        auto runTest = [&](auto&& links, bool expectedConst) {
+            auto const expected = std::array{
+                scene.contacts().at({ {0,0,0}, Direction::plusX() }),
+                scene.contacts().at({ {1,0,0}, Direction::plusX() }),
+            };
+            REQUIRE_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
+            CHECK(expectedConst == (*links.begin()).structure().userData().isCalledAsConst());
         };
-        CHECK_THAT(links, matchers::c2::UnorderedRangeEquals(expected));
+
+        SECTION("// mutable") {
+            runTest(scene.links(), false);
+        }
+
+        SECTION("// const") {
+            runTest(cScene.links(), true);
+        }
     }
 
     SECTION(".structures()") {
