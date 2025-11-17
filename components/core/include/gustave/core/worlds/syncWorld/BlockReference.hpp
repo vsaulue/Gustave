@@ -67,7 +67,7 @@ namespace gustave::core::worlds::syncWorld {
 
         class Contacts {
         private:
-            using SceneContacts = SceneBlock::Contacts;
+            using SceneContacts = SceneBlock::template Contacts<false>;
 
             class Enumerator {
             private:
@@ -77,17 +77,13 @@ namespace gustave::core::worlds::syncWorld {
                 Enumerator()
                     : contacts_{ nullptr }
                     , sceneIt_{}
-                    , value_{ utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
                 explicit Enumerator(Contacts const& contacts)
                     : contacts_{ &contacts }
                     , sceneIt_{ contacts.sceneContacts_.begin() }
-                    , value_{ utils::NO_INIT }
-                {
-                    updateValue();
-                }
+                {}
 
                 [[nodiscard]]
                 bool isEnd() const {
@@ -95,13 +91,12 @@ namespace gustave::core::worlds::syncWorld {
                 }
 
                 [[nodiscard]]
-                ContactReference const& operator*() const {
-                    return value_;
+                ContactReference operator*() const {
+                    return ContactReference{ *contacts_->world_, (*sceneIt_).index() };
                 }
 
                 void operator++() {
                     ++sceneIt_;
-                    updateValue();
                 }
 
                 [[nodiscard]]
@@ -109,15 +104,8 @@ namespace gustave::core::worlds::syncWorld {
                     return sceneIt_ == other.sceneIt_;
                 }
             private:
-                void updateValue() {
-                    if (!isEnd()) {
-                        value_ = ContactReference{ *contacts_->world_, sceneIt_->index() };
-                    }
-                }
-
                 Contacts const* contacts_;
                 SceneIterator sceneIt_;
-                ContactReference value_;
             };
         public:
             using Iterator = utils::ForwardIterator<Enumerator>;
