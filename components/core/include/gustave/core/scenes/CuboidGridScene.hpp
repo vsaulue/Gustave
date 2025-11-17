@@ -60,7 +60,6 @@ namespace gustave::core::scenes {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Links = cuboidGridScene::Links<libCfg, UserData_, false>;
 
         template<bool mut>
         using Blocks = cuboidGridScene::Blocks<libCfg, UserData_, mut>;
@@ -73,6 +72,9 @@ namespace gustave::core::scenes {
 
         template<bool mut>
         using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, mut>;
+
+        template<bool mut>
+        using Links = cuboidGridScene::Links<libCfg, UserData_, mut>;
 
         template<bool mut>
         using Structures = cuboidGridScene::Structures<libCfg, UserData_, mut>;
@@ -137,8 +139,13 @@ namespace gustave::core::scenes {
         }
 
         [[nodiscard]]
-        Links links() const {
-            return Links{ data_ };
+        Links<true> links() {
+            return Links<true>{ data_ };
+        }
+
+        [[nodiscard]]
+        Links<false> links() const {
+            return Links<false>{ data_ };
         }
 
         [[nodiscard]]

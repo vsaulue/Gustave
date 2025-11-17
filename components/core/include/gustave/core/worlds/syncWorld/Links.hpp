@@ -37,7 +37,7 @@ namespace gustave::core::worlds::syncWorld {
     class Links {
     private:
         using WorldData = detail::WorldData<libCfg>;
-        using SceneLinks = typename WorldData::Scene::Links;
+        using SceneLinks = WorldData::Scene::template Links<false>;
     public:
         using ContactReference = syncWorld::ContactReference<libCfg>;
         using ContactIndex = typename ContactReference::ContactIndex;
