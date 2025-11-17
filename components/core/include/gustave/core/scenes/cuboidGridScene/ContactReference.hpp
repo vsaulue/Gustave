@@ -163,7 +163,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         AsImmutable asImmutable() const
             requires (isMut_)
         {
-            return AsImmutable{ scene_, index_ };
+            return AsImmutable{ *scene_, index_ };
         }
 
         [[nodiscard]]

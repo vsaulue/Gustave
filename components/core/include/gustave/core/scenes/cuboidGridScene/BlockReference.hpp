@@ -33,6 +33,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/blockReference/Contacts.hpp>
 #include <gustave/core/scenes/cuboidGridScene/blockReference/Structures.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
@@ -77,108 +78,19 @@ namespace gustave::core::scenes::cuboidGridScene {
     public:
         using BlockIndex = cuboidGridScene::BlockIndex;
         using Direction = math3d::BasicDirection;
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, false>;
         using PressureStress = model::PressureStress<libCfg>;
+
+        template<bool mut>
+        using Contacts = blockReference::Contacts<libCfg, UserData_, mut>;
+
+        template<bool mut>
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, mut>;
 
         template<bool mut>
         using Structures = blockReference::Structures<libCfg, UserData_, mut>;
 
         template<bool mut>
         using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
-
-        class Contacts {
-        private:
-            using Values = std::array<Direction, 6>;
-            using DirIterator = Values::const_iterator;
-
-            class Enumerator {
-            public:
-                [[nodiscard]]
-                Enumerator()
-                    : contacts_{ nullptr }
-                    , value_ { utils::NO_INIT }
-                    , state_{ 6 }
-                {}
-
-                [[nodiscard]]
-                explicit Enumerator(Contacts const& contacts)
-                    : contacts_{ &contacts }
-                    , value_{ utils::NO_INIT }
-                    , state_{ 0 }
-                {
-                    next();
-                }
-
-                [[nodiscard]]
-                bool isEnd() const {
-                    return state_ >= 6;
-                }
-
-                void operator++() {
-                    ++state_;
-                    next();
-                }
-
-                [[nodiscard]]
-                ContactReference const& operator*() const {
-                    return value_;
-                }
-
-                [[nodiscard]]
-                bool operator==(Enumerator const& other) const {
-                    return (contacts_ == other.contacts_) && (state_ == other.state_);
-                }
-            private:
-                void next() {
-                    while (!isEnd()) {
-                        value_ = contacts_->alongUnchecked(static_cast<Direction::Id>(state_));
-                        if (value_.isValid()) {
-                            return;
-                        }
-                        state_++;
-                    }
-                }
-
-                Contacts const* contacts_;
-                ContactReference value_;
-                int state_;
-            };
-        public:
-            using Iterator = utils::ForwardIterator<Enumerator>;
-
-            [[nodiscard]]
-            explicit Contacts(BlockReference const& source)
-                : scene_{ source.sceneData_ }
-                , index_{ source.index_ }
-            {}
-
-            [[nodiscard]]
-            ContactReference along(Direction direction) const {
-                ContactReference result = alongUnchecked(direction);
-                if (!result.isValid()) {
-                    throw result.invalidError();
-                }
-                return result;
-            }
-
-            [[nodiscard]]
-            Iterator begin() const {
-                return Iterator{ *this };
-            }
-
-            [[nodiscard]]
-            utils::EndIterator end() const {
-                return {};
-            }
-        private:
-            [[nodiscard]]
-            ContactReference alongUnchecked(Direction direction) const {
-                return ContactReference{ *scene_, { index_, direction } };
-            }
-
-            SceneData const* scene_;
-            BlockIndex index_;
-        };
 
         [[nodiscard]]
         explicit BlockReference(Prop<SceneData>& sceneData, BlockIndex const& index)
@@ -238,8 +150,15 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        Contacts contacts() const {
-            return Contacts{ *this };
+        Contacts<true> contacts()
+            requires (isMut_)
+        {
+            return Contacts<true>{ *sceneData_, index_ };
+        }
+
+        [[nodiscard]]
+        Contacts<false> contacts() const {
+            return Contacts<false>{ *sceneData_, index_ };
         }
 
         [[nodiscard]]

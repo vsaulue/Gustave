@@ -44,125 +44,110 @@ namespace {
     };
 }
 
-using BlockReference = cuboidGrid::BlockReference<libCfg, UserData, true>;
+template<bool mut>
+using BlockReference = cuboidGrid::BlockReference<libCfg, UserData, mut>;
 using SceneData = cuboidGrid::detail::SceneData<libCfg, UserData>;
 using SceneUpdater = cuboidGrid::detail::SceneUpdater<libCfg, UserData>;
 
-using BlockIndex = BlockReference::BlockIndex;
-using ContactIndex = BlockReference::ContactReference::ContactIndex;
-using ContactReference = BlockReference::ContactReference;
-using Direction = BlockReference::Direction;
-using StructureReference = BlockReference::StructureReference<false>;
+using BlockIndex = BlockReference<false>::BlockIndex;
+using ContactIndex = BlockReference<false>::ContactReference<false>::ContactIndex;
+using Direction = ContactIndex::Direction;
 using Transaction = SceneUpdater::Transaction;
 
-static_assert(std::ranges::forward_range<BlockReference::Contacts>);
-
-static_assert(gustave::testing::cPropPtr<BlockReference>);
+static_assert(gustave::testing::cPropPtr<BlockReference<true>>);
 
 TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
     SceneData sceneData{ blockSize };
 
-    Transaction t;
-    auto newBlock = [&](BlockIndex const& index, Real<u.mass> mass, bool isFoundation) -> BlockReference {
-        t.addBlock({ index, concrete_20m, mass, isFoundation });
-        return BlockReference{ sceneData, index };
+    {
+        Transaction t;
+        t.addBlock({ {1,1,1}, concrete_20m, 1000.f * u.mass, false });
+        t.addBlock({ {1,1,2}, concrete_20m, 9000.f * u.mass, true });
+        t.addBlock({ {1,1,3}, concrete_20m, 2000.f * u.mass, false });
+        SceneUpdater{ sceneData }.runTransaction(t);
+    }
+
+    auto deleteBlock = [&](BlockIndex const& blockId) {
+        Transaction t;
+        t.removeBlock(blockId);
+        SceneUpdater{ sceneData }.runTransaction(t);
     };
-    BlockReference b000 = newBlock({ 0,0,0 }, 1000.f * u.mass, true);
-    BlockReference b111 = newBlock({ 1,1,1 }, 3000.f * u.mass, false);
-    /* b011 */ newBlock({0,1,1}, 4000.f * u.mass, false);
-    BlockReference b211 = newBlock({ 2,1,1 }, 5000.f * u.mass, false);
-    BlockReference b101 = newBlock({ 1,0,1 }, 6000.f * u.mass, false);
-    BlockReference b121 = newBlock({ 1,2,1 }, 7000.f * u.mass, true);
-    /* b110 */ newBlock({1,1,0}, 8000.f * u.mass, false);
-    BlockReference b112 = newBlock({ 1,1,2 }, 9000.f * u.mass, true);
-    /* b122 */ newBlock({1,2,2}, 2000.f * u.mass, false);
-    SceneUpdater{ sceneData }.runTransaction(t);
+
+    auto mb112 = BlockReference<true>{ sceneData, {1,1,2} };
+    auto const& cmb112 = mb112;
+    auto ib112 = BlockReference<false>{ sceneData, {1,1,2} };
 
     SECTION(".blockSize()") {
-        CHECK(b101.blockSize() == blockSize);
+        CHECK(ib112.blockSize() == blockSize);
     }
 
     SECTION(".contacts()") {
-        auto makeContactRef = [&](BlockReference const& source, Direction direction) {
-            return ContactReference{ sceneData, ContactIndex{ source.index(), direction}};
+        auto runTest = [&](auto&& blockRef, bool expectedConst) {
+            auto contactRef = blockRef.contacts().along(Direction::minusZ());
+            REQUIRE(contactRef.isValid());
+            CHECK(contactRef.index() == ContactIndex{ blockRef.index(), Direction::minusZ()});
+            CHECK(expectedConst == contactRef.structure().userData().isCalledAsConst());
         };
 
-        SECTION(".along()") {
-            SECTION("// valid") {
-                ContactReference contact = b121.contacts().along(Direction::minusY());
-                CHECK(contact == makeContactRef(b121, Direction::minusY()));
-            }
-
-            SECTION("// invalid") {
-                CHECK_THROWS_AS(b121.contacts().along(Direction::plusY()), std::out_of_range);
-            }
+        SECTION("// mutable") {
+            runTest(mb112, false);
         }
 
-        SECTION(".begin() // & .end()") {
-            SECTION("// empty") {
-                auto contacts = b000.contacts();
-                CHECK(contacts.begin() == contacts.end());
-            }
+        SECTION("// const") {
+            runTest(cmb112, true);
+        }
 
-            SECTION("// 6 contacts") {
-                std::vector<ContactReference> expected = {
-                    makeContactRef(b111, Direction::minusX()),
-                    makeContactRef(b111, Direction::plusX()),
-                    makeContactRef(b111, Direction::minusY()),
-                    makeContactRef(b111, Direction::plusY()),
-                    makeContactRef(b111, Direction::minusZ()),
-                    makeContactRef(b111, Direction::plusZ()),
-                };
-                CHECK_THAT(b111.contacts(), matchers::c2::UnorderedRangeEquals(expected));
-            }
+        SECTION("// immutable") {
+            runTest(ib112, true);
         }
     }
 
     SECTION(".index()") {
-        CHECK(b121.index() == BlockIndex{ 1,2,1 });
+        CHECK(ib112.index() == BlockIndex{ 1,1,2 });
     }
 
     SECTION(".isFoundation()") {
         SECTION("// valid") {
-            CHECK_FALSE(b111.isFoundation());
+            CHECK(ib112.isFoundation());
         }
 
         SECTION("// invalid") {
-            sceneData.blocks.erase({ 1,1,1 });
-            CHECK_THROWS_AS(b111.isFoundation() == false, std::out_of_range);
+            sceneData.blocks.erase({ 1,1,2 });
+            CHECK_THROWS_AS(ib112.isFoundation(), std::out_of_range);
         }
     }
 
     SECTION(".isValid()") {
-        REQUIRE(b111.isValid());
-        sceneData.blocks.erase(b111.index());
-        REQUIRE_FALSE(b111.isValid());
+        REQUIRE(ib112.isValid());
+        deleteBlock(ib112.index());
+        REQUIRE_FALSE(ib112.isValid());
     }
 
     SECTION(".mass()") {
         SECTION("// valid") {
-            CHECK(b111.mass() == 3000.f * u.mass);
+            CHECK(ib112.mass() == 9000.f * u.mass);
         }
+
         SECTION("// invalid") {
-            sceneData.blocks.erase({ 1,1,1 });
-            CHECK_THROWS_AS(b111.mass(), std::out_of_range);
+            sceneData.blocks.erase({ 1,1,2 });
+            CHECK_THROWS_AS(ib112.mass(), std::out_of_range);
         }
     }
 
     SECTION(".maxPressureStress()") {
         SECTION("// valid") {
-            CHECK(b111.maxPressureStress() == concrete_20m);
+            CHECK(ib112.maxPressureStress() == concrete_20m);
         }
 
         SECTION("// invalid") {
-            sceneData.blocks.erase({ 1,1,1 });
-            CHECK_THROWS_AS(b111.maxPressureStress() == concrete_20m, std::out_of_range);
+            deleteBlock(ib112.index());
+            CHECK_THROWS_AS(ib112.maxPressureStress(), std::out_of_range);
         }
     }
 
     SECTION(".position()") {
-        CHECK(b211.position() == vector3(4.f, 3.f, 1.f, u.length));
+        CHECK(ib112.position() == vector3(2.f, 3.f, 2.f, u.length));
     }
 
     SECTION(".structures()") {
@@ -175,16 +160,15 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
         };
 
         SECTION("// mutable") {
-            runTest(b112, false);
+            runTest(mb112, false);
         }
 
         SECTION("// const") {
-            auto const& cb112 = b112;
-            runTest(cb112, true);
+            runTest(cmb112, true);
         }
 
         SECTION("// immutable") {
-            runTest(b112.asImmutable(), true);
+            runTest(ib112, true);
         }
     }
 }
