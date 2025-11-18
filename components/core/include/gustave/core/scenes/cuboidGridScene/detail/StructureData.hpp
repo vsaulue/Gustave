@@ -141,6 +141,11 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
+        SceneData& sceneData() {
+            return *scene_;
+        }
+
+        [[nodiscard]]
         SceneData const& sceneData() const {
             return *scene_;
         }
