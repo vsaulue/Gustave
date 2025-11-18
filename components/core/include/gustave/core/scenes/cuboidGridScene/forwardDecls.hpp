@@ -48,6 +48,11 @@ namespace gustave::core::scenes::cuboidGridScene {
         class Structures;
     }
 
+    namespace structureReference {
+        template<cfg::cLibConfig auto, common::cSceneUserData, bool>
+        class Blocks;
+    }
+
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
     class BlockReference;
 
