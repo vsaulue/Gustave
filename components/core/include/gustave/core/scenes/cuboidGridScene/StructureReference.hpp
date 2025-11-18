@@ -39,6 +39,7 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/structureReference/Blocks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
@@ -80,114 +81,8 @@ namespace gustave::core::scenes::cuboidGridScene {
         using ContactIndex = typename ContactReference::ContactIndex;
         using StructureIndex = cfg::StructureIndex<cfg>;
 
-        class Blocks {
-        private:
-            using DataIterator = typename StructureData::SolverIndices::const_iterator;
-
-            class Enumerator {
-            public:
-                [[nodiscard]]
-                Enumerator()
-                    : structureData_{ nullptr }
-                    , dataIterator_{}
-                    , value_{ utils::NO_INIT }
-                {}
-
-                [[nodiscard]]
-                explicit Enumerator(StructureData const& structureData)
-                    : structureData_{ &structureData }
-                    , dataIterator_{ structureData.solverIndices().begin() }
-                    , value_{ utils::NO_INIT }
-                {
-                    updateValue();
-                }
-
-                [[nodiscard]]
-                bool isEnd() const {
-                    return dataIterator_ == structureData_->solverIndices().end();
-                }
-
-                void operator++() {
-                    ++dataIterator_;
-                    updateValue();
-                }
-
-                [[nodiscard]]
-                BlockReference const& operator*() const {
-                    return value_;
-                }
-
-                [[nodiscard]]
-                bool operator==(Enumerator const& other) const {
-                    return dataIterator_ == other.dataIterator_;
-                }
-            private:
-                void updateValue() {
-                    if (!isEnd()) {
-                        value_ = BlockReference{ structureData_->sceneData(), dataIterator_->first };
-                    }
-                }
-
-                StructureData const* structureData_;
-                DataIterator dataIterator_;
-                BlockReference value_;
-            };
-        public:
-            using Iterator = utils::ForwardIterator<Enumerator>;
-
-            [[nodiscard]]
-            explicit Blocks(StructureData const& data)
-                : data_{ &data }
-            {}
-
-            [[nodiscard]]
-            BlockReference at(BlockIndex const& index) const {
-                auto it = data_->solverIndices().find(index);
-                if (it == data_->solverIndices().end()) {
-                    std::stringstream msg;
-                    msg << "Structure does not contain the block at " << index << '.';
-                    throw std::out_of_range(msg.str());
-                }
-                return BlockReference{ data_->sceneData(), index };
-            }
-
-            [[nodiscard]]
-            Iterator begin() const {
-                return Iterator{ *data_ };
-            }
-
-            [[nodiscard]]
-            bool contains(BlockIndex const& index) const {
-                return data_->solverIndices().contains(index);
-            }
-
-            [[nodiscard]]
-            constexpr utils::EndIterator end() const {
-                return {};
-            }
-
-            [[nodiscard]]
-            std::optional<BlockReference> find(BlockIndex const& index) const {
-                auto it = data_->solverIndices().find(index);
-                if (it == data_->solverIndices().end()) {
-                    return {};
-                } else {
-                    return BlockReference{ data_->sceneData(), index };
-                }
-            }
-
-            [[nodiscard]]
-            std::size_t size() const {
-                return data_->solverIndices().size();
-            }
-        private:
-            [[nodiscard]]
-            BlockReference blockAt(DataIterator const& dataIterator) const {
-                return BlockReference{ data_->sceneData(), dataIterator->first() };
-            }
-
-            StructureData const* data_;
-        };
+        template<bool mut>
+        using Blocks = structureReference::Blocks<cfg, UserData_, mut>;
 
         class Contacts {
         public:
@@ -389,8 +284,15 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        Blocks blocks() const {
-            return Blocks{ *data_ };
+        Blocks<true> blocks()
+            requires (isMutable_)
+        {
+            return Blocks<true>{ *data_ };
+        }
+
+        [[nodiscard]]
+        Blocks<false> blocks() const {
+            return Blocks<false>{ *data_ };
         }
 
         [[nodiscard]]

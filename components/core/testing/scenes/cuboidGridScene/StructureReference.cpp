@@ -52,7 +52,6 @@ using ContactReference = StructureReference<true>::ContactReference;
 using Direction = StructureReference<true>::ContactIndex::Direction;
 using Transaction = SceneUpdater::Transaction;
 
-static_assert(std::ranges::forward_range<StructureReference<true>::Blocks>);
 static_assert(std::ranges::forward_range<StructureReference<true>::Links>);
 
 static_assert(gustave::testing::cPropPtr<StructureReference<true>>);
@@ -84,106 +83,83 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         SceneUpdater{ data }.runTransaction(t);
     }
 
-    auto structureOf = [&](BlockIndex const& index) -> StructureReference<true> {
-        auto const blockDataRef = data.blocks.find(index);
+    auto structureDataOf = [&](BlockIndex const& blockId) {
+        auto const blockDataRef = data.blocks.find(blockId);
         REQUIRE(blockDataRef);
         auto const structId = blockDataRef.structureId();
         REQUIRE(structId != data.structureIdGenerator.invalidIndex());
-        return StructureReference<true>{ data.structures.atShared(structId) };
+        return data.structures.atShared(structId);
     };
 
     auto makeContactRef = [&](BlockIndex const& source, Direction direction) {
         return ContactReference{ data, ContactIndex{ source, direction } };
     };
 
-    auto s1 = structureOf({ 1,0,0 });
-    auto s3 = structureOf({ 3,0,0 });
-    auto s666 = structureOf({ 6,6,6, });
+    auto ms1 = StructureReference<true>{ structureDataOf({ 1,0,0 }) };
+    auto is1 = StructureReference<false>{ structureDataOf({ 1,0,0 }) };
+
+    auto ms3 = StructureReference<true>{ structureDataOf({ 3,0,0 }) };
+    auto const& cms3 = ms3;
+    auto is3 = StructureReference<false>{ structureDataOf({ 3,0,0 }) };
+
+    auto s666 = StructureReference<false>{ structureDataOf({ 6,6,6 }) };
     auto sInvalid = StructureReference<true>{ gustave::utils::NO_INIT };
 
     SECTION(".blocks()") {
-        SECTION(".at()") {
-            SECTION("// valid") {
-                BlockReference r4 = s3.blocks().at({ 4,0,0 });
-                CHECK(r4.mass() == 4000.f * u.mass);
-            }
+        auto runTest = [&](auto&& structRef, bool expectedConst) {
+            auto blocks = structRef.blocks();
+            auto bRef = blocks.at({ 3,0,0 });
+            REQUIRE(bRef.isValid());
+            CHECK(bRef.mass() == 3000.f * u.mass);
+            CHECK(expectedConst == bRef.structures()[0].userData().isCalledAsConst());
+        };
 
-            SECTION("// invalid") {
-                auto const blocks = s3.blocks();
-                CHECK_THROWS_AS(blocks.at({ 1,0,0 }), std::out_of_range);
-            }
+        SECTION("// mutable") {
+            runTest(ms3, false);
         }
 
-        SECTION(".begin() // & end()") {
-            std::vector<BlockIndex> blocks;
-            for (auto const& block : s1.blocks()) {
-                blocks.push_back(block.index());
-            }
-            std::vector<BlockIndex> expected = { {1,0,0},{2,0,0} };
-            CHECK_THAT(blocks, matchers::c2::UnorderedRangeEquals(expected));
+        SECTION("// const") {
+            runTest(cms3, true);
         }
 
-        SECTION(".contains()") {
-            SECTION("// true") {
-                CHECK(s1.blocks().contains({ 2,0,0 }));
-            }
-
-            SECTION("// false") {
-                CHECK_FALSE(s3.blocks().contains({ 1,0,0 }));
-            }
-        }
-
-        SECTION(".find()") {
-            SECTION("// valid") {
-                auto optBlock = s3.blocks().find({ 2,0,0 });
-                REQUIRE(optBlock);
-                CHECK(optBlock->isFoundation());
-            }
-
-            SECTION("// invalid") {
-                auto optBlock = s3.blocks().find({ 1,0,0 });
-                CHECK_FALSE(optBlock);
-            }
-        }
-
-        SECTION(".size()") {
-            CHECK(s3.blocks().size() == 3);
+        SECTION("// immutable") {
+            runTest(is3, true);
         }
     }
 
     SECTION(".contacts()") {
         SECTION(".at()") {
             SECTION("// valid") {
-                ContactReference contact = s1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() });
+                ContactReference contact = is1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() });
                 CHECK(contact == makeContactRef({ 1,0,0 }, Direction::plusX()));
             }
 
             SECTION("// invalid source") {
-                CHECK_THROWS_AS(s1.contacts().at(ContactIndex{ {0,0,0}, Direction::plusX() }), std::out_of_range);
+                CHECK_THROWS_AS(is1.contacts().at(ContactIndex{ {0,0,0}, Direction::plusX() }), std::out_of_range);
             }
 
             SECTION("// invalid other") {
-                CHECK_THROWS_AS(s1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusY() }), std::out_of_range);
+                CHECK_THROWS_AS(is1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusY() }), std::out_of_range);
             }
 
             SECTION("// invalid structure") {
-                CHECK_THROWS_AS(s3.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() }), std::out_of_range);
+                CHECK_THROWS_AS(is3.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() }), std::out_of_range);
             }
         }
     }
 
     SECTION(".index()") {
         SECTION("// valid") {
-            auto const res = s1.index();
+            auto const res = is1.index();
             CHECK(res != data.structureIdGenerator.invalidIndex());
         }
 
         SECTION("// invalidated") {
-            auto const expected = s1.index();
+            auto const expected = is1.index();
             Transaction t;
             t.removeBlock({ 1,0,0 });
             SceneUpdater{ data }.runTransaction(t);
-            CHECK(s1.index() == expected);
+            CHECK(is1.index() == expected);
         }
 
         SECTION("// invalid index") {
@@ -194,14 +170,14 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
 
     SECTION(".isValid()") {
         SECTION("// true") {
-            CHECK(s1.isValid());
+            CHECK(is1.isValid());
         }
 
         SECTION("// false") {
             Transaction t;
             t.removeBlock({ 1,0,0 });
             SceneUpdater{ data }.runTransaction(t);
-            CHECK_FALSE(s1.isValid());
+            CHECK_FALSE(is1.isValid());
         }
     }
 
@@ -224,15 +200,15 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
 
     SECTION(".solverIndexOf() ") {
         SECTION("// invalid") {
-            auto opt = s3.solverIndexOf({ 1,0,0 });
+            auto opt = is3.solverIndexOf({ 1,0,0 });
             CHECK_FALSE(opt);
         }
 
         SECTION("// & .solverStructurePtr()") {
-            auto const& solver3 = *s3.solverStructurePtr();
-            auto const optIndex2 = s3.solverIndexOf({ 2,0,0 });
-            auto const optIndex3 = s3.solverIndexOf({ 3,0,0 });
-            auto const optIndex4 = s3.solverIndexOf({ 4,0,0 });
+            auto const& solver3 = *is3.solverStructurePtr();
+            auto const optIndex2 = is3.solverIndexOf({ 2,0,0 });
+            auto const optIndex3 = is3.solverIndexOf({ 3,0,0 });
+            auto const optIndex4 = is3.solverIndexOf({ 4,0,0 });
             REQUIRE(optIndex2);
             REQUIRE(optIndex3);
             REQUIRE(optIndex4);
@@ -258,30 +234,32 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         }
 
         SECTION("// valid") {
-            auto const& cs1 = s1;
-            CHECK_FALSE(s1.userData().isCalledAsConst());
-            CHECK(cs1.userData().isCalledAsConst());
-            s1.userData().tag = 5;
-            CHECK(cs1.userData().tag == 5);
-            CHECK(s3.userData().tag == 0);
+            CHECK_FALSE(ms3.userData().isCalledAsConst());
+            CHECK(cms3.userData().isCalledAsConst());
+            CHECK(is3.userData().isCalledAsConst());
+            ms3.userData().tag = 5;
+            CHECK(is3.userData().tag == 5);
+            CHECK(is1.userData().tag == 0);
         }
     }
 
     SECTION(".operator==()") {
-        auto const is3 = s3.asImmutable();
-        auto const is1 = s1.asImmutable();
         SECTION("// mutable == immutable") {
-            CHECK(is3 == s3);
-            CHECK(s3 == is3);
+            CHECK(is3 == cms3);
+            CHECK(cms3 == is3);
+            CHECK(is1 != cms3);
+            CHECK(ms1 != is3);
             CHECK(is3 != sInvalid);
         }
 
         SECTION("// immutable == immutable") {
+            CHECK(is1 == is1);
             CHECK(is3 != is1);
         }
 
         SECTION("// mutable == mutable") {
-            CHECK(s1 != s3);
+            CHECK(ms3 == ms3);
+            CHECK(ms1 != ms3);
         }
     }
 }
