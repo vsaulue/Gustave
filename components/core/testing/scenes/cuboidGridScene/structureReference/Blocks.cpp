@@ -48,7 +48,7 @@ using Transaction = SceneUpdater::Transaction;
 static_assert(std::ranges::forward_range<Blocks<true>>);
 static_assert(std::ranges::forward_range<Blocks<false>>);
 
-TEST_CASE("core::scenes::cuboidGridScene::blockReference::Blocks") {
+TEST_CASE("core::scenes::cuboidGridScene::structureReference::Blocks") {
     auto const blockSize = vector3(1.f, 1.f, 1.f, u.length);
     SceneData scene{ blockSize };
 
