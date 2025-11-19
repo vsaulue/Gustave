@@ -34,6 +34,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/Prop.hpp>

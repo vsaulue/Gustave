@@ -52,6 +52,7 @@ function(add_distrib_unit_test)
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/SceneUpdater.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/structureReference/Blocks.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/structureReference/Contacts.cpp"
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/structureReference/Links.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/Links.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/StructureReference.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/Structures.cpp"
