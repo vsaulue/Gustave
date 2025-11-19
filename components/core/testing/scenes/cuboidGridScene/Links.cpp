@@ -48,6 +48,9 @@ using BlockIndex = cuboid::BlockIndex;
 using Direction = ContactReference<false>::Direction;
 using Transaction = SceneUpdater::Transaction;
 
+static_assert(std::ranges::forward_range<Links<false>>);
+static_assert(std::ranges::forward_range<Links<true>>);
+
 TEST_CASE("core::scenes::cuboidGridScene::Links") {
     SceneData scene{ vector3(1.f, 2.f, 3.f, u.length) };
 
