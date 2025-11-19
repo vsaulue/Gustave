@@ -54,6 +54,9 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         template<cfg::cLibConfig auto, common::cSceneUserData, bool>
         class Contacts;
+
+        template<cfg::cLibConfig auto, common::cSceneUserData, bool>
+        class Links;
     }
 
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>

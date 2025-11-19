@@ -176,8 +176,8 @@ namespace gustave::core::worlds::syncWorld {
 
         class Links {
         private:
-            using SceneStructLinks = typename WorldData::Scene::template StructureReference<false>::Links;
-            using SceneIterator = typename SceneStructLinks::Iterator;
+            using SceneStructLinks = WorldData::Scene::template StructureReference<false>::template Links<false>;
+            using SceneIterator = SceneStructLinks::Iterator;
 
             class Enumerator {
             public:
@@ -185,17 +185,13 @@ namespace gustave::core::worlds::syncWorld {
                 Enumerator()
                     : links_{ nullptr }
                     , sceneIterator_{}
-                    , value_{ utils::NO_INIT }
                 {}
 
                 [[nodiscard]]
                 explicit Enumerator(Links const& links)
                     : links_{ &links }
                     , sceneIterator_{ links.sceneLinks_.begin() }
-                    , value_{ utils::NO_INIT }
-                {
-                    updateValue();
-                }
+                {}
 
                 [[nodiscard]]
                 bool isEnd() const {
@@ -203,13 +199,12 @@ namespace gustave::core::worlds::syncWorld {
                 }
 
                 [[nodiscard]]
-                ContactReference const& operator*() const {
-                    return value_;
+                ContactReference operator*() const {
+                    return ContactReference{ links_->structure_->world(), (*sceneIterator_).index() };
                 }
 
                 void operator++() {
                     ++sceneIterator_;
-                    updateValue();
                 }
 
                 [[nodiscard]]
@@ -217,15 +212,8 @@ namespace gustave::core::worlds::syncWorld {
                     return sceneIterator_ == other.sceneIterator_;
                 }
             private:
-                void updateValue() {
-                    if (!isEnd()) {
-                        value_ = ContactReference{ links_->structure_->world(), sceneIterator_->index() };
-                    }
-                }
-
                 Links const* links_;
                 SceneIterator sceneIterator_;
-                ContactReference value_;
             };
         public:
             using Iterator = utils::ForwardIterator<Enumerator>;

@@ -36,11 +36,10 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/common/UserDataTraits.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/structureReference/Blocks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/structureReference/Contacts.hpp>
+#include <gustave/core/scenes/cuboidGridScene/structureReference/Links.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
@@ -58,9 +57,6 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<cfg::cLibConfig auto, common::cSceneUserData, bool>
         friend class StructureReference;
 
-        using BlockData = detail::BlockData<cfg>;
-        using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
-
         using SceneData = detail::SceneData<cfg, UserData_>;
         using StructureData = SceneData::StructureData;
 
@@ -69,18 +65,19 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         template<typename T>
         using Prop = utils::Prop<isMutable_, T>;
-    public:
-        using UDTraits = common::UserDataTraits<UserData_>;
 
-        using BlockReference = cuboidGridScene::BlockReference<cfg, UserData_, false>;
-        using ContactReference = cuboidGridScene::ContactReference<cfg, UserData_, false>;
+        using UDTraits = common::UserDataTraits<UserData_>;
+    public:
         using SolverStructure = solvers::Structure<cfg>;
         using NodeIndex = cfg::NodeIndex<cfg>;
         using UserDataMember = UDTraits::StructureMember;
 
-        using BlockIndex = typename BlockReference::BlockIndex;
-        using ContactIndex = typename ContactReference::ContactIndex;
+        using BlockIndex = cuboidGridScene::BlockIndex;
+        using ContactIndex = cuboidGridScene::ContactIndex;
         using StructureIndex = cfg::StructureIndex<cfg>;
+
+        template<bool mut>
+        using BlockReference = cuboidGridScene::BlockReference<cfg, UserData_, mut>;
 
         template<bool mut>
         using Blocks = structureReference::Blocks<cfg, UserData_, mut>;
@@ -88,108 +85,11 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<bool mut>
         using Contacts = structureReference::Contacts<cfg, UserData_, mut>;
 
-        class Links {
-        private:
-            using InternalLinks = detail::InternalLinks<cfg, UserData_>;
-            using SolverIndexIterator = typename StructureData::SolverIndices::const_iterator;
+        template<bool mut>
+        using ContactReference = cuboidGridScene::ContactReference<cfg, UserData_, mut>;
 
-            class Enumerator {
-            public:
-                Enumerator()
-                    : structure_{ nullptr }
-                    , solverIndexIt_{}
-                    , internalLinks_{ utils::NO_INIT }
-                    , linkIndex_{ 0 }
-                    , value_{ utils::NO_INIT }
-                {}
-
-                explicit Enumerator(StructureData const& structure)
-                    : structure_{ &structure }
-                    , solverIndexIt_{ structure.solverIndices().begin() }
-                    , internalLinks_{ utils::NO_INIT }
-                    , linkIndex_{ 0 }
-                    , value_{ utils::NO_INIT }
-                {
-                    if (!isEnd()) {
-                        updateInternalLinks();
-                        next();
-                    }
-                }
-
-                void operator++() {
-                    ++linkIndex_;
-                    next();
-                }
-
-                [[nodiscard]]
-                ContactReference const& operator*() const {
-                    return value_;
-                }
-
-                [[nodiscard]]
-                bool isEnd() const {
-                    return solverIndexIt_ == structure_->solverIndices().end();
-                }
-
-                [[nodiscard]]
-                bool operator==(Enumerator const& other) const {
-                    return (solverIndexIt_ == other.solverIndexIt_) && (linkIndex_ == other.linkIndex_);
-                }
-            private:
-                void next() {
-                    auto const structId = structure_->index();
-                    while (true) {
-                        while (linkIndex_ < internalLinks_.size()) {
-                            if ((structId == internalLinks_.source().structureId()) || (structId == internalLinks_[linkIndex_].otherBlock.structureId())) {
-                                return updateValue();
-                            }
-                            ++linkIndex_;
-                        }
-                        ++solverIndexIt_;
-                        if (!isEnd()) {
-                            updateInternalLinks();
-                            linkIndex_ = 0;
-                        } else {
-                            return;
-                        }
-                    }
-                }
-
-                void updateInternalLinks() {
-                    internalLinks_ = InternalLinks{ structure_->sceneData(), solverIndexIt_->first };
-                }
-
-                void updateValue() {
-                    ContactIndex index{ solverIndexIt_->first, internalLinks_[linkIndex_].direction };
-                    value_ = ContactReference{ structure_->sceneData(), index };
-                }
-
-                StructureData const* structure_;
-                SolverIndexIterator solverIndexIt_;
-                InternalLinks internalLinks_;
-                std::size_t linkIndex_;
-                ContactReference value_;
-            };
-        public:
-            using Iterator = utils::ForwardIterator<Enumerator>;
-
-            [[nodiscard]]
-            explicit Links(StructureData const& structure)
-                : structure_{ &structure }
-            {}
-
-            [[nodiscard]]
-            Iterator begin() const {
-                return Iterator{ *structure_ };
-            }
-
-            [[nodiscard]]
-            utils::EndIterator end() const {
-                return {};
-            }
-        private:
-            StructureData const* structure_;
-        };
+        template<bool mut>
+        using Links = structureReference::Links<cfg, UserData_, mut>;
 
         [[nodiscard]]
         explicit StructureReference(PropSharedPtr<StructureData> data)
@@ -303,8 +203,15 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        Links links() const {
-            return Links{ *data_ };
+        Links<true> links()
+            requires (isMutable_)
+        {
+            return Links<true>{ *data_ };
+        }
+
+        [[nodiscard]]
+        Links<false> links() const {
+            return Links<false>{ *data_ };
         }
 
         [[nodiscard]]

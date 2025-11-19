@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
+#include <array>
 #include <ranges>
-#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -42,17 +42,14 @@ struct UserData {
 
 template<bool isMutable>
 using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg, UserData, isMutable>;
+
 using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, UserData>;
 using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, UserData>;
 
 using BlockIndex = StructureReference<true>::BlockIndex;
-using BlockReference = StructureReference<true>::BlockReference;
 using ContactIndex = StructureReference<true>::ContactIndex;
-using ContactReference = StructureReference<true>::ContactReference;
-using Direction = StructureReference<true>::ContactIndex::Direction;
+using Direction = ContactIndex::Direction;
 using Transaction = SceneUpdater::Transaction;
-
-static_assert(std::ranges::forward_range<StructureReference<true>::Links>);
 
 static_assert(gustave::testing::cPropPtr<StructureReference<true>>);
 
@@ -66,20 +63,6 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         t.addBlock({ {2,0,0}, concrete_20m, 2000.f * u.mass, true });
         t.addBlock({ {3,0,0}, concrete_20m, 3000.f * u.mass, false });
         t.addBlock({ {4,0,0}, concrete_20m, 4000.f * u.mass, false });
-
-        t.addBlock({ {5,6,6}, concrete_20m, 2000.f * u.mass, true });
-        t.addBlock({ {6,5,6}, concrete_20m, 2000.f * u.mass, true });
-        t.addBlock({ {6,6,5}, concrete_20m, 2000.f * u.mass, true });
-        t.addBlock({ {6,6,6}, concrete_20m, 2000.f * u.mass, false });
-        t.addBlock({ {6,6,7}, concrete_20m, 2000.f * u.mass, false });
-        t.addBlock({ {6,6,8}, concrete_20m, 2000.f * u.mass, true });
-        t.addBlock({ {6,6,9}, concrete_20m, 2000.f * u.mass, false });
-        t.addBlock({ {6,7,6}, concrete_20m, 2000.f * u.mass, false });
-        t.addBlock({ {6,8,6}, concrete_20m, 2000.f * u.mass, true });
-        t.addBlock({ {6,9,6}, concrete_20m, 2000.f * u.mass, false });
-        t.addBlock({ {7,6,6}, concrete_20m, 2000.f * u.mass, false });
-        t.addBlock({ {8,6,6}, concrete_20m, 2000.f * u.mass, true });
-        t.addBlock({ {9,6,6}, concrete_20m, 2000.f * u.mass, false });
         SceneUpdater{ data }.runTransaction(t);
     }
 
@@ -91,10 +74,6 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         return data.structures.atShared(structId);
     };
 
-    auto makeContactRef = [&](BlockIndex const& source, Direction direction) {
-        return ContactReference{ data, ContactIndex{ source, direction } };
-    };
-
     auto ms1 = StructureReference<true>{ structureDataOf({ 1,0,0 }) };
     auto is1 = StructureReference<false>{ structureDataOf({ 1,0,0 }) };
 
@@ -102,7 +81,6 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
     auto const& cms3 = ms3;
     auto is3 = StructureReference<false>{ structureDataOf({ 3,0,0 }) };
 
-    auto s666 = StructureReference<false>{ structureDataOf({ 6,6,6 }) };
     auto sInvalid = StructureReference<true>{ gustave::utils::NO_INIT };
 
     SECTION(".blocks()") {
@@ -182,19 +160,26 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
     }
 
     SECTION(".links()") {
-        SECTION(".begin() // && .end()") {
-            std::vector<ContactReference> expected = {
-                makeContactRef({5,6,6}, Direction::plusX()),
-                makeContactRef({6,5,6}, Direction::plusY()),
-                makeContactRef({6,6,5}, Direction::plusZ()),
-                makeContactRef({6,6,6}, Direction::plusX()),
-                makeContactRef({6,6,6}, Direction::plusY()),
-                makeContactRef({6,6,6}, Direction::plusZ()),
-                makeContactRef({6,6,7}, Direction::plusZ()),
-                makeContactRef({6,7,6}, Direction::plusY()),
-                makeContactRef({7,6,6}, Direction::plusX()),
+        auto runTest = [&](auto&& structRef, bool expectedConst) {
+            auto const expectedIds = std::array{
+                ContactIndex{ {2,0,0}, Direction::plusX() },
+                ContactIndex{ {3,0,0}, Direction::plusX() },
             };
-            CHECK_THAT(s666.links(), matchers::c2::UnorderedRangeEquals(expected));
+            auto ids = structRef.links() | std::views::transform([](auto&& contactRef) { return contactRef.index(); });
+            REQUIRE_THAT(ids, matchers::c2::UnorderedRangeEquals(expectedIds));
+            CHECK(expectedConst == (*structRef.links().begin()).structure().userData().isCalledAsConst());
+        };
+
+        SECTION("// mutable") {
+            runTest(ms3, false);
+        }
+
+        SECTION("// const") {
+            runTest(cms3, true);
+        }
+
+        SECTION("// immutable") {
+            runTest(is3, true);
         }
     }
 
