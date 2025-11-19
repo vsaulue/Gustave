@@ -40,10 +40,10 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto libCfg_, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg_, common::cSceneUserData UD_>
     class SceneStructures {
     public:
-        using StructureData = detail::StructureData<libCfg_, UserData_>;
+        using StructureData = detail::StructureData<libCfg_, UD_>;
         using StructureIndex = cfg::StructureIndex<libCfg_>;
 
         template<typename T>

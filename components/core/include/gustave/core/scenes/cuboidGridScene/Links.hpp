@@ -112,7 +112,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         };
     }
 
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_, bool isMut_>
     class Links {
     public:
         template<typename T>
@@ -122,14 +122,14 @@ namespace gustave::core::scenes::cuboidGridScene {
         using PropPtr = utils::PropPtr<isMut_, T>;
 
         template<bool mut>
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, mut>;
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UD_, mut>;
 
         using ContactIndex = ContactReference<false>::ContactIndex;
     private:
-        using SceneData = detail::SceneData<libCfg, UserData_>;
+        using SceneData = detail::SceneData<libCfg, UD_>;
 
         template<bool mut>
-        using Enumerator = links::detail::Enumerator<libCfg, UserData_, mut>;
+        using Enumerator = links::detail::Enumerator<libCfg, UD_, mut>;
     public:
         using ConstIterator = utils::ForwardIterator<Enumerator<false>>;
         using Iterator = utils::ForwardIterator<Enumerator<isMut_>>;

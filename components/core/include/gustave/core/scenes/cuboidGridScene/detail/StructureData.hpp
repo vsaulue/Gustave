@@ -45,7 +45,7 @@
 #include <gustave/utils/prop/Ptr.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
     class StructureData {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -65,12 +65,12 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
     public:
-        using UDTraits = common::UserDataTraits<UserData_>;
+        using UDTraits = common::UserDataTraits<UD_>;
 
         using BlockDataReference = detail::BlockDataReference<libCfg, true>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
-        using SceneData = detail::SceneData<libCfg, UserData_>;
+        using SceneData = detail::SceneData<libCfg, UD_>;
         using SolverIndices = std::unordered_map<BlockIndex, NodeIndex>;
         using StructureIndex = cfg::StructureIndex<libCfg>;
         using UserDataMember = UDTraits::StructureMember;
