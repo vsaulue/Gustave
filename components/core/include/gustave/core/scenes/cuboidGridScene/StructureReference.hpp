@@ -40,6 +40,7 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/structureReference/Blocks.hpp>
+#include <gustave/core/scenes/cuboidGridScene/structureReference/Contacts.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
@@ -84,38 +85,8 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<bool mut>
         using Blocks = structureReference::Blocks<cfg, UserData_, mut>;
 
-        class Contacts {
-        public:
-            [[nodiscard]]
-            explicit Contacts(StructureData const& structure)
-                : structure_{ &structure }
-            {}
-
-            [[nodiscard]]
-            ContactReference at(ContactIndex const& index) const {
-                auto const structId = structure_->index();
-                SceneData const& scene = structure_->sceneData();
-                ContactReference result{ scene, index };
-                BlockIndex const& srcId = index.localBlockIndex();
-                ConstBlockDataReference srcBlock = scene.blocks.find(srcId);
-                if (srcBlock) {
-                    std::optional<BlockIndex> const otherId = srcId.neighbourAlong(index.direction());
-                    if (otherId) {
-                        ConstBlockDataReference otherBlock = scene.blocks.find(*otherId);
-                        if (otherBlock) {
-                            if ((structId == srcBlock.structureId()) || (structId == otherBlock.structureId())) {
-                                return result;
-                            }
-                        }
-                    }
-                }
-                std::stringstream msg;
-                msg << "Structure does not contain the contact at " << index << '.';
-                throw std::out_of_range(msg.str());
-            }
-        private:
-            StructureData const* structure_;
-        };
+        template<bool mut>
+        using Contacts = structureReference::Contacts<cfg, UserData_, mut>;
 
         class Links {
         private:
@@ -296,8 +267,15 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        Contacts contacts() const {
-            return Contacts{ *data_ };
+        Contacts<true> contacts()
+            requires (isMutable_)
+        {
+            return Contacts<true>{ *data_ };
+        }
+
+        [[nodiscard]]
+        Contacts<false> contacts() const {
+            return Contacts<false>{ *data_ };
         }
 
         [[nodiscard]]
