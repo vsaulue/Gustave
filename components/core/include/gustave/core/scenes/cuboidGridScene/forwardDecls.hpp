@@ -30,13 +30,13 @@
 
 namespace gustave::core::scenes::cuboidGridScene {
     namespace detail {
-        template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
+        template<cfg::cLibConfig auto, common::cSceneUserData>
         class StructureData;
 
-        template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
+        template<cfg::cLibConfig auto, common::cSceneUserData>
         struct SceneData;
 
-        template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
+        template<cfg::cLibConfig auto, common::cSceneUserData>
         class SceneStructures;
     }
 
@@ -59,12 +59,12 @@ namespace gustave::core::scenes::cuboidGridScene {
         class Links;
     }
 
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
+    template<cfg::cLibConfig auto, common::cSceneUserData, bool>
     class BlockReference;
 
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMutable_>
+    template<cfg::cLibConfig auto, common::cSceneUserData, bool>
     class StructureReference;
 
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
+    template<cfg::cLibConfig auto, common::cSceneUserData, bool>
     class ContactReference;
 }
