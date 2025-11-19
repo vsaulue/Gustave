@@ -51,7 +51,7 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_, bool isMutable_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_, bool isMut_>
     class StructureReference {
     private:
         template<cfg::cLibConfig auto, common::cSceneUserData, bool>
@@ -61,10 +61,10 @@ namespace gustave::core::scenes::cuboidGridScene {
         using StructureData = SceneData::StructureData;
 
         template<typename T>
-        using PropSharedPtr = utils::PropSharedPtr<isMutable_, T>;
+        using PropSharedPtr = utils::PropSharedPtr<isMut_, T>;
 
         template<typename T>
-        using Prop = utils::Prop<isMutable_, T>;
+        using Prop = utils::Prop<isMut_, T>;
 
         using UDTraits = common::UserDataTraits<UserData_>;
     public:
@@ -110,33 +110,33 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         StructureReference(StructureReference const&)
-            requires (not isMutable_)
+            requires (not isMut_)
         = default;
 
         [[nodiscard]]
         StructureReference(meta::cCvRefOf<StructureReference<cfg, UserData_, true>> auto&& v)
-            requires (not isMutable_)
+            requires (not isMut_)
             : StructureReference{ std::forward<decltype(v)>(v).asImmutable() }
         {}
 
         [[nodiscard]]
         StructureReference(StructureReference&)
-            requires (isMutable_)
+            requires (isMut_)
         = default;
 
         [[nodiscard]]
         StructureReference(StructureReference&&) = default;
 
         StructureReference& operator=(StructureReference const&)
-            requires (not isMutable_)
+            requires (not isMut_)
         = default;
 
         StructureReference& operator=(StructureReference&)
-            requires (isMutable_)
+            requires (isMut_)
         = default;
 
         StructureReference& operator=(meta::cCvRefOf<StructureReference<cfg, UserData_, true>> auto&& v)
-            requires (not isMutable_)
+            requires (not isMut_)
         {
             *this = std::forward<decltype(v)>(v).asImmutable();
             return *this;
@@ -156,7 +156,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         Blocks<true> blocks()
-            requires (isMutable_)
+            requires (isMut_)
         {
             return Blocks<true>{ *data_ };
         }
@@ -168,7 +168,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         Contacts<true> contacts()
-            requires (isMutable_)
+            requires (isMut_)
         {
             return Contacts<true>{ *data_ };
         }
@@ -199,12 +199,12 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         static constexpr bool isMutable() {
-            return isMutable_;
+            return isMut_;
         }
 
         [[nodiscard]]
         Links<true> links()
-            requires (isMutable_)
+            requires (isMut_)
         {
             return Links<true>{ *data_ };
         }
@@ -236,7 +236,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         UserDataMember& userData()
-            requires (UDTraits::hasStructureUserData() && isMutable_)
+            requires (UDTraits::hasStructureUserData() && isMut_)
         {
             return getUserData(*this);
         }
