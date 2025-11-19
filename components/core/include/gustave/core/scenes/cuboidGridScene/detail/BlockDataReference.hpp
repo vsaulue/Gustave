@@ -39,13 +39,13 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto libCfg, bool isMutable_>
+    template<cfg::cLibConfig auto libCfg, bool isMut_>
     class BlockDataReference {
     private:
         static constexpr auto u = cfg::units(libCfg);
 
         template<typename T>
-        using Prop = utils::Prop<isMutable_, T>;
+        using Prop = utils::Prop<isMut_, T>;
 
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
@@ -61,7 +61,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         [[nodiscard]]
         static constexpr bool isMutable() {
-            return isMutable_;
+            return isMut_;
         }
 
         [[nodiscard]]
@@ -79,12 +79,12 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         [[nodiscard]]
         BlockDataReference(BlockDataReference<libCfg, true> const& otherBlock)
-            requires (!isMutable_)
+            requires (!isMut_)
             : data_{ otherBlock.data() }
         {}
 
         BlockDataReference& operator=(BlockDataReference<libCfg, true> const& rhs)
-            requires (!isMutable_)
+            requires (!isMut_)
         {
             data_ = rhs.data();
             return *this;
@@ -108,7 +108,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         [[nodiscard]]
         StructureIndex& structureId()
-            requires (isMutable_)
+            requires (isMut_)
         {
             return data_->second.structureId();
         }

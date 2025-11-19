@@ -36,11 +36,11 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg, bool isMutable_>
+    template<cfg::cLibConfig auto cfg, bool isMut_>
     class DataNeighbours {
     private:
         template<typename T>
-        using Prop = utils::Prop<isMutable_, T>;
+        using Prop = utils::Prop<isMut_, T>;
 
         using IndexIterator = IndexNeighbours::Iterator;
 
@@ -73,7 +73,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             }
 
             [[nodiscard]]
-            DataNeighbour<cfg, isMutable_> const& operator*() const {
+            DataNeighbour<cfg, isMut_> const& operator*() const {
                 return value_;
             }
 
@@ -89,7 +89,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
             void next() {
                 while (indexIterator_ != indices().end()) {
-                    if (BlockDataReference<cfg, isMutable_> neighbour = neighbours_->blocks_->find(indexIterator_->index)) {
+                    if (BlockDataReference<cfg, isMut_> neighbour = neighbours_->blocks_->find(indexIterator_->index)) {
                         value_ = { indexIterator_->direction, neighbour };
                         break;
                     }
@@ -98,7 +98,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             }
 
             DataNeighbours* neighbours_;
-            DataNeighbour<cfg, isMutable_> value_;
+            DataNeighbour<cfg, isMut_> value_;
             IndexIterator indexIterator_;
         };
     public:
