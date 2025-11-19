@@ -51,13 +51,13 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_, bool isMut_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_, bool isMut_>
     class StructureReference {
     private:
         template<cfg::cLibConfig auto, common::cSceneUserData, bool>
         friend class StructureReference;
 
-        using SceneData = detail::SceneData<cfg, UserData_>;
+        using SceneData = detail::SceneData<cfg, UD_>;
         using StructureData = SceneData::StructureData;
 
         template<typename T>
@@ -66,7 +66,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<typename T>
         using Prop = utils::Prop<isMut_, T>;
 
-        using UDTraits = common::UserDataTraits<UserData_>;
+        using UDTraits = common::UserDataTraits<UD_>;
     public:
         using SolverStructure = solvers::Structure<cfg>;
         using NodeIndex = cfg::NodeIndex<cfg>;
@@ -77,19 +77,19 @@ namespace gustave::core::scenes::cuboidGridScene {
         using StructureIndex = cfg::StructureIndex<cfg>;
 
         template<bool mut>
-        using BlockReference = cuboidGridScene::BlockReference<cfg, UserData_, mut>;
+        using BlockReference = cuboidGridScene::BlockReference<cfg, UD_, mut>;
 
         template<bool mut>
-        using Blocks = structureReference::Blocks<cfg, UserData_, mut>;
+        using Blocks = structureReference::Blocks<cfg, UD_, mut>;
 
         template<bool mut>
-        using Contacts = structureReference::Contacts<cfg, UserData_, mut>;
+        using Contacts = structureReference::Contacts<cfg, UD_, mut>;
 
         template<bool mut>
-        using ContactReference = cuboidGridScene::ContactReference<cfg, UserData_, mut>;
+        using ContactReference = cuboidGridScene::ContactReference<cfg, UD_, mut>;
 
         template<bool mut>
-        using Links = structureReference::Links<cfg, UserData_, mut>;
+        using Links = structureReference::Links<cfg, UD_, mut>;
 
         [[nodiscard]]
         explicit StructureReference(PropSharedPtr<StructureData> data)
@@ -114,7 +114,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         = default;
 
         [[nodiscard]]
-        StructureReference(meta::cCvRefOf<StructureReference<cfg, UserData_, true>> auto&& v)
+        StructureReference(meta::cCvRefOf<StructureReference<cfg, UD_, true>> auto&& v)
             requires (not isMut_)
             : StructureReference{ std::forward<decltype(v)>(v).asImmutable() }
         {}
@@ -135,7 +135,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             requires (isMut_)
         = default;
 
-        StructureReference& operator=(meta::cCvRefOf<StructureReference<cfg, UserData_, true>> auto&& v)
+        StructureReference& operator=(meta::cCvRefOf<StructureReference<cfg, UD_, true>> auto&& v)
             requires (not isMut_)
         {
             *this = std::forward<decltype(v)>(v).asImmutable();
@@ -145,13 +145,13 @@ namespace gustave::core::scenes::cuboidGridScene {
         StructureReference& operator=(StructureReference&&) = default;
 
         [[nodiscard]]
-        StructureReference<cfg, UserData_, false> asImmutable() const& {
-            return StructureReference<cfg, UserData_, false>{ data_ };
+        StructureReference<cfg, UD_, false> asImmutable() const& {
+            return StructureReference<cfg, UD_, false>{ data_ };
         }
 
         [[nodiscard]]
-        StructureReference<cfg, UserData_, false> asImmutable() && {
-            return StructureReference<cfg, UserData_, false>{ std::move(data_) };
+        StructureReference<cfg, UD_, false> asImmutable() && {
+            return StructureReference<cfg, UD_, false>{ std::move(data_) };
         }
 
         [[nodiscard]]
@@ -250,7 +250,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         template<bool rhsMutable>
         [[nodiscard]]
-        bool operator==(StructureReference<cfg, UserData_, rhsMutable> const& rhs) const {
+        bool operator==(StructureReference<cfg, UD_, rhsMutable> const& rhs) const {
             return data_ == rhs.data_;
         }
     private:

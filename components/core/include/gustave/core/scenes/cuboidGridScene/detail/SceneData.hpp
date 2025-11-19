@@ -39,12 +39,12 @@
 #include <gustave/utils/PointerHash.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_>
     struct SceneData {
     public:
-        using UserData = UserData_;
+        using UserData = UD_;
 
-        using StructureData = detail::StructureData<cfg, UserData_>;
+        using StructureData = detail::StructureData<cfg, UD_>;
         using StructureIndex = cfg::StructureIndex<cfg>;
     private:
         static constexpr auto u = cfg::units(cfg);
@@ -54,7 +54,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using Blocks = SceneBlocks<cfg>;
         using StructureIdGenerator = utils::IndexGenerator<StructureIndex>;
-        using Structures = SceneStructures<cfg, UserData_>;
+        using Structures = SceneStructures<cfg, UD_>;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)

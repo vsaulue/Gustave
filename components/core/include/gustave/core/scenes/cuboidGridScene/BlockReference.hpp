@@ -51,7 +51,7 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_, bool isMut_>
     class BlockReference {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -66,7 +66,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using DataNeighbours = detail::DataNeighbours<libCfg, false>;
         using IndexNeighbour = detail::IndexNeighbour;
         using IndexNeighbours = detail::IndexNeighbours;
-        using SceneData = detail::SceneData<libCfg, UserData_>;
+        using SceneData = detail::SceneData<libCfg, UD_>;
         using StructureData = SceneData::StructureData;
         using StructureIndex = StructureData::StructureIndex;
 
@@ -81,16 +81,16 @@ namespace gustave::core::scenes::cuboidGridScene {
         using PressureStress = model::PressureStress<libCfg>;
 
         template<bool mut>
-        using Contacts = blockReference::Contacts<libCfg, UserData_, mut>;
+        using Contacts = blockReference::Contacts<libCfg, UD_, mut>;
 
         template<bool mut>
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, mut>;
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UD_, mut>;
 
         template<bool mut>
-        using Structures = blockReference::Structures<libCfg, UserData_, mut>;
+        using Structures = blockReference::Structures<libCfg, UD_, mut>;
 
         template<bool mut>
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UD_, mut>;
 
         [[nodiscard]]
         explicit BlockReference(Prop<SceneData>& sceneData, BlockIndex const& index)
@@ -114,7 +114,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         = default;
 
         [[nodiscard]]
-        BlockReference(meta::cCvRefOf<BlockReference<libCfg, UserData_, true>> auto&& other)
+        BlockReference(meta::cCvRefOf<BlockReference<libCfg, UD_, true>> auto&& other)
             requires (not isMut_)
             : BlockReference{ std::forward<decltype(other)>(other).asImmutable()}
         {}
@@ -130,7 +130,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             requires (not isMut_)
         = default;
 
-        BlockReference& operator=(meta::cCvRefOf<BlockReference<libCfg, UserData_, true>> auto&& other)
+        BlockReference& operator=(meta::cCvRefOf<BlockReference<libCfg, UD_, true>> auto&& other)
             requires (not isMut_)
         {
             *this = std::forward<decltype(other)>(other).asImmutable();
@@ -140,8 +140,8 @@ namespace gustave::core::scenes::cuboidGridScene {
         BlockReference& operator=(BlockReference&&) = default;
 
         [[nodiscard]]
-        BlockReference<libCfg, UserData_, false> asImmutable() const {
-            return BlockReference<libCfg, UserData_, false>{ *sceneData_, index_ };
+        BlockReference<libCfg, UD_, false> asImmutable() const {
+            return BlockReference<libCfg, UD_, false>{ *sceneData_, index_ };
         }
 
         [[nodiscard]]

@@ -45,14 +45,14 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_ = void>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_ = void>
     class CuboidGridScene {
     private:
         static constexpr auto u = cfg::units(libCfg);
 
-        using SceneData = cuboidGridScene::detail::SceneData<libCfg, UserData_>;
-        using SceneUpdater = cuboidGridScene::detail::SceneUpdater<libCfg, UserData_>;
-        using StructureData = cuboidGridScene::detail::StructureData<libCfg, UserData_>;
+        using SceneData = cuboidGridScene::detail::SceneData<libCfg, UD_>;
+        using SceneUpdater = cuboidGridScene::detail::SceneUpdater<libCfg, UD_>;
+        using StructureData = cuboidGridScene::detail::StructureData<libCfg, UD_>;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -62,25 +62,25 @@ namespace gustave::core::scenes {
     public:
 
         template<bool mut>
-        using Blocks = cuboidGridScene::Blocks<libCfg, UserData_, mut>;
+        using Blocks = cuboidGridScene::Blocks<libCfg, UD_, mut>;
 
         template<bool mut>
-        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, mut>;
+        using BlockReference = cuboidGridScene::BlockReference<libCfg, UD_, mut>;
 
         template<bool mut>
-        using Contacts = cuboidGridScene::Contacts<libCfg, UserData_, mut>;
+        using Contacts = cuboidGridScene::Contacts<libCfg, UD_, mut>;
 
         template<bool mut>
-        using ContactReference = cuboidGridScene::ContactReference<libCfg, UserData_, mut>;
+        using ContactReference = cuboidGridScene::ContactReference<libCfg, UD_, mut>;
 
         template<bool mut>
-        using Links = cuboidGridScene::Links<libCfg, UserData_, mut>;
+        using Links = cuboidGridScene::Links<libCfg, UD_, mut>;
 
         template<bool mut>
-        using Structures = cuboidGridScene::Structures<libCfg, UserData_, mut>;
+        using Structures = cuboidGridScene::Structures<libCfg, UD_, mut>;
 
         template<bool mut>
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UD_, mut>;
 
         using Transaction = cuboidGridScene::Transaction<libCfg>;
         using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;

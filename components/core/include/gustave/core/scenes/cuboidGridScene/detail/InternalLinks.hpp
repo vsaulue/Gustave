@@ -36,12 +36,12 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg, common::cSceneUserData UserData_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_>
     class InternalLinks {
     public:
         using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
         using Direction = math3d::BasicDirection;
-        using SceneData = detail::SceneData<cfg, UserData_>;
+        using SceneData = detail::SceneData<cfg, UD_>;
 
         struct Value {
             [[nodiscard]]

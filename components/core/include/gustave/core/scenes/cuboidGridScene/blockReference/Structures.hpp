@@ -39,7 +39,7 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::blockReference {
-    template<cfg::cLibConfig auto libCfg_, common::cSceneUserData UserData_, bool isMut_>
+    template<cfg::cLibConfig auto libCfg_, common::cSceneUserData UD_, bool isMut_>
     class Structures {
     private:
         template<typename T>
@@ -47,8 +47,8 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
 
         using BlockDataRef = cuboidGridScene::detail::BlockDataReference<libCfg_, false>;
         using DataNeighbours = cuboidGridScene::detail::DataNeighbours<libCfg_, false>;
-        using SceneData = cuboidGridScene::detail::SceneData<libCfg_, UserData_>;
-        using StructureReference = cuboidGridScene::StructureReference<libCfg_, UserData_, isMut_>;
+        using SceneData = cuboidGridScene::detail::SceneData<libCfg_, UD_>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg_, UD_, isMut_>;
         using StructureIndex = StructureReference::StructureIndex;
 
         using Values = std::array<StructureReference, 6>;

@@ -45,7 +45,7 @@
 #include <gustave/meta/Meta.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
-    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UserData_, bool isMut_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_, bool isMut_>
     class ContactReference {
     private:
         template<cfg::cLibConfig auto, common::cSceneUserData, bool>
@@ -60,7 +60,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         static constexpr auto u = cfg::units(libCfg);
 
         using BlockDataReference = detail::BlockDataReference<libCfg, false>;
-        using SceneData = detail::SceneData<libCfg, UserData_>;
+        using SceneData = detail::SceneData<libCfg, UD_>;
         using StructureData = SceneData::StructureData;
         using StructureIndex = SceneData::StructureIndex;
 
@@ -92,7 +92,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
     public:
-        using AsImmutable = ContactReference<libCfg, UserData_, false>;
+        using AsImmutable = ContactReference<libCfg, UD_, false>;
         using BlockIndex = cuboidGridScene::BlockIndex;
         using ContactIndex = cuboidGridScene::ContactIndex;
         using Direction = math3d::BasicDirection;
@@ -101,10 +101,10 @@ namespace gustave::core::scenes::cuboidGridScene {
         using SolverContactIndex = typename solvers::Structure<libCfg>::ContactIndex;
 
         template<bool mut>
-        using BlockReference = cuboidGridScene::BlockReference<libCfg, UserData_, mut>;
+        using BlockReference = cuboidGridScene::BlockReference<libCfg, UD_, mut>;
 
         template<bool mut>
-        using StructureReference = cuboidGridScene::StructureReference<libCfg, UserData_, mut>;
+        using StructureReference = cuboidGridScene::StructureReference<libCfg, UD_, mut>;
 
         [[nodiscard]]
         explicit ContactReference(utils::NoInit NO_INIT)
@@ -129,7 +129,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         = default;
 
         [[nodiscard]]
-        ContactReference(meta::cCvRefOf<ContactReference<libCfg, UserData_, true>> auto&& other)
+        ContactReference(meta::cCvRefOf<ContactReference<libCfg, UD_, true>> auto&& other)
             requires (not isMut_)
             : ContactReference{ std::forward<decltype(other)>(other).asImmutable() }
         {}
@@ -145,7 +145,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             requires (not isMut_)
         = default;
 
-        ContactReference& operator=(meta::cCvRefOf<ContactReference<libCfg, UserData_, true>> auto&& rhs)
+        ContactReference& operator=(meta::cCvRefOf<ContactReference<libCfg, UD_, true>> auto&& rhs)
             requires (not isMut_)
         {
             *this = std::forward<decltype(rhs)>(rhs).asImmutable();
@@ -275,7 +275,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         template<bool mut>
         [[nodiscard]]
-        bool operator==(ContactReference<libCfg, UserData_, mut> const& rhs) const {
+        bool operator==(ContactReference<libCfg, UD_, mut> const& rhs) const {
             return (scene_ == rhs.scene_) && (index_ == rhs.index_);
         }
     private:
