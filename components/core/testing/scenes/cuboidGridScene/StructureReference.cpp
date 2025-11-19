@@ -128,23 +128,23 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
     }
 
     SECTION(".contacts()") {
-        SECTION(".at()") {
-            SECTION("// valid") {
-                ContactReference contact = is1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() });
-                CHECK(contact == makeContactRef({ 1,0,0 }, Direction::plusX()));
-            }
+        auto runTest = [&](auto&& structRef, bool expectedConst) {
+            auto contact = structRef.contacts().at(ContactIndex{ {2,0,0}, Direction::plusX() });
+            REQUIRE(contact.isValid());
+            CHECK(contact.otherBlock().index() == BlockIndex{ 3,0,0 });
+            CHECK(expectedConst == contact.structure().userData().isCalledAsConst());
+        };
 
-            SECTION("// invalid source") {
-                CHECK_THROWS_AS(is1.contacts().at(ContactIndex{ {0,0,0}, Direction::plusX() }), std::out_of_range);
-            }
+        SECTION("// mutable") {
+            runTest(ms3, false);
+        }
 
-            SECTION("// invalid other") {
-                CHECK_THROWS_AS(is1.contacts().at(ContactIndex{ {1,0,0}, Direction::plusY() }), std::out_of_range);
-            }
+        SECTION("// const") {
+            runTest(cms3, true);
+        }
 
-            SECTION("// invalid structure") {
-                CHECK_THROWS_AS(is3.contacts().at(ContactIndex{ {1,0,0}, Direction::plusX() }), std::out_of_range);
-            }
+        SECTION("// immutable") {
+            runTest(is3, true);
         }
     }
 

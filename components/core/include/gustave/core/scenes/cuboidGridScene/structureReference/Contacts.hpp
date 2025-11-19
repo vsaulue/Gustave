@@ -34,6 +34,7 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/ContactIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
