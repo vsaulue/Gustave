@@ -24,9 +24,6 @@
  */
 
 #include <ranges>
-#include <vector>
-
-#include <catch2/catch_test_macros.hpp>
 
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
@@ -34,20 +31,15 @@
 #include <gustave/testing/cPropPtr.hpp>
 #include <gustave/testing/ConstDetector.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 namespace cuboidGrid = gustave::core::scenes::cuboidGridScene;
 
-namespace {
-    struct UserData {
-        using Structure = gustave::testing::ConstDetector<int>;
-    };
-}
-
 template<bool mut>
-using BlockReference = cuboidGrid::BlockReference<libCfg, UserData, mut>;
-using SceneData = cuboidGrid::detail::SceneData<libCfg, UserData>;
-using SceneUpdater = cuboidGrid::detail::SceneUpdater<libCfg, UserData>;
+using BlockReference = cuboidGrid::BlockReference<libCfg, SceneUserData, mut>;
+using SceneData = cuboidGrid::detail::SceneData<libCfg, SceneUserData>;
+using SceneUpdater = cuboidGrid::detail::SceneUpdater<libCfg, SceneUserData>;
 
 using BlockIndex = BlockReference<false>::BlockIndex;
 using ContactIndex = BlockReference<false>::ContactReference<false>::ContactIndex;

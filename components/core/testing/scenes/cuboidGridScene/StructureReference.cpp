@@ -34,17 +34,14 @@
 #include <gustave/testing/ConstDetector.hpp>
 #include <gustave/testing/cPropPtr.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
-struct UserData {
-    using Structure = gustave::testing::ConstDetector<int>;
-};
-
 template<bool isMutable>
-using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg, UserData, isMutable>;
+using StructureReference = gustave::core::scenes::cuboidGridScene::StructureReference<libCfg, SceneUserData, isMutable>;
 
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, UserData>;
-using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, UserData>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, SceneUserData>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, SceneUserData>;
 
 using BlockIndex = StructureReference<true>::BlockIndex;
 using ContactIndex = StructureReference<true>::ContactIndex;

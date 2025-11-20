@@ -27,18 +27,14 @@
 #include <gustave/utils/prop/SharedPtr.hpp>
 #include <gustave/testing/ConstDetector.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 #include <initializer_list>
-#include <vector>
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
-struct UserData {
-    using Structure = gustave::testing::ConstDetector<int>;
-};
-
-using SceneStructures = cuboid::detail::SceneStructures<libCfg, UserData>;
+using SceneStructures = cuboid::detail::SceneStructures<libCfg, SceneUserData>;
 
 using StructureData = SceneStructures::StructureData;
 using SceneData = StructureData::SceneData;

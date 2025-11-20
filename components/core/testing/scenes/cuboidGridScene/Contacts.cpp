@@ -30,22 +30,17 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/testing/ConstDetector.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
-namespace {
-    struct UserData {
-        using Structure = gustave::testing::ConstDetector<int>;
-    };
-}
-
 template<bool mut>
-using Contacts = gustave::core::scenes::cuboidGridScene::Contacts<libCfg, UserData, mut>;
+using Contacts = gustave::core::scenes::cuboidGridScene::Contacts<libCfg, SceneUserData, mut>;
 
 template<bool mut>
 using ContactReference = Contacts<false>::ContactReference<mut>;
 
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, UserData>;
-using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, UserData>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, SceneUserData>;
+using SceneUpdater = gustave::core::scenes::cuboidGridScene::detail::SceneUpdater<libCfg, SceneUserData>;
 
 using ContactIndex = Contacts<false>::ContactIndex;
 using Direction = ContactIndex::Direction;

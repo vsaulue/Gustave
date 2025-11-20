@@ -31,15 +31,10 @@
 #include <gustave/core/scenes/CuboidGridScene.hpp>
 #include <gustave/testing/ConstDetector.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
-namespace {
-    struct UserData {
-        using Structure = gustave::testing::ConstDetector<int>;
-    };
-}
-
-using Scene = gustave::core::scenes::CuboidGridScene<libCfg, UserData>;
+using Scene = gustave::core::scenes::CuboidGridScene<libCfg, SceneUserData>;
 
 using BlockIndex = Scene::BlockIndex;
 using Direction = Scene::Direction;
