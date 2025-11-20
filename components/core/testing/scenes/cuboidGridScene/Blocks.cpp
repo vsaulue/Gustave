@@ -31,22 +31,17 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/testing/ConstDetector.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
-namespace {
-    struct UserData {
-        using Structure = gustave::testing::ConstDetector<int>;
-    };
-}
-
 template<bool mut>
-using Blocks = cuboid::Blocks<libCfg, UserData, mut>;
+using Blocks = cuboid::Blocks<libCfg, SceneUserData, mut>;
 
 using BlockIndex = Blocks<false>::BlockIndex;
-using SceneData = cuboid::detail::SceneData<libCfg, UserData>;
-using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, UserData>;
+using SceneData = cuboid::detail::SceneData<libCfg, SceneUserData>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, SceneUserData>;
 
 using Transaction = SceneUpdater::Transaction;
 

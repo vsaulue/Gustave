@@ -33,21 +33,16 @@
 #include <gustave/testing/ConstDetector.hpp>
 #include <gustave/testing/cPropPtr.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
-
-namespace {
-    struct UserData {
-        using Structure = gustave::testing::ConstDetector<int>;
-    };
-}
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
 template<bool mut>
-using ContactReference = cuboid::ContactReference<libCfg, UserData, mut>;
+using ContactReference = cuboid::ContactReference<libCfg, SceneUserData, mut>;
 
-using SceneData = cuboid::detail::SceneData<libCfg, UserData>;
-using SceneUpdater = cuboid::detail::SceneUpdater<libCfg,UserData>;
+using SceneData = cuboid::detail::SceneData<libCfg, SceneUserData>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, SceneUserData>;
 
 using BlockIndex = ContactReference<false>::BlockIndex;
 using ContactIndex = ContactReference<false>::ContactIndex;

@@ -24,27 +24,23 @@
  */
 
 #include <array>
+#include <ranges>
 
 #include <gustave/core/scenes/cuboidGridScene/blockReference/Structures.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/testing/ConstDetector.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
-
-namespace {
-    struct UserData {
-        using Structure = gustave::testing::ConstDetector<int>;
-    };
-}
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
-using SceneData = cuboid::detail::SceneData<libCfg, UserData>;
-using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, UserData>;
+using SceneData = cuboid::detail::SceneData<libCfg, SceneUserData>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, SceneUserData>;
 
 template<bool mut>
-using Structures = cuboid::blockReference::Structures<libCfg, UserData, mut>;
+using Structures = cuboid::blockReference::Structures<libCfg, SceneUserData, mut>;
 
 using BlockIndex = SceneData::Blocks::BlockIndex;
 using Transaction = SceneUpdater::Transaction;
