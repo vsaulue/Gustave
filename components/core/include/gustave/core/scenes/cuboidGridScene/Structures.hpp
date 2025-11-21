@@ -51,29 +51,12 @@ namespace gustave::core::scenes::cuboidGridScene {
             [[nodiscard]]
             Enumerator()
                 :  dataIterator_{}
-                , value_{ utils::NO_INIT }
-            {}
-
-            [[nodiscard]]
-            Enumerator(Enumerator const& other)
-                // needed for MSVC, which doesn't auto-generate
-                : dataIterator_{ other.dataIterator_ }
-                , value_{ other.value_ }
             {}
 
             [[nodiscard]]
             explicit Enumerator(Prop<SceneStructures>& structures)
                 : dataIterator_{ structures.begin() }
-                , value_{ utils::NO_INIT }
-            {
-                updateValue();
-            }
-
-            Enumerator& operator=(Enumerator const& other) {
-                // needed for MSVC, which doesn't auto-generate
-                dataIterator_ = other.dataIterator_;
-                value_ = other.value;
-            }
+            {}
 
             [[nodiscard]]
             bool isEnd() const {
@@ -82,12 +65,11 @@ namespace gustave::core::scenes::cuboidGridScene {
 
             void operator++() {
                 ++dataIterator_;
-                updateValue();
             }
 
             [[nodiscard]]
-            Value& operator*() const {
-                return value_;
+            Value operator*() const {
+                return Value{ *dataIterator_ };
             }
 
             [[nodiscard]]
@@ -95,14 +77,7 @@ namespace gustave::core::scenes::cuboidGridScene {
                 return dataIterator_ == other.dataIterator_;
             }
         private:
-            void updateValue() {
-                if (!isEnd()) {
-                    value_ = Value{ *dataIterator_ };
-                }
-            }
-
             DataIterator dataIterator_;
-            mutable Value value_;
         };
     }
 

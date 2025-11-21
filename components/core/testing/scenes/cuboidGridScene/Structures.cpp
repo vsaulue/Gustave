@@ -102,7 +102,8 @@ TEST_CASE("core::scenes::cuboidGridScene::Structures") {
             auto const expectedIds = std::views::iota(0, 2);
             auto ids = structs | std::views::transform([](auto&& s) { return s.index(); });
             CHECK_THAT(ids, matchers::c2::UnorderedRangeEquals(expectedIds));
-            CHECK(expectedConst == structs.begin()->userData().isCalledAsConst());
+            auto firstStruct = *structs.begin();
+            CHECK(expectedConst == firstStruct.userData().isCalledAsConst());
         };
 
         SECTION("// mutable") {
