@@ -144,7 +144,7 @@ namespace gustave::core::scenes::cuboidGridScene::structureReference {
         }
 
         [[nodiscard]]
-        constexpr utils::EndIterator end() const {
+        constexpr std::default_sentinel_t end() const {
             return {};
         }
 

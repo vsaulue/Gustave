@@ -34,7 +34,6 @@
 #include <gustave/core/worlds/syncWorld/forwardDecls.hpp>
 #include <gustave/core/worlds/syncWorld/BlockReference.hpp>
 #include <gustave/core/worlds/syncWorld/ContactReference.hpp>
-#include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -129,7 +128,7 @@ namespace gustave::core::worlds::syncWorld {
             }
 
             [[nodiscard]]
-            constexpr utils::EndIterator end() const {
+            constexpr std::default_sentinel_t end() const {
                 return {};
             }
 
@@ -223,7 +222,7 @@ namespace gustave::core::worlds::syncWorld {
             }
 
             [[nodiscard]]
-            utils::EndIterator end() const {
+            constexpr std::default_sentinel_t end() const {
                 return {};
             }
         private:

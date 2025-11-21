@@ -157,7 +157,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         }
 
         [[nodiscard]]
-        utils::EndIterator end() const {
+        constexpr std::default_sentinel_t end() const {
             return {};
         }
     private:

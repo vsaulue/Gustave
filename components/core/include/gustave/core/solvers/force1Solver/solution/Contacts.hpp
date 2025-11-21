@@ -33,8 +33,6 @@
 #include <gustave/core/solvers/force1Solver/detail/SolutionData.hpp>
 #include <gustave/core/solvers/force1Solver/solution/ContactReference.hpp>
 #include <gustave/core/solvers/Structure.hpp>
-#include <gustave/utils/EndIterator.hpp>
-#include <gustave/utils/ForwardIterator.hpp>
 
 namespace gustave::core::solvers::force1Solver::solution {
     template<cfg::cLibConfig auto libCfg>

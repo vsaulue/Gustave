@@ -33,7 +33,6 @@
 #include <gustave/core/solvers/force1Solver/detail/SolutionData.hpp>
 #include <gustave/core/solvers/force1Solver/solution/NodeReference.hpp>
 #include <gustave/core/solvers/Structure.hpp>
-#include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 
 namespace gustave::core::solvers::force1Solver::solution {
@@ -106,7 +105,7 @@ namespace gustave::core::solvers::force1Solver::solution {
         }
 
         [[nodiscard]]
-        utils::EndIterator end() const {
+        constexpr std::default_sentinel_t end() const {
             return {};
         }
 

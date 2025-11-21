@@ -30,7 +30,6 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/meta/Meta.hpp>
-#include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 
@@ -136,7 +135,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        constexpr utils::EndIterator end() const {
+        constexpr std::default_sentinel_t end() const {
             return {};
         }
 

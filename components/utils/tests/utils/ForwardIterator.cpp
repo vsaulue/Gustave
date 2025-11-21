@@ -92,7 +92,7 @@ namespace {
         }
 
         [[nodiscard]]
-        constexpr utils::EndIterator end() const {
+        constexpr std::default_sentinel_t end() const {
             return {};
         }
     private:
@@ -154,7 +154,7 @@ namespace {
         }
 
         [[nodiscard]]
-        utils::EndIterator end() const {
+        constexpr std::default_sentinel_t end() const {
             return {};
         }
     private:
@@ -199,7 +199,7 @@ TEST_CASE("utils::ForwardIterator") {
         CHECK(*it2 == Coord{ 1 });
     }
 
-    SECTION("== EndIterator") {
+    SECTION("== std::default_sentinel_t") {
         REQUIRE(stepsIt != steps.end());
         ++stepsIt;
         REQUIRE(stepsIt != steps.end());

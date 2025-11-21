@@ -45,8 +45,6 @@
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/core/solvers/Structure.hpp>
-#include <gustave/utils/EndIterator.hpp>
-#include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 #include <gustave/utils/Prop.hpp>
 
