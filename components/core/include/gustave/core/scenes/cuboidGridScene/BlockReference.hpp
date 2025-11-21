@@ -45,8 +45,6 @@
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/meta/Meta.hpp>
-#include <gustave/utils/EndIterator.hpp>
-#include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 #include <gustave/utils/Prop.hpp>
 

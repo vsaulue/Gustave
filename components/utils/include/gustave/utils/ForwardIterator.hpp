@@ -26,12 +26,12 @@
 #pragma once
 
 #include <cstddef>
+#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
 #include <gustave/utils/cEnumerator.hpp>
-#include <gustave/utils/EndIterator.hpp>
 
 namespace gustave::utils {
     template<cEnumerator Enumerator>
@@ -73,7 +73,7 @@ namespace gustave::utils {
         }
 
         [[nodiscard]]
-        bool operator==(EndIterator const&) const {
+        bool operator==(std::default_sentinel_t) const {
             return enumerator_.isEnd();
         }
 

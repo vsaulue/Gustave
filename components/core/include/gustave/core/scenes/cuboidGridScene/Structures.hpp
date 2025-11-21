@@ -31,7 +31,6 @@
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
-#include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
 #include <gustave/utils/Prop.hpp>
@@ -78,7 +77,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
             [[nodiscard]]
             bool isEnd() const {
-                return dataIterator_ == utils::EndIterator{};
+                return dataIterator_ == std::default_sentinel;
             }
 
             void operator++() {
@@ -175,7 +174,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        constexpr utils::EndIterator end() const {
+        constexpr std::default_sentinel_t end() const {
             return {};
         }
 

@@ -36,7 +36,6 @@
 #include <vector>
 
 #include <gustave/utils/cIndex.hpp>
-#include <gustave/utils/EndIterator.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 
 namespace gustave::utils {
@@ -138,7 +137,7 @@ namespace gustave::utils {
         }
 
         [[nodiscard]]
-        constexpr utils::EndIterator end() const {
+        constexpr std::default_sentinel_t end() const {
             return {};
         }
 
