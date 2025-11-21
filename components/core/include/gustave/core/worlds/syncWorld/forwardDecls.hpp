@@ -25,36 +25,24 @@
 
 #pragma once
 
-#include <cassert>
-
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/core/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 
-namespace gustave::core::worlds::syncWorld::detail {
-    template<cfg::cLibConfig auto libCfg>
-    class WorldUpdater {
-    public:
-        using WorldData = detail::WorldData<libCfg>;
+namespace gustave::core::worlds::syncWorld {
+    namespace detail {
+        template<cfg::cLibConfig auto>
+        class StructureUserData;
 
-        using TransactionResult = typename WorldData::Scene::TransactionResult;
-        using Transaction = typename WorldData::Scene::Transaction;
+        template<cfg::cLibConfig auto>
+        struct WorldData;
+    }
 
-        [[nodiscard]]
-        explicit WorldUpdater(WorldData& data)
-            : data_{ data }
-        {}
+    template<cfg::cLibConfig auto>
+    class BlockReference;
 
-        TransactionResult runTransaction(Transaction const& transaction) {
-            TransactionResult const result = data_.scene.modify(transaction);
-            for (auto const& structureId : result.newStructures()) {
-                auto structure = data_.scene.structures().at(structureId);
-                structure.userData().init(data_);
-                auto const solverResult = data_.solver.run(structure.solverStructurePtr());
-                structure.userData().solve(solverResult.solutionPtr());
-            }
-            return result;
-        }
-    private:
-        WorldData& data_;
-    };
+    template<cfg::cLibConfig auto>
+    class StructureReference;
+
+    template<cfg::cLibConfig auto>
+    class ContactReference;
 }

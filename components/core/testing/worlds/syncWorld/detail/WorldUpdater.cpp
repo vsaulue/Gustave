@@ -28,11 +28,11 @@
 
 #include <TestHelpers.hpp>
 
-using StructureData = gustave::core::worlds::syncWorld::detail::StructureData<libCfg>;
 using WorldData = gustave::core::worlds::syncWorld::detail::WorldData<libCfg>;
 using WorldUpdater = gustave::core::worlds::syncWorld::detail::WorldUpdater<libCfg>;
 
 using Solver = WorldData::Solver;
+using StructureState = WorldData::StructureState;
 using Transaction = WorldUpdater::Transaction;
 using BlockIndex = WorldData::Scene::BlockIndex;
 
@@ -51,22 +51,10 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
     WorldData world = makeWorld();
 
     auto runTransaction = [&](Transaction const& transaction) {
-        auto oldStructures = world.structures;
         auto const result = WorldUpdater{ world }.runTransaction(transaction);
-        // Check new structures are solved.
+        // Check all structures are solved.
         for (auto const& sceneStructure : world.scene.structures()) {
-            auto const it = world.structures.find(sceneStructure.index());
-            REQUIRE(it != world.structures.end());
-            auto const& worldStructure = it->second;
-            CHECK(worldStructure->state() == StructureData::State::Solved);
-        }
-        // Check structure removed from scenes are invalidated.
-        for (auto const& [structId, worldStruct] : oldStructures) {
-            if (worldStruct->sceneStructure().isValid()) {
-                CHECK(worldStruct->state() == StructureData::State::Solved);
-            } else {
-                CHECK(worldStruct->state() == StructureData::State::Invalid);
-            }
+            CHECK(sceneStructure.userData().state() == StructureState::Solved);
         }
         return result;
     };
@@ -78,13 +66,13 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
     };
 
     auto checkForce = [&](BlockIndex const& to, BlockIndex const& from, Vector3<u.force> const& expectedForce) {
-        auto const worldStruct = world.structures.at(sceneStructureOf(from).index());
+        auto const sceneStruct = world.scene.structures().at(sceneStructureOf(from).index());
 
-        auto const idTo = worldStruct->sceneStructure().solverIndexOf(to);
-        auto const idFrom = worldStruct->sceneStructure().solverIndexOf(from);
+        auto const idTo = sceneStruct.solverIndexOf(to);
+        auto const idFrom = sceneStruct.solverIndexOf(from);
         REQUIRE(idTo);
         REQUIRE(idFrom);
-        auto const force = worldStruct->solution().nodes().at(*idTo).forceVectorFrom(*idFrom);
+        auto const force = sceneStruct.userData().solution().nodes().at(*idTo).forceVectorFrom(*idFrom);
         CHECK_THAT(force, matchers::WithinRel(expectedForce, solverPrecision));
     };
 
@@ -112,17 +100,17 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldUpdater") {
 
             CHECK(trRes1.deletedStructures().size() == 0);
             REQUIRE(trRes1.newStructures().size() == 1);
-            auto const oldStruct = world.structures.at(trRes1.newStructures().at(0));
-            REQUIRE(oldStruct->state() == StructureData::State::Solved);
+            auto const oldSceneStruct = world.scene.structures().at(trRes1.newStructures().at(0));
+            REQUIRE(oldSceneStruct.userData().state() == StructureState::Solved);
 
             t.clear();
             t.removeBlock({ 0,2,0 });
             auto const trRes2 = runTransaction(t);
 
             REQUIRE(trRes2.deletedStructures().size() == 1);
-            CHECK(trRes2.deletedStructures().at(0) == oldStruct->sceneStructure().index());
+            CHECK(trRes2.deletedStructures().at(0) == oldSceneStruct.index());
             CHECK(trRes2.newStructures().size() == 1);
-            CHECK(oldStruct->state() == StructureData::State::Invalid);
+            CHECK_FALSE(oldSceneStruct.isValid());
             checkForce({ 0,0,0 }, { 0,1,0 }, blockMass * g);
         }
     }

@@ -39,66 +39,56 @@ namespace gustave::core::worlds::syncWorld {
     class Structures {
     public:
         using StructureReference = syncWorld::StructureReference<libCfg>;
-
         using StructureIndex = StructureReference::StructureIndex;
     private:
         using WorldData = detail::WorldData<libCfg>;
+        using SceneStructures = WorldData::Scene::template Structures<false>;
 
         class Enumerator {
         private:
-            using DataIterator = typename WorldData::Structures::const_iterator;
+            using SceneIterator = SceneStructures::ConstIterator;
         public:
             [[nodiscard]]
             Enumerator()
-                : world_{ nullptr }
-                , dataIterator_{}
-                , value_{ utils::NO_INIT }
+                : structures_{ nullptr }
+                , sceneIt_{}
             {}
 
             [[nodiscard]]
-            explicit Enumerator(WorldData const& world)
-                : world_{ &world }
-                , dataIterator_{ world.structures.begin() }
-                , value_{ utils::NO_INIT }
-            {
-                updateValue();
-            }
+            explicit Enumerator(Structures const& structures)
+                : structures_{ &structures }
+                , sceneIt_{ structures.sceneStructs_.begin() }
+            {}
 
             [[nodiscard]]
             bool isEnd() const {
-                return dataIterator_ == world_->structures.end();
+                return sceneIt_ == structures_->end();
             }
 
             void operator++() {
-                ++dataIterator_;
-                updateValue();
+                ++sceneIt_;
             }
 
             [[nodiscard]]
-            StructureReference const& operator*() const {
-                return value_;
+            StructureReference operator*() const {
+                return StructureReference{ *sceneIt_ };
             }
 
             [[nodiscard]]
             bool operator==(Enumerator const& other) const {
-                return dataIterator_ == other.dataIterator_;
+                return sceneIt_ == other.sceneIt_;
             }
         private:
-            void updateValue() {
-                if (!isEnd()) {
-                    value_ = StructureReference{ dataIterator_->second };
-                }
-            }
-            WorldData const* world_;
-            DataIterator dataIterator_;
-            StructureReference value_;
+            Structures const* structures_;
+            SceneIterator sceneIt_;
         };
     public:
         using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Structures(WorldData const& world)
-            : world_{ &world }
+            : sceneStructs_{ world.scene.structures() }
+            , world_{ &world }
         {}
 
         [[nodiscard]]
@@ -112,7 +102,7 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         Iterator begin() const {
-            return Iterator{ *world_ };
+            return Iterator{ *this };
         }
 
         [[nodiscard]]
@@ -122,14 +112,15 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         StructureReference find(StructureIndex index) const {
-            return StructureReference{ *world_, index };
+            return StructureReference{ sceneStructs_.find(index) };
         }
 
         [[nodiscard]]
         std::size_t size() const {
-            return world_->structures.size();
+            return sceneStructs_.size();
         }
     private:
+        SceneStructures sceneStructs_;
         WorldData const* world_;
     };
 }

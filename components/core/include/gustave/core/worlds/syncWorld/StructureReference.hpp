@@ -30,7 +30,8 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/worlds/syncWorld/detail/StructureData.hpp>
+#include <gustave/core/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/core/worlds/syncWorld/forwardDecls.hpp>
 #include <gustave/core/worlds/syncWorld/BlockReference.hpp>
 #include <gustave/core/worlds/syncWorld/ContactReference.hpp>
 #include <gustave/utils/EndIterator.hpp>
@@ -39,12 +40,6 @@
 
 namespace gustave::core::worlds::syncWorld {
     template<cfg::cLibConfig auto libCfg>
-    class BlockReference;
-
-    template<cfg::cLibConfig auto libCfg>
-    class ContactReference;
-
-    template<cfg::cLibConfig auto libCfg>
     class StructureReference {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -52,23 +47,21 @@ namespace gustave::core::worlds::syncWorld {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        using StructureData = detail::StructureData<libCfg>;
         using WorldData = detail::WorldData<libCfg>;
 
-        using SceneContactReference = WorldData::Scene::template ContactReference<false>;
         using SceneStructureReference = WorldData::Scene::template StructureReference<false>;
     public:
-        using BlockIndex = typename WorldData::Scene::BlockIndex;
+        using BlockIndex = WorldData::Scene::BlockIndex;
         using BlockReference = syncWorld::BlockReference<libCfg>;
-        using ContactIndex = typename WorldData::Scene::ContactIndex;
+        using ContactIndex = WorldData::Scene::ContactIndex;
         using ContactReference = syncWorld::ContactReference<libCfg>;
-        using State = typename StructureData::State;
+        using State = WorldData::StructureState;
         using StructureIndex = WorldData::Scene::StructureIndex;
 
         class Blocks {
         private:
             using SceneStructBlocks = SceneStructureReference::template Blocks<false>;
-            using SceneIterator = typename SceneStructBlocks::Iterator;
+            using SceneIterator = SceneStructBlocks::Iterator;
 
             class Enumerator {
             public:
@@ -110,9 +103,9 @@ namespace gustave::core::worlds::syncWorld {
             using Iterator = utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
-            explicit Blocks(StructureData const& structure)
+            explicit Blocks(StructureReference const& structure)
                 : structure_{ &structure }
-                , sceneBlocks_{ structure.sceneStructure().blocks() }
+                , sceneBlocks_{ structure.sceneStructRef_.blocks() }
             {}
 
             [[nodiscard]]
@@ -154,29 +147,29 @@ namespace gustave::core::worlds::syncWorld {
                 return sceneBlocks_.size();
             }
         private:
-            StructureData const* structure_;
+            StructureReference const* structure_;
             SceneStructBlocks sceneBlocks_;
         };
 
         class Contacts {
         public:
             [[nodiscard]]
-            explicit Contacts(StructureData const& structure)
+            explicit Contacts(StructureReference const& structure)
                 : structure_{ &structure }
             {}
 
             [[nodiscard]]
             ContactReference at(ContactIndex const& index) const {
-                SceneContactReference sceneContact = structure_->sceneStructure().contacts().at(index);
+                auto const sceneContact = structure_->sceneStructRef_.contacts().at(index);
                 return ContactReference{ structure_->world(), sceneContact.index() };
             }
         private:
-            StructureData const* structure_;
+            StructureReference const* structure_;
         };
 
         class Links {
         private:
-            using SceneStructLinks = WorldData::Scene::template StructureReference<false>::template Links<false>;
+            using SceneStructLinks = SceneStructureReference::template Links<false>;
             using SceneIterator = SceneStructLinks::Iterator;
 
             class Enumerator {
@@ -219,9 +212,9 @@ namespace gustave::core::worlds::syncWorld {
             using Iterator = utils::ForwardIterator<Enumerator>;
 
             [[nodiscard]]
-            explicit Links(StructureData const& structure)
+            explicit Links(StructureReference const& structure)
                 : structure_{ &structure }
-                , sceneLinks_{ structure.sceneStructure().links() }
+                , sceneLinks_{ structure.sceneStructRef_.links() }
             {}
 
             [[nodiscard]]
@@ -234,23 +227,23 @@ namespace gustave::core::worlds::syncWorld {
                 return {};
             }
         private:
-            StructureData const* structure_;
+            StructureReference const* structure_;
             SceneStructLinks sceneLinks_;
         };
 
         [[nodiscard]]
-        explicit StructureReference(std::shared_ptr<StructureData const> data)
-            : data_{ std::move(data) }
+        explicit StructureReference(SceneStructureReference sceneStructRef)
+            : sceneStructRef_{ std::move(sceneStructRef) }
         {}
 
         [[nodiscard]]
         explicit StructureReference(WorldData const& world, StructureIndex index)
-            : data_{ initData(world, index) }
+            : sceneStructRef_{ world.scene.structures().find(index) }
         {}
 
         [[nodiscard]]
         explicit StructureReference(utils::NoInit)
-            : data_{ nullptr }
+            : sceneStructRef_{ nullptr }
         {}
 
         [[nodiscard]]
@@ -258,7 +251,7 @@ namespace gustave::core::worlds::syncWorld {
             if (!isValid()) {
                 throw invalidError();
             }
-            return Blocks{ *data_ };
+            return Blocks{ *this };
         }
 
         [[nodiscard]]
@@ -266,7 +259,7 @@ namespace gustave::core::worlds::syncWorld {
             if (!isValid()) {
                 throw invalidError();
             }
-            return Contacts{ *data_ };
+            return Contacts{ *this };
         }
 
         [[nodiscard]]
@@ -274,10 +267,11 @@ namespace gustave::core::worlds::syncWorld {
             if (!isSolved()) {
                 return {};
             }
-            auto const toIndex = data_->sceneStructure().solverIndexOf(to);
-            auto const fromIndex = data_->sceneStructure().solverIndexOf(from);
+            auto const toIndex = sceneStructRef_.solverIndexOf(to);
+            auto const fromIndex = sceneStructRef_.solverIndexOf(from);
             if (toIndex && fromIndex) {
-                return data_->solution().nodes().at(*toIndex).forceVectorFrom(*fromIndex);
+                auto const& solution = sceneStructRef_.userData().solution();
+                return solution.nodes().at(*toIndex).forceVectorFrom(*fromIndex);
             } else {
                 return {};
             }
@@ -285,29 +279,22 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         StructureIndex index() const {
-            if (data_ == nullptr) {
-                throw invalidError();
-            }
-            return data_->sceneStructure().index();
+            return sceneStructRef_.index();
         }
 
         [[nodiscard]]
         std::out_of_range invalidError() const {
-            if (data_ == nullptr) {
-                return SceneStructureReference{ utils::NO_INIT }.invalidError();
-            } else {
-                return data_->sceneStructure().invalidError();
-            }
+            return sceneStructRef_.invalidError();
         }
 
         [[nodiscard]]
         bool isSolved() const {
-            return data_ != nullptr && data_->state() == State::Solved;
+            return state() == State::Solved;
         }
 
         [[nodiscard]]
         bool isValid() const {
-            return data_!= nullptr && data_->state() != State::Invalid;
+            return state() != State::Invalid;
         }
 
         [[nodiscard]]
@@ -315,30 +302,25 @@ namespace gustave::core::worlds::syncWorld {
             if (!isValid()) {
                 throw invalidError();
             }
-            return Links{ *data_ };
+            return Links{ *this };
         }
 
         [[nodiscard]]
         State state() const {
-            if (data_ == nullptr) {
+            if (not sceneStructRef_.isValid()) {
                 return State::Invalid;
             }
-            return data_->state();
+            return sceneStructRef_.userData().state();
         }
 
         [[nodiscard]]
         bool operator==(StructureReference const&) const = default;
     private:
         [[nodiscard]]
-        static std::shared_ptr<StructureData const> initData(WorldData const& data, StructureIndex index) {
-            auto const it = data.structures.find(index);
-            if (it != data.structures.end()) {
-                return it->second;
-            } else {
-                return nullptr;
-            }
+        WorldData const& world() const {
+            return sceneStructRef_.userData().world();
         }
 
-        std::shared_ptr<StructureData const> data_;
+        SceneStructureReference sceneStructRef_;
     };
 }

@@ -86,6 +86,7 @@ TEST_CASE("core::worlds::SyncWorld") {
     SECTION(".structures()") {
         auto const structureIt = world.structures().begin();
         REQUIRE(structureIt != world.structures().end());
-        CHECK(structureIt->blocks().size() == 10);
+        auto const structure = *structureIt;
+        CHECK(structure.blocks().size() == 10);
     }
 }

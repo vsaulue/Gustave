@@ -28,44 +28,33 @@
 #include <memory>
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/core/scenes/CuboidGridScene.hpp>
+#include <gustave/core/solvers/Force1Solver.hpp>
 #include <gustave/core/worlds/syncWorld/StructureState.hpp>
+#include <gustave/core/worlds/syncWorld/forwardDecls.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::worlds::syncWorld::detail {
-    template<cfg::cLibConfig auto libCfg>
-    struct WorldData;
-
-    template<cfg::cLibConfig auto libCfg>
-    class StructureData {
+    template<cfg::cLibConfig auto libCfg_>
+    class StructureUserData {
     public:
-        using WorldData = detail::WorldData<libCfg>;
-        using Scene = typename WorldData::Scene;
-        using Solver = typename WorldData::Solver;
+        using Solver = solvers::Force1Solver<libCfg_>;
         using State = StructureState;
+        using WorldData = detail::WorldData<libCfg_>;
 
-        using SceneStructure = typename Scene::template StructureReference<false>;
-        using Solution = typename Solver::Solution;
-        using SolverStructure = typename Solver::Structure;
-
-        using StructureIndex = SceneStructure::StructureIndex;
+        using Solution = Solver::Solution;
+        using SolverStructure = Solver::Structure;
 
         [[nodiscard]]
-        explicit StructureData(WorldData const& world, SceneStructure sceneStructure)
-            : world_{ &world }
-            , sceneStructure_{ std::move(sceneStructure) }
+        StructureUserData()
+            : world_{ nullptr }
             , solution_{ nullptr }
             , state_{ State::New }
-        {
-            assert(sceneStructure_.isValid());
-        }
+        {}
 
-        void invalidate() {
-            state_ = State::Invalid;
-        }
-
-        [[nodiscard]]
-        SceneStructure const& sceneStructure() const {
-            return sceneStructure_;
+        void init(WorldData& world) {
+            assert(state_ == State::New);
+            assert(world_ == nullptr);
+            world_ = &world;
         }
 
         [[nodiscard]]
@@ -79,7 +68,6 @@ namespace gustave::core::worlds::syncWorld::detail {
         void solve(std::shared_ptr<Solution const> solution) {
             assert(state_ == State::New);
             if (solution != nullptr) {
-                assert(&solution->basis().structure() == &sceneStructure_.solverStructure());
                 assert(&solution->basis().config() == &world_->solver.config());
                 solution_ = std::move(solution);
                 state_ = State::Solved;
@@ -93,7 +81,7 @@ namespace gustave::core::worlds::syncWorld::detail {
             return state_;
         }
 
-        void setWorldData(WorldData const& value) {
+        void setWorldData(WorldData& value) {
             world_ = &value;
         }
 
@@ -102,8 +90,7 @@ namespace gustave::core::worlds::syncWorld::detail {
             return *world_;
         }
     private:
-        WorldData const* world_;
-        SceneStructure sceneStructure_;
+        utils::prop::Ptr<WorldData> world_;
         std::shared_ptr<Solution const> solution_;
         State state_;
     };

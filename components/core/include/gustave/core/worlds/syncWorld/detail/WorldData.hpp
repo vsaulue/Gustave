@@ -26,17 +26,13 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/core/scenes/CuboidGridScene.hpp>
-#include <gustave/core/solvers/Force1Solver.hpp>
-#include <gustave/core/worlds/syncWorld/detail/StructureData.hpp>
+#include <gustave/core/worlds/syncWorld/detail/StructureUserData.hpp>
+#include <gustave/core/worlds/syncWorld/StructureState.hpp>
 
 namespace gustave::core::worlds::syncWorld::detail {
-    template<cfg::cLibConfig auto libCfg>
-    class StructureData;
-
     template<cfg::cLibConfig auto libCfg>
     struct WorldData {
     private:
@@ -44,14 +40,14 @@ namespace gustave::core::worlds::syncWorld::detail {
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
-    public:
-        using Scene = scenes::CuboidGridScene<libCfg>;
-        using Solver = solvers::Force1Solver<libCfg>;
-        using StructureData = detail::StructureData<libCfg>;
-        using StructureIndex = StructureData::StructureIndex;
 
-        using SceneStructure = typename Scene::template StructureReference<false>;
-        using Structures = std::unordered_map<StructureIndex, std::shared_ptr<StructureData>>;
+        struct SceneUserData {
+            using Structure = StructureUserData<libCfg>;
+        };
+    public:
+        using Scene = scenes::CuboidGridScene<libCfg, SceneUserData>;
+        using Solver = SceneUserData::Structure::Solver;
+        using StructureState = syncWorld::StructureState;
 
         [[nodiscard]]
         explicit WorldData(Vector3<u.length> const& blockSize, Solver solver_)
@@ -66,7 +62,6 @@ namespace gustave::core::worlds::syncWorld::detail {
         WorldData(WorldData&& other)
             : scene{ std::move(other.scene) }
             , solver{ std::move(other.solver) }
-            , structures{ std::move(other.structures) }
         {
             resetWorldDataPtr();
         }
@@ -75,7 +70,6 @@ namespace gustave::core::worlds::syncWorld::detail {
             if (&other != this) {
                 scene = std::move(other.scene);
                 solver = std::move(other.solver);
-                structures = std::move(other.structures);
                 resetWorldDataPtr();
             }
             return *this;
@@ -83,11 +77,10 @@ namespace gustave::core::worlds::syncWorld::detail {
 
         Scene scene;
         Solver solver;
-        Structures structures;
     private:
         void resetWorldDataPtr() {
-            for (auto& structPair : structures) {
-                structPair.second->setWorldData(*this);
+            for (auto& structure : scene.structures()) {
+                structure.userData().setWorldData(*this);
             }
         }
     };
