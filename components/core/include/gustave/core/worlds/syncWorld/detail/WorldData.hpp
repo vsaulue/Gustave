@@ -79,7 +79,7 @@ namespace gustave::core::worlds::syncWorld::detail {
         Solver solver;
     private:
         void resetWorldDataPtr() {
-            for (auto& structure : scene.structures()) {
+            for (auto structure : scene.structures()) {
                 structure.userData().setWorldData(*this);
             }
         }

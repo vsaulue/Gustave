@@ -113,7 +113,8 @@ TEST_CASE("core::scenes::CuboidGridScene") {
     SECTION(".structures()") {
         auto runTest = [&](auto&& structs, bool expectedConst) {
             REQUIRE(structs.size() == 2);
-            CHECK(expectedConst == structs.begin()->userData().isCalledAsConst());
+            auto firstStruct = *structs.begin();
+            CHECK(expectedConst == firstStruct.userData().isCalledAsConst());
         };
 
         SECTION("// mutable") {
