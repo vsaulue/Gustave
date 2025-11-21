@@ -30,7 +30,6 @@
 using WorldData = gustave::core::worlds::syncWorld::detail::WorldData<libCfg>;
 
 using Solver = WorldData::Solver;
-using StructureData = WorldData::StructureData;
 
 TEST_CASE("core::worlds::syncWorld::detail::WorldData") {
     auto const blockSize = vector3(3.f, 2.f, 1.f, u.length);
@@ -47,17 +46,13 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldData") {
     auto b1 = world1.scene.blocks().at({ 1,1,1 });
     auto b1Structs = b1.structures();
     REQUIRE(b1Structs.size() == 1);
-    auto const sceneS1 = b1Structs[0];
-    auto worldS1 = std::make_shared<StructureData>(world1, sceneS1);
-    world1.structures[sceneS1.index()] = worldS1;
+    b1Structs[0].userData().init(world1);
 
     SECTION("// move") {
-        auto const expectedStructs = WorldData::Structures{
-            { sceneS1.index(), worldS1},
-        };
-
         auto checkMovedWorld = [&](WorldData const& movedWorld) {
-            CHECK_THAT(movedWorld.structures, matchers::c2::UnorderedRangeEquals(expectedStructs));
+            CHECK(std::ranges::all_of(movedWorld.scene.structures(), [&](auto&& structRef) {
+                return &structRef.userData().world() == &movedWorld;
+            }));
             CHECK(movedWorld.scene.blocks().size() == 1);
             CHECK(movedWorld.solver.config().targetMaxError() == solver.config().targetMaxError());
         };

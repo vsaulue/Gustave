@@ -28,7 +28,8 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
-#include <gustave/core/worlds/syncWorld/detail/StructureData.hpp>
+#include <gustave/core/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/core/worlds/syncWorld/forwardDecls.hpp>
 #include <gustave/core/worlds/syncWorld/ContactReference.hpp>
 #include <gustave/core/worlds/syncWorld/StructureReference.hpp>
 #include <gustave/utils/EndIterator.hpp>
@@ -36,12 +37,6 @@
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::worlds::syncWorld {
-    template<cfg::cLibConfig auto libCfg>
-    class ContactReference;
-
-    template<cfg::cLibConfig auto libCfg>
-    class StructureReference;
-
     template<cfg::cLibConfig auto libCfg>
     class BlockReference {
     private:
@@ -53,7 +48,6 @@ namespace gustave::core::worlds::syncWorld {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        using StructureData = detail::StructureData<libCfg>;
         using WorldData = detail::WorldData<libCfg>;
         using Scene = typename WorldData::Scene;
 

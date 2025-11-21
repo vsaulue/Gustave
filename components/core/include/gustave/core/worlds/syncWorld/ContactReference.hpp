@@ -31,23 +31,18 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/worlds/syncWorld/detail/WorldData.hpp>
+#include <gustave/core/worlds/syncWorld/forwardDecls.hpp>
 #include <gustave/core/worlds/syncWorld/BlockReference.hpp>
 #include <gustave/core/worlds/syncWorld/StructureReference.hpp>
 
 namespace gustave::core::worlds::syncWorld {
     template<cfg::cLibConfig auto libCfg>
-    class StructureReference;
-
-    template<cfg::cLibConfig auto libCfg>
-    class BlockReference;
-
-    template<cfg::cLibConfig auto libCfg>
     class ContactReference {
     private:
         using WorldData = detail::WorldData<libCfg>;
         using SceneContact = WorldData::Scene::template ContactReference<false>;
-        using SceneStructure = typename WorldData::Scene::template StructureReference<false>;
-        using StructureData = typename WorldData::StructureData;
+        using SceneStructure = WorldData::Scene::template StructureReference<false>;
+        using StructureState = WorldData::StructureState;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -101,8 +96,8 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         Vector3<u.force> forceVector() const {
             auto const sContact = sceneContact();
-            auto const& structureData = *world_->structures.at(sContact.structure().index());
-            return structureData.solution().contacts().at(sContact.solverIndex()).forceVector();
+            auto const structure = sceneContact().structure();
+            return structure.userData().solution().contacts().at(sContact.solverIndex()).forceVector();
         }
 
         [[nodiscard]]
@@ -119,7 +114,7 @@ namespace gustave::core::worlds::syncWorld {
         bool isSolved() const {
             auto const sContact = world_->scene.contacts().find(index_);
             if (sContact.isValid()) {
-                return world_->structures.at(sContact.structure().index())->state() == StructureData::State::Solved;
+                return sContact.structure().userData().state() == StructureState::Solved;
             } else {
                 return false;
             }
