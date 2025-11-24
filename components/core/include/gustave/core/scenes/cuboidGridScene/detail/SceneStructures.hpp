@@ -158,6 +158,15 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return numDeleted > 0;
         }
 
+        SharedPtr<StructureData> extract(StructureIndex id) {
+            auto node = structures_.extract(id);
+            if (node) {
+                return std::move(node.mapped());
+            } else {
+                return nullptr;
+            }
+        }
+
         [[nodiscard]]
         SharedPtr<StructureData> findShared(StructureIndex id) {
             return doFindShared(*this, id);
