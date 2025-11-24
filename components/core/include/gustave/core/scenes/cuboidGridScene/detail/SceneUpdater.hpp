@@ -181,8 +181,9 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         void removeStructureOf(TransactionContext& ctx, ConstBlockDataReference block) {
             auto const structureId = block.structureId();
             if (structureId != data_->structureIdGenerator.invalidIndex()) {
-                auto const didDelete = data_->structures.erase(structureId);
-                if (didDelete) {
+                auto removedStruct = data_->structures.extract(structureId);
+                if (removedStruct != nullptr) {
+                    removedStruct->invalidate();
                     ctx.removedStructures.push_back(structureId);
                 }
             }

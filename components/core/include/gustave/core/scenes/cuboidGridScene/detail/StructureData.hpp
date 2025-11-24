@@ -85,6 +85,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             : index_{ index }
             , scene_{ &sceneData }
             , solverStructure_{ std::make_shared<SolverStructure>() }
+            , isValid_{ true }
         {
             std::stack<BlockDataReference> remainingBlocks;
             remainingBlocks.push(root);
@@ -135,9 +136,16 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return index_;
         }
 
+        void invalidate() {
+            assert(isValid_);
+            isValid_ = false;
+            solverStructure_ = nullptr;
+            solverIndices_.clear();
+        }
+
         [[nodiscard]]
         bool isValid() const {
-            return scene_->structures.contains(index_);
+            return isValid_;
         }
 
         [[nodiscard]]
@@ -257,5 +265,6 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         [[no_unique_address]]
         UserDataMember userData_;
+        bool isValid_;
     };
 }
