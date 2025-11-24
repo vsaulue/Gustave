@@ -155,6 +155,21 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneStructures") {
         }
     }
 
+    SECTION(".extract()") {
+        SECTION("// present") {
+            auto res = structs.extract(2);
+            REQUIRE(res);
+            CHECK(res->index() == 2);
+            CHECK(cStructs.size() == 1);
+        }
+
+        SECTION("// absent") {
+            auto res = structs.extract(1);
+            CHECK_FALSE(res);
+            CHECK(cStructs.size() == 2);
+        }
+    }
+
     SECTION(".findShared()") {
         SECTION("// valid - const") {
             auto res = cStructs.findShared(2);
