@@ -209,6 +209,9 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         NormalizedVector3 normal() const {
+            if (not isValid()) {
+                throw invalidError();
+            }
             return NormalizedVector3::basisVector(index_.direction());
         }
 
