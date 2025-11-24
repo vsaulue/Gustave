@@ -174,7 +174,13 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     }
 
     SECTION(".normal()") {
-        CHECK(iContact222minusX.normal() == -Normals::x);
+        SECTION("// valid") {
+            CHECK(iContact222minusX.normal() == -Normals::x);
+        }
+
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(invalidContact.normal(), std::out_of_range);
+        }
     }
 
     SECTION(".opposite()") {
