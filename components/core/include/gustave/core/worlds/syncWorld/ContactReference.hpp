@@ -41,7 +41,6 @@ namespace gustave::core::worlds::syncWorld {
     private:
         using WorldData = detail::WorldData<libCfg>;
         using SceneContact = WorldData::Scene::template ContactReference<false>;
-        using SceneStructure = WorldData::Scene::template StructureReference<false>;
         using StructureState = WorldData::StructureState;
 
         template<cfg::cUnitOf<libCfg> auto unit>
@@ -62,19 +61,19 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         explicit ContactReference(WorldData const& world, ContactIndex const& index)
-            : world_{ &world }
-            , index_{ index }
+            : sceneContact_{ world.scene.contacts().find(index) }
+            , world_{ &world }
         {}
 
         [[nodiscard]]
         explicit ContactReference(utils::NoInit NO_INIT)
-            : world_{ nullptr }
-            , index_{ NO_INIT }
+            : sceneContact_{ NO_INIT }
+            , world_{ nullptr }
         {}
 
         [[nodiscard]]
         Real<u.area> area() const {
-            return sceneContact().area();
+            return sceneContact_.area();
         }
 
         [[nodiscard]]
@@ -95,26 +94,24 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         Vector3<u.force> forceVector() const {
-            auto const sContact = sceneContact();
-            auto const structure = sceneContact().structure();
-            return structure.userData().solution().contacts().at(sContact.solverIndex()).forceVector();
+            auto const structure = sceneContact_.structure();
+            return structure.userData().solution().contacts().at(sceneContact_.solverIndex()).forceVector();
         }
 
         [[nodiscard]]
         ContactIndex const& index() const {
-            return index_;
+            return sceneContact_.index();
         }
 
         [[nodiscard]]
         std::out_of_range invalidError() {
-            return sceneContact().invalidError();
+            return sceneContact_.invalidError();
         }
 
         [[nodiscard]]
         bool isSolved() const {
-            auto const sContact = world_->scene.contacts().find(index_);
-            if (sContact.isValid()) {
-                return sContact.structure().userData().state() == StructureState::Solved;
+            if (sceneContact_.isValid()) {
+                return sceneContact_.structure().userData().state() == StructureState::Solved;
             } else {
                 return false;
             }
@@ -122,30 +119,30 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         bool isValid() const {
-            return world_->scene.contacts().find(index_).isValid();
+            return sceneContact_.isValid();
         }
 
         [[nodiscard]]
         BlockReference localBlock() const {
-            return BlockReference{ *world_, sceneContact().localBlock().index() };
+            return BlockReference{ *world_, sceneContact_.localBlock().index() };
         }
 
         [[nodiscard]]
         PressureStress maxPressureStress() const {
-            return sceneContact().maxPressureStress();
+            return sceneContact_.maxPressureStress();
         }
 
         [[nodiscard]]
         NormalizedVector3 normal() const {
-            return sceneContact().normal();
+            return sceneContact_.normal();
         }
 
         [[nodiscard]]
         ContactReference opposite() const {
-            std::optional<ContactIndex> oppositeId = index_.opposite();
+            std::optional<ContactIndex> oppositeId = sceneContact_.index().opposite();
             if (!oppositeId) {
                 std::stringstream msg;
-                msg << "Invalid contact index: " << index_ << ".";
+                msg << "Invalid contact index: " << sceneContact_.index() << ".";
                 throw std::out_of_range(msg.str());
             }
             return ContactReference{ *world_, *oppositeId };
@@ -153,35 +150,29 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         BlockReference otherBlock() const {
-            return BlockReference{ *world_, sceneContact().otherBlock().index() };
+            return BlockReference{ *world_, sceneContact_.otherBlock().index() };
         }
 
         [[nodiscard]]
         PressureStress pressureStress() const {
-            return forceStress() / sceneContact().area();
+            return forceStress() / sceneContact_.area();
         }
 
         [[nodiscard]]
         StressRatio stressRatio() const {
-            auto sContact = sceneContact();
-            return forceStress() / (sContact.maxPressureStress() * sContact.area());
+            return forceStress() / (sceneContact_.maxPressureStress() * sceneContact_.area());
         }
 
         [[nodiscard]]
         StructureReference structure() const {
-            SceneStructure sceneStructure = sceneContact().structure();
+            auto sceneStructure = sceneContact_.structure();
             return StructureReference{ *world_, sceneStructure.index() };
         }
 
         [[nodiscard]]
         bool operator==(ContactReference const&) const = default;
     private:
-        [[nodiscard]]
-        SceneContact sceneContact() const {
-            return world_->scene.contacts().at(index_);
-        }
-
+        SceneContact sceneContact_;
         WorldData const* world_;
-        ContactIndex index_;
     };
 }
