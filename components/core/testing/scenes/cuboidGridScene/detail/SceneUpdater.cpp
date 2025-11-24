@@ -57,8 +57,8 @@ using SolverNode = SolverStructure::Node;
 using StructureIndex = StructureData::StructureIndex;
 using Structures = SceneData::Structures;
 
-template<typename Ptr>
-using PtrSet = gustave::utils::PointerHash::Set<Ptr>;
+template<typename T>
+using SharedPtr = gustave::utils::prop::SharedPtr<T>;
 
 static constexpr Real<u.density> concreteDensity = 2'400.f * u.density;
 
@@ -67,29 +67,34 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
     SceneData data{ blockSize };
 
-    auto structureIds = [&]() {
-        auto result = std::unordered_set<StructureIndex>{};
-        for (auto const& structPtr : data.structures) {
-            result.insert(structPtr->index());
+    auto copyStructures = [&]() {
+        auto result = std::unordered_map<StructureIndex, SharedPtr<StructureData>>{};
+        for (auto& structPtr : data.structures) {
+            result[structPtr->index()] = structPtr;
         }
         return result;
     };
 
     auto runTransaction = [&](Transaction const& transaction) {
-        auto oldStructureIds = structureIds();
+        auto oldStructures = copyStructures();
         auto const result = SceneUpdater{ data }.runTransaction(transaction);
         // Check structure diff of the result.
         for (auto const& deletedStructureId : result.deletedStructures()) {
-            auto const didDelete = oldStructureIds.erase(deletedStructureId);
-            REQUIRE(didDelete);
+            auto extractedStruct = oldStructures.extract(deletedStructureId);
+            REQUIRE(extractedStruct);
+            CHECK_FALSE(extractedStruct.mapped()->isValid());
             REQUIRE_FALSE(data.structures.contains(deletedStructureId));
         }
         for (auto const& newStructureId : result.newStructures()) {
-            oldStructureIds.insert(newStructureId);
+            REQUIRE_FALSE(oldStructures.contains(newStructureId));
+            auto newStructure = data.structures.atShared(newStructureId);
+            CHECK(newStructure->isValid());
+            oldStructures[newStructureId] = std::move(newStructure);
         }
-        REQUIRE_THAT(structureIds(), matchers::c2::UnorderedRangeEquals(oldStructureIds));
+        REQUIRE_THAT(copyStructures(), matchers::c2::UnorderedRangeEquals(oldStructures));
         // check structures.
         for (auto const& structure : data.structures) {
+            CHECK(structure->isValid());
             bool hasNonFoundation = false;
             for (auto const& [index,solverIndex] : structure->solverIndices()) {
                 ConstBlockDataReference blockRef = data.blocks.find(index);
