@@ -156,6 +156,9 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         Real<u.area> area() const {
+            if (not isValid()) {
+                throw invalidError();
+            }
             return scene_->blocks.contactAreaAlong(index_.direction());
         }
 
