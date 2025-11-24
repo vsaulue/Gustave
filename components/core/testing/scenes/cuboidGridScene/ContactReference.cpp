@@ -103,7 +103,13 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     auto invalidContact = immContactRef({ 0,0,0 }, Direction::minusZ());
 
     SECTION(".area()") {
-        CHECK(iContact222minusX.area() == 3.f * u.area);
+        SECTION("// valid") {
+            CHECK(iContact222minusX.area() == 3.f * u.area);
+        }
+
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(invalidContact.area(), std::out_of_range);
+        }
     }
 
     SECTION(".index()") {
