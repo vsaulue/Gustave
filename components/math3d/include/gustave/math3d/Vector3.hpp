@@ -90,7 +90,7 @@ namespace gustave::math3d {
         static constexpr auto one = rt.units().one;
 
         template<cfg::cUnitOf<rt> auto u, cfg::cRealRep R>
-        using Real = typename RealTraits::template Type<u,R>;
+        using Real = RealTraits::template Type<u,R>;
     public:
         using RealRep = Rep_;
         using Coord = Real<unit_, Rep_>;
