@@ -204,7 +204,7 @@ template<gustave::cfg::cRealRep Float>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::Config<Float>> {
     using Config = gustave::examples::jsonGustave::svgRenderer::Config<Float>;
 
-    using Color = typename Config::Color;
+    using Color = Config::Color;
 
     static void from_json(nlohmann::json const& json, Config& config) {
         config.setArrowLineFactor(json.at("arrowLineFactor").get<Float>());

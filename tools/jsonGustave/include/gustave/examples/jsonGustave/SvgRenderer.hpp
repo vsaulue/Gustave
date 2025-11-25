@@ -48,7 +48,7 @@ namespace gustave::examples::jsonGustave {
     template<core::cGustave G>
     class SvgRenderer {
     private:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
         using SvgCanvas = svgRenderer::detail::SvgCanvas<G>;
         using SvgCanvasContext = svgRenderer::detail::SvgCanvasContext<G>;
         using SvgDims = svgRenderer::detail::SvgDims<Float>;
@@ -57,7 +57,7 @@ namespace gustave::examples::jsonGustave {
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
         using Phase = svgRenderer::phases::Phase<G>;
-        using PhaseContext = typename Phase::PhaseContext;
+        using PhaseContext = Phase::PhaseContext;
 
         [[nodiscard]]
         SvgRenderer() = default;
@@ -127,7 +127,7 @@ template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<typename gustave::examples::jsonGustave::SvgRenderer<G>> {
     using SvgRenderer = gustave::examples::jsonGustave::SvgRenderer<G>;
 
-    using Config = typename SvgRenderer::Config;
+    using Config = SvgRenderer::Config;
     using JsonPhase = gustave::examples::jsonGustave::svgRenderer::detail::JsonPhase<G>;
 
     [[nodiscard]]

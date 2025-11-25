@@ -35,7 +35,7 @@ namespace gustave::examples {
     template<core::cGustave G>
     struct JsonGustave {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
         using Json = jsonGustave::Json;

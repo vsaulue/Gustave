@@ -38,7 +38,7 @@ namespace gustave::examples::jsonGustave::svgRenderer {
         using ColorPoint = svgRenderer::ColorPoint<Float_>;
         using Float = Float_;
 
-        using Color = typename ColorPoint::Color;
+        using Color = ColorPoint::Color;
 
         [[nodiscard]]
         explicit ColorScale(std::vector<ColorPoint> colorPoints)
@@ -109,7 +109,7 @@ template<gustave::cfg::cRealRep Float>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::ColorScale<Float>> {
     using ColorScale = gustave::examples::jsonGustave::svgRenderer::ColorScale<Float>;
 
-    using ColorPoint = typename ColorScale::ColorPoint;
+    using ColorPoint = ColorScale::ColorPoint;
 
     [[nodiscard]]
     static ColorScale from_json(nlohmann::json const& json) {

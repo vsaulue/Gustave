@@ -40,8 +40,8 @@ namespace gustave::examples::jsonGustave {
         using BlockConstructionInfo = jsonWorld::BlockConstructionInfo<G>;
         using BlockType = jsonWorld::BlockType<G>;
         using Transaction = jsonWorld::Transaction<G>;
-        using SyncWorld = typename Transaction::SyncWorld;
-        using BlockIndex = typename SyncWorld::BlockIndex;
+        using SyncWorld = Transaction::SyncWorld;
+        using BlockIndex = SyncWorld::BlockIndex;
     private:
         struct MatHasher {
             using is_transparent = void;
@@ -77,7 +77,7 @@ namespace gustave::examples::jsonGustave {
         };
 
         template<auto unit>
-        using Vector3 = typename G::template Vector3<unit>;
+        using Vector3 = G::template Vector3<unit>;
 
         static constexpr auto u = G::units();
     public:
@@ -129,8 +129,8 @@ namespace gustave::examples::jsonGustave {
     private:
         [[nodiscard]]
         static SyncWorld newWorld(Vector3<u.length> const& blockSize, Vector3<u.acceleration> const& g) {
-            using Solver = typename SyncWorld::Solver;
-            using Config = typename Solver::Config;
+            using Solver = SyncWorld::Solver;
+            using Config = Solver::Config;
             auto solverConfig = Config{ g, 0.001f, 100000 };
             return SyncWorld{ blockSize, Solver{ solverConfig } };
         }
@@ -145,12 +145,12 @@ template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::JsonWorld<G>> {
     using JsonWorld = gustave::examples::jsonGustave::JsonWorld<G>;
 
-    using BlockConstructionInfo = typename JsonWorld::BlockConstructionInfo;
-    using BlockType = typename JsonWorld::BlockType;
-    using Transaction = typename JsonWorld::Transaction;
+    using BlockConstructionInfo = JsonWorld::BlockConstructionInfo;
+    using BlockType = JsonWorld::BlockType;
+    using Transaction = JsonWorld::Transaction;
 
     template<auto unit>
-    using Vector3 = typename G::template Vector3<unit>;
+    using Vector3 = G::template Vector3<unit>;
 
     static constexpr auto u = G::units();
 

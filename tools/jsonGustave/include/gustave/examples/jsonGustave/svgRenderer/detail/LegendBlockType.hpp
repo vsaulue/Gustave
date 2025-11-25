@@ -39,14 +39,14 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class LegendBlockType {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
         using SvgCanvasContext = detail::SvgCanvasContext<G>;
         using SvgDims = detail::SvgDims<Float>;
         using SvgPhaseCanvas = detail::SvgPhaseCanvas<G>;
 
-        using BlockType = typename SvgCanvasContext::World::BlockType;
+        using BlockType = SvgCanvasContext::World::BlockType;
 
         [[nodiscard]]
         explicit LegendBlockType(SvgCanvasContext const& ctx, Color const& blockBorderColor, Float blockBorderWidth, Float xMin, Float yMin)

@@ -37,7 +37,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class LegendBlockHatch {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
         using SvgCanvasContext = detail::SvgCanvasContext<G>;

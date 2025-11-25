@@ -39,9 +39,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     class ContactStressPhase : public Phase<G> {
     private:
         template<auto unit>
-        using Real = typename G::template Real<unit>;
+        using Real = G::template Real<unit>;
 
-        using NormalizedVector3 = typename G::NormalizedVector3;
+        using NormalizedVector3 = G::NormalizedVector3;
 
         using LegendColorScale = detail::LegendColorScale<G>;
         using LegendContactLength = detail::LegendContactLength<G>;
@@ -49,17 +49,17 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
         static constexpr auto u = G::units();
         static constexpr auto rt = G::libConfig().realTraits;
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
         using ColorPoint = svgRenderer::ColorPoint<Float>;
         using ColorScale = svgRenderer::ColorScale<Float>;
-        using Config = typename Phase<G>::Config;
-        using JsonWorld = typename Phase<G>::JsonWorld;
-        using PhaseContext = typename Phase<G>::PhaseContext;
-        using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
-        using SvgDims = typename Phase<G>::SvgDims;
-        using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
+        using Config = Phase<G>::Config;
+        using JsonWorld = Phase<G>::JsonWorld;
+        using PhaseContext = Phase<G>::PhaseContext;
+        using SvgCanvasContext = Phase<G>::SvgCanvasContext;
+        using SvgDims = Phase<G>::SvgDims;
+        using SvgPhaseCanvas = Phase<G>::SvgPhaseCanvas;
 
         class ContactStressPhaseContext : public PhaseContext {
         public:
@@ -187,9 +187,9 @@ template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::phases::ContactStressPhase<G>> {
     using ContactStressPhase = gustave::examples::jsonGustave::svgRenderer::phases::ContactStressPhase<G>;
 
-    using Color = typename ContactStressPhase::Color;
-    using ColorScale = typename ContactStressPhase::ColorScale;
-    using Float = typename ContactStressPhase::Float;
+    using Color = ContactStressPhase::Color;
+    using ColorScale = ContactStressPhase::ColorScale;
+    using Float = ContactStressPhase::Float;
 
     [[nodiscard]]
     static ContactStressPhase from_json(nlohmann::json const& json) {
