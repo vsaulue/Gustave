@@ -123,29 +123,6 @@ namespace gustave::core::worlds::syncWorld {
             WorldData const* world_;
         };
 
-        class Neighbour {
-        public:
-            [[nodiscard]]
-            explicit Neighbour(BlockReference const& block)
-                : block_{ block }
-            {}
-
-            [[nodiscard]]
-            explicit Neighbour(utils::NoInit NO_INIT)
-                : block_{ NO_INIT }
-            {}
-
-            [[nodiscard]]
-            BlockReference const& block() const {
-                return block_;
-            }
-
-            [[nodiscard]]
-            bool operator==(Neighbour const&) const = default;
-        private:
-            BlockReference block_;
-        };
-
         class Structures {
         private:
             using SceneStructures = typename SceneBlock::template Structures<false>;
