@@ -93,6 +93,11 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
         SECTION("// immutable") {
             runTest(ib112, true);
         }
+
+        SECTION("// invalid") {
+            deleteBlock(ib112.index());
+            CHECK_THROWS_AS(ib112.contacts(), std::out_of_range);
+        }
     }
 
     SECTION(".index()") {
@@ -105,7 +110,7 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
         }
 
         SECTION("// invalid") {
-            sceneData.blocks.erase({ 1,1,2 });
+            deleteBlock(ib112.index());
             CHECK_THROWS_AS(ib112.isFoundation(), std::out_of_range);
         }
     }
@@ -122,7 +127,7 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
         }
 
         SECTION("// invalid") {
-            sceneData.blocks.erase({ 1,1,2 });
+            deleteBlock(ib112.index());
             CHECK_THROWS_AS(ib112.mass(), std::out_of_range);
         }
     }
@@ -161,6 +166,11 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
 
         SECTION("// immutable") {
             runTest(ib112, true);
+        }
+
+        SECTION("// invalid") {
+            deleteBlock(ib112.index());
+            CHECK_THROWS_AS(ib112.structures(), std::out_of_range);
         }
     }
 }
