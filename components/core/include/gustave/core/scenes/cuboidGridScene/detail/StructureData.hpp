@@ -59,8 +59,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using SolverStructure = solvers::Structure<libCfg>;
 
-        using Link = typename SolverStructure::Link;
-        using Node = typename SolverStructure::Node;
+        using Link = SolverStructure::Link;
+        using Node = SolverStructure::Node;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;

@@ -43,7 +43,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     private:
         using ConstructionHashEquals = utils::HashEquals<BlockConstructionInfo, utils::getter(&BlockConstructionInfo::index)>;
     public:
-        using ConstructionSet = typename ConstructionHashEquals::Set;
+        using ConstructionSet = ConstructionHashEquals::Set;
         using DeletedSet = std::unordered_set<BlockIndex>;
 
         [[nodiscard]]

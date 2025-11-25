@@ -98,7 +98,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using Direction = math3d::BasicDirection;
         using PressureStress = model::PressureStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
-        using SolverContactIndex = typename solvers::Structure<libCfg>::ContactIndex;
+        using SolverContactIndex = solvers::Structure<libCfg>::ContactIndex;
 
         template<bool mut>
         using BlockReference = cuboidGridScene::BlockReference<libCfg, UD_, mut>;

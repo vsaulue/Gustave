@@ -196,7 +196,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             if (not isValid()) {
                 throw invalidError();
             }
-            using Rep = typename Real<u.length>::Rep;
+            using Rep = Real<u.length>::Rep;
             auto const& bSize = blockSize();
             auto const x = Rep(index_.x) * bSize.x();
             auto const y = Rep(index_.y) * bSize.y();
