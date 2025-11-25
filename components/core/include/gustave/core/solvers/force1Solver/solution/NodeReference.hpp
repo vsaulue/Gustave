@@ -46,13 +46,13 @@ namespace gustave::core::solvers::force1Solver::solution {
         using SolutionData = detail::SolutionData<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
-        using F1LocalContacts = typename SolutionData::F1Structure::LocalContacts;
-        using F1Node = typename SolutionData::F1Structure::F1Node;
+        using F1LocalContacts = SolutionData::F1Structure::LocalContacts;
+        using F1Node = SolutionData::F1Structure::F1Node;
         using LinkIndex = cfg::LinkIndex<libCfg>;
-        using NodeStats = typename SolutionData::ForceRepartition::NodeStats;
-        using StructureNode = typename Structure::Node;
-        using StructureLink = typename Structure::Link;
-        using StructureLinks = typename Structure::Links;
+        using NodeStats = SolutionData::ForceRepartition::NodeStats;
+        using StructureNode = Structure::Node;
+        using StructureLink = Structure::Link;
+        using StructureLinks = Structure::Links;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -64,14 +64,14 @@ namespace gustave::core::solvers::force1Solver::solution {
     public:
         using ContactReference = solution::ContactReference<libCfg>;
 
-        using ContactIndex = typename Structure::ContactIndex;
-        using NodeIndex = typename Structure::NodeIndex;
+        using ContactIndex = Structure::ContactIndex;
+        using NodeIndex = Structure::NodeIndex;
 
         class Contacts {
         private:
             class Enumerator {
             private:
-                using DataIterator = typename F1LocalContacts::iterator;
+                using DataIterator = F1LocalContacts::iterator;
             public:
                 [[nodiscard]]
                 Enumerator()

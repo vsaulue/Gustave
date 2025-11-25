@@ -40,11 +40,11 @@ namespace gustave::core::solvers::force1Solver::solution {
     class Nodes {
     public:
         using NodeReference = solution::NodeReference<libCfg>;
-        using NodeIndex = typename NodeReference::NodeIndex;
+        using NodeIndex = NodeReference::NodeIndex;
     private:
         using SolutionData = detail::SolutionData<libCfg>;
         using Structure = solvers::Structure<libCfg>;
-        using StructureNodes = typename Structure::Nodes;
+        using StructureNodes = Structure::Nodes;
 
         class Enumerator {
         public:

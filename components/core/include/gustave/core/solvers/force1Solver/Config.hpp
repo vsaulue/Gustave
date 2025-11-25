@@ -36,10 +36,10 @@ namespace gustave::core::solvers::force1Solver {
         static constexpr auto u = cfg::units(libCfg);
 
         template<cfg::cUnitOf<libCfg> auto unit>
-        using Real = typename cfg::Real<libCfg, unit>;
+        using Real = cfg::Real<libCfg, unit>;
 
         template<cfg::cUnitOf<libCfg> auto unit>
-        using Vector3 = typename cfg::Vector3<libCfg, unit>;
+        using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
         using IterationIndex = std::uint64_t;
 

@@ -44,7 +44,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         static constexpr auto u = cfg::units(libCfg);
 
         template<cfg::cUnitOf<libCfg> auto unit>
-        using Real = typename cfg::Real<libCfg, unit>;
+        using Real = cfg::Real<libCfg, unit>;
 
         using NodeIndex = cfg::NodeIndex<libCfg>;
     public:

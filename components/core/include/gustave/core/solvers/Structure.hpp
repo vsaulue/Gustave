@@ -41,8 +41,8 @@ namespace gustave::core::solvers {
         using Link = structure::Link<libCfg>;
         using Node = structure::Node<libCfg>;
 
-        using LinkIndex = typename Link::LinkIndex;
-        using NodeIndex = typename Node::NodeIndex;
+        using LinkIndex = Link::LinkIndex;
+        using NodeIndex = Node::NodeIndex;
 
         using Links = std::vector<Link>;
         using Nodes = std::vector<Node>;

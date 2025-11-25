@@ -43,7 +43,7 @@ namespace gustave::core::solvers::force1Solver::detail::f1Structure {
     public:
         using F1BasicContact = detail::F1BasicContact<libCfg>;
 
-        using ForceStats = typename F1BasicContact::ForceStats;
+        using ForceStats = F1BasicContact::ForceStats;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 

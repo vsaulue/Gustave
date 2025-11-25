@@ -41,9 +41,9 @@ namespace gustave::core::solvers::force1Solver::solution {
         using SolutionData = detail::SolutionData<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
-        using LinkIndex = typename Structure::LinkIndex;
+        using LinkIndex = Structure::LinkIndex;
     public:
-        using ContactIndex = typename Structure::ContactIndex;
+        using ContactIndex = Structure::ContactIndex;
         using ContactReference = solution::ContactReference<libCfg>;
 
         [[nodiscard]]

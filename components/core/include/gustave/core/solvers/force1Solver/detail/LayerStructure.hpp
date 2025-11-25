@@ -52,7 +52,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         using LayerIndex = cfg::NodeIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
 
-        using F1BasicContact = typename F1Structure::F1Contact::F1BasicContact;
+        using F1BasicContact = F1Structure::F1Contact::F1BasicContact;
 
         using LayerContact = detail::LocalContact<libCfg>;
 

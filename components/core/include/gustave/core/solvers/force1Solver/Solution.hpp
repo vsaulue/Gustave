@@ -59,12 +59,12 @@ namespace gustave::core::solvers::force1Solver {
         using Contacts = solution::Contacts<libCfg>;
         using Nodes = solution::Nodes<libCfg>;
 
-        using ContactIndex = typename Basis::Structure::ContactIndex;
-        using ContactReference = typename Contacts::ContactReference;
-        using Link = typename Basis::Structure::Link;
-        using NodeIndex = typename Nodes::NodeReference::NodeIndex;
-        using NodeReference = typename Nodes::NodeReference;
-        using Structure = typename Basis::Structure;
+        using ContactIndex = Basis::Structure::ContactIndex;
+        using ContactReference = Contacts::ContactReference;
+        using Link = Basis::Structure::Link;
+        using NodeIndex = Nodes::NodeReference::NodeIndex;
+        using NodeReference = Nodes::NodeReference;
+        using Structure = Basis::Structure;
 
         [[nodiscard]]
         explicit Solution(std::shared_ptr<const Basis> basis)
