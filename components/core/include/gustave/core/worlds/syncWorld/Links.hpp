@@ -39,11 +39,11 @@ namespace gustave::core::worlds::syncWorld {
         using SceneLinks = WorldData::Scene::template Links<false>;
     public:
         using ContactReference = syncWorld::ContactReference<libCfg>;
-        using ContactIndex = typename ContactReference::ContactIndex;
+        using ContactIndex = ContactReference::ContactIndex;
     private:
         class Enumerator {
         private:
-            using SceneIterator = typename SceneLinks::Iterator;
+            using SceneIterator = SceneLinks::Iterator;
         public:
             [[nodiscard]]
             Enumerator()

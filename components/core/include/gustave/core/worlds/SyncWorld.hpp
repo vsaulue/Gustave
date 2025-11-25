@@ -59,15 +59,15 @@ namespace gustave::core::worlds {
         using Links = syncWorld::Links<libCfg>;
         using Structures = syncWorld::Structures<libCfg>;
 
-        using BlockIndex = typename WorldData::Scene::BlockIndex;
-        using BlockReference = typename Blocks::BlockReference;
-        using ContactIndex = typename Contacts::ContactIndex;
-        using ContactReference = typename Contacts::ContactReference;
-        using Scene = typename WorldData::Scene;
-        using Solver = typename WorldData::Solver;
-        using StructureReference = typename Structures::StructureReference;
-        using Transaction = typename WorldData::Scene::Transaction;
-        using TransactionResult = typename WorldData::Scene::TransactionResult;
+        using BlockIndex = WorldData::Scene::BlockIndex;
+        using BlockReference = Blocks::BlockReference;
+        using ContactIndex = Contacts::ContactIndex;
+        using ContactReference = Contacts::ContactReference;
+        using Scene = WorldData::Scene;
+        using Solver = WorldData::Solver;
+        using StructureReference = Structures::StructureReference;
+        using Transaction = WorldData::Scene::Transaction;
+        using TransactionResult = WorldData::Scene::TransactionResult;
 
         [[nodiscard]]
         explicit SyncWorld(Vector3<u.length> const& blockSize, Solver solver)

@@ -52,9 +52,9 @@ namespace gustave::core::worlds::syncWorld {
         static constexpr auto u = cfg::units(libCfg);
     public:
         using BlockReference = syncWorld::BlockReference<libCfg>;
-        using ContactIndex = typename WorldData::Scene::ContactIndex;
+        using ContactIndex = WorldData::Scene::ContactIndex;
         using ForceStress = model::ForceStress<libCfg>;
-        using PressureStress = typename SceneContact::PressureStress;
+        using PressureStress = SceneContact::PressureStress;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using StressRatio = model::StressRatio<libCfg>;
         using StructureReference = syncWorld::StructureReference<libCfg>;
