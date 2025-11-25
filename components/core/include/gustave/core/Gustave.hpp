@@ -43,7 +43,7 @@ namespace gustave::core {
             return cfg::units(libCfg_);
         }
 
-        using RealRep = typename decltype(libCfg_)::RealRep;
+        using RealRep = decltype(libCfg_)::RealRep;
 
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg_>;
 

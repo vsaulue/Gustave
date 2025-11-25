@@ -48,11 +48,11 @@ namespace gustave::core::worlds::syncWorld {
         using Vector3 = cfg::Vector3<libCfg, unit>;
 
         using WorldData = detail::WorldData<libCfg>;
-        using Scene = typename WorldData::Scene;
+        using Scene = WorldData::Scene;
 
         using SceneBlock = Scene::template BlockReference<false>;
     public:
-        using BlockIndex = typename WorldData::Scene::BlockIndex;
+        using BlockIndex = WorldData::Scene::BlockIndex;
         using ContactReference = syncWorld::ContactReference<libCfg>;
         using PressureStress = model::PressureStress<libCfg>;
         using StressRatio = model::StressRatio<libCfg>;
@@ -64,7 +64,7 @@ namespace gustave::core::worlds::syncWorld {
 
             class Enumerator {
             private:
-                using SceneIterator = typename SceneContacts::Iterator;
+                using SceneIterator = SceneContacts::Iterator;
             public:
                 [[nodiscard]]
                 Enumerator()
@@ -125,8 +125,8 @@ namespace gustave::core::worlds::syncWorld {
 
         class Structures {
         private:
-            using SceneStructures = typename SceneBlock::template Structures<false>;
-            using SceneIterator = typename SceneStructures::ConstIterator;
+            using SceneStructures = SceneBlock::template Structures<false>;
+            using SceneIterator = SceneStructures::ConstIterator;
 
             class Enumerator {
             public:

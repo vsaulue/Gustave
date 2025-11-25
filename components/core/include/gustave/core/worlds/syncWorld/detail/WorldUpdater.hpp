@@ -36,8 +36,8 @@ namespace gustave::core::worlds::syncWorld::detail {
     public:
         using WorldData = detail::WorldData<libCfg>;
 
-        using TransactionResult = typename WorldData::Scene::TransactionResult;
-        using Transaction = typename WorldData::Scene::Transaction;
+        using TransactionResult = WorldData::Scene::TransactionResult;
+        using Transaction = WorldData::Scene::Transaction;
 
         [[nodiscard]]
         explicit WorldUpdater(WorldData& data)

@@ -36,7 +36,7 @@ namespace gustave::core::worlds::syncWorld {
     public:
         using ContactReference = syncWorld::ContactReference<libCfg>;
 
-        using ContactIndex = typename ContactReference::ContactIndex;
+        using ContactIndex = ContactReference::ContactIndex;
 
         [[nodiscard]]
         explicit Contacts(WorldData const& world)

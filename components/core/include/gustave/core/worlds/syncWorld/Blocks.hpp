@@ -39,14 +39,14 @@ namespace gustave::core::worlds::syncWorld {
     private:
         using WorldData = detail::WorldData<libCfg>;
 
-        using SceneBlocks = typename WorldData::Scene::template Blocks<false>;
+        using SceneBlocks = WorldData::Scene::template Blocks<false>;
     public:
-        using BlockIndex = typename WorldData::Scene::BlockIndex;
+        using BlockIndex = WorldData::Scene::BlockIndex;
         using BlockReference = syncWorld::BlockReference<libCfg>;
     private:
         class Enumerator {
         private:
-            using SceneIterator = typename SceneBlocks::Iterator;
+            using SceneIterator = SceneBlocks::Iterator;
         public:
             [[nodiscard]]
             Enumerator()
