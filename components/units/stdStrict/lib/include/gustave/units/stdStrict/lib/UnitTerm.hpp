@@ -34,7 +34,7 @@
 namespace gustave::units::stdStrict::lib {
     template<cBasicUnitIdentifier auto basicUnit_, cExponent auto exponent_>
     struct UnitTerm {
-        using Char = typename decltype(basicUnit_)::Char;
+        using Char = decltype(basicUnit_)::Char;
 
         [[nodiscard]]
         constexpr UnitTerm() = default;
@@ -73,7 +73,7 @@ namespace gustave::units::stdStrict::lib {
 
         [[nodiscard]]
         constexpr auto operator<=>(cUnitTerm auto rhs) const {
-            using RhsChar = typename decltype(rhs)::Char;
+            using RhsChar = decltype(rhs)::Char;
             static_assert(std::is_same_v<Char, RhsChar>, "Only terms using the same Char can be compared.");
             return basicUnit_.symbol() <=> rhs.basicUnit().symbol();
         }

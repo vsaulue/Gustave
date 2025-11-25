@@ -66,7 +66,7 @@ namespace gustave::units::stdStrict::lib {
     class UnitIdentifier<headTerm_, tailTerms_...> {
     public:
         using HeadTerm = decltype(headTerm_);
-        using Char = typename HeadTerm::Char;
+        using Char = HeadTerm::Char;
         using TailUnit = UnitIdentifier<tailTerms_...>;
 
         [[nodiscard]]

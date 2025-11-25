@@ -33,7 +33,7 @@
 namespace gustave::units::stdStrict::lib {
     template<utils::SizedString symbol_>
     struct BasicUnitIdentifier {
-        using Char = typename decltype(symbol_)::Char;
+        using Char = decltype(symbol_)::Char;
 
         [[nodiscard]]
         static constexpr auto const& symbol() {
