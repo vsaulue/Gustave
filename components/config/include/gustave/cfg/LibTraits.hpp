@@ -34,23 +34,23 @@ namespace gustave::cfg {
     }
 
     template<cLibConfig auto cfg>
-    using NormalizedVector3 = typename decltype(cfg)::NormalizedVector3;
+    using NormalizedVector3 = decltype(cfg)::NormalizedVector3;
 
     template<cLibConfig auto cfg>
-    using LinkIndex = typename decltype(cfg)::LinkIndex;
+    using LinkIndex = decltype(cfg)::LinkIndex;
 
     template<cLibConfig auto cfg>
-    using LocalContactIndex = typename decltype(cfg)::LinkIndex;
+    using LocalContactIndex = decltype(cfg)::LinkIndex;
 
     template<cLibConfig auto cfg>
-    using NodeIndex = typename decltype(cfg)::NodeIndex;
+    using NodeIndex = decltype(cfg)::NodeIndex;
 
     template<cLibConfig auto cfg>
-    using StructureIndex = typename decltype(cfg)::StructureIndex;
+    using StructureIndex = decltype(cfg)::StructureIndex;
 
     template<cLibConfig auto cfg, auto unit>
-    using Vector3 = typename decltype(cfg)::template Vector3<unit>;
+    using Vector3 = decltype(cfg)::template Vector3<unit>;
 
     template<cLibConfig auto cfg, auto unit>
-    using Real = typename decltype(cfg.realTraits)::template Type<unit, typename decltype(cfg)::RealRep>;
+    using Real = decltype(cfg.realTraits)::template Type<unit, typename decltype(cfg)::RealRep>;
 }

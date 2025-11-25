@@ -76,7 +76,7 @@ namespace gustave::cfg {
         };
 
         template<typename RealTraits, auto unit>
-        using Float = typename RealTraits::template Type<unit,float>;
+        using Float = RealTraits::template Type<unit,float>;
     }
 
     template<typename T>
