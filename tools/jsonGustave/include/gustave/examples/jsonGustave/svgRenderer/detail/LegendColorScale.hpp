@@ -41,7 +41,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class LegendColorScale {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
         using ColorScale = svgRenderer::ColorScale<Float>;
@@ -52,7 +52,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     private:
         using SvgLinearGradient = detail::SvgLinearGradient<Float>;
 
-        using GradientStop = typename SvgLinearGradient::Stop;
+        using GradientStop = SvgLinearGradient::Stop;
 
         struct GradientRect {
         public:

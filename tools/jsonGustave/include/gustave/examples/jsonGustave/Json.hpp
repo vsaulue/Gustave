@@ -42,7 +42,7 @@ namespace gustave::examples::jsonGustave {
 template<typename Real>
     requires gustave::cfg::cReal<Real>
 struct nlohmann::adl_serializer<Real> {
-    using Rep = typename Real::Rep;
+    using Rep = Real::Rep;
     static constexpr auto unit = Real::unit();
 
     [[nodiscard]]
@@ -54,7 +54,7 @@ struct nlohmann::adl_serializer<Real> {
 template<typename Vector3>
     requires gustave::cfg::cVector3<Vector3>
 struct nlohmann::adl_serializer<Vector3> {
-    using Coord = typename Vector3::Coord;
+    using Coord = Vector3::Coord;
 
     [[nodiscard]]
     static Vector3 from_json(nlohmann::json const& json) {
@@ -83,7 +83,7 @@ template<typename Stress>
     requires gustave::core::model::cStress<Stress>
 struct nlohmann::adl_serializer<Stress> {
 public:
-    using Coord = typename Stress::Coord;
+    using Coord = Stress::Coord;
 
     [[nodiscard]]
     static Stress from_json(nlohmann::json const& json) {

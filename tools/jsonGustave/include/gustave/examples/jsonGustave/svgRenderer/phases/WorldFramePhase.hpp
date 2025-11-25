@@ -34,14 +34,14 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     template<core::cGustave G>
     class WorldFramePhase : public Phase<G> {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
-        using Config = typename Phase<G>::Config;
-        using JsonWorld = typename Phase<G>::JsonWorld;
-        using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
-        using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
-        using PhaseContext = typename Phase<G>::PhaseContext;
+        using Config = Phase<G>::Config;
+        using JsonWorld = Phase<G>::JsonWorld;
+        using SvgCanvasContext = Phase<G>::SvgCanvasContext;
+        using SvgPhaseCanvas = Phase<G>::SvgPhaseCanvas;
+        using PhaseContext = Phase<G>::PhaseContext;
 
         class WorldFramePhaseContext : public PhaseContext {
         public:
@@ -92,8 +92,8 @@ template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::phases::WorldFramePhase<G>> {
     using WorldFramePhase = gustave::examples::jsonGustave::svgRenderer::phases::WorldFramePhase<G>;
 
-    using Color = typename WorldFramePhase::Color;
-    using Float = typename WorldFramePhase::Float;
+    using Color = WorldFramePhase::Color;
+    using Float = WorldFramePhase::Float;
 
     [[nodiscard]]
     static WorldFramePhase from_json(nlohmann::json const& json) {

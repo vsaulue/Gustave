@@ -39,11 +39,11 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     template<core::cGustave G>
     class Phase {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
-        using SyncWorld = typename JsonWorld::SyncWorld;
+        using SyncWorld = JsonWorld::SyncWorld;
         using SvgCanvasContext = detail::SvgCanvasContext<G>;
         using SvgDims = detail::SvgDims<Float>;
         using SvgPhaseCanvas = detail::SvgPhaseCanvas<G>;

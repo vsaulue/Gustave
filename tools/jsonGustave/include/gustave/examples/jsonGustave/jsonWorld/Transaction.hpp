@@ -34,11 +34,11 @@ namespace gustave::examples::jsonGustave::jsonWorld {
     template<core::cGustave G>
     class Transaction {
     public:
-        using SyncWorld = typename G::Worlds::SyncWorld;
+        using SyncWorld = G::Worlds::SyncWorld;
 
-        using BlockIndex = typename SyncWorld::BlockIndex;
+        using BlockIndex = SyncWorld::BlockIndex;
         using BlockType = jsonWorld::BlockType<G>;
-        using SyncTransaction = typename SyncWorld::Transaction;
+        using SyncTransaction = SyncWorld::Transaction;
 
         using BlockTypeOf = std::unordered_map<BlockIndex, std::string>;
 

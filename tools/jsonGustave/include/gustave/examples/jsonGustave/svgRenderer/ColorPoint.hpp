@@ -44,7 +44,7 @@ template<gustave::cfg::cRealRep Float>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::ColorPoint<Float>> {
     using ColorPoint = gustave::examples::jsonGustave::svgRenderer::ColorPoint<Float>;
 
-    using Color = typename ColorPoint::Color;
+    using Color = ColorPoint::Color;
 
     [[nodiscard]]
     static ColorPoint from_json(nlohmann::json const& json) {

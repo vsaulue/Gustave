@@ -35,7 +35,7 @@ namespace gustave::examples::jsonGustave::jsonWorld {
     template<core::cGustave G>
     class BlockConstructionInfo {
     public:
-        using BlockIndex = typename G::Worlds::SyncWorld::BlockIndex;
+        using BlockIndex = G::Worlds::SyncWorld::BlockIndex;
 
         [[nodiscard]]
         explicit BlockConstructionInfo(BlockIndex const& index, std::string blockTypeName, bool isFoundation)
@@ -69,7 +69,7 @@ template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::jsonWorld::BlockConstructionInfo<G>> {
     using BlockConstructionInfo = gustave::examples::jsonGustave::jsonWorld::BlockConstructionInfo<G>;
 
-    using BlockIndex = typename BlockConstructionInfo::BlockIndex;
+    using BlockIndex = BlockConstructionInfo::BlockIndex;
 
     [[nodiscard]]
     static BlockConstructionInfo from_json(nlohmann::json const& json) {

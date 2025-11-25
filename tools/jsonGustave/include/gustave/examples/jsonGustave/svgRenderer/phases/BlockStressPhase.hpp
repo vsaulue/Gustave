@@ -40,16 +40,16 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     template<core::cGustave G>
     class BlockStressPhase : public Phase<G> {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
-        using Config = typename Phase<G>::Config;
+        using Config = Phase<G>::Config;
         using ColorScale = svgRenderer::ColorScale<Float>;
-        using JsonWorld = typename Phase<G>::JsonWorld;
-        using PhaseContext = typename Phase<G>::PhaseContext;
-        using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
-        using SvgDims = typename Phase<G>::SvgDims;
-        using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
+        using JsonWorld = Phase<G>::JsonWorld;
+        using PhaseContext = Phase<G>::PhaseContext;
+        using SvgCanvasContext = Phase<G>::SvgCanvasContext;
+        using SvgDims = Phase<G>::SvgDims;
+        using SvgPhaseCanvas = Phase<G>::SvgPhaseCanvas;
         using StressCoord = jsonGustave::StressCoord;
     private:
         using LegendBlockHatch = detail::LegendBlockHatch<G>;
@@ -162,10 +162,10 @@ template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::phases::BlockStressPhase<G>> {
     using BlockStressPhase = gustave::examples::jsonGustave::svgRenderer::phases::BlockStressPhase<G>;
 
-    using Color = typename BlockStressPhase::Color;
-    using ColorScale = typename BlockStressPhase::ColorScale;
-    using Float = typename BlockStressPhase::Float;
-    using StressCoord = typename BlockStressPhase::StressCoord;
+    using Color = BlockStressPhase::Color;
+    using ColorScale = BlockStressPhase::ColorScale;
+    using Float = BlockStressPhase::Float;
+    using StressCoord = BlockStressPhase::StressCoord;
 
     [[nodiscard]]
     static BlockStressPhase from_json(nlohmann::json const& json) {

@@ -43,8 +43,8 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class SvgCanvas {
     public:
-        using Float = typename G::RealRep;
-        using SyncWorld = typename G::Worlds::SyncWorld;
+        using Float = G::RealRep;
+        using SyncWorld = G::Worlds::SyncWorld;
 
         using Config = svgRenderer::Config<Float>;
         using JsonWorld = jsonGustave::JsonWorld<G>;
@@ -53,9 +53,9 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using SvgLinearGradient = detail::SvgLinearGradient<Float>;
         using SvgRect = detail::SvgRect<Float>;
     private:
-        using BlockIndex = typename SyncWorld::BlockIndex;
-        using Direction = typename SyncWorld::ContactIndex::Direction;
-        using GridCoord = typename SyncWorld::BlockIndex::Coord;
+        using BlockIndex = SyncWorld::BlockIndex;
+        using Direction = SyncWorld::ContactIndex::Direction;
+        using GridCoord = SyncWorld::BlockIndex::Coord;
 
         using SvgWorldBox = detail::SvgWorldBox<G>;
     public:

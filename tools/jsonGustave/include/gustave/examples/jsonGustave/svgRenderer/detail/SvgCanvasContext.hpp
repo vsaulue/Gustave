@@ -35,7 +35,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class SvgCanvasContext {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using World = jsonGustave::JsonWorld<G>;
         using Config = svgRenderer::Config<Float>;

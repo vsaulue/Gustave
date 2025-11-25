@@ -33,15 +33,15 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class SvgPhaseCanvas {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
         using SvgCanvas = detail::SvgCanvas<G>;
-        using SyncWorld = typename G::Worlds::SyncWorld;
+        using SyncWorld = G::Worlds::SyncWorld;
 
-        using Attrs = typename SvgCanvas::Attrs;
-        using BlockReference = typename SyncWorld::BlockReference;
-        using ContactReference = typename SyncWorld::ContactReference;
-        using SvgLinearGradient = typename SvgCanvas::SvgLinearGradient;
-        using SvgRect = typename SvgCanvas::SvgRect;
+        using Attrs = SvgCanvas::Attrs;
+        using BlockReference = SyncWorld::BlockReference;
+        using ContactReference = SyncWorld::ContactReference;
+        using SvgLinearGradient = SvgCanvas::SvgLinearGradient;
+        using SvgRect = SvgCanvas::SvgRect;
 
         [[nodiscard]]
         explicit SvgPhaseCanvas(SvgCanvas& canvas, Float xLegendOffset, Float yLegendOffset)

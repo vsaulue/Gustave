@@ -36,15 +36,15 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
     template<core::cGustave G>
     class BlockTypePhase : public Phase<G> {
     public:
-        using Float = typename G::RealRep;
+        using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
-        using Config = typename Phase<G>::Config;
-        using JsonWorld = typename Phase<G>::JsonWorld;
-        using SvgCanvasContext = typename Phase<G>::SvgCanvasContext;
-        using SvgDims = typename Phase<G>::SvgDims;
-        using SvgPhaseCanvas = typename Phase<G>::SvgPhaseCanvas;
-        using PhaseContext = typename Phase<G>::PhaseContext;
+        using Config = Phase<G>::Config;
+        using JsonWorld = Phase<G>::JsonWorld;
+        using SvgCanvasContext = Phase<G>::SvgCanvasContext;
+        using SvgDims = Phase<G>::SvgDims;
+        using SvgPhaseCanvas = Phase<G>::SvgPhaseCanvas;
+        using PhaseContext = Phase<G>::PhaseContext;
     private:
         using LegendBlockHatch = detail::LegendBlockHatch<G>;
         using LegendBlockType = detail::LegendBlockType<G>;
@@ -133,8 +133,8 @@ template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::svgRenderer::phases::BlockTypePhase<G>> {
     using BlockTypePhase = gustave::examples::jsonGustave::svgRenderer::phases::BlockTypePhase<G>;
 
-    using Color = typename BlockTypePhase::Color;
-    using Float = typename BlockTypePhase::Float;
+    using Color = BlockTypePhase::Color;
+    using Float = BlockTypePhase::Float;
 
     [[nodiscard]]
     static BlockTypePhase from_json(nlohmann::json const& json) {

@@ -34,11 +34,11 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class SvgWorldBox {
     public:
-        using Float = typename G::RealRep;
-        using SyncWorld = typename G::Worlds::SyncWorld;
+        using Float = G::RealRep;
+        using SyncWorld = G::Worlds::SyncWorld;
 
-        using BlockIndex = typename SyncWorld::BlockIndex;
-        using GridCoord = typename SyncWorld::BlockIndex::Coord;
+        using BlockIndex = SyncWorld::BlockIndex;
+        using GridCoord = SyncWorld::BlockIndex::Coord;
         using SvgCanvasContext = detail::SvgCanvasContext<G>;
         using SvgRect = detail::SvgRect<Float>;
 

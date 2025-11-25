@@ -37,12 +37,12 @@ namespace gustave::examples::jsonGustave::jsonWorld {
     class BlockType {
     private:
         template<auto unit>
-        using Real = typename G::template Real<unit>;
+        using Real = G::template Real<unit>;
 
         static constexpr auto u = G::units();
     public:
         using Color = jsonGustave::Color<typename G::RealRep>;
-        using PressureStress = typename G::Model::PressureStress;
+        using PressureStress = G::Model::PressureStress;
 
         [[nodiscard]]
         explicit BlockType(std::string name, Color const& color, Real<u.mass> mass, PressureStress const& maxStress)
@@ -81,14 +81,14 @@ namespace gustave::examples::jsonGustave::jsonWorld {
 
 template<gustave::core::cGustave G>
 struct nlohmann::adl_serializer<gustave::examples::jsonGustave::jsonWorld::BlockType<G>> {
-    using Float = typename G::RealRep;
+    using Float = G::RealRep;
 
     static constexpr auto u = G::units();
 
     template<auto unit>
-    using Real = typename G::template Real<unit>;
+    using Real = G::template Real<unit>;
 
-    using PressureStress = typename G::Model::PressureStress;
+    using PressureStress = G::Model::PressureStress;
     using BlockType = gustave::examples::jsonGustave::jsonWorld::BlockType<G>;
     using Color = gustave::examples::jsonGustave::Color<Float>;
 
