@@ -40,7 +40,7 @@ namespace gustave::testing::matchers {
     template<cfg::cReal TargetReal>
     class RealWithinRelMatcher : public Catch::Matchers::MatcherGenericBase {
     public:
-        using Rep = typename TargetReal::Rep;
+        using Rep = TargetReal::Rep;
 
         [[nodiscard]]
         constexpr RealWithinRelMatcher(TargetReal target, Rep epsilon)
