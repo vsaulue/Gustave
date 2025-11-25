@@ -41,11 +41,11 @@ namespace gustave::testing::matchers {
         static constexpr auto rt = TargetVector::realTraits();
         static constexpr auto u = rt.units();
     public:
-        using Coord = typename TargetVector::Coord;
-        using RealRep = typename TargetVector::RealRep;
+        using Coord = TargetVector::Coord;
+        using RealRep = TargetVector::RealRep;
 
         template<cfg::cUnitOf<rt> auto unit>
-        using Real = typename decltype(rt)::template Type<unit, RealRep>;
+        using Real = decltype(rt)::template Type<unit, RealRep>;
 
         [[nodiscard]]
         constexpr Vector3WithinRelMatcher(TargetVector const& target, Real<u.one> epsilon)
