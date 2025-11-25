@@ -51,8 +51,8 @@ namespace gustave::utils {
         using Size = std::size_t;
         using Data = std::array<Char, length>;
 
-        using const_iterator = typename Data::const_iterator;
-        using iterator = typename Data::iterator;
+        using const_iterator = Data::const_iterator;
+        using iterator = Data::iterator;
 
         using string_view = std::basic_string_view<Char>;
 
@@ -163,8 +163,8 @@ namespace gustave::utils {
 
     [[nodiscard]]
     constexpr std::strong_ordering operator<=>(cSizedString auto const& lhs, cSizedString auto const& rhs) {
-        using LhsChar = typename decltype(meta::value(lhs))::Char;
-        using RhsChar = typename decltype(meta::value(rhs))::Char;
+        using LhsChar = decltype(meta::value(lhs))::Char;
+        using RhsChar = decltype(meta::value(rhs))::Char;
         static_assert(std::is_same_v<LhsChar,RhsChar>,"Invalid comparison: incompatible character types");
         return lhs.view() <=> rhs.view();
     }
