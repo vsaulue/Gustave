@@ -64,7 +64,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         };
 
         using Values = std::array<Value, 3>;
-        using Iterator = typename Values::const_iterator;
+        using Iterator = Values::const_iterator;
 
         [[nodiscard]]
         explicit InternalLinks(utils::NoInit)

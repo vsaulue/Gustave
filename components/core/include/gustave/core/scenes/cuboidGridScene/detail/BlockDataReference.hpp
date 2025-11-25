@@ -55,7 +55,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         Prop<BlockData<libCfg>>* data_;
     public:
         using Hasher = utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
-        using LinkIndices = typename BlockMappedData<libCfg>::LinkIndices;
+        using LinkIndices = BlockMappedData<libCfg>::LinkIndices;
         using PressureStress = model::PressureStress<libCfg>;
         using StructureIndex = BlockMappedData<libCfg>::StructureIndex;
 

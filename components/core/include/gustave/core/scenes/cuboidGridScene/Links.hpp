@@ -45,7 +45,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             using InternalLinks = cuboidGridScene::detail::InternalLinks<libCfg, UD_>;
             using SceneData = cuboidGridScene::detail::SceneData<libCfg, UD_>;
 
-            using BlockDataIterator = typename SceneData::Blocks::const_iterator;
+            using BlockDataIterator = SceneData::Blocks::const_iterator;
         public:
             using Value  = cuboidGridScene::ContactReference<libCfg, UD_, isMut_>;
 

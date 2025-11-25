@@ -56,7 +56,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<libCfg>>;
         using Direction = math3d::BasicDirection;
 
-        using const_iterator = typename BlockMap::const_iterator;
+        using const_iterator = BlockMap::const_iterator;
 
         [[nodiscard]]
         explicit SceneBlocks(Vector3<u.length> const& blockSize)

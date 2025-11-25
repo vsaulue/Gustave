@@ -44,7 +44,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<bool mut>
         using ContactReference = cuboidGridScene::ContactReference<libCfg, UD_, mut>;
 
-        using ContactIndex = typename ContactReference<false>::ContactIndex;
+        using ContactIndex = ContactReference<false>::ContactIndex;
 
         [[nodiscard]]
         explicit Contacts(Prop<SceneData>& scene)

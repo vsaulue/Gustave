@@ -49,7 +49,7 @@ namespace gustave::core::scenes::cuboidGridScene::structureReference {
 
             using StructureData = cuboidGridScene::detail::StructureData<libCfg_, UD_>;
 
-            using DataIterator = typename StructureData::SolverIndices::const_iterator;
+            using DataIterator = StructureData::SolverIndices::const_iterator;
         public:
             using Value = cuboidGridScene::BlockReference<libCfg_, UD_, isMut_>;
 
