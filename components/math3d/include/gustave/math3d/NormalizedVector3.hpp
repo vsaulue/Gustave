@@ -59,7 +59,7 @@ namespace gustave::math3d {
 
         using RealTraits = decltype(rt);
         using Vector = Vector3<rt, one, Rep_>;
-        using Coord = typename Vector::Coord;
+        using Coord = Vector::Coord;
 
         [[nodiscard]]
         static constexpr RealTraits realTraits() {
