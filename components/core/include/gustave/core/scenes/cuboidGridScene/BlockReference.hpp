@@ -151,17 +151,24 @@ namespace gustave::core::scenes::cuboidGridScene {
         Contacts<true> contacts()
             requires (isMut_)
         {
-            return Contacts<true>{ *sceneData_, index_ };
+            return doContacts(*this);
         }
 
         [[nodiscard]]
         Contacts<false> contacts() const {
-            return Contacts<false>{ *sceneData_, index_ };
+            return doContacts(*this);
         }
 
         [[nodiscard]]
         BlockIndex const& index() const {
             return index_;
+        }
+
+        [[nodiscard]]
+        std::out_of_range invalidError() const {
+            std::stringstream msg;
+            msg << "No block at index " << index_ << ".";
+            return std::out_of_range{ msg.str() };
         }
 
         [[nodiscard]]
@@ -186,11 +193,14 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         Vector3<u.length> position() const {
+            if (not isValid()) {
+                throw invalidError();
+            }
             using Rep = typename Real<u.length>::Rep;
-            Vector3<u.length> const& bSize = blockSize();
-            Real<u.length> const x = Rep(index_.x) * bSize.x();
-            Real<u.length> const y = Rep(index_.y) * bSize.y();
-            Real<u.length> const z = Rep(index_.z) * bSize.z();
+            auto const& bSize = blockSize();
+            auto const x = Rep(index_.x) * bSize.x();
+            auto const y = Rep(index_.y) * bSize.y();
+            auto const z = Rep(index_.z) * bSize.z();
             return Vector3<u.length>{ x, y, z };
         }
 
@@ -216,11 +226,18 @@ namespace gustave::core::scenes::cuboidGridScene {
         BlockDataReference data() const {
             BlockDataReference result = sceneData_->blocks.find(index_);
             if (!result) {
-                std::stringstream msg;
-                msg << "No block at index " << index_ << ".";
-                throw std::out_of_range(msg.str());
+                throw invalidError();
             }
             return result;
+        }
+
+        [[nodiscard]]
+        static auto doContacts(meta::cCvRefOf<BlockReference> auto&& self) {
+            using Result = decltype(self.contacts());
+            if (not self.isValid()) {
+                throw self.invalidError();
+            }
+            return Result{ *self.sceneData_, self.index_ };
         }
     };
 }
