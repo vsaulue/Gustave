@@ -32,7 +32,7 @@
 namespace cfg = ::gustave::cfg;
 
 template<auto unit, cfg::cRealRep Rep>
-using Real = typename Rt::template Type<unit, Rep>;
+using Real = Rt::template Type<unit, Rep>;
 
 inline constexpr auto rt = Rt{};
 inline constexpr auto u = Rt::units();

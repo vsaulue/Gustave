@@ -36,7 +36,7 @@
 namespace u = gustave::units::stdStrict::lib;
 
 static void testValue(u::cReal auto tested, std::floating_point auto expected) {
-    using TestedRep = typename decltype(tested)::Rep;
+    using TestedRep = decltype(tested)::Rep;
     CHECK(std::is_same_v<TestedRep, decltype(expected)>);
     CHECK(tested.value() == expected);
 }
