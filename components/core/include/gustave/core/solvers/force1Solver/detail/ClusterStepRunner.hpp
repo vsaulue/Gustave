@@ -46,8 +46,8 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         using SolverRunContext = detail::SolverRunContext<libCfg>;
 
-        using ClusterStructure = typename SolverRunContext::ClusterStructure;
-        using ClusterIndex = typename SolverRunContext::ClusterStructure::ClusterIndex;
+        using ClusterStructure = SolverRunContext::ClusterStructure;
+        using ClusterIndex = SolverRunContext::ClusterStructure::ClusterIndex;
 
         using NodeBalancer = detail::NodeBalancer<libCfg>;
         using NodeEvaluator = detail::ClusterNodeEvaluator<libCfg>;

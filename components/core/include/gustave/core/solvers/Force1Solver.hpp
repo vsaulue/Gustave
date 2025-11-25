@@ -51,29 +51,29 @@ namespace gustave::core::solvers {
         static constexpr auto rt = libCfg.realTraits;
 
         template<cfg::cUnitOf<libCfg> auto unit>
-        using Real = typename cfg::Real<libCfg, unit>;
+        using Real = cfg::Real<libCfg, unit>;
 
         template<cfg::cUnitOf<libCfg> auto unit>
-        using Vector3 = typename cfg::Vector3<libCfg, unit>;
+        using Vector3 = cfg::Vector3<libCfg, unit>;
 
-        using NodeIndex = typename cfg::NodeIndex<libCfg>;
-        using NormalizedVector3 = typename cfg::NormalizedVector3<libCfg>;
+        using NodeIndex = cfg::NodeIndex<libCfg>;
+        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
 
         using BasicStepRunner = force1Solver::detail::BasicStepRunner<libCfg>;
         using ClusterStepRunner = force1Solver::detail::ClusterStepRunner<libCfg>;
         using LayerStepRunner = force1Solver::detail::LayerStepRunner<libCfg>;
         using SolverRunContext = force1Solver::detail::SolverRunContext<libCfg>;
 
-        using BasicStepResult = typename BasicStepRunner::StepResult;
-        using F1Structure = typename SolverRunContext::F1Structure;
+        using BasicStepResult = BasicStepRunner::StepResult;
+        using F1Structure = SolverRunContext::F1Structure;
     public:
         using Config = force1Solver::Config<libCfg>;
         using Solution = force1Solver::Solution<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
-        using Basis = typename Solution::Basis;
-        using IterationIndex = typename SolverRunContext::IterationIndex;
-        using Node = typename Structure::Node;
+        using Basis = Solution::Basis;
+        using IterationIndex = SolverRunContext::IterationIndex;
+        using Node = Structure::Node;
 
         class Result {
         public:

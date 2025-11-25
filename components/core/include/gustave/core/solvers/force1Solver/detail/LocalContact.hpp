@@ -43,8 +43,8 @@ namespace gustave::core::solvers::force1Solver::detail {
     public:
         using F1BasicContact = detail::F1BasicContact<libCfg>;
 
-        using ForceStats = typename F1BasicContact::ForceStats;
-        using NodeIndex = typename F1BasicContact::NodeIndex;
+        using ForceStats = F1BasicContact::ForceStats;
+        using NodeIndex = F1BasicContact::NodeIndex;
 
         [[nodiscard]]
         explicit LocalContact(F1BasicContact const& fContact, NodeIndex localIndex)

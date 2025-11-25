@@ -45,8 +45,8 @@ namespace gustave::core::solvers::force1Solver::solution {
         using SolutionData = detail::SolutionData<libCfg>;
         using Structure = solvers::Structure<libCfg>;
 
-        using LinkIndex = typename Structure::LinkIndex;
-        using StructureLink = typename Structure::Link;
+        using LinkIndex = Structure::LinkIndex;
+        using StructureLink = Structure::Link;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -54,9 +54,9 @@ namespace gustave::core::solvers::force1Solver::solution {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
-        using Conductivity = typename StructureLink::Conductivity;
-        using ContactIndex = typename Structure::ContactIndex;
-        using NodeIndex = typename Structure::NodeIndex;
+        using Conductivity = StructureLink::Conductivity;
+        using ContactIndex = Structure::ContactIndex;
+        using NodeIndex = Structure::NodeIndex;
         using NodeReference = solution::NodeReference<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
 

@@ -44,7 +44,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         using Real = cfg::Real<libCfg, unit>;
 
         using DepthDecomposition = detail::DepthDecomposition<libCfg>;
-        using DepthIndex = typename DepthDecomposition::DepthIndex;
+        using DepthIndex = DepthDecomposition::DepthIndex;
     public:
         using F1Structure = detail::F1Structure<libCfg>;
         using LayerIndex = cfg::NodeIndex<libCfg>;

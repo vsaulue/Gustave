@@ -56,7 +56,7 @@ namespace gustave::core::solvers::force1Solver::detail {
         static constexpr auto u = cfg::units(libCfg);
         static constexpr auto rt = libCfg.realTraits;
 
-        using Rep = typename Real<u.one>::Rep;
+        using Rep = Real<u.one>::Rep;
         static constexpr auto infConductivity = std::numeric_limits<Rep>::infinity() * u.conductivity;
 
         struct ConductivityPair {
@@ -70,10 +70,10 @@ namespace gustave::core::solvers::force1Solver::detail {
         using F1Contact = f1Structure::F1Contact<libCfg>;
         using F1Link = f1Structure::F1Link<libCfg>;
         using F1Node = f1Structure::F1Node<libCfg>;
-        using Link = typename Structure::Link;
-        using LocalContactIndex = typename F1Link::LocalContactIndex;
+        using Link = Structure::Link;
+        using LocalContactIndex = F1Link::LocalContactIndex;
         using LocalContacts = std::span<F1Contact const>;
-        using Node = typename Structure::Node;
+        using Node = Structure::Node;
 
         [[nodiscard]]
         explicit F1Structure(Structure const& structure, Config const& config)

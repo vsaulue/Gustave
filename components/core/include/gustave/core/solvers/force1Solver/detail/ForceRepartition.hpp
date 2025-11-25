@@ -53,16 +53,16 @@ namespace gustave::core::solvers::force1Solver::detail {
         static constexpr auto rt = libCfg.realTraits;
     public:
         using F1Structure = detail::F1Structure<libCfg>;
-        using Structure = typename F1Structure::Structure;
+        using Structure = F1Structure::Structure;
 
-        using ContactIndex = typename Structure::ContactIndex;
-        using ContactStats = typename F1Structure::F1Contact::ForceStats;
-        using F1Contact = typename F1Structure::F1Contact;
-        using F1Link = typename F1Structure::F1Link;
-        using F1Node = typename F1Structure::F1Node;
-        using Link = typename Structure::Link;
-        using LocalContactIndex = typename F1Link::LocalContactIndex;
-        using Node = typename Structure::Node;
+        using ContactIndex = Structure::ContactIndex;
+        using ContactStats = F1Structure::F1Contact::ForceStats;
+        using F1Contact = F1Structure::F1Contact;
+        using F1Link = F1Structure::F1Link;
+        using F1Node = F1Structure::F1Node;
+        using Link = Structure::Link;
+        using LocalContactIndex = F1Link::LocalContactIndex;
+        using Node = Structure::Node;
         using NodeStats = detail::NodePoint<libCfg>;
 
         [[nodiscard]]

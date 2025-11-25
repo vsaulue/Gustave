@@ -51,9 +51,9 @@ namespace gustave::core::solvers::force1Solver::detail {
 
         using SolverRunContext = detail::SolverRunContext<libCfg>;
 
-        using LayerStructure = typename SolverRunContext::LayerStructure;
-        using Layer = typename LayerStructure::Layer;
-        using LayerIndex = typename LayerStructure::LayerIndex;
+        using LayerStructure = SolverRunContext::LayerStructure;
+        using Layer = LayerStructure::Layer;
+        using LayerIndex = LayerStructure::LayerIndex;
 
         [[nodiscard]]
         explicit LayerStepRunner(SolverRunContext& ctx)
