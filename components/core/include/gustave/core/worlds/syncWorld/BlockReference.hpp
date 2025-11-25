@@ -105,7 +105,7 @@ namespace gustave::core::worlds::syncWorld {
 
             [[nodiscard]]
             explicit Contacts(BlockReference const& block)
-                : sceneContacts_{ block.sceneBlock().contacts() }
+                : sceneContacts_{ block.sceneBlock_.contacts() }
                 , world_{ block.world_ }
             {}
 
@@ -205,7 +205,7 @@ namespace gustave::core::worlds::syncWorld {
             [[nodiscard]]
             explicit Structures(BlockReference const& block)
                 : world_{ block.world_ }
-                , sceneStructures_{ block.sceneBlock().structures() }
+                , sceneStructures_{ block.sceneBlock_.structures() }
             {}
 
             [[nodiscard]]
@@ -234,21 +234,21 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         explicit BlockReference(WorldData const& world, BlockIndex const& index)
-            : world_{ &world }
-            , index_{ index }
+            : sceneBlock_{ world.scene.blocks().find(index) }
+            , world_{ &world }
         {}
 
         [[nodiscard]]
         explicit BlockReference(utils::NoInit NO_INIT)
-            : world_{ nullptr }
-            , index_{ NO_INIT }
+            : sceneBlock_{ NO_INIT }
+            , world_{ nullptr }
         {}
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const
-            requires requires (SceneBlock const& sb) { sb.blockSize(); }
+            requires requires { this->sceneBlock_.blockSize(); }
         {
-            return sceneBlock().blockSize();
+            return sceneBlock_.blockSize();
         }
 
         [[nodiscard]]
@@ -258,32 +258,32 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         BlockIndex const& index() const {
-            return index_;
+            return sceneBlock_.index();
         }
 
         [[nodiscard]]
         bool isFoundation() const {
-            return sceneBlock().isFoundation();
+            return sceneBlock_.isFoundation();
         }
 
         [[nodiscard]]
         bool isValid() const {
-            return world_->scene.blocks().find(index_).isValid();
+            return sceneBlock_.isValid();
         }
 
         [[nodiscard]]
         Real<u.mass> mass() const {
-            return sceneBlock().mass();
+            return sceneBlock_.mass();
         }
 
         [[nodiscard]]
         PressureStress const& maxPressureStress() const {
-            return sceneBlock().maxPressureStress();
+            return sceneBlock_.maxPressureStress();
         }
 
         [[nodiscard]]
         decltype(auto) position() const {
-            return sceneBlock().position();
+            return sceneBlock_.position();
         }
 
         [[nodiscard]]
@@ -304,12 +304,7 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         bool operator==(BlockReference const&) const = default;
     private:
-        [[nodiscard]]
-        SceneBlock sceneBlock() const {
-            return world_->scene.blocks().at(index_);
-        }
-
+        SceneBlock sceneBlock_;
         WorldData const* world_;
-        BlockIndex index_;
     };
 }
