@@ -192,6 +192,11 @@ namespace gustave::core::worlds::syncWorld {
             std::size_t size() const {
                 return sceneStructures_.size();
             }
+
+            [[nodiscard]]
+            StructureReference unique() const {
+                return StructureReference{ sceneStructures_.unique() };
+            }
         private:
             WorldData const* world_;
             SceneStructures sceneStructures_;

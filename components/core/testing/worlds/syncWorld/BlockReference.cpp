@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <array>
+
 #include <gustave/core/worlds/syncWorld/detail/WorldData.hpp>
 #include <gustave/core/worlds/syncWorld/detail/WorldUpdater.hpp>
 #include <gustave/core/worlds/syncWorld/BlockReference.hpp>
@@ -181,24 +183,36 @@ TEST_CASE("core::worlds::syncWorld::BlockReference") {
             return StructureReference{ world, structId };
         };
 
-        SECTION("// empty") {
-            auto const structures = b002.structures();
-            CHECK(structures.size() == 0);
-            CHECK(structures.begin() == structures.end());
+        SECTION(".begin() // &&.end()") {
+            auto const structures = b000.structures();
+            auto const expected = std::array{ structureOf({1,0,0}), structureOf({0,1,0}) };
+            CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));
         }
 
-        SECTION("// singleton") {
+        SECTION(".operator[]") {
             auto const structures = b020.structures();
-            REQUIRE(structures.size() == 1);
-            CHECK(structures[0] == structureOf({0,2,0}));
+            auto const first = structures[0];
+            REQUIRE(first.isValid());
+            CHECK(first == structureOf({ 0,2,0 }));
         }
 
-        SECTION("// 2 structures") {
+        SECTION(".unique()") {
+            SECTION("// valid") {
+                auto const structures = b020.structures();
+                auto const result = structures.unique();
+                REQUIRE(result.isValid());
+                CHECK(result == structureOf({ 0,2,0 }));
+            }
+
+            SECTION("// invalid") {
+                auto const structures = b002.structures();
+                CHECK_THROWS_AS(structures.unique(), std::logic_error);
+            }
+        }
+
+        SECTION(".size()") {
             auto const structures = b000.structures();
             CHECK(structures.size() == 2);
-
-            std::vector<StructureReference> expected = { structureOf({1,0,0}), structureOf({0,1,0}) };
-            CHECK_THAT(structures, matchers::c2::UnorderedRangeEquals(expected));
         }
     }
 }
