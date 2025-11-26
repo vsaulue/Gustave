@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
     {
         auto printMaxStressOfStructure = [&world](World::BlockIndex const& blockId) -> void {
             // Gets the StructureReference of a block (unique for a non-foundation).
-            auto const structRef = world.blocks().at(blockId).structures()[0];
+            auto const structRef = world.blocks().at(blockId).structures().unique();
             std::cout << "Max stress ratio of structure of block " << blockId << " = ";
             // Ensures that we can access forces & stresses of all links in the structure.
             if (structRef.isSolved()) {

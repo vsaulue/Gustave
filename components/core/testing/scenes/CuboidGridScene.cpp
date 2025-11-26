@@ -58,7 +58,7 @@ TEST_CASE("core::scenes::CuboidGridScene") {
     SECTION(".blocks()") {
         auto runTest = [&](auto&& blocks, bool expectedConst) {
             REQUIRE(blocks.size() == 3);
-            CHECK(expectedConst == blocks.at({ 0,0,0 }).structures()[0].userData().isCalledAsConst());
+            CHECK(expectedConst == blocks.at({ 0,0,0 }).structures().unique().userData().isCalledAsConst());
         };
 
         SECTION("// mutable") {

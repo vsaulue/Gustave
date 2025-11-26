@@ -86,7 +86,7 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
             auto bRef = blocks.at({ 3,0,0 });
             REQUIRE(bRef.isValid());
             CHECK(bRef.mass() == 3000.f * u.mass);
-            CHECK(expectedConst == bRef.structures()[0].userData().isCalledAsConst());
+            CHECK(expectedConst == bRef.structures().unique().userData().isCalledAsConst());
         };
 
         SECTION("// mutable") {
