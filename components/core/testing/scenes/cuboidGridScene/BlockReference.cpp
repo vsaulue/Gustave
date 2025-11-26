@@ -151,7 +151,8 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
         auto runTest = [&](auto&& blockRef, bool expectedConst) {
             auto structs = blockRef.structures();
             REQUIRE(structs.size() == 2);
-            auto& s0 = structs[0];
+            auto s0 = structs[0];
+            REQUIRE(s0.isValid());
             CHECK(s0.blocks().contains(blockRef.index()));
             CHECK(expectedConst == s0.userData().isCalledAsConst());
         };
