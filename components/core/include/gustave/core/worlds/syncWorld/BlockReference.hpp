@@ -148,7 +148,7 @@ namespace gustave::core::worlds::syncWorld {
 
                 [[nodiscard]]
                 StructureReference operator*() const {
-                    return StructureReference{ *structures_->world_, (*sceneIterator_).index() };
+                    return StructureReference{ *sceneIterator_ };
                 }
 
                 [[nodiscard]]
@@ -169,13 +169,12 @@ namespace gustave::core::worlds::syncWorld {
 
             [[nodiscard]]
             explicit Structures(BlockReference const& block)
-                : world_{ block.world_ }
-                , sceneStructures_{ block.sceneBlock_.structures() }
+                : sceneStructures_{ block.sceneBlock_.structures() }
             {}
 
             [[nodiscard]]
             StructureReference operator[](std::size_t index) const {
-                return StructureReference{ *world_, sceneStructures_[index].index() };
+                return StructureReference{ sceneStructures_[index] };
             }
 
             [[nodiscard]]
@@ -198,7 +197,6 @@ namespace gustave::core::worlds::syncWorld {
                 return StructureReference{ sceneStructures_.unique() };
             }
         private:
-            WorldData const* world_;
             SceneStructures sceneStructures_;
         };
 
