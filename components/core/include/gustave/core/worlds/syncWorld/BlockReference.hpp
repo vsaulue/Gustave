@@ -148,7 +148,7 @@ namespace gustave::core::worlds::syncWorld {
 
                 [[nodiscard]]
                 StructureReference operator*() const {
-                    return StructureReference{ *structures_->world_, sceneIterator_->index() };
+                    return StructureReference{ *structures_->world_, (*sceneIterator_).index() };
                 }
 
                 [[nodiscard]]

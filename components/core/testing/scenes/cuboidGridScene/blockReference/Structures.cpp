@@ -115,7 +115,9 @@ TEST_CASE("core::scenes::cuboidGridScene::blockReference::Structures") {
                 };
                 auto ids = structs | std::views::transform([](auto&& s) { return s.index(); });
                 REQUIRE_THAT(ids, matchers::c2::UnorderedRangeEquals(expectedIds));
-                CHECK(expectedConst == structs.begin()->userData().isCalledAsConst());
+                auto first = *structs.begin();
+                REQUIRE(first.isValid());
+                CHECK(expectedConst == first.userData().isCalledAsConst());
             };
 
             SECTION("// mutable") {
@@ -138,7 +140,9 @@ TEST_CASE("core::scenes::cuboidGridScene::blockReference::Structures") {
                 };
                 auto ids = structs | std::views::transform([](auto&& s) { return s.index(); });
                 REQUIRE_THAT(ids, matchers::c2::UnorderedRangeEquals(expectedIds));
-                CHECK(expectedConst == structs.begin()->userData().isCalledAsConst());
+                auto first = *structs.begin();
+                REQUIRE(first.isValid());
+                CHECK(expectedConst == first.userData().isCalledAsConst());
             };
 
             SECTION("// mutable") {
@@ -163,7 +167,7 @@ TEST_CASE("core::scenes::cuboidGridScene::blockReference::Structures") {
 
     SECTION(".unique()") {
         auto runValidTest = [&](auto&& structs, bool expectedConst) {
-            auto& result = structs.unique();
+            auto result = structs.unique();
             REQUIRE(result.isValid());
             CHECK(result.index() == structIdOf({ 0,1,0 }));
             CHECK(expectedConst == result.userData().isCalledAsConst());
