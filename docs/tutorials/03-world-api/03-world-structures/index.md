@@ -25,7 +25,7 @@ Here's a visual representation of this world:
 
 ![](world.svg)
 
-## Transaction: list the indices of modified structures
+## Transaction: modified structures
 
 Note that in the previous code block, the result of the transaction was stored in a `trResult` variable. This `TransactionResult` objects holds 2 containers:
 
@@ -44,7 +44,7 @@ Possible output:
 --8<-- "generated-snippets/tuto-03-03.txt:transaction-result"
 ```
 
-## Get a structure reference by index
+## Get a structure by index
 
 `world.structures()` provides 2 methods to get a `StructureReference` by index:
 
@@ -61,7 +61,7 @@ Possible output:
 --8<-- "generated-snippets/tuto-03-03.txt:structure-by-id"
 ```
 
-## List all structures and their blocks
+## List all structures
 
 `world.structures()` is a [forward range](https://en.cppreference.com/w/cpp/ranges/forward_range) of `StructureReference`. They can be iterated over using a [range-based for loop](https://en.cppreference.com/w/cpp/language/range-for). Then a `StructureReference` has a `.blocks()` method, which works like `world.blocks()`, and is a range of `BlockReference` objects.
 
@@ -86,7 +86,7 @@ In the above output:
 - The `5 blocks` structure is the green one, and includes the 2 foundations
 - The `3 blocks` structure is the red one on the left, and includes the bottom-left foundation.
 
-## List all structures of a block
+## Block: all structures
 
 A `BlockReference` has a `.structures()` method returning a range of `StructureReference`, similar to `world.structures()`:
 
