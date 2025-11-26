@@ -103,6 +103,20 @@ Expected output:
 !!! note
     A non-foundation block always has exactly 1 structure. A foundation block can have 0 to 6 structures in a cuboid world.
 
+## Block: unique structure
+
+If a `block` belongs to a unique structure, this structure can be obtained using `block.structures().unique()`. This is primarily intended for non-foundation blocks which always belong to a single structure. This can also be used on foundations, however it will throw if the block doesn't belong to exactly one structure.
+
+```c++
+--8<-- "docs/tutorials/03-world-api/03-world-structures/main.cpp:block-unique-structure"
+```
+
+Possible output:
+
+```
+--8<-- "generated-snippets/tuto-03-03.txt:block-unique-structure"
+```
+
 ## Structure status: valid and solved
 
 A `StructureReference` has two important methods about its status:

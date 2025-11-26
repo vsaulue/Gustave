@@ -115,7 +115,6 @@ int main(int argc, char** argv) {
     }
     // -8<- [end:list-world-structures]
 
-
     tuto.section("list-block-structures", "List the structures of a block");
     // -8<- [start:list-block-structures]
     auto listStructuresOfBlock = [&world](World::BlockIndex const& blockId) -> void {
@@ -130,6 +129,14 @@ int main(int argc, char** argv) {
     listStructuresOfBlock({ 7,0,0 });
     // -8<- [end:list-block-structures]
 
+    tuto.section("block-unique-structure", "Get the unique structure of a block");
+    {
+        // -8<- [start:block-unique-structure]
+        auto const blockRef = world.blocks().at({ 0,1,0 });
+        auto const structRef = blockRef.structures().unique();
+        std::cout << "Unique structure of block " << blockRef.index() << ": index = " << structRef.index() << '\n';
+        // -8<- [end:block-unique-structure]
+    }
 
     tuto.section("structure-status", "Structure status (valid, solved)");
     // -8<- [start:structure-status]
