@@ -27,6 +27,8 @@
 
 #include <array>
 #include <cstddef>
+#include <sstream>
+#include <stdexcept>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
@@ -60,6 +62,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         explicit Structures(Prop<SceneData>& scene, BlockDataRef blockData)
             : sceneStructures_{ NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT(), NO_INIT() }
             , size_{ 0 }
+            , block_{ blockData }
         {
             auto addValue = [&](StructureIndex structId) {
                 if (!contains(structId)) {
@@ -108,7 +111,32 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         std::size_t size() const {
             return size_;
         }
+
+        [[nodiscard]]
+        StructureReference& unique() {
+            return doUnique(*this);
+        }
+
+        [[nodiscard]]
+        StructureReference const& unique() const {
+            return doUnique(*this);
+        }
     private:
+        [[nodiscard]]
+        static auto doUnique(meta::cCvRefOf<Structures> auto&& self) -> decltype(self.unique()) {
+            if (self.size_ != 1) {
+                throw self.noUniqueError();
+            }
+            return self.sceneStructures_[0];
+        }
+
+        [[nodiscard]]
+        std::logic_error noUniqueError() const {
+            std::stringstream msg;
+            msg << "Block " << block_.index() << " does not have a unique structure (count = " << size_ << ").";
+            return std::logic_error{ msg.str() };
+        }
+
         [[nodiscard]]
         static StructureReference NO_INIT() {
             return StructureReference{ utils::NO_INIT };
@@ -126,5 +154,6 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
 
         Values sceneStructures_;
         std::size_t size_;
+        BlockDataRef block_;
     };
 }
