@@ -44,9 +44,7 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldData") {
     }
 
     auto b1 = world1.scene.blocks().at({ 1,1,1 });
-    auto b1Structs = b1.structures();
-    REQUIRE(b1Structs.size() == 1);
-    b1Structs[0].userData().init(world1);
+    b1.structures().unique().userData().init(world1);
 
     SECTION("// move") {
         auto checkMovedWorld = [&](WorldData const& movedWorld) {

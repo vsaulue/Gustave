@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
     tuto.section("structure-status", "Structure status (valid, solved)");
     // -8<- [start:structure-status]
     auto printStructureStatusOfBlock = [&world](World::BlockIndex const& blockId) -> void {
-        auto const structureRef = world.blocks().at(blockId).structures()[0];
+        auto const structureRef = world.blocks().at(blockId).structures().unique();
         std::cout << "Block " << blockId << ": structure ";
         if (structureRef.isValid()) {
             std::cout << "(index = " << structureRef.index() << ") ";

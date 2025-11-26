@@ -71,9 +71,7 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
     }
 
     auto structureOf = [&](BlockIndex const& index) {
-        auto const sceneBlockStructures = world.scene.blocks().at(index).structures();
-        REQUIRE(sceneBlockStructures.size() == 1);
-        return StructureReference{ world, sceneBlockStructures[0].index() };
+        return StructureReference{ world.scene.blocks().at(index).structures().unique() };
     };
 
     auto removeBlock = [&](BlockIndex const& index) {
@@ -200,7 +198,7 @@ TEST_CASE("core::worlds::syncWorld::StructureReference") {
     }
 
     SECTION(".index()") {
-        auto const s010index = world.scene.blocks().at({ 0,1,0 }).structures()[0].index();
+        auto const s010index = world.scene.blocks().at({ 0,1,0 }).structures().unique().index();
 
         SECTION("// valid") {
             CHECK(s010.index() == s010index);

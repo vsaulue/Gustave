@@ -64,9 +64,7 @@ TEST_CASE("core::worlds::syncWorld::Structures") {
     }
 
     auto structureOf = [&](BlockIndex const& index) {
-        auto sceneStructures = world.scene.blocks().at(index).structures();
-        REQUIRE(sceneStructures.size() == 1);
-        return StructureReference{ world, sceneStructures[0].index() };
+        return StructureReference{ world.scene.blocks().at(index).structures().unique()};
     };
 
     SECTION(".at()") {
