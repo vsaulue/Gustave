@@ -63,8 +63,7 @@ TEST_CASE("core::scenes::cuboidGridScene::blockReference::Structures") {
     newBlock({ 0,0,2 }, false);
     newBlock({ 0,0,3 }, true);
     newBlock({ 0,0,4 }, false);
-    newBlock({ 0,1,2 }, false);
-    newBlock({ 0,1,3 }, false);
+    newBlock({ 0,0,9 }, true);
     SceneUpdater{ scene }.runTransaction(t);
 
     auto mStructs010 = Structures<true>{ scene, scene.blocks.at({0,1,0}) };
@@ -74,6 +73,8 @@ TEST_CASE("core::scenes::cuboidGridScene::blockReference::Structures") {
     auto mStructs003 = Structures<true>{ scene, scene.blocks.at({0,0,3}) };
     auto const& cmStructs003 = mStructs003;
     auto iStructs003 = Structures<false>{ scene, scene.blocks.at({0,0,3}) };
+
+    auto iStructs009 = Structures<false>{ scene, scene.blocks.at({0,0,9}) };
 
     auto structIdOf = [&](BlockIndex const& blockId) {
         return scene.blocks.at(blockId).structureId();
@@ -158,5 +159,34 @@ TEST_CASE("core::scenes::cuboidGridScene::blockReference::Structures") {
         CHECK(mStructs003.size() == 2);
         CHECK(cmStructs010.size() == 1);
         CHECK(iStructs003.size() == 2);
+    }
+
+    SECTION(".unique()") {
+        auto runValidTest = [&](auto&& structs, bool expectedConst) {
+            auto& result = structs.unique();
+            REQUIRE(result.isValid());
+            CHECK(result.index() == structIdOf({ 0,1,0 }));
+            CHECK(expectedConst == result.userData().isCalledAsConst());
+        };
+
+        SECTION("// mutable") {
+            runValidTest(mStructs010, false);
+        }
+
+        SECTION("// const") {
+            runValidTest(cmStructs010, true);
+        }
+
+        SECTION("// immutable") {
+            runValidTest(iStructs010, true);
+        }
+
+        SECTION("// invalid - too many structures") {
+            CHECK_THROWS_AS(iStructs003.unique(), std::logic_error);
+        }
+
+        SECTION("// invalid - no structure") {
+            CHECK_THROWS_AS(iStructs009.unique(), std::logic_error);
+        }
     }
 }
