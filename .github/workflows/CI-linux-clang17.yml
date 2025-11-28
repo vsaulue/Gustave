@@ -1,26 +1,30 @@
 ---
 
-name: Linux gcc-13
+name: Linux clang-17
 
-on:
-  workflow_call:
-    inputs:
-      should_skip:
-        description: 'Indicates if the workflow must be run'
-        default: 'true'
-        required: false
-        type: string
+on: [push, pull_request, workflow_dispatch]
 
 env:
-  cmake_profile: conan-x86_64-linux-gcc-13
+  cmake_profile: conan-x86_64-linux-clang-17
   conan_pr_build: ./.github/conanProfiles/ubuntu24.txt
-  conan_pr_host: ./.github/conanProfiles/linux-gcc13.txt
+  conan_pr_host: ./.github/conanProfiles/linux-clang17.txt
   vcpkg_base: '$HOME/vcpkg'
 
 jobs:
-  linux_gcc13:
+  skip_duplicate:
     runs-on: ubuntu-24.04
-    if: inputs.should_skip != 'true'
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          skip_after_successful_duplicate: true
+
+  linux_clang17:
+    runs-on: ubuntu-24.04
+    needs: skip_duplicate
+    if: ${{ !fromJSON(needs.skip_duplicate.outputs.should_skip) }}
     strategy:
       matrix:
         build_type: [Debug, Release]
@@ -41,7 +45,7 @@ jobs:
       - name: "[setup] Install apt-get packages"
         run: |
           sudo apt update
-          sudo apt install -y ninja-build valgrind
+          sudo apt install -y ninja-build libc++-17-dev valgrind
 
       - name: "[setup] Install conan"
         run: |
