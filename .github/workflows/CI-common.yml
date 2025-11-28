@@ -1,0 +1,133 @@
+---
+name: CI workflow
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        description: 'The github runner for the workflow'
+        required: true
+      conan_pr_build:
+        type: string
+        description: "Path to the conan build profile (relative to source dir)"
+        required: true
+      conan_pr_host:
+        type: string
+        description: "Path to the conan host profile (relative to source dir)"
+        required: true
+      cmake_profile:
+        type: string
+        description: "Name of the CMake build profile"
+        required: true
+      compiler_name:
+        type: string
+        description: "Name of the compiler (gcc/clang/msvc)"
+        required: true
+
+env:
+  drMemory_base: '$HOME/drMemory'
+  vcpkg_base: '$HOME/vcpkg'
+
+jobs:
+  skip_duplicate:
+    runs-on: ubuntu-24.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          skip_after_successful_duplicate: true
+
+  ci_common:
+    runs-on: ${{ inputs.runner }}
+    needs: skip_duplicate
+    if: ${{ !fromJSON(needs.skip_duplicate.outputs.should_skip) }}
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: build_type
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ${{ matrix.build_type }}
+
+      - name: "[setup] Enable MSVC"
+        if: ${{ contains(inputs.compiler_name, 'msvc') }}
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: "[setup] Install vcpkg"
+        run: python '.github/scripts/installVcpkg.py' --dest "${{ env.vcpkg_base }}"
+
+      - name: "[setup] Install apt-get packages (ubuntu/clang)"
+        if: ${{ contains(inputs.runner, 'ubuntu') && inputs.compiler_name == 'clang' }}
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build libc++-17-dev valgrind
+
+      - name: "[setup] Install apt-get packages (ubuntu/gcc)"
+        if: ${{ contains(inputs.runner, 'ubuntu') && inputs.compiler_name == 'gcc' }}
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build valgrind
+
+      - name: "[setup] Install DrMemory (windows)"
+        if: ${{ contains(inputs.runner, 'windows') }}
+        run: python '.github/scripts/msvc/installDrMemory.py' --dest "${{ env.drMemory_base }}"
+
+      - name: "[setup] Install conan"
+        run: |
+          pipx install conan
+          pipx ensurepath
+
+      - name: "[setup] Cache conan packages"
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2/p
+          key: ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
+
+      - name: "[build] conan install"
+        run: conan install . -pr:b=${{ inputs.conan_pr_build }} -pr:h=${{ inputs.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
+
+      - name: "[build] cmake config (windows)"
+        if: ${{ contains(inputs.runner, 'windows') }}
+        run: >
+          cmake . --preset ${{ inputs.cmake_profile }}
+          -D "GUSTAVE_MEMCHECKER_PATH=${{ env.drMemory_base }}/bin64"
+          -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ inputs.conan_pr_build }}"
+          -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
+          -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
+
+      - name: "[build] cmake config (ubuntu)"
+        if: ${{ contains(inputs.runner, 'ubuntu') }}
+        run: >
+          cmake . --preset ${{ inputs.cmake_profile }}
+          -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ inputs.conan_pr_build }}"
+          -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
+          -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
+
+      - name: "[build/setup] Install Python venvs"
+        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target venvs
+
+      - name: "[build] Build"
+        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
+
+      - name: "[build] Run unit tests"
+        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-unit-tests
+
+      - name: "[build] Run tool tests"
+        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tool-tests
+
+      - name: "[build] Run memcheck tests"
+        # Disabled drMemory test (windows) because of too many false positives
+        if: ${{ contains(inputs.runner, 'ubuntu') }}
+        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
+
+      - name: "[build] Run tutorials"
+        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tutorials
+
+      - name: "[build] Run packaging tests"
+        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-packaging-tests

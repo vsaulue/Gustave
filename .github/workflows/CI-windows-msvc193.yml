@@ -1,0 +1,15 @@
+---
+
+name: Windows VS-2022
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  windows_msvc193:
+    uses: ./.github/workflows/CI-common.yml
+    with:
+      runner: windows-2022
+      conan_pr_build: ./.github/conanProfiles/windows2022.txt
+      conan_pr_host: ./.github/conanProfiles/windows-msvc193.txt
+      cmake_profile: conan-x86_64-windows-msvc-193
+      compiler_name: msvc

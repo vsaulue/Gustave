@@ -1,0 +1,15 @@
+---
+
+name: Linux clang-17
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  linux_clang17:
+    uses: ./.github/workflows/CI-common.yml
+    with:
+      runner: ubuntu-24.04
+      conan_pr_build: ./.github/conanProfiles/ubuntu24.txt
+      conan_pr_host: ./.github/conanProfiles/linux-clang17.txt
+      cmake_profile: conan-x86_64-linux-clang-17
+      compiler_name: clang
