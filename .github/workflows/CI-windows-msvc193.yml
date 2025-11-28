@@ -1,0 +1,27 @@
+---
+
+name: Windows VS-2022
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  skip_duplicate:
+    runs-on: ubuntu-24.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          skip_after_successful_duplicate: true
+
+  windows_msvc193:
+    uses: ./.github/workflows/CI-common.yml
+    needs: skip_duplicate
+    with:
+      runner: windows-2022
+      conan_pr_build: ./.github/conanProfiles/windows2022.txt
+      conan_pr_host: ./.github/conanProfiles/windows-msvc193.txt
+      cmake_profile: conan-x86_64-windows-msvc-193
+      compiler_name: msvc
+      should_skip: ${{needs.skip_duplicate.outputs.should_skip}}

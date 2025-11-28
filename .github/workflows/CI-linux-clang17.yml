@@ -1,6 +1,6 @@
 ---
 
-name: CI workflow
+name: Linux clang-17
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -16,19 +16,12 @@ jobs:
           skip_after_successful_duplicate: true
 
   linux_clang17:
-    uses: ./.github/workflows/linux-clang17.yml
+    uses: ./.github/workflows/CI-common.yml
     needs: skip_duplicate
     with:
-      should_skip: ${{needs.skip_duplicate.outputs.should_skip}}
-
-  linux_gcc13:
-    uses: ./.github/workflows/linux-gcc13.yml
-    needs: skip_duplicate
-    with:
-      should_skip: ${{needs.skip_duplicate.outputs.should_skip}}
-
-  windows_msvc193:
-    uses: ./.github/workflows/windows-msvc193.yml
-    needs: skip_duplicate
-    with:
+      runner: ubuntu-24.04
+      conan_pr_build: ./.github/conanProfiles/ubuntu24.txt
+      conan_pr_host: ./.github/conanProfiles/linux-clang17.txt
+      cmake_profile: conan-x86_64-linux-clang-17
+      compiler_name: clang
       should_skip: ${{needs.skip_duplicate.outputs.should_skip}}
