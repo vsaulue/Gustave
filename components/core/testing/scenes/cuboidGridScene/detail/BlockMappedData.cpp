@@ -30,26 +30,38 @@
 #include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockMappedData.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 using BlockConstructionInfo = gustave::core::scenes::cuboidGridScene::BlockConstructionInfo<libCfg>;
-using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
+using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg, SceneUserData>;
 
 using IndexGenerator = gustave::utils::IndexGenerator<std::size_t>;
 
 TEST_CASE("core::scenes::cuboidGridScene::detail::BlockMappedData") {
+    auto const info = BlockConstructionInfo{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
+    auto data = BlockMappedData{ info };
+    auto const& cData = data;
+
+    constexpr LinkIndex maxLinkId = std::numeric_limits<LinkIndex>::max();
+
     SECTION("// constructor & getters") {
-        const BlockConstructionInfo info{ {4,5,6}, concrete_20m, 5.f * u.mass, true };
-        BlockMappedData data{ info };
+        CHECK(cData.maxPressureStress() == concrete_20m);
+        CHECK(cData.linkIndices().plusX == maxLinkId);
+        CHECK(cData.linkIndices().plusY == maxLinkId);
+        CHECK(cData.linkIndices().plusZ == maxLinkId);
+        CHECK(cData.mass() == 5.f * u.mass);
+        CHECK(cData.isFoundation() == true);
+        CHECK(cData.structureId() == IndexGenerator::invalidIndex());
+    }
 
-        constexpr LinkIndex maxLinkId = std::numeric_limits<LinkIndex>::max();
+    SECTION(".userData()") {
+        SECTION("// mutable") {
+            CHECK_FALSE(data.userData().isCalledAsConst());
+        }
 
-        CHECK(data.maxPressureStress() == concrete_20m);
-        CHECK(data.linkIndices().plusX == maxLinkId);
-        CHECK(data.linkIndices().plusY == maxLinkId);
-        CHECK(data.linkIndices().plusZ == maxLinkId);
-        CHECK(data.mass() == 5.f * u.mass);
-        CHECK(data.isFoundation() == true);
-        CHECK(data.structureId() == IndexGenerator::invalidIndex());
+        SECTION("// const") {
+            CHECK(cData.userData().isCalledAsConst());
+        }
     }
 }

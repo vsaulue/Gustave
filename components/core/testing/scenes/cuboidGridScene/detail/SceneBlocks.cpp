@@ -29,12 +29,13 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
-using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg,true>;
+using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg, SceneUserData, true>;
 using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
 using Direction = gustave::math3d::BasicDirection;
-using SceneBlocks = gustave::core::scenes::cuboidGridScene::detail::SceneBlocks<libCfg>;
+using SceneBlocks = gustave::core::scenes::cuboidGridScene::detail::SceneBlocks<libCfg, SceneUserData>;
 
 TEST_CASE("core::scenes::cuboidGridScene::detail::SceneBlocks") {
     SceneBlocks sceneBlocks{ vector3(1.f, 2.f, 3.f, u.length) };

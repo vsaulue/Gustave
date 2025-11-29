@@ -26,11 +26,12 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg, bool isMut_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_, bool isMut_>
     struct DataNeighbour {
     public:
         using Direction = math3d::BasicDirection;
@@ -42,7 +43,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         {}
 
         [[nodiscard]]
-        DataNeighbour(Direction direction, BlockDataReference<cfg,isMut_> block)
+        DataNeighbour(Direction direction, BlockDataReference<cfg, UD_, isMut_> block)
             : direction{ direction }
             , block{ block }
         {}
@@ -51,6 +52,6 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         bool operator==(DataNeighbour const&) const = default;
 
         Direction direction;
-        BlockDataReference<cfg,isMut_> block;
+        BlockDataReference<cfg, UD_, isMut_> block;
     };
 }

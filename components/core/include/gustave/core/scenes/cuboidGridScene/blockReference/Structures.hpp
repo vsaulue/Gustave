@@ -56,8 +56,8 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         template<typename T>
         using PropPtr = utils::PropPtr<isMut_, T>;
 
-        using BlockDataRef = cuboidGridScene::detail::BlockDataReference<libCfg_, false>;
-        using DataNeighbours = cuboidGridScene::detail::DataNeighbours<libCfg_, false>;
+        using BlockDataRef = cuboidGridScene::detail::BlockDataReference<libCfg_, UD_, false>;
+        using DataNeighbours = cuboidGridScene::detail::DataNeighbours<libCfg_, UD_, false>;
         using SceneData = cuboidGridScene::detail::SceneData<libCfg_, UD_>;
 
         using Values = std::array<StructureIndex, 6>;

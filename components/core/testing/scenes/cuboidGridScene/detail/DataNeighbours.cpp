@@ -35,16 +35,17 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
 using BlockIndex = cuboid::BlockIndex;
-using BlockDataReference = cuboid::detail::BlockDataReference<libCfg,true>;
-using DataNeighbour = cuboid::detail::DataNeighbour<libCfg, true>;
-using DataNeighbours = cuboid::detail::DataNeighbours<libCfg, true>;
+using BlockDataReference = cuboid::detail::BlockDataReference<libCfg, SceneUserData, true>;
+using DataNeighbour = cuboid::detail::DataNeighbour<libCfg, SceneUserData, true>;
+using DataNeighbours = cuboid::detail::DataNeighbours<libCfg, SceneUserData, true>;
 using Direction = gustave::math3d::BasicDirection;
-using SceneBlocks = cuboid::detail::SceneBlocks<libCfg>;
+using SceneBlocks = cuboid::detail::SceneBlocks<libCfg, SceneUserData>;
 
 using Coord = BlockIndex::Coord;
 using Limits = std::numeric_limits<Coord>;

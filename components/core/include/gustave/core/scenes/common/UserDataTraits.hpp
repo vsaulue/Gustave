@@ -36,22 +36,37 @@ namespace gustave::core::scenes::common {
     struct UserDataTraits {
     private:
         [[nodiscard]]
+        static consteval meta::cTypeWrapper auto blockUserDataType() {
+            if constexpr (std::is_void_v<UserDatas_>) {
+                return meta::TypeWrapper<void>{};
+            } else {
+                return meta::TypeWrapper<typename UserDatas_::Block>{};
+            }
+        }
+
+        [[nodiscard]]
         static consteval meta::cTypeWrapper auto structureUserDataType() {
             if constexpr (std::is_void_v<UserDatas_>) {
                 return meta::TypeWrapper<void>{};
-            }
-            else {
+            } else {
                 return meta::TypeWrapper<typename UserDatas_::Structure>{};
             }
         }
     public:
+        using Block = decltype(blockUserDataType())::Type;
         using Structure = decltype(structureUserDataType())::Type;
+
+        [[nodiscard]]
+        static constexpr bool hasBlockUserData() {
+            return not std::is_void_v<Block>;
+        }
 
         [[nodiscard]]
         static constexpr bool hasStructureUserData() {
             return not std::is_void_v<Structure>;
         }
 
+        using BlockMember = std::conditional_t<hasBlockUserData(), Block, EmptyUserData>;
         using StructureMember = std::conditional_t<hasStructureUserData(), Structure, EmptyUserData>;
     };
 }

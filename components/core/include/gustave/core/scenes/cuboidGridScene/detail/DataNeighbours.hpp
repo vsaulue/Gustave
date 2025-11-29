@@ -26,6 +26,7 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
@@ -35,8 +36,10 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg, bool isMut_>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_, bool isMut_>
     class DataNeighbours {
+    public:
+        using Neighbour = DataNeighbour<cfg, UD_, isMut_>;
     private:
         template<typename T>
         using Prop = utils::Prop<isMut_, T>;
@@ -72,7 +75,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             }
 
             [[nodiscard]]
-            DataNeighbour<cfg, isMut_> const& operator*() const {
+            Neighbour const& operator*() const {
                 return value_;
             }
 
@@ -88,7 +91,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
             void next() {
                 while (indexIterator_ != indices().end()) {
-                    if (BlockDataReference<cfg, isMut_> neighbour = neighbours_->blocks_->find(indexIterator_->index)) {
+                    if (auto neighbour = neighbours_->blocks_->find(indexIterator_->index)) {
                         value_ = { indexIterator_->direction, neighbour };
                         break;
                     }
@@ -97,14 +100,14 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             }
 
             DataNeighbours* neighbours_;
-            DataNeighbour<cfg, isMut_> value_;
+            Neighbour value_;
             IndexIterator indexIterator_;
         };
     public:
         using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
-        explicit DataNeighbours(Prop<SceneBlocks<cfg>>& blocks, BlockIndex const& source)
+        explicit DataNeighbours(Prop<SceneBlocks<cfg, UD_>>& blocks, BlockIndex const& source)
             : blocks_{ &blocks }
             , indices_{ source }
         {}
@@ -119,7 +122,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return {};
         }
     private:
-        Prop<SceneBlocks<cfg>>* blocks_;
+        Prop<SceneBlocks<cfg, UD_>>* blocks_;
         IndexNeighbours indices_;
     };
 }

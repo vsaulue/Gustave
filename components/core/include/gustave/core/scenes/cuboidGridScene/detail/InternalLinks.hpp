@@ -39,7 +39,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_>
     class InternalLinks {
     public:
-        using ConstBlockDataReference = detail::BlockDataReference<cfg, false>;
+        using ConstBlockDataReference = detail::BlockDataReference<cfg, UD_, false>;
         using Direction = math3d::BasicDirection;
         using SceneData = detail::SceneData<cfg, UD_>;
 
