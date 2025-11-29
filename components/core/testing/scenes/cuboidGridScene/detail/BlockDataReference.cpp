@@ -30,16 +30,17 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 using BlockConstructionInfo = gustave::core::scenes::cuboidGridScene::BlockConstructionInfo<libCfg>;
-using BlockData = gustave::core::scenes::cuboidGridScene::detail::BlockData<libCfg>;
+using BlockData = gustave::core::scenes::cuboidGridScene::detail::BlockData<libCfg, SceneUserData>;
 using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
-using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg>;
-using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg,void>;
+using BlockMappedData = gustave::core::scenes::cuboidGridScene::detail::BlockMappedData<libCfg, SceneUserData>;
+using SceneData = gustave::core::scenes::cuboidGridScene::detail::SceneData<libCfg, SceneUserData>;
 
-template<bool isMutable>
-using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg, isMutable>;
+template<bool mut>
+using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg, SceneUserData, mut>;
 
 TEST_CASE("core::scenes::cuboidGridScene::detail::BlockDataReference") {
     SceneData sceneData{ vector3(1.f, 1.f, 1.f, u.length) };

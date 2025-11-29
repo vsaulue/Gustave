@@ -56,12 +56,12 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         static constexpr auto u = cfg::units(libCfg);
 
         using BlockConstructionInfo = cuboidGridScene::BlockConstructionInfo<libCfg>;
-        using BlockDataReference = detail::BlockDataReference<libCfg, true>;
-        using ConstBlockDataReference = detail::BlockDataReference<libCfg, false>;
-        using ConstDataNeighbour = detail::DataNeighbour<libCfg, false>;
-        using ConstDataNeighbours = detail::DataNeighbours<libCfg, false>;
-        using DataNeighbour = detail::DataNeighbour<libCfg, true>;
-        using DataNeighbours = detail::DataNeighbours<libCfg, true>;
+        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, true>;
+        using ConstBlockDataReference = detail::BlockDataReference<libCfg, UD_, false>;
+        using ConstDataNeighbour = detail::DataNeighbour<libCfg, UD_, false>;
+        using ConstDataNeighbours = detail::DataNeighbours<libCfg, UD_, false>;
+        using DataNeighbour = detail::DataNeighbour<libCfg, UD_, true>;
+        using DataNeighbours = detail::DataNeighbours<libCfg, UD_, true>;
         using Direction = math3d::BasicDirection;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;

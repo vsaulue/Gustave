@@ -59,7 +59,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         static constexpr auto u = cfg::units(libCfg);
 
-        using BlockDataReference = detail::BlockDataReference<libCfg, false>;
+        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, false>;
         using SceneData = detail::SceneData<libCfg, UD_>;
         using StructureData = SceneData::StructureData;
         using StructureIndex = SceneData::StructureIndex;

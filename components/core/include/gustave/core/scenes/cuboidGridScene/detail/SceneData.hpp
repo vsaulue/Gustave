@@ -52,7 +52,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<cfg::cUnitOf<cfg> auto unit>
         using Vector3 = cfg::Vector3<cfg, unit>;
     public:
-        using Blocks = SceneBlocks<cfg>;
+        using Blocks = SceneBlocks<cfg, UD_>;
         using StructureIdGenerator = utils::IndexGenerator<StructureIndex>;
         using Structures = SceneStructures<cfg, UD_>;
 

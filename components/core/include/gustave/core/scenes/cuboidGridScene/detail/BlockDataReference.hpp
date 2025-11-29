@@ -32,6 +32,7 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/utils/HashEquals.hpp>
@@ -39,7 +40,7 @@
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto libCfg, bool isMut_>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_, bool isMut_>
     class BlockDataReference {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -52,12 +53,14 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
 
-        Prop<BlockData<libCfg>>* data_;
+        using Data = BlockData<libCfg, UD_>;
+
+        Prop<Data>* data_;
     public:
         using Hasher = utils::Hasher<BlockDataReference, &BlockDataReference::data_>;
-        using LinkIndices = BlockMappedData<libCfg>::LinkIndices;
+        using LinkIndices = BlockMappedData<libCfg, UD_>::LinkIndices;
         using PressureStress = model::PressureStress<libCfg>;
-        using StructureIndex = BlockMappedData<libCfg>::StructureIndex;
+        using StructureIndex = BlockMappedData<libCfg, UD_>::StructureIndex;
 
         [[nodiscard]]
         static constexpr bool isMutable() {
@@ -65,7 +68,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        BlockDataReference(Prop<BlockData<libCfg>>* data)
+        BlockDataReference(Prop<BlockData<libCfg, UD_>>* data)
             : data_{ data }
         {}
 
@@ -78,12 +81,12 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         BlockDataReference& operator=(BlockDataReference const&) = default;
 
         [[nodiscard]]
-        BlockDataReference(BlockDataReference<libCfg, true> const& otherBlock)
+        BlockDataReference(BlockDataReference<libCfg, UD_, true> const& otherBlock)
             requires (!isMut_)
             : data_{ otherBlock.data() }
         {}
 
-        BlockDataReference& operator=(BlockDataReference<libCfg, true> const& rhs)
+        BlockDataReference& operator=(BlockDataReference<libCfg, UD_, true> const& rhs)
             requires (!isMut_)
         {
             data_ = rhs.data();
@@ -92,12 +95,12 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         template<bool rhsMutable>
         [[nodiscard]]
-        bool operator==(BlockDataReference<libCfg, rhsMutable> const& rhs) const {
+        bool operator==(BlockDataReference<libCfg, UD_, rhsMutable> const& rhs) const {
             return data_ == rhs.data();
         }
 
         [[nodiscard]]
-        BlockData<libCfg> const* data() const {
+        BlockData<libCfg, UD_> const* data() const {
             return data_;
         }
 
@@ -145,7 +148,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     };
 }
 
-template<gustave::cfg::cLibConfig auto libCfg, bool isMutable>
-struct std::hash<gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg,isMutable>>
-    : public gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg,isMutable>::Hasher
+template<gustave::cfg::cLibConfig auto libCfg, gustave::core::scenes::common::cSceneUserData UD, bool isMut>
+struct std::hash<gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg,UD,isMut>>
+    : public gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg,UD,isMut>::Hasher
 {};

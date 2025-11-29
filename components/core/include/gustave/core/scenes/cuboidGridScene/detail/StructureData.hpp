@@ -50,9 +50,9 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     private:
         static constexpr auto u = cfg::units(libCfg);
 
-        using ConstBlockDataReference = detail::BlockDataReference<libCfg, false>;
-        using DataNeighbour = detail::DataNeighbour<libCfg, true>;
-        using DataNeighbours = detail::DataNeighbours<libCfg, true>;
+        using ConstBlockDataReference = detail::BlockDataReference<libCfg, UD_, false>;
+        using DataNeighbour = detail::DataNeighbour<libCfg, UD_, true>;
+        using DataNeighbours = detail::DataNeighbours<libCfg, UD_, true>;
         using Direction = math3d::BasicDirection;
 
         using PressureStress = model::PressureStress<libCfg>;
@@ -67,7 +67,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using UDTraits = common::UserDataTraits<UD_>;
 
-        using BlockDataReference = detail::BlockDataReference<libCfg, true>;
+        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, true>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
         using SceneData = detail::SceneData<libCfg, UD_>;

@@ -28,10 +28,11 @@
 #include <utility>
 
 #include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockMappedData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto libCfg>
-    using BlockData = std::pair<const BlockIndex, BlockMappedData<libCfg>>;
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
+    using BlockData = std::pair<const BlockIndex, BlockMappedData<libCfg, UD_>>;
 }

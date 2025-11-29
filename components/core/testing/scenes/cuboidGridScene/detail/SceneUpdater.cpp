@@ -36,18 +36,19 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
 using BlockIndex = cuboid::BlockIndex;
-using ConstBlockDataReference = cuboid::detail::BlockDataReference<libCfg, false>;
-using ConstDataNeighbours = cuboid::detail::DataNeighbours<libCfg, false>;
+using ConstBlockDataReference = cuboid::detail::BlockDataReference<libCfg, SceneUserData, false>;
+using ConstDataNeighbours = cuboid::detail::DataNeighbours<libCfg, SceneUserData, false>;
 using Direction = gustave::math3d::BasicDirection;
 using LinkIndices = ConstBlockDataReference::LinkIndices;
-using SceneData = cuboid::detail::SceneData<libCfg, void>;
-using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, void>;
-using StructureData = cuboid::detail::StructureData<libCfg, void>;
+using SceneData = cuboid::detail::SceneData<libCfg, SceneUserData>;
+using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, SceneUserData>;
+using StructureData = cuboid::detail::StructureData<libCfg, SceneUserData>;
 using Transaction = SceneUpdater::Transaction;
 
 using SolverStructure = gustave::core::solvers::Structure<libCfg>;

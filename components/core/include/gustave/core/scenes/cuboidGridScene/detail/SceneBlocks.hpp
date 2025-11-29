@@ -40,7 +40,7 @@
 #include <gustave/meta/Meta.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto libCfg>
+    template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
     class SceneBlocks {
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -53,7 +53,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using BlockConstructionInfo = cuboidGridScene::BlockConstructionInfo<libCfg>;
         using BlockIndex = cuboidGridScene::BlockIndex;
-        using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<libCfg>>;
+        using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<libCfg, UD_>>;
         using Direction = math3d::BasicDirection;
 
         using const_iterator = BlockMap::const_iterator;
@@ -74,12 +74,12 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        BlockDataReference<libCfg, true> at(BlockIndex const& index) {
+        BlockDataReference<libCfg, UD_, true> at(BlockIndex const& index) {
             return doAt(*this, index);
         }
 
         [[nodiscard]]
-        BlockDataReference<libCfg, false> at(BlockIndex const& index) const {
+        BlockDataReference<libCfg, UD_, false> at(BlockIndex const& index) const {
             return doAt(*this, index);
         }
 
@@ -130,17 +130,17 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        BlockDataReference<libCfg,true> find(BlockIndex const& index) {
+        BlockDataReference<libCfg, UD_, true> find(BlockIndex const& index) {
             return doFind(*this, index);
         }
 
         [[nodiscard]]
-        BlockDataReference<libCfg,false> find(BlockIndex const& index) const {
+        BlockDataReference<libCfg, UD_, false> find(BlockIndex const& index) const {
             return doFind(*this, index);
         }
 
-        BlockDataReference<libCfg, true> insert(BlockConstructionInfo const& info) {
-            auto it = blocks_.emplace(info.index(), BlockMappedData{ info }).first;
+        BlockDataReference<libCfg, UD_, true> insert(BlockConstructionInfo const& info) {
+            auto it = blocks_.emplace(info.index(), BlockMappedData<libCfg, UD_>{ info }).first;
             return { &(*it) };
         }
 

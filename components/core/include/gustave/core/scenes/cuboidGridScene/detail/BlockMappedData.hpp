@@ -32,11 +32,13 @@
 #include <gustave/cfg/cUnitOf.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
+#include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
 #include <gustave/utils/IndexGenerator.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
-    template<cfg::cLibConfig auto cfg>
+    template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_>
     class BlockMappedData {
     private:
         static constexpr auto u = cfg::units(cfg);
@@ -44,15 +46,23 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<cfg::cUnitOf<cfg> auto unit>
         using Real = cfg::Real<cfg, unit>;
     public:
+        using UDTraits = common::UserDataTraits<UD_>;
+
         using LinkIndex = cfg::LinkIndex<cfg>;
         using PressureStress = model::PressureStress<cfg>;
         using StructureIndex = cfg::StructureIndex<cfg>;
+        using UserDataMember = UDTraits::BlockMember;
 
         struct LinkIndices {
             LinkIndex plusX;
             LinkIndex plusY;
             LinkIndex plusZ;
         };
+
+        [[nodiscard]]
+        static constexpr bool hasUserData() {
+            return UDTraits::hasBlockUserData();
+        }
 
         [[nodiscard]]
         explicit BlockMappedData(BlockConstructionInfo<cfg> const& info)
@@ -99,6 +109,20 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         StructureIndex structureId() const {
             return structureId_;
         }
+
+        [[nodiscard]]
+        UserDataMember const& userData() const
+            requires (hasUserData())
+        {
+            return userData_;
+        }
+
+        [[nodiscard]]
+        UserDataMember& userData()
+            requires (hasUserData())
+        {
+            return userData_;
+        }
     private:
         [[nodiscard]]
         static constexpr LinkIndex maxLinkId() {
@@ -109,6 +133,10 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         LinkIndices linkIndices_;
         Real<u.mass> mass_;
         bool isFoundation_;
+
+        [[no_unique_address]]
+        UserDataMember userData_;
+
         StructureIndex structureId_;
     };
 }
