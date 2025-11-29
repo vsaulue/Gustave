@@ -42,6 +42,7 @@ namespace gustave::core::worlds::syncWorld::detail {
         using Vector3 = cfg::Vector3<libCfg, unit>;
 
         struct SceneUserData {
+            using Block = void;
             using Structure = StructureUserData<libCfg>;
         };
     public:

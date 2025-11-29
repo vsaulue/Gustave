@@ -35,6 +35,7 @@ namespace gustave::core::scenes::common {
 
     template<typename T>
     concept cSceneUserData = std::is_void_v<T> || requires {
+        requires detail::cUserData<typename T::Block>;
         requires detail::cUserData<typename T::Structure>;
     };
 }
