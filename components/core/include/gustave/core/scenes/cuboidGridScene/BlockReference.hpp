@@ -33,6 +33,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cuboidGridScene/blockReference/Contacts.hpp>
 #include <gustave/core/scenes/cuboidGridScene/blockReference/Structures.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
@@ -60,13 +61,16 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<typename T>
         using PropPtr = utils::PropPtr<isMut_, T>;
 
-        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, false>;
+        template<bool mut>
+        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, mut>;
+
         using DataNeighbours = detail::DataNeighbours<libCfg, UD_, false>;
         using IndexNeighbour = detail::IndexNeighbour;
         using IndexNeighbours = detail::IndexNeighbours;
         using SceneData = detail::SceneData<libCfg, UD_>;
         using StructureData = SceneData::StructureData;
         using StructureIndex = StructureData::StructureIndex;
+        using UDTraits = common::UserDataTraits<UD_>;
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -77,6 +81,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using BlockIndex = cuboidGridScene::BlockIndex;
         using Direction = math3d::BasicDirection;
         using PressureStress = model::PressureStress<libCfg>;
+        using UserDataMember = UDTraits::BlockMember;
 
         template<bool mut>
         using Contacts = blockReference::Contacts<libCfg, UD_, mut>;
@@ -217,18 +222,33 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
+        UserDataMember& userData()
+            requires (isMut_ && UDTraits::hasBlockUserData())
+        {
+            return data().userData();
+        }
+
+        [[nodiscard]]
+        UserDataMember const& userData() const
+            requires (UDTraits::hasBlockUserData())
+        {
+            return data().userData();
+        }
+
+        [[nodiscard]]
         bool operator==(BlockReference const&) const = default;
     private:
         PropPtr<SceneData> sceneData_;
         BlockIndex index_;
 
         [[nodiscard]]
-        BlockDataReference data() const {
-            BlockDataReference result = sceneData_->blocks.find(index_);
-            if (!result) {
-                throw invalidError();
-            }
-            return result;
+        BlockDataReference<true> data() {
+            return doData(*this);
+        }
+
+        [[nodiscard]]
+        BlockDataReference<false> data() const {
+            return doData(*this);
         }
 
         [[nodiscard]]
@@ -238,6 +258,15 @@ namespace gustave::core::scenes::cuboidGridScene {
                 throw self.invalidError();
             }
             return Result{ *self.sceneData_, self.index_ };
+        }
+
+        [[nodiscard]]
+        static auto doData(meta::cCvRefOf<BlockReference> auto&& self) -> decltype(self.data()) {
+            auto result = self.sceneData_->blocks.find(self.index_);
+            if (!result) {
+                throw self.invalidError();
+            }
+            return result;
         }
     };
 }
