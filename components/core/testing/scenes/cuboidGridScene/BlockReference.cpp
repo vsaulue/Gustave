@@ -174,4 +174,31 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
             CHECK_THROWS_AS(ib112.structures(), std::out_of_range);
         }
     }
+
+    SECTION(".userdata()") {
+        mb112.userData().tag = 0.75f;
+
+        auto runValidTest = [&](auto&& blockRef, bool expectedConst) {
+            auto&& userData = blockRef.userData();
+            CHECK(expectedConst == userData.isCalledAsConst());
+            CHECK(userData.tag == 0.75f);
+            };
+
+        SECTION("// mutable") {
+            runValidTest(mb112, false);
+        }
+
+        SECTION("// const") {
+            runValidTest(cmb112, true);
+        }
+
+        SECTION("// immutable") {
+            runValidTest(ib112, true);
+        }
+
+        SECTION("// invalid") {
+            deleteBlock(ib112.index());
+            CHECK_THROWS_AS(ib112.userData(), std::out_of_range);
+        }
+    }
 }
