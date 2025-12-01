@@ -57,6 +57,6 @@ namespace gustave::testing {
         [[nodiscard]]
         constexpr bool operator==(ConstDetector const&) const = default;
 
-        int tag;
+        Tag tag;
     };
 }
