@@ -143,7 +143,7 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
             auto res = contactRef.localBlock();
             auto const expected = blockRef({ 2,2,2 });
             CHECK(res == expected);
-            CHECK(expectedConst == res.structures().unique().userData().isCalledAsConst());
+            CHECK(expectedConst == res.userData().isCalledAsConst());
         };
 
         SECTION("// valid - mutable") {
@@ -213,7 +213,7 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
             auto result = contactRef.otherBlock();
             auto const expected = blockRef({ 1,2,2 });
             CHECK(result == expected);
-            CHECK(expectedConst == result.structures().unique().userData().isCalledAsConst());
+            CHECK(expectedConst == result.userData().isCalledAsConst());
         };
 
         SECTION("// valid - mutable") {

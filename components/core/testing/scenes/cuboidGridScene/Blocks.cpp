@@ -67,7 +67,7 @@ TEST_CASE("core::scenes::cuboidGridScene::Blocks") {
             auto ref = blocks.at({ 0,1,0 });
             REQUIRE(ref.isValid());
             CHECK(ref.mass() == 2000.f * u.mass);
-            CHECK(expectedConst == ref.structures().unique().userData().isCalledAsConst());
+            CHECK(expectedConst == ref.userData().isCalledAsConst());
         };
 
         SECTION("// mutable") {
@@ -92,7 +92,7 @@ TEST_CASE("core::scenes::cuboidGridScene::Blocks") {
             auto ref = blocks.find({ 0,2,0 });
             REQUIRE(ref.isValid());
             CHECK(ref.mass() == 3000.f * u.mass);
-            CHECK(expectedConst == ref.structures().unique().userData().isCalledAsConst());
+            CHECK(expectedConst == ref.userData().isCalledAsConst());
         };
 
         SECTION("// mutable") {
@@ -120,7 +120,7 @@ TEST_CASE("core::scenes::cuboidGridScene::Blocks") {
             };
             auto ids = blocks | std::views::transform([](auto&& b) { return b.index(); });
             REQUIRE_THAT(ids, matchers::c2::UnorderedRangeEquals(expectedIds));
-            bool isConst = (*blocks.begin()).structures().unique().userData().isCalledAsConst();
+            bool isConst = (*blocks.begin()).userData().isCalledAsConst();
             CHECK(expectedConst == isConst);
         };
 
