@@ -45,53 +45,93 @@ using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::Block
 TEST_CASE("core::scenes::cuboidGridScene::detail::BlockDataReference") {
     SceneData sceneData{ vector3(1.f, 1.f, 1.f, u.length) };
 
-    BlockDataReference<true> b111 = sceneData.blocks.insert(BlockConstructionInfo{ {1,1,1}, concrete_20m, 5.f * u.mass, false });
-    BlockDataReference<true> b333 = sceneData.blocks.insert(BlockConstructionInfo{ {3,3,3}, concrete_20m, 10.f * u.mass, true });
+    auto mb111 = sceneData.blocks.insert(BlockConstructionInfo{ {1,1,1}, concrete_20m, 5.f * u.mass, false });
+    auto const& cmb111 = mb111;
+    auto ib111 = BlockDataReference<false>{ mb111 };
 
-    SECTION("<*,true>") {
-        SECTION("// constructor & getters") {
-            CHECK(b111.index() == BlockIndex{ 1,1,1 });
-            CHECK(b111.mass() == 5.f * u.mass);
-            CHECK(b111.isFoundation() == false);
-            CHECK(b111.structureId() == sceneData.structureIdGenerator.invalidIndex());
+    auto mb333 = sceneData.blocks.insert(BlockConstructionInfo{ {3,3,3}, concrete_20m, 10.f * u.mass, true });
+    auto ib333 = BlockDataReference<false>{ mb333 };
+
+    auto mInvalid = BlockDataReference<true>{ nullptr };
+    auto iInvalid = BlockDataReference<false>{ nullptr };
+
+    SECTION("// constructor && const getters") {
+        auto runTest = [&](auto&& block) {
+            CHECK(block.index() == BlockIndex{ 1,1,1 });
+            CHECK(block.mass() == 5.f * u.mass);
+            CHECK(block.isFoundation() == false);
+        };
+
+        SECTION("// mutable") {
+            runTest(mb111);
         }
 
-        SECTION("operator bool() const") {
-            SECTION("// true") {
-                CHECK(b111);
-            }
-
-            SECTION("// false") {
-                BlockDataReference<true> const ref{ nullptr };
-                CHECK_FALSE(ref);
-            }
-        }
-
-        SECTION(".structure() // mutable") {
-            b333.structureId() = 64;
-            CHECK(b333.structureId() == 64);
+        SECTION("// immutable") {
+            runTest(ib111);
         }
     }
 
-    SECTION("<*,false>") {
-        SECTION("::BlockDataReference(BlockData const*) // + getters") {
-            BlockDataReference<false> cRef{ b111.data() };
-            CHECK(cRef.index() == BlockIndex{ 1,1,1 });
-            CHECK(cRef.mass() == 5.f * u.mass);
-            CHECK(cRef.isFoundation() == false);
-            CHECK(cRef.structureId() == sceneData.structureIdGenerator.invalidIndex());
+    SECTION(".structureId()") {
+        SECTION("// immutable") {
+            CHECK(ib333.structureId() == sceneData.structureIdGenerator.invalidIndex());
         }
 
-        SECTION("::BlockDataReference(BlockDataReference<*,true> const&)") {
-            BlockDataReference<false> cRef{ b111 };
-            CHECK(b111.data() == cRef.data());
+        SECTION("// mutable") {
+            mb333.structureId() = 64;
+            CHECK(ib333.structureId() == 64);
+        }
+    }
+
+    SECTION(".userData()") {
+        SECTION("// mutable") {
+            CHECK_FALSE(mb111.userData().isCalledAsConst());
+            mb111.userData().tag = 0.25f;
+            CHECK(ib111.userData().tag == 0.25f);
         }
 
-        SECTION("::operator==(BlockDataReference<*;true> const&)") {
-            BlockDataReference<true> nullRef{ nullptr };
-            BlockDataReference<false> cRef{ b111.data() };
-            CHECK(cRef == b111);
-            CHECK(cRef != nullRef);
+        SECTION("// const") {
+            CHECK(cmb111.userData().isCalledAsConst());
+        }
+
+        SECTION("// immutable") {
+            CHECK(ib111.userData().isCalledAsConst());
+        }
+    }
+
+    SECTION(".operator bool() const") {
+        SECTION("operator bool() const") {
+            SECTION("// true") {
+                CHECK(mb111);
+                CHECK(ib111);
+            }
+
+            SECTION("// false") {
+                CHECK_FALSE(mInvalid);
+                CHECK_FALSE(iInvalid);
+            }
+        }
+    }
+
+    SECTION("::operator==()") {
+        SECTION("// mutable == mutable") {
+            CHECK(mb111 == BlockDataReference<true>{ mb111 });
+            CHECK(mb333 != mb111);
+            CHECK(mb111 != mInvalid);
+        }
+
+        SECTION("// mutable == immutable") {
+            CHECK(mb111 == ib111);
+            CHECK(ib333 == mb333);
+            CHECK(mb111 != ib333);
+            CHECK(ib111 != mb333);
+            CHECK(mb111 != iInvalid);
+            CHECK(mInvalid != ib111);
+        }
+
+        SECTION("// immutable == immutable") {
+            CHECK(ib111 == BlockDataReference<false>{ mb111 });
+            CHECK(ib111 != ib333);
+            CHECK(ib111 != iInvalid);
         }
     }
 }

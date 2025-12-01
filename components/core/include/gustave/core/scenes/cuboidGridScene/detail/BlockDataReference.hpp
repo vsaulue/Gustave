@@ -33,6 +33,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/utils/HashEquals.hpp>
@@ -54,6 +55,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using Real = cfg::Real<libCfg, unit>;
 
         using Data = BlockData<libCfg, UD_>;
+        using UDTraits = common::UserDataTraits<UD_>;
 
         Prop<Data>* data_;
     public:
@@ -61,6 +63,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using LinkIndices = BlockMappedData<libCfg, UD_>::LinkIndices;
         using PressureStress = model::PressureStress<libCfg>;
         using StructureIndex = BlockMappedData<libCfg, UD_>::StructureIndex;
+        using UserDataMember = UDTraits::BlockMember;
 
         [[nodiscard]]
         static constexpr bool isMutable() {
@@ -139,6 +142,22 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         [[nodiscard]]
         bool isFoundation() const {
             return data_->second.isFoundation();
+        }
+
+        [[nodiscard]]
+        UserDataMember& userData()
+            requires (isMut_&& UDTraits::hasBlockUserData())
+        {
+            assert(data_);
+            return data_->second.userData();
+        }
+
+        [[nodiscard]]
+        UserDataMember const& userData() const
+            requires (UDTraits::hasBlockUserData())
+        {
+            assert(data_);
+            return data_->second.userData();
         }
 
         [[nodiscard]]
