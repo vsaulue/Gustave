@@ -28,6 +28,6 @@
 #include <gustave/testing/ConstDetector.hpp>
 
 struct SceneUserData {
-    using Block = gustave::testing::ConstDetector<int>;
+    using Block = gustave::testing::ConstDetector<double>;
     using Structure = gustave::testing::ConstDetector<int>;
 };
