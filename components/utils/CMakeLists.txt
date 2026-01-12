@@ -1,6 +1,6 @@
 # This file is part of Gustave, a structural integrity library for video games.
 # 
-# Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+# Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
 # 
 # MIT License
 # 
@@ -35,6 +35,7 @@ add_unit_test(TARGET Comp-Utils-unit-test
         "tests/utils/Hasher.cpp"
         "tests/utils/IndexGenerator.cpp"
         "tests/utils/IndexRange.cpp"
+        "tests/utils/InplaceVector.cpp"
         "tests/utils/NumberHyperscript.cpp"
         "tests/utils/PointerHash.cpp"
         "tests/utils/prop/Ptr.cpp"
