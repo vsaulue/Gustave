@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -25,16 +25,28 @@
 
 #pragma once
 
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
-#include <gustave/utils/cEnumerator.hpp>
+#include <gustave/meta/Meta.hpp>
 
 namespace gustave::utils {
-    template<cEnumerator Enumerator>
+    template<typename T>
+    concept cForwardEnumerator = requires(T& v, T const& cv) {
+        T{ cv };
+        T{};
+        v = cv;
+        ++v;
+        { cv == cv } -> std::convertible_to<bool>;
+        { *cv } -> meta::notVoid;
+        { cv.isEnd() } -> std::convertible_to<bool>;
+    };
+
+    template<cForwardEnumerator Enumerator>
     class ForwardIterator {
     public:
         using difference_type = std::ptrdiff_t;

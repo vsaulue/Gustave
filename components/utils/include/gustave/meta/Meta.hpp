@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -39,7 +39,7 @@ namespace gustave::meta {
     */
     template<typename T>
     consteval std::remove_cvref_t<T> value(T&&) {
-        static_assert(detail::alwaysFalse<T>, "Meta::value() cannot be used in an evaluated context.");
+        static_assert(detail::alwaysFalse<T>, "meta::value() cannot be used in an evaluated context.");
     }
 
     template<typename T, typename Desired>
@@ -60,4 +60,7 @@ namespace gustave::meta {
 
     template<typename T>
     concept cTypeWrapper = std::is_same_v<T, TypeWrapper<typename T::Type>>;
+
+    template<typename T>
+    concept notVoid = !std::is_void_v<T>;
 }
