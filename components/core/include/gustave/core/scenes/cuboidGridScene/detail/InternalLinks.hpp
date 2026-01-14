@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -25,68 +25,42 @@
 
 #pragma once
 
-#include <array>
 #include <optional>
 
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/utils/InplaceVector.hpp>
 #include <gustave/utils/NoInit.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_>
     class InternalLinks {
     public:
-        using ConstBlockDataReference = detail::BlockDataReference<cfg, UD_, false>;
+        using BlockData = detail::BlockData<cfg, UD_>;
         using Direction = math3d::BasicDirection;
         using SceneData = detail::SceneData<cfg, UD_>;
+        using Value = DataNeighbour<cfg, UD_, false>;
 
-        struct Value {
-            [[nodiscard]]
-            Value()
-                : otherBlock{ nullptr }
-                , direction{ Direction::plusX() }
-            {}
-
-            [[nodiscard]]
-            explicit Value(ConstBlockDataReference otherBlock_, Direction direction_)
-                : otherBlock{ otherBlock_ }
-                , direction{ direction_ }
-            {}
-
-            [[nodiscard]]
-            bool operator==(Value const&) const = default;
-
-            ConstBlockDataReference otherBlock;
-            Direction direction;
-        };
-
-        using Values = std::array<Value, 3>;
-        using Iterator = Values::const_iterator;
+        using Values = utils::InplaceVector<Value, 3>;
+        using Iterator = Values::ConstIterator;
 
         [[nodiscard]]
         explicit InternalLinks(utils::NoInit)
             : source_{ nullptr }
-            , values_{}
-            , size_{ 0 }
         {}
 
         [[nodiscard]]
         explicit InternalLinks(SceneData const& scene, BlockIndex const& blockIndex)
-            : source_{ scene.blocks.find(blockIndex) }
-            , values_{}
-            , size_{ 0 }
+            : source_{ &scene.blocks.at(blockIndex) }
         {
-            assert(source_);
             auto processNeighbour = [&](Direction direction) {
-                std::optional<BlockIndex> neighbourId = blockIndex.neighbourAlong(direction);
-                if (neighbourId) {
-                    ConstBlockDataReference neighbour = scene.blocks.find(*neighbourId);
-                    if (neighbour) {
-                        if (!source_.isFoundation() || !neighbour.isFoundation()) {
-                            addValue(neighbour, direction);
+                if (auto neighbourId = blockIndex.neighbourAlong(direction)) {
+                    if (auto neighbourPtr = scene.blocks.find(*neighbourId)) {
+                        if (!source_->isFoundation() || !neighbourPtr->isFoundation()) {
+                            values_.emplaceBack(direction, *neighbourPtr);
                         }
                     }
                 }
@@ -97,7 +71,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        Value operator[](std::size_t index) const {
+        Value const& operator[](std::size_t index) const {
             return values_[index];
         }
 
@@ -108,26 +82,20 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         [[nodiscard]]
         Iterator end() const {
-            return values_.begin() + size_;
+            return values_.end();
         }
 
         [[nodiscard]]
         std::size_t size() const {
-            return size_;
+            return values_.size();
         }
 
         [[nodiscard]]
-        ConstBlockDataReference source() const {
-            return source_;
+        BlockData const& source() const {
+            return *source_;
         }
     private:
-        void addValue(ConstBlockDataReference neighbour, Direction direction) {
-            values_[size_] = Value{ neighbour, direction };
-            ++size_;
-        }
-
-        ConstBlockDataReference source_;
+        BlockData const* source_;
         Values values_;
-        std::size_t size_;
     };
 }

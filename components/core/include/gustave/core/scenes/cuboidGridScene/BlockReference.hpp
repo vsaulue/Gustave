@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -37,8 +37,6 @@
 #include <gustave/core/scenes/cuboidGridScene/blockReference/Contacts.hpp>
 #include <gustave/core/scenes/cuboidGridScene/blockReference/Structures.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
@@ -61,13 +59,10 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<typename T>
         using PropPtr = utils::PropPtr<isMut_, T>;
 
-        template<bool mut>
-        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, mut>;
-
         using DataNeighbours = detail::DataNeighbours<libCfg, UD_, false>;
-        using IndexNeighbour = detail::IndexNeighbour;
-        using IndexNeighbours = detail::IndexNeighbours;
         using SceneData = detail::SceneData<libCfg, UD_>;
+
+        using BlockData = SceneData::BlockData;
         using StructureData = SceneData::StructureData;
         using StructureIndex = StructureData::StructureIndex;
         using UDTraits = common::UserDataTraits<UD_>;
@@ -149,7 +144,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
-            return sceneData_->blocks.blockSize();
+            return sceneData_->blockSize();
         }
 
         [[nodiscard]]
@@ -242,12 +237,12 @@ namespace gustave::core::scenes::cuboidGridScene {
         BlockIndex index_;
 
         [[nodiscard]]
-        BlockDataReference<true> data() {
+        BlockData& data() {
             return doData(*this);
         }
 
         [[nodiscard]]
-        BlockDataReference<false> data() const {
+        BlockData const& data() const {
             return doData(*this);
         }
 
@@ -266,7 +261,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             if (!result) {
                 throw self.invalidError();
             }
-            return result;
+            return *result;
         }
     };
 }

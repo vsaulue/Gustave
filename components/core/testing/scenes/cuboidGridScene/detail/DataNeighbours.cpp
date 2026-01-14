@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -23,56 +23,53 @@
  * SOFTWARE.
  */
 
+#include <array>
 #include <limits>
 #include <ranges>
 
-#include <catch2/catch_test_macros.hpp>
-
-#include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
-#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
-#include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 
 #include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
-using BlockIndex = cuboid::BlockIndex;
-using BlockDataReference = cuboid::detail::BlockDataReference<libCfg, SceneUserData, true>;
-using DataNeighbour = cuboid::detail::DataNeighbour<libCfg, SceneUserData, true>;
 using DataNeighbours = cuboid::detail::DataNeighbours<libCfg, SceneUserData, true>;
-using Direction = gustave::math3d::BasicDirection;
-using SceneBlocks = cuboid::detail::SceneBlocks<libCfg, SceneUserData>;
+using SceneData = cuboid::detail::SceneData<libCfg, SceneUserData>;
+
+using BlockConstructionInfo = SceneData::BlockData::BlockConstructionInfo;
+using BlockData = SceneData::BlockData;
+using BlockIndex = SceneData::BlockIndex;
+using DataNeighbour = DataNeighbours::Neighbour;
+using Direction = DataNeighbour::Direction;
 
 using Coord = BlockIndex::Coord;
 using Limits = std::numeric_limits<Coord>;
 
-static constexpr Coord max{ Limits::max() };
-static constexpr Coord min{ Limits::min() };
+static constexpr auto max = Coord{ Limits::max() };
+static constexpr auto min = Coord{ Limits::min() };
 
 static_assert(std::ranges::forward_range<DataNeighbours>);
 
 TEST_CASE("core::scenes::cuboidGridScene::detail::DataNeighbours") {
-    SceneBlocks sceneBlocks{ vector3(2.f, 3.f, 1.f, u.length) };
+    auto scene = SceneData{ vector3(2.f, 3.f, 1.f, u.length) };
 
-    auto addBlock = [&](BlockIndex const& index) -> BlockDataReference {
-        return sceneBlocks.insert({ index, concrete_20m, 20.f * u.mass, false });
+    auto addBlock = [&](BlockIndex const& index) -> BlockData& {
+        return scene.blocks.emplace(BlockConstructionInfo{ index, concrete_20m, 20.f * u.mass, false });
     };
 
-    BlockDataReference source = addBlock({ min, 1, 2 });
-    BlockDataReference plusX = addBlock({ 1 + min, 1, 2 });
-    BlockDataReference minusZ = addBlock({ min, 1, 1 });
+    auto& source = addBlock({ min, 1, 2 });
+    auto& plusX = addBlock({ 1 + min, 1, 2 });
+    auto& minusZ = addBlock({ min, 1, 1 });
     addBlock({ max, 1, 2 });
     addBlock({ min, 2, 3 });
 
-    DataNeighbours neighbours{ sceneBlocks, source.index() };
+    auto neighbours = DataNeighbours{ scene, source.index() };
 
-    std::vector<DataNeighbour> const expected = {
-        {Direction::plusX(), plusX},
-        {Direction::minusZ(), minusZ},
+    auto const expected = std::array{
+        DataNeighbour{ Direction::plusX(), plusX },
+        DataNeighbour{ Direction::minusZ(), minusZ },
     };
 
     CHECK_THAT(neighbours, matchers::c2::RangeEquals(expected));

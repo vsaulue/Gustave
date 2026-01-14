@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -63,9 +63,8 @@ TEST_CASE("core::scenes::cuboidGridScene::Structures") {
     SceneUpdater{ sceneData }.runTransaction(t);
 
     auto structureIdOf = [&](BlockIndex const& blockId) {
-        auto const blockDataRef = sceneData.blocks.find(blockId);
-        REQUIRE(blockDataRef);
-        return blockDataRef.structureId();
+        auto const& blockData = sceneData.blocks.at(blockId);
+        return blockData.structureId();
     };
 
     SECTION(".at()") {

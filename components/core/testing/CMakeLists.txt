@@ -1,6 +1,6 @@
 # This file is part of Gustave, a structural integrity library for video games.
 # 
-# Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+# Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
 # 
 # MIT License
 # 
@@ -41,14 +41,12 @@ function(add_distrib_unit_test)
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/Contacts.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/blockReference/Contacts.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/blockReference/Structures.cpp"
-            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/BlockDataReference.cpp"
-            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/BlockMappedData.cpp"
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/BlockData.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/DataNeighbours.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/IndexNeighbours.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/InternalLinks.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/SceneBlocks.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/SceneData.cpp"
-            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/SceneStructures.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/detail/SceneUpdater.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/structureReference/Blocks.cpp"
             "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scenes/cuboidGridScene/structureReference/Contacts.cpp"

@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -45,7 +45,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             using InternalLinks = cuboidGridScene::detail::InternalLinks<libCfg, UD_>;
             using SceneData = cuboidGridScene::detail::SceneData<libCfg, UD_>;
 
-            using BlockDataIterator = SceneData::Blocks::const_iterator;
+            using BlockDataIterator = utils::PropIterator<isMut_, typename SceneData::Blocks>;
         public:
             using Value  = cuboidGridScene::ContactReference<libCfg, UD_, isMut_>;
 
@@ -64,7 +64,7 @@ namespace gustave::core::scenes::cuboidGridScene {
                 , internalLinkId_{ 0 }
             {
                 if (blockIt_ != scene_->blocks.end()) {
-                    blockLinks_ = InternalLinks{ *scene_, blockIt_->first };
+                    blockLinks_ = InternalLinks{ *scene_, (*blockIt_)->index() };
                     next();
                 }
             }
@@ -77,7 +77,8 @@ namespace gustave::core::scenes::cuboidGridScene {
             [[nodiscard]]
             Value operator*() const {
                 assert(not isEnd());
-                return Value{ *scene_, { blockIt_->first, blockLinks_[internalLinkId_].direction } };;
+                auto const contactId = ContactIndex{ (*blockIt_)->index(), blockLinks_[internalLinkId_].direction() };
+                return Value{ *scene_, contactId };
             }
 
             [[nodiscard]]
@@ -95,7 +96,7 @@ namespace gustave::core::scenes::cuboidGridScene {
                     ++blockIt_;
                     internalLinkId_ = 0;
                     while (blockIt_ != scene_->blocks.end()) {
-                        blockLinks_ = InternalLinks{ *scene_, blockIt_->first };
+                        blockLinks_ = InternalLinks{ *scene_, (*blockIt_)->index() };
                         if (blockLinks_.size() > 0) {
                             return;
                         }

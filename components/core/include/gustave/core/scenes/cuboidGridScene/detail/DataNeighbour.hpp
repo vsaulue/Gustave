@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -27,31 +27,40 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_, bool isMut_>
-    struct DataNeighbour {
+    class DataNeighbour {
+    private:
+        template<typename T>
+        using Prop = utils::Prop<isMut_, T>;
     public:
+        using BlockData = detail::BlockData<cfg, UD_>;
         using Direction = math3d::BasicDirection;
 
         [[nodiscard]]
-        DataNeighbour(utils::NoInit NO_INIT)
-            : direction{ Direction::plusX() }
-            , block{ NO_INIT }
+        explicit DataNeighbour(Direction direction, Prop<BlockData>& otherBlock)
+            : direction_{ direction }
+            , otherBlock_{ &otherBlock }
         {}
 
         [[nodiscard]]
-        DataNeighbour(Direction direction, BlockDataReference<cfg, UD_, isMut_> block)
-            : direction{ direction }
-            , block{ block }
-        {}
+        bool operator==(DataNeighbour const& other) const = default;
 
         [[nodiscard]]
-        bool operator==(DataNeighbour const&) const = default;
+        Direction direction() const {
+            return direction_;
+        }
 
-        Direction direction;
-        BlockDataReference<cfg, UD_, isMut_> block;
+        [[nodiscard]]
+        Prop<BlockData>& otherBlock() const {
+            return *otherBlock_;
+        }
+    private:
+        Direction direction_;
+        Prop<BlockData>* otherBlock_;
     };
 }

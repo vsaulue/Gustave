@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -26,15 +26,15 @@
 #pragma once
 
 #include <memory>
-#include <unordered_set>
+#include <stdexcept>
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/SceneStructures.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
+#include <gustave/utils/SharedIndexedSet.hpp>
 #include <gustave/utils/IndexGenerator.hpp>
 #include <gustave/utils/PointerHash.hpp>
 
@@ -44,6 +44,9 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using UserData = UD_;
 
+        using BlockData = detail::BlockData<cfg, UD_>;
+        using BlockIndex = cuboidGridScene::BlockIndex;
+        using Direction = math3d::BasicDirection;
         using StructureData = detail::StructureData<cfg, UD_>;
         using StructureIndex = cfg::StructureIndex<cfg>;
     private:
@@ -51,15 +54,28 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         template<cfg::cUnitOf<cfg> auto unit>
         using Vector3 = cfg::Vector3<cfg, unit>;
+
+        template<cfg::cUnitOf<cfg> auto unit>
+        using Real = cfg::Real<cfg, unit>;
     public:
-        using Blocks = SceneBlocks<cfg, UD_>;
+        using Blocks = utils::SharedIndexedSet<BlockData>;
         using StructureIdGenerator = utils::IndexGenerator<StructureIndex>;
-        using Structures = SceneStructures<cfg, UD_>;
+        using Structures = utils::SharedIndexedSet<StructureData>;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)
-            : blocks{ blockSize }
-        {}
+            : blockSize_{ blockSize }
+        {
+            if (blockSize.x() <= 0.f * u.length) {
+                throw blockSizeError('x', blockSize.x());
+            }
+            if (blockSize.y() <= 0.f * u.length) {
+                throw blockSizeError('y', blockSize.y());
+            }
+            if (blockSize.z() <= 0.f * u.length) {
+                throw blockSizeError('z', blockSize.z());
+            }
+        }
 
         SceneData(SceneData const&) = delete;
         SceneData& operator=(SceneData const&) = delete;
@@ -69,6 +85,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             : blocks{ std::move(other.blocks) }
             , structures{ std::move(other.structures) }
             , structureIdGenerator{ other.structureIdGenerator }
+            , blockSize_{ std::move(other.blockSize_) }
         {
             resetSceneDataPtr();
         }
@@ -78,9 +95,32 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
                 blocks = std::move(other.blocks);
                 structures = std::move(other.structures);
                 structureIdGenerator = other.structureIdGenerator;
+                blockSize_ = other.blockSize_;
                 resetSceneDataPtr();
             }
             return *this;
+        }
+
+        [[nodiscard]]
+        Vector3<u.length> const& blockSize() const {
+            return blockSize_;
+        }
+
+        [[nodiscard]]
+        Real<u.area> contactAreaAlong(Direction direction) const {
+            auto const& dims = blockSize_;
+            switch (direction.id()) {
+            case Direction::Id::plusX:
+            case Direction::Id::minusX:
+                return dims.y() * dims.z();
+            case Direction::Id::plusY:
+            case Direction::Id::minusY:
+                return dims.x() * dims.z();
+            case Direction::Id::plusZ:
+            case Direction::Id::minusZ:
+                return dims.x() * dims.y();
+            }
+            throw direction.invalidError();
         }
 
         [[nodiscard]]
@@ -93,14 +133,39 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return id != structureIdGenerator.invalidIndex() && structures.contains(id);
         }
 
+        [[nodiscard]]
+        Real<u.length> thicknessAlong(Direction direction) const {
+            switch (direction.id()) {
+            case Direction::Id::plusX:
+            case Direction::Id::minusX:
+                return blockSize_.x();
+            case Direction::Id::plusY:
+            case Direction::Id::minusY:
+                return blockSize_.y();
+            case Direction::Id::plusZ:
+            case Direction::Id::minusZ:
+                return blockSize_.z();
+            }
+            throw direction.invalidError();
+        }
+
         Blocks blocks;
         Structures structures;
         StructureIdGenerator structureIdGenerator;
     private:
+        [[nodiscard]]
+        static std::invalid_argument blockSizeError(char coordSymbol, Real<u.length> const value) {
+            std::stringstream result;
+            result << "blocksize." << coordSymbol << " must be strictly positive (passed: " << value << ").";
+            return std::invalid_argument{ result.str() };
+        }
+
         void resetSceneDataPtr() {
             for (auto& structure : structures) {
                 structure->setSceneData(*this);
             }
         }
+
+        Vector3<u.length> blockSize_;
     };
 }

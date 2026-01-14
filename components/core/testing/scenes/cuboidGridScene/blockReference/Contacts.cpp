@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -42,7 +42,7 @@ using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, SceneUserData>;
 template<bool mut>
 using Contacts = cuboid::blockReference::Contacts<libCfg, SceneUserData, mut>;
 
-using BlockIndex = SceneData::Blocks::BlockIndex;
+using BlockIndex = SceneData::BlockIndex;
 using ContactIndex = Contacts<false>::ContactReference<false>::ContactIndex;
 using Direction = Contacts<false>::Direction;
 using Transaction = SceneUpdater::Transaction;

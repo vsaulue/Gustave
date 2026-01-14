@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -25,14 +25,125 @@
 
 #pragma once
 
-#include <utility>
+#include <cassert>
+#include <limits>
 
 #include <gustave/cfg/cLibConfig.hpp>
+#include <gustave/cfg/cUnitOf.hpp>
+#include <gustave/cfg/LibTraits.hpp>
+#include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockMappedData.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
+#include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/utils/IndexGenerator.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
-    using BlockData = std::pair<const BlockIndex, BlockMappedData<libCfg, UD_>>;
+    class BlockData {
+        static constexpr auto u = cfg::units(libCfg);
+
+        using NodeIndex = cfg::NodeIndex<libCfg>;
+
+        template<cfg::cUnitOf<libCfg> auto unit>
+        using Real = cfg::Real<libCfg, unit>;
+
+        using Data = BlockData<libCfg, UD_>;
+        using UDTraits = common::UserDataTraits<UD_>;
+    public:
+        using BlockConstructionInfo = cuboidGridScene::BlockConstructionInfo<libCfg>;
+        using BlockIndex = cuboidGridScene::BlockIndex;
+        using LinkIndex = cfg::LinkIndex<libCfg>;
+        using PressureStress = model::PressureStress<libCfg>;
+        using StructureIndex = cfg::StructureIndex<libCfg>;
+        using UserDataMember = UDTraits::BlockMember;
+
+        struct LinkIndices {
+            LinkIndex plusX;
+            LinkIndex plusY;
+            LinkIndex plusZ;
+        };
+
+        [[nodiscard]]
+        explicit BlockData(BlockConstructionInfo const& info)
+            : index_{ info.index() }
+            , maxPressureStress_{ info.maxPressureStress() }
+            , linkIndices_{ maxLinkId(), maxLinkId(), maxLinkId() }
+            , mass_{ info.mass() }
+            , isFoundation_{ info.isFoundation() }
+            , structureId_{ utils::IndexGenerator<StructureIndex>::invalidIndex() }
+        {
+            assert(mass_ > 0.f * u.mass);
+        }
+
+        [[nodiscard]]
+        LinkIndices& linkIndices() {
+            return linkIndices_;
+        }
+
+        [[nodiscard]]
+        LinkIndices const& linkIndices() const {
+            return linkIndices_;
+        }
+
+        [[nodiscard]]
+        BlockIndex const& index() const {
+            return index_;
+        }
+
+        [[nodiscard]]
+        bool isFoundation() const {
+            return isFoundation_;
+        }
+
+        [[nodiscard]]
+        Real<u.mass> mass() const {
+            return mass_;
+        }
+
+        [[nodiscard]]
+        PressureStress const& maxPressureStress() const {
+            return maxPressureStress_;
+        }
+
+        [[nodiscard]]
+        StructureIndex& structureId() {
+            return structureId_;
+        }
+
+        [[nodiscard]]
+        StructureIndex structureId() const {
+            return structureId_;
+        }
+
+        [[nodiscard]]
+        UserDataMember& userData()
+            requires (UDTraits::hasBlockUserData())
+        {
+            return userData_;
+        }
+
+        [[nodiscard]]
+        UserDataMember const& userData() const
+            requires (UDTraits::hasBlockUserData())
+        {
+            return userData_;
+        }
+    private:
+        [[nodiscard]]
+        static constexpr LinkIndex maxLinkId() {
+            return std::numeric_limits<LinkIndex>::max();
+        }
+
+        BlockIndex index_;
+        PressureStress maxPressureStress_;
+        LinkIndices linkIndices_;
+        Real<u.mass> mass_;
+        bool isFoundation_;
+
+        [[no_unique_address]]
+        UserDataMember userData_;
+
+        StructureIndex structureId_;
+    };
 }

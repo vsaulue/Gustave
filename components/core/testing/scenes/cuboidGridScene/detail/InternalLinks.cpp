@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <array>
+
 #include <gustave/core/scenes/cuboidGridScene/detail/InternalLinks.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
@@ -35,14 +37,14 @@ using InternalLinks = cuboid::detail::InternalLinks<libCfg,void>;
 using SceneData = cuboid::detail::SceneData<libCfg,void>;
 using SceneUpdater = cuboid::detail::SceneUpdater<libCfg,void>;
 
-using BlockIndex = SceneData::Blocks::BlockIndex;
-using ConstBlockDataReference = InternalLinks::ConstBlockDataReference;
+using BlockIndex = SceneData::BlockIndex;
 using Direction = InternalLinks::Direction;
 using Transaction = SceneUpdater::Transaction;
 using Value = InternalLinks::Value;
 
 TEST_CASE("core::scenes::cuboidGridScene::detail::InternalLinks") {
-    SceneData scene{ vector3(1.f, 2.f, 3.f, u.length) };
+    auto scene = SceneData{ vector3(1.f, 2.f, 3.f, u.length) };
+    auto& blocks = scene.blocks;
 
     Transaction t;
     t.addBlock({ {2,2,2}, concrete_20m, 1000.f * u.mass, false });
@@ -52,36 +54,31 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::InternalLinks") {
     t.addBlock({ {2,2,4}, concrete_20m, 1000.f * u.mass, true });
     SceneUpdater{ scene }.runTransaction(t);
 
-    auto getBlockData = [&](BlockIndex const& index) {
-        return scene.blocks.find(index);
-    };
+    auto links222 = InternalLinks{ scene, {2,2,2} };
+    auto links223 = InternalLinks{ scene, {2,2,3} };
 
     SECTION(".begin() // & .end() ") {
         SECTION("empty") {
-            InternalLinks links{ scene, {2,2,3} };
-            CHECK(links.begin() == links.end());
+            CHECK(links223.begin() == links223.end());
         }
 
         SECTION("non-empty") {
-            InternalLinks links{ scene, {2,2,2} };
-            std::vector<Value> expected = {
-                Value{ getBlockData({3,2,2}), Direction::plusX() },
-                Value{ getBlockData({2,3,2}), Direction::plusY() },
-                Value{ getBlockData({2,2,3}), Direction::plusZ() },
+            auto const expected = std::array{
+                Value{ Direction::plusX(), blocks.at({3,2,2}) },
+                Value{ Direction::plusY(), blocks.at({2,3,2}) },
+                Value{ Direction::plusZ(), blocks.at({2,2,3}) },
             };
-            CHECK_THAT(links, matchers::c2::RangeEquals(expected));
+            CHECK_THAT(links222, matchers::c2::RangeEquals(expected));
         }
     }
 
     SECTION(".size()") {
         SECTION("// 0") {
-            InternalLinks links{ scene, {2,2,3} };
-            CHECK(links.size() == 0);
+            CHECK(links223.size() == 0);
         }
 
         SECTION("// 3") {
-            InternalLinks links{ scene, {2,2,2} };
-            CHECK(links.size() == 3);
+            CHECK(links222.size() == 3);
         }
     }
 }

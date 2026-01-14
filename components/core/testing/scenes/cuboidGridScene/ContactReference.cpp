@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -234,7 +234,7 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     }
 
     SECTION(".solverIndex()") {
-        auto const structureId = scene.blocks.find({ 7,7,7 }).structureId();
+        auto const structureId = scene.blocks.at({ 7,7,7 }).structureId();
         auto const& structureData = scene.structures.at(structureId);
         auto checkContact = [&](BlockIndex const& localBlockId, Direction direction) {
             auto const result = immContactRef(localBlockId, direction).solverIndex();

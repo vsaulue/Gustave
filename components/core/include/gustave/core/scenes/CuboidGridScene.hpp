@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -120,7 +120,7 @@ namespace gustave::core::scenes {
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
-            return data_.blocks.blockSize();
+            return data_.blockSize();
         }
 
         [[nodiscard]]
@@ -135,7 +135,7 @@ namespace gustave::core::scenes {
 
         [[nodiscard]]
         Real<u.area> contactAreaAlong(Direction direction) const {
-            return data_.blocks.contactAreaAlong(direction);
+            return data_.contactAreaAlong(direction);
         }
 
         [[nodiscard]]
@@ -160,7 +160,7 @@ namespace gustave::core::scenes {
 
         [[nodiscard]]
         Real<u.length> thicknessAlong(Direction direction) const {
-            return data_.blocks.thicknessAlong(direction);
+            return data_.thicknessAlong(direction);
         }
     private:
         SceneData data_;

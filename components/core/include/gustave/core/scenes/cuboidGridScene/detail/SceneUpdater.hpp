@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -36,36 +36,29 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/Transaction.hpp>
 #include <gustave/core/scenes/cuboidGridScene/TransactionResult.hpp>
-#include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/utils/IndexRange.hpp>
 #include <gustave/utils/prop/Ptr.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
     class SceneUpdater {
+    public:
+        using SceneData = detail::SceneData<libCfg, UD_>;
+        using Transaction = cuboidGridScene::Transaction<libCfg>;
+        using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
     private:
         static constexpr auto u = cfg::units(libCfg);
 
-        using BlockConstructionInfo = cuboidGridScene::BlockConstructionInfo<libCfg>;
-        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, true>;
-        using ConstBlockDataReference = detail::BlockDataReference<libCfg, UD_, false>;
-        using ConstDataNeighbour = detail::DataNeighbour<libCfg, UD_, false>;
+        using BlockConstructionInfo = Transaction::BlockConstructionInfo;
+        using BlockData = SceneData::BlockData;
         using ConstDataNeighbours = detail::DataNeighbours<libCfg, UD_, false>;
-        using DataNeighbour = detail::DataNeighbour<libCfg, UD_, true>;
         using DataNeighbours = detail::DataNeighbours<libCfg, UD_, true>;
-        using Direction = math3d::BasicDirection;
-        using LinkIndex = cfg::LinkIndex<libCfg>;
-        using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
-        using SceneData = detail::SceneData<libCfg, UD_>;
         using StructureData = SceneData::StructureData;
         using StructureIndex = StructureData::StructureIndex;
 
@@ -73,13 +66,11 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using Real = cfg::Real<libCfg, unit>;
 
         struct TransactionContext {
-            std::unordered_set<BlockDataReference> newRoots;
+            std::unordered_set<BlockData*> newRoots;
             std::vector<StructureIndex> removedStructures;
         };
-    public:
-        using Transaction = cuboidGridScene::Transaction<libCfg>;
-        using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
 
+    public:
         [[nodiscard]]
         explicit SceneUpdater(SceneData& data)
             : data_{ &data }
@@ -88,14 +79,15 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         TransactionResult runTransaction(Transaction const& transaction) {
             checkTransaction(transaction);
             TransactionContext ctx;
-            for (BlockIndex const& delIndex : transaction.deletedBlocks()) {
-                removeBlock(ctx, delIndex);
+            for (auto const& delBlockId : transaction.deletedBlocks()) {
+                removeBlock(ctx, delBlockId);
             }
-            for (BlockConstructionInfo const& newInfo : transaction.newBlocks()) {
-                addBlock(ctx, newInfo);
+            for (auto const& newBlockInfo : transaction.newBlocks()) {
+                addBlock(ctx, newBlockInfo);
             }
             auto const newIdStart = data_->structureIdGenerator.readNextIndex();
-            for (BlockDataReference root : ctx.newRoots) {
+            for (auto rootPtr : ctx.newRoots) {
+                auto& root = *rootPtr;
                 assert(!root.isFoundation());
                 if (!data_->isStructureIdValid(root.structureId())) {
                     auto const newStructId = data_->structureIdGenerator();
@@ -103,22 +95,21 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
                     data_->structures.insert(std::move(newStructure));
                 }
             }
-            auto newIdEnd = data_->structureIdGenerator.readNextIndex();
+            auto const newIdEnd = data_->structureIdGenerator.readNextIndex();
             auto const newStructureIds = utils::IndexRange<StructureIndex>{ newIdStart, newIdEnd - newIdStart };
             return TransactionResult{ newStructureIds, std::move(ctx.removedStructures) };
         }
     private:
         void addBlock(TransactionContext& ctx, BlockConstructionInfo const& newInfo) {
-            BlockDataReference ref = data_->blocks.insert(newInfo);
-            assert(ref);
-            if (ref.isFoundation()) {
-                for (DataNeighbour const& neighbour : neighbours(ref)) {
-                    declareRoot(ctx, neighbour.block);
+            auto& newBlock = data_->blocks.emplace(newInfo);
+            if (newBlock.isFoundation()) {
+                for (auto const& neighbour : neighbours(newBlock)) {
+                    declareRoot(ctx, neighbour.otherBlock());
                 }
             } else {
-                declareRoot(ctx, ref);
-                for (ConstDataNeighbour const& neighbour : constNeighbours(ref)) {
-                    removeStructureOf(ctx, neighbour.block);
+                declareRoot(ctx, newBlock);
+                for (auto const& neighbour : constNeighbours(newBlock)) {
+                    removeStructureOf(ctx, neighbour.otherBlock());
                 }
             }
         }
@@ -143,13 +134,13 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        ConstDataNeighbours constNeighbours(ConstBlockDataReference source) const {
-            return ConstDataNeighbours{ data_->blocks, source.index() };
+        ConstDataNeighbours constNeighbours(BlockData const& source) const {
+            return ConstDataNeighbours{ *data_, source.index() };
         }
 
-        void declareRoot(TransactionContext& ctx, BlockDataReference possibleRoot) {
+        void declareRoot(TransactionContext& ctx, BlockData& possibleRoot) {
             if (!possibleRoot.isFoundation()) {
-                auto insertResult = ctx.newRoots.insert(possibleRoot);
+                auto insertResult = ctx.newRoots.insert(&possibleRoot);
                 if (insertResult.second) {
                     removeStructureOf(ctx, possibleRoot);
                 }
@@ -157,28 +148,27 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        DataNeighbours neighbours(BlockDataReference source) {
-            return DataNeighbours{ data_->blocks, source.index() };
+        DataNeighbours neighbours(BlockData& source) {
+            return DataNeighbours{ *data_, source.index() };
         }
 
         [[nodiscard]]
         DataNeighbours neighbours(BlockIndex const& source) {
-            return DataNeighbours{ data_->blocks, source };
+            return DataNeighbours{ *data_, source };
         }
 
         void removeBlock(TransactionContext& ctx, BlockIndex const& deletedIndex) {
-            BlockDataReference deletedBlock = data_->blocks.find(deletedIndex);
-            assert(deletedBlock);
-            ctx.newRoots.erase(deletedBlock);
+            auto& deletedBlock = data_->blocks.at(deletedIndex);
+            ctx.newRoots.erase(&deletedBlock);
             removeStructureOf(ctx, deletedBlock);
-            for (DataNeighbour const& neighbour : neighbours(deletedIndex)) {
-                declareRoot(ctx, neighbour.block);
+            for (auto const& neighbour : neighbours(deletedIndex)) {
+                declareRoot(ctx, neighbour.otherBlock());
             }
             [[maybe_unused]] bool isDeleted = data_->blocks.erase(deletedIndex);
             assert(isDeleted);
         }
 
-        void removeStructureOf(TransactionContext& ctx, ConstBlockDataReference block) {
+        void removeStructureOf(TransactionContext& ctx, BlockData const& block) {
             auto const structureId = block.structureId();
             if (structureId != data_->structureIdGenerator.invalidIndex()) {
                 auto removedStruct = data_->structures.extract(structureId);

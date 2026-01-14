@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -23,29 +23,26 @@
  * SOFTWARE.
  */
 
-#include <catch2/catch_test_macros.hpp>
-
-#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
 
 #include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
-using BlockDataReference = gustave::core::scenes::cuboidGridScene::detail::BlockDataReference<libCfg, SceneUserData, true>;
-using BlockIndex = gustave::core::scenes::cuboidGridScene::BlockIndex;
-using Direction = gustave::math3d::BasicDirection;
 using SceneBlocks = gustave::core::scenes::cuboidGridScene::detail::SceneBlocks<libCfg, SceneUserData>;
 
+using BlockData = SceneBlocks::BlockData;
+using BlockIndex = SceneBlocks::BlockIndex;
+using Direction = SceneBlocks::Direction;
+
 TEST_CASE("core::scenes::cuboidGridScene::detail::SceneBlocks") {
-    SceneBlocks sceneBlocks{ vector3(1.f, 2.f, 3.f, u.length) };
-    BlockDataReference b1 = sceneBlocks.insert({ {2,3,4}, concrete_20m, 10.f * u.mass, true });
-    BlockDataReference b2 = sceneBlocks.insert({ {4,6,9}, concrete_20m, 25.f * u.mass, false });
+    auto sceneBlocks = SceneBlocks{ vector3(1.f, 2.f, 3.f, u.length) };
+    auto& b1 = sceneBlocks.insert({ {2,3,4}, concrete_20m, 10.f * u.mass, true });
+    auto& b2 = sceneBlocks.insert({ {4,6,9}, concrete_20m, 25.f * u.mass, false });
 
     SECTION(".at()") {
         SECTION("// valid") {
-            auto const res = sceneBlocks.at({ 4,6,9 });
-            CHECK(res == b2);
+            auto const& res = sceneBlocks.at({ 4,6,9 });
+            CHECK(&res == &b2);
         }
 
         SECTION("// invalid") {
@@ -88,11 +85,11 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneBlocks") {
 
     SECTION(".find(BlockIndex const&)") {
         SECTION("// true") {
-            BlockDataReference f1 = sceneBlocks.find({ 2,3,4 });
-            CHECK(f1 == b1);
+            auto f1 = sceneBlocks.find({ 2,3,4 });
+            CHECK(f1 == &b1);
 
-            BlockDataReference f2 = sceneBlocks.find({ 4,6,9 });
-            CHECK(f2 == b2);
+            auto f2 = sceneBlocks.find({ 4,6,9 });
+            CHECK(f2 == &b2);
         }
 
         SECTION("// false") {
@@ -101,12 +98,10 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneBlocks") {
     }
 
     SECTION(".insert(BlockConstructionInfo const&)") {
-        REQUIRE(b1);
         CHECK(b1.index() == BlockIndex{2, 3, 4});
         CHECK(b1.mass() == 10.f * u.mass);
         CHECK(b1.isFoundation() == true);
 
-        REQUIRE(b2);
         CHECK(b2.index() == BlockIndex{4, 6, 9});
         CHECK(b2.mass() == 25.f * u.mass);
         CHECK(b2.isFoundation() == false);
