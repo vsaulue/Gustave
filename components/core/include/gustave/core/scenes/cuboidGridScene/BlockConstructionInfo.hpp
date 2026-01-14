@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -43,6 +43,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
     public:
+        using BlockIndex = cuboidGridScene::BlockIndex;
         using PressureStress = model::PressureStress<libCfg>;
 
         [[nodiscard]]

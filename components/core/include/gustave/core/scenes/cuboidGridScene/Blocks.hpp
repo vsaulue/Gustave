@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -32,6 +32,7 @@
 #include <gustave/meta/Meta.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
 #include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene {
     namespace blocks::detail {
@@ -43,7 +44,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
             using SceneData = cuboidGridScene::detail::SceneData<cfg_, UD_>;
 
-            using DataIterator = SceneData::Blocks::BlockMap::const_iterator;
+            using DataIterator = utils::PropIterator<isMut_, typename SceneData::Blocks>;
         public:
             using Value = BlockReference<cfg_, UD_, isMut_>;
 
@@ -70,7 +71,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
             [[nodiscard]]
             Value operator*() const {
-                return Value{ *sceneData_, dataIterator_->first };
+                return Value{ *sceneData_, (*dataIterator_)->index() };
             }
 
             [[nodiscard]]

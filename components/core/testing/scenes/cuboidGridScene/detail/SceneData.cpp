@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -31,7 +31,8 @@ namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
 using SceneData = cuboid::detail::SceneData<libCfg, void>;
 
-using BlockConstructionInfo = SceneData::Blocks::BlockConstructionInfo;
+using BlockConstructionInfo = SceneData::BlockData::BlockConstructionInfo;
+using Direction = SceneData::Direction;
 using SceneBlocks = SceneData::Blocks;
 using StructureData = SceneData::StructureData;
 
@@ -39,7 +40,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     auto scene1 = SceneData{ blockSize };
 
-    auto block1 = scene1.blocks.insert({ {1,1,1}, concrete_20m, 1000.f * u.mass, false });
+    auto block1 = scene1.blocks.emplace(BlockConstructionInfo{ {1,1,1}, concrete_20m, 1000.f * u.mass, false });
     auto struct1 = std::make_shared<StructureData>(scene1.structureIdGenerator(), scene1, block1);
     scene1.structures.insert(struct1);
 
@@ -52,12 +53,12 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
         auto checkMovedScene = [&](SceneData const& movedScene) {
             CHECK_THAT(movedScene.structures, matchers::c2::UnorderedRangeEquals(expectedStructs));
             CHECK(&struct1->sceneData() == &movedScene);
-            CHECK(movedScene.blocks.blockSize() == blockSize);
+            CHECK(movedScene.blockSize() == blockSize);
             CHECK(movedScene.structureIdGenerator.readNextIndex() == expectedNextStructId);
         };
 
         SECTION("// assign") {
-            auto scene2 = SceneData{ blockSize };
+            auto scene2 = SceneData{ vector3(4.f, 4.f, 4.f, u.length) };
             scene2 = std::move(scene1);
 
             checkMovedScene(scene2);
@@ -68,5 +69,23 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
 
             checkMovedScene(scene2);
         }
+    }
+
+    SECTION(".contactAreaAlong(BasicDirection)") {
+        CHECK(scene1.contactAreaAlong(Direction::minusX()) == 6.f * u.area);
+        CHECK(scene1.contactAreaAlong(Direction::plusX()) == 6.f * u.area);
+        CHECK(scene1.contactAreaAlong(Direction::minusY()) == 3.f * u.area);
+        CHECK(scene1.contactAreaAlong(Direction::plusY()) == 3.f * u.area);
+        CHECK(scene1.contactAreaAlong(Direction::minusZ()) == 2.f * u.area);
+        CHECK(scene1.contactAreaAlong(Direction::plusZ()) == 2.f * u.area);
+    }
+
+    SECTION(".thicknessAlong(BasicDirection)") {
+        CHECK(scene1.thicknessAlong(Direction::minusX()) == 1.f * u.length);
+        CHECK(scene1.thicknessAlong(Direction::plusX()) == 1.f * u.length);
+        CHECK(scene1.thicknessAlong(Direction::minusY()) == 2.f * u.length);
+        CHECK(scene1.thicknessAlong(Direction::plusY()) == 2.f * u.length);
+        CHECK(scene1.thicknessAlong(Direction::minusZ()) == 3.f * u.length);
+        CHECK(scene1.thicknessAlong(Direction::plusZ()) == 3.f * u.length);
     }
 }

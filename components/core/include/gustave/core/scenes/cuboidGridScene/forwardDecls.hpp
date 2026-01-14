@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -30,6 +30,9 @@
 
 namespace gustave::core::scenes::cuboidGridScene {
     namespace detail {
+        template<cfg::cLibConfig auto, common::cSceneUserData, bool>
+        class DataNeighbours;
+
         template<cfg::cLibConfig auto, common::cSceneUserData>
         class StructureData;
 

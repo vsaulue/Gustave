@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -83,13 +83,13 @@ namespace gustave::core::scenes::cuboidGridScene::structureReference {
             auto& scene = self.structure_->sceneData();
             auto result = Result{ scene, contactId };
             auto const& srcId = contactId.localBlockIndex();
-            auto srcBlock = scene.blocks.find(srcId);
-            if (srcBlock) {
+            auto srcBlockPtr = scene.blocks.find(srcId);
+            if (srcBlockPtr != nullptr) {
                 auto const optOtherId = srcId.neighbourAlong(contactId.direction());
                 if (optOtherId) {
-                    auto otherBlock = scene.blocks.find(*optOtherId);
-                    if (otherBlock) {
-                        if ((structId == srcBlock.structureId()) || (structId == otherBlock.structureId())) {
+                    auto otherBlockPtr = scene.blocks.find(*optOtherId);
+                    if (otherBlockPtr != nullptr) {
+                        if ((structId == srcBlockPtr->structureId()) || (structId == otherBlockPtr->structureId())) {
                             return result;
                         }
                     }

@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -27,36 +27,29 @@
 #include <stack>
 #include <unordered_set>
 
-#include <catch2/catch_test_macros.hpp>
-
-#include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 
 #include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
-using BlockIndex = cuboid::BlockIndex;
-using ConstBlockDataReference = cuboid::detail::BlockDataReference<libCfg, SceneUserData, false>;
-using ConstDataNeighbours = cuboid::detail::DataNeighbours<libCfg, SceneUserData, false>;
-using Direction = gustave::math3d::BasicDirection;
-using LinkIndices = ConstBlockDataReference::LinkIndices;
-using SceneData = cuboid::detail::SceneData<libCfg, SceneUserData>;
 using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, SceneUserData>;
-using StructureData = cuboid::detail::StructureData<libCfg, SceneUserData>;
+using ConstDataNeighbours = cuboid::detail::DataNeighbours<libCfg, SceneUserData, false>;
+
+using SceneData = SceneUpdater::SceneData;
+
+using BlockData = SceneData::BlockData;
+using BlockIndex = BlockData::BlockIndex;
+using Direction = gustave::math3d::BasicDirection;
+using LinkIndices = BlockData::LinkIndices;
+using StructureData = SceneData::StructureData;
+using StructureIndex = SceneData::StructureIndex;
 using Transaction = SceneUpdater::Transaction;
 
-using SolverStructure = gustave::core::solvers::Structure<libCfg>;
+using SolverStructure = StructureData::SolverStructure;
 using SolverLink = SolverStructure::Link;
-using SolverNode = SolverStructure::Node;
-
-using StructureIndex = StructureData::StructureIndex;
-using Structures = SceneData::Structures;
 
 template<typename T>
 using SharedPtr = gustave::utils::prop::SharedPtr<T>;
@@ -98,44 +91,42 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(structure->isValid());
             bool hasNonFoundation = false;
             for (auto const& [index,solverIndex] : structure->solverIndices()) {
-                ConstBlockDataReference blockRef = data.blocks.find(index);
-                REQUIRE(blockRef);
-                if (!blockRef.isFoundation()) {
+                auto& blockData = data.blocks.at(index);
+                if (!blockData.isFoundation()) {
                     hasNonFoundation = true;
-                    REQUIRE(blockRef.structureId() == structure->index());
+                    REQUIRE(blockData.structureId() == structure->index());
                 }
             }
             REQUIRE(hasNonFoundation);
         }
         // Check blocks.
-        for (auto const& blockData : data.blocks) {
-            ConstBlockDataReference blockRef{ &blockData };
-            auto const blockStructId = blockRef.structureId();
+        for (auto const& blockPtr : data.blocks) {
+            auto const blockStructId = blockPtr->structureId();
             // structure
-            if (blockRef.isFoundation()) {
+            if (blockPtr->isFoundation()) {
                 REQUIRE(blockStructId == data.structureIdGenerator.invalidIndex());
             } else {
-                auto const& blockStruct = data.structures.at(blockRef.structureId());
-                for (auto const& neighbour : ConstDataNeighbours{ data.blocks, blockRef.index() }) {
-                    REQUIRE(blockStruct.solverIndices().contains(neighbour.block.index()));
+                auto const& blockStruct = data.structures.at(blockPtr->structureId());
+                for (auto const& neighbour : ConstDataNeighbours{ data, blockPtr->index() }) {
+                    REQUIRE(blockStruct.solverIndices().contains(neighbour.otherBlock().index()));
                 }
             }
             // linkIndices
             auto checkNeighbour = [&](Direction direction, LinkIndex (LinkIndices::*indexField)) {
-                auto const neighbourIndex = blockRef.index().neighbourAlong(direction);
+                auto const neighbourIndex = blockPtr->index().neighbourAlong(direction);
                 if (neighbourIndex) {
-                    auto const neighbourRef = data.blocks.find(*neighbourIndex);
-                    if (neighbourRef) {
-                        if (!blockRef.isFoundation() || !neighbourRef.isFoundation()) {
+                    auto const neighbourPtr = data.blocks.find(*neighbourIndex);
+                    if (neighbourPtr != nullptr) {
+                        if (!blockPtr->isFoundation() || !neighbourPtr->isFoundation()) {
                             auto structId = blockStructId;
                             if (structId == data.structureIdGenerator.invalidIndex()) {
-                                structId = neighbourRef.structureId();
+                                structId = neighbourPtr->structureId();
                             }
                             auto const& structure = data.structures.at(structId);
-                            LinkIndex const& linkId = blockRef.linkIndices().*indexField;
-                            SolverLink const& link = structure.solverStructure().links().at(linkId);
-                            CHECK(link.localNodeId() == *structure.solverIndexOf(blockRef.index()));
-                            CHECK(link.otherNodeId() == *structure.solverIndexOf(neighbourRef.index()));
+                            LinkIndex const& linkId = blockPtr->linkIndices().*indexField;
+                            auto const& solverLink = structure.solverStructure().links().at(linkId);
+                            CHECK(solverLink.localNodeId() == *structure.solverIndexOf(blockPtr->index()));
+                            CHECK(solverLink.otherNodeId() == *structure.solverIndexOf(neighbourPtr->index()));
                         }
                     }
                 }
@@ -149,9 +140,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
 
     SECTION(".runTransaction(Transaction const&)") {
         auto structureOf = [&](BlockIndex const& index) -> StructureData const& {
-            ConstBlockDataReference ref = data.blocks.find(index);
-            REQUIRE(ref);
-            return data.structures.at(ref.structureId());
+            auto& block = data.blocks.at(index);
+            return data.structures.at(block.structureId());
         };
 
         auto getSolverIndex = [](StructureData const& structure, BlockIndex const& index) -> NodeIndex {
@@ -163,7 +153,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
         auto checkLink = [&data](StructureData const& structure, NodeIndex source, NodeIndex dest, Direction sourceNormal, PressureStress const& maxStress) {
             NormalizedVector3 const normal = NormalizedVector3::basisVector(sourceNormal);
             SolverLink const* selectedLink = nullptr;
-            for (SolverLink const& link : structure.solverStructure().links()) {
+            for (auto const& link : structure.solverStructure().links()) {
                 if (link.localNodeId() == source && link.otherNodeId() == dest) {
                     CHECK(link.normal() == normal);
                     selectedLink = &link;
@@ -175,7 +165,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
                 }
             }
             REQUIRE(selectedLink != nullptr);
-            Real<u.length> const conductivityFactor = data.blocks.contactAreaAlong(sourceNormal) / data.blocks.thicknessAlong(sourceNormal);
+            Real<u.length> const conductivityFactor = data.contactAreaAlong(sourceNormal) / data.thicknessAlong(sourceNormal);
             CHECK_THAT(selectedLink->conductivity().compression(), matchers::WithinRel(conductivityFactor * maxStress.compression(), epsilon));
             CHECK_THAT(selectedLink->conductivity().shear(), matchers::WithinRel(conductivityFactor * maxStress.shear(), epsilon));
             CHECK_THAT(selectedLink->conductivity().tensile(), matchers::WithinRel(conductivityFactor * maxStress.tensile(), epsilon));
@@ -189,9 +179,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(result.deletedStructures().size() == 0);
 
             CHECK(data.structures.size() == 0);
-            auto const blockRef = data.blocks.find({ 1,0,0 });
-            REQUIRE(blockRef);
-            CHECK(blockRef.structureId() == data.structureIdGenerator.invalidIndex());
+            auto const& blockData = data.blocks.at({ 1,0,0 });
+            CHECK(blockData.structureId() == data.structureIdGenerator.invalidIndex());
         }
 
         SECTION("// Transaction{1+}: single non-foundation") {
@@ -206,7 +195,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             StructureData const& structure = structureOf({ 1,0,0 });
             CHECK(structure.index() == 0);
             NodeIndex blockIndex = getSolverIndex(structure, { 1,0,0 });
-            SolverNode const& solverNode = structure.solverStructure().nodes()[blockIndex];
+            auto const& solverNode = structure.solverStructure().nodes()[blockIndex];
             CHECK_FALSE(solverNode.isFoundation);
             CHECK(solverNode.mass() == blockMass);
         }
@@ -270,9 +259,8 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             CHECK(data.structures.size() == 1);
 
             {
-                auto const blockRef = data.blocks.find({ 0,0,0 });
-                REQUIRE(blockRef);
-                REQUIRE(blockRef.structureId() == data.structureIdGenerator.invalidIndex());
+                auto const& blockData = data.blocks.at({ 0,0,0 });
+                REQUIRE(blockData.structureId() == data.structureIdGenerator.invalidIndex());
             }
 
             {

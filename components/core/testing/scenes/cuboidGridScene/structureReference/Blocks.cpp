@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -41,8 +41,8 @@ using SceneUpdater = cuboid::detail::SceneUpdater<libCfg, SceneUserData>;
 template<bool mut>
 using Blocks = cuboid::structureReference::Blocks<libCfg, SceneUserData, mut>;
 
-using BlockIndex = SceneData::Blocks::BlockIndex;
-using StructureData = SceneData::Structures::StructureData;
+using BlockIndex = SceneData::BlockIndex;
+using StructureData = SceneData::StructureData;
 using Transaction = SceneUpdater::Transaction;
 
 static_assert(std::ranges::forward_range<Blocks<true>>);

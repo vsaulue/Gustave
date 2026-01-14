@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -36,7 +36,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
 #include <gustave/core/scenes/common/UserDataTraits.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
@@ -47,17 +47,17 @@
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
     class StructureData {
+    public:
+        using SolverStructure = solvers::Structure<libCfg>;
     private:
         static constexpr auto u = cfg::units(libCfg);
 
-        using ConstBlockDataReference = detail::BlockDataReference<libCfg, UD_, false>;
         using DataNeighbour = detail::DataNeighbour<libCfg, UD_, true>;
         using DataNeighbours = detail::DataNeighbours<libCfg, UD_, true>;
         using Direction = math3d::BasicDirection;
 
         using PressureStress = model::PressureStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
-        using SolverStructure = solvers::Structure<libCfg>;
 
         using Link = SolverStructure::Link;
         using Node = SolverStructure::Node;
@@ -67,7 +67,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using UDTraits = common::UserDataTraits<UD_>;
 
-        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, true>;
+        using BlockData = detail::BlockData<libCfg, UD_>;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
         using SceneData = detail::SceneData<libCfg, UD_>;
@@ -81,29 +81,29 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        explicit StructureData(StructureIndex index, SceneData& sceneData, BlockDataReference root)
+        explicit StructureData(StructureIndex index, SceneData& sceneData, BlockData& root)
             : index_{ index }
             , scene_{ &sceneData }
             , solverStructure_{ std::make_shared<SolverStructure>() }
             , isValid_{ true }
         {
-            std::stack<BlockDataReference> remainingBlocks;
-            remainingBlocks.push(root);
+            std::stack<BlockData*> remainingBlocks;
+            remainingBlocks.push(&root);
             while (!remainingBlocks.empty()) {
-                BlockDataReference curBlock = remainingBlocks.top();
+                auto& curBlock = *remainingBlocks.top();
                 remainingBlocks.pop();
-                assert(!curBlock.isFoundation());
+                assert(not curBlock.isFoundation());
                 if (curBlock.structureId() != index) {
                     declareBlock(curBlock);
                     curBlock.structureId() = index;
-                    for (DataNeighbour const& neighbour : DataNeighbours{ scene_->blocks, curBlock.index() }) {
-                        BlockDataReference nBlock = neighbour.block;
+                    for (auto const& neighbour : DataNeighbours{ *scene_, curBlock.index() }) {
+                        auto& nBlock = neighbour.otherBlock();
                         if (nBlock.isFoundation()) {
                             declareBlock(nBlock);
                             addContact(curBlock, neighbour);
                         } else {
                             if (nBlock.structureId() != index) {
-                                remainingBlocks.push(nBlock);
+                                remainingBlocks.push(&nBlock);
                             } else {
                                 addContact(curBlock, neighbour);
                             }
@@ -117,18 +117,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         StructureData& operator=(StructureData const&) = delete;
 
         [[nodiscard]]
-        bool contains(ConstBlockDataReference block) const {
-            return solverIndices_.contains(block.index());
-        }
-
-        [[nodiscard]]
         bool contains(BlockIndex const& index) const {
-            ConstBlockDataReference block = scene_->blocks.find(index);
-            if (block) {
-                return contains(block);
-            } else {
-                return false;
-            }
+            return isValid_ && solverIndices_.contains(index);
         }
 
         [[nodiscard]]
@@ -163,23 +153,14 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        std::optional<NodeIndex> solverIndexOf(ConstBlockDataReference block) const {
-            auto const findResult = solverIndices_.find(block.index());
-            if (findResult != solverIndices_.end()) {
-                return { findResult->second };
-            } else {
-                return {};
-            }
-        }
-
-        [[nodiscard]]
         std::optional<NodeIndex> solverIndexOf(BlockIndex const& index) const {
-            ConstBlockDataReference const block = scene_->blocks.find(index);
-            if (block) {
-                return solverIndexOf(block);
-            } else {
-                return {};
+            if (isValid_) {
+                auto const findResult = solverIndices_.find(index);
+                if (findResult != solverIndices_.end()) {
+                    return { findResult->second };
+                }
             }
+            return {};
         }
 
         [[nodiscard]]
@@ -211,8 +192,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return userData_;
         }
     private:
-        void declareBlock(ConstBlockDataReference block) {
-            assert(block);
+        void declareBlock(BlockData const& block) {
             auto insertResult = solverIndices_.insert({ block.index(), NodeIndex{0} });
             if (insertResult.second) {
                 NodeIndex newIndex = solverStructure_->addNode(Node{ block.mass(), block.isFoundation() });
@@ -220,9 +200,9 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             }
         }
 
-        void addContact(BlockDataReference source, DataNeighbour const& neighbour) {
-            Direction const direction = neighbour.direction;
-            BlockDataReference nBlock = neighbour.block;
+        void addContact(BlockData& source, DataNeighbour const& neighbour) {
+            auto const direction = neighbour.direction();
+            auto& nBlock = neighbour.otherBlock();
             switch (direction.id()) {
             case Direction::Id::plusX:
                 source.linkIndices().plusX = addLink(source, nBlock, direction);
@@ -245,16 +225,16 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             }
         }
 
-        LinkIndex addLink(BlockDataReference localNode, BlockDataReference otherNode, Direction direction) {
+        LinkIndex addLink(BlockData const& localNode, BlockData const& otherNode, Direction direction) {
             NormalizedVector3 const normal = NormalizedVector3::basisVector(direction);
-            Real<u.area> const area = scene_->blocks.contactAreaAlong(direction);
-            Real<u.length> const thickness = scene_->blocks.thicknessAlong(direction);
+            Real<u.area> const area = scene_->contactAreaAlong(direction);
+            Real<u.length> const thickness = scene_->thicknessAlong(direction);
             PressureStress const maxStress = PressureStress::minStress(localNode.maxPressureStress(), otherNode.maxPressureStress());
             return solverStructure_->addLink(Link{ indexOf(localNode), indexOf(otherNode), normal, area, thickness, maxStress });
         }
 
         [[nodiscard]]
-        NodeIndex indexOf(ConstBlockDataReference block) const {
+        NodeIndex indexOf(BlockData const& block) const {
             return solverIndices_.at(block.index());
         }
 

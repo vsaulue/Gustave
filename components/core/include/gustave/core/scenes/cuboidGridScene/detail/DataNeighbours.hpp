@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -30,8 +30,10 @@
 #include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbour.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/IndexNeighbours.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/SceneBlocks.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
+#include <gustave/utils/InplaceVector.hpp>
 #include <gustave/utils/NoInit.hpp>
 #include <gustave/utils/Prop.hpp>
 
@@ -44,85 +46,30 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<typename T>
         using Prop = utils::Prop<isMut_, T>;
 
-        using IndexIterator = IndexNeighbours::Iterator;
-
-        class Enumerator {
-        public:
-            [[nodiscard]]
-            Enumerator()
-                : neighbours_{ nullptr }
-                , value_{ utils::NO_INIT }
-                , indexIterator_{}
-            {}
-
-            [[nodiscard]]
-            explicit Enumerator(DataNeighbours& neighbours)
-                : neighbours_{ &neighbours }
-                , value_{ utils::NO_INIT }
-                , indexIterator_{ neighbours.indices_.begin() }
-            {
-                next();
-            }
-
-            [[nodiscard]]
-            bool isEnd() const {
-                return indexIterator_ == indices().end();
-            }
-
-            void operator++() {
-                ++indexIterator_;
-                next();
-            }
-
-            [[nodiscard]]
-            Neighbour const& operator*() const {
-                return value_;
-            }
-
-            [[nodiscard]]
-            bool operator==(Enumerator const& other) const {
-                return indexIterator_ == other.indexIterator_;
-            }
-        private:
-            [[nodiscard]]
-            IndexNeighbours const& indices() const {
-                return neighbours_->indices_;
-            }
-
-            void next() {
-                while (indexIterator_ != indices().end()) {
-                    if (auto neighbour = neighbours_->blocks_->find(indexIterator_->index)) {
-                        value_ = { indexIterator_->direction, neighbour };
-                        break;
-                    }
-                    ++indexIterator_;
-                }
-            }
-
-            DataNeighbours* neighbours_;
-            Neighbour value_;
-            IndexIterator indexIterator_;
-        };
+        using Values = utils::InplaceVector<Neighbour, 6>;
     public:
-        using Iterator = utils::ForwardIterator<Enumerator>;
+        using Iterator = Values::Iterator;
+        using EndIterator = Values::ConstIterator;
 
         [[nodiscard]]
-        explicit DataNeighbours(Prop<SceneBlocks<cfg, UD_>>& blocks, BlockIndex const& source)
-            : blocks_{ &blocks }
-            , indices_{ source }
-        {}
+        explicit DataNeighbours(Prop<SceneData<cfg, UD_>>& scene, BlockIndex const& source) {
+            for (auto const& indexNeighbour : IndexNeighbours{ source }) {
+                if (auto neighbour = scene.blocks.find(indexNeighbour.index)) {
+                    values_.emplaceBack(indexNeighbour.direction, *neighbour);
+                }
+            }
+        }
 
         [[nodiscard]]
         Iterator begin() {
-            return Iterator{ *this };
+            return values_.begin();
         }
 
         [[nodiscard]]
-        constexpr std::default_sentinel_t end() const {
-            return {};
+        EndIterator end() const {
+            return values_.end();
         }
     private:
-        Prop<SceneBlocks<cfg, UD_>>* blocks_;
-        IndexNeighbours indices_;
+        Values values_;
     };
 }

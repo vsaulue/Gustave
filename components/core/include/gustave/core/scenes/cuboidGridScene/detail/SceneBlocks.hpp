@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -32,16 +32,22 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockMappedData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
 #include <gustave/meta/Meta.hpp>
+#include <gustave/utils/ForwardIterator.hpp>
+#include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
     class SceneBlocks {
+    public:
+        using BlockConstructionInfo = cuboidGridScene::BlockConstructionInfo<libCfg>;
+        using BlockData = detail::BlockData<libCfg, UD_>;
+        using BlockIndex = cuboidGridScene::BlockIndex;
+        using Direction = math3d::BasicDirection;
     private:
         static constexpr auto u = cfg::units(libCfg);
 
@@ -50,36 +56,84 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Vector3 = cfg::Vector3<libCfg, unit>;
-    public:
-        using BlockConstructionInfo = cuboidGridScene::BlockConstructionInfo<libCfg>;
-        using BlockIndex = cuboidGridScene::BlockIndex;
-        using BlockMap = std::unordered_map<BlockIndex, BlockMappedData<libCfg, UD_>>;
-        using Direction = math3d::BasicDirection;
 
-        using const_iterator = BlockMap::const_iterator;
+        template<typename T>
+        using SharedPtr = utils::prop::SharedPtr<T>;
+
+        using BlocksMap = std::unordered_map<BlockIndex, SharedPtr<BlockData>>;
+
+        template<bool isMut_>
+        class Enumerator {
+        private:
+            using PairIterator = utils::PropIterator<isMut_, BlocksMap>;
+        public:
+            using BlocksMember = utils::Prop<isMut_, BlocksMap>;
+            using Value = std::conditional_t<isMut_, std::shared_ptr<BlockData>, SharedPtr<BlockData>>;
+            using Reference = Value const&;
+
+            [[nodiscard]]
+            Enumerator()
+                : blocks_{ nullptr }
+                , pairIt_{}
+            {}
+
+            [[nodiscard]]
+            explicit Enumerator(BlocksMember& blocks)
+                : blocks_{ &blocks }
+                , pairIt_{ blocks.begin() }
+            {}
+
+            [[nodiscard]]
+            bool isEnd() const {
+                return pairIt_ == blocks_->end();
+            }
+
+            void operator++() {
+                ++pairIt_;
+            }
+
+            [[nodiscard]]
+            Reference operator*() const {
+                if constexpr (isMut_) {
+                    return pairIt_->second.unprop();
+                } else {
+                    return pairIt_->second;
+                }
+            }
+
+            [[nodiscard]]
+            bool operator==(Enumerator const& other) const {
+                return pairIt_ == other.pairIt_;
+            }
+        private:
+            BlocksMember* blocks_;
+            PairIterator pairIt_;
+        };
+    public:
+        using ConstIterator = utils::ForwardIterator<Enumerator<false>>;
 
         [[nodiscard]]
         explicit SceneBlocks(Vector3<u.length> const& blockSize)
             : blockSize_{ blockSize }
         {
             if (blockSize.x() <= 0.f * u.length) {
-                throw std::invalid_argument{ blockSizeError('x', blockSize.x()) };
+                throw blockSizeError('x', blockSize.x());
             }
             if (blockSize.y() <= 0.f * u.length) {
-                throw std::invalid_argument{ blockSizeError('y', blockSize.y()) };
+                throw blockSizeError('y', blockSize.y());
             }
             if (blockSize.z() <= 0.f * u.length) {
-                throw std::invalid_argument{ blockSizeError('z', blockSize.z()) };
+                throw blockSizeError('z', blockSize.z());
             }
         }
 
         [[nodiscard]]
-        BlockDataReference<libCfg, UD_, true> at(BlockIndex const& index) {
+        BlockData& at(BlockIndex const& index) {
             return doAt(*this, index);
         }
 
         [[nodiscard]]
-        BlockDataReference<libCfg, UD_, false> at(BlockIndex const& index) const {
+        BlockData const& at(BlockIndex const& index) const {
             return doAt(*this, index);
         }
 
@@ -120,28 +174,29 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         [[nodiscard]]
-        const_iterator begin() const {
-            return blocks_.begin();
+        ConstIterator begin() const {
+            return ConstIterator{ blocks_ };
         }
 
         [[nodiscard]]
-        const_iterator end() const {
-            return blocks_.end();
+        std::default_sentinel_t end() const {
+            return {};
         }
 
         [[nodiscard]]
-        BlockDataReference<libCfg, UD_, true> find(BlockIndex const& index) {
+        BlockData* find(BlockIndex const& index) {
             return doFind(*this, index);
         }
 
         [[nodiscard]]
-        BlockDataReference<libCfg, UD_, false> find(BlockIndex const& index) const {
+        BlockData const* find(BlockIndex const& index) const {
             return doFind(*this, index);
         }
 
-        BlockDataReference<libCfg, UD_, true> insert(BlockConstructionInfo const& info) {
-            auto it = blocks_.emplace(info.index(), BlockMappedData<libCfg, UD_>{ info }).first;
-            return { &(*it) };
+        BlockData& insert(BlockConstructionInfo const& info) {
+            auto insertResult = blocks_.emplace(info.index(), std::make_shared<BlockData>(info));
+            assert(insertResult.second);
+            return *insertResult.first->second;
         }
 
         [[nodiscard]]
@@ -175,24 +230,24 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             if (it == self.blocks_.end()) {
                 throw invalidIndexError(index);
             }
-            return { &(*it) };
+            return *it->second;
         }
 
         [[nodiscard]]
         static auto doFind(auto&& self, BlockIndex const& index) -> decltype(self.find(index)) {
             auto it = self.blocks_.find(index);
             if (it != self.blocks_.end()) {
-                return { &(*it) };
+                return it->second.get();
             } else {
-                return { nullptr };
+                return nullptr;
             }
         }
 
         [[nodiscard]]
-        static std::string blockSizeError(char coordSymbol, Real<u.length> const value) {
+        static std::invalid_argument blockSizeError(char coordSymbol, Real<u.length> const value) {
             std::stringstream result;
             result << "blocksize." << coordSymbol << " must be strictly positive (passed: " << value << ").";
-            return result.str();
+            return std::invalid_argument{ result.str() };
         }
 
         [[nodiscard]]
@@ -203,6 +258,6 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         Vector3<u.length> blockSize_;
-        BlockMap blocks_;
+        BlocksMap blocks_;
     };
 }

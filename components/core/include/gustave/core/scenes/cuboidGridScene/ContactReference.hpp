@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -34,7 +34,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockDataReference.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
@@ -59,19 +59,19 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         static constexpr auto u = cfg::units(libCfg);
 
-        using BlockDataReference = detail::BlockDataReference<libCfg, UD_, false>;
+        using BlockData = detail::BlockData<libCfg, UD_>;
         using SceneData = detail::SceneData<libCfg, UD_>;
         using StructureData = SceneData::StructureData;
         using StructureIndex = SceneData::StructureIndex;
 
         struct BlockDatas {
-            BlockDataReference local;
-            BlockDataReference other;
+            BlockData const* local;
+            BlockData const* other;
 
             [[nodiscard]]
             bool isValid() const {
                 if (local && other) {
-                    return !local.isFoundation() || !other.isFoundation();
+                    return !local->isFoundation() || !other->isFoundation();
                 }
                 return false;
             }
@@ -81,10 +81,10 @@ namespace gustave::core::scenes::cuboidGridScene {
                 if (!isValid()) {
                     return {};
                 }
-                if (!local.isFoundation()) {
-                    return local.structureId();
+                if (!local->isFoundation()) {
+                    return local->structureId();
                 } else {
-                    return other.structureId();
+                    return other->structureId();
                 }
             }
         };
@@ -159,7 +159,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             if (not isValid()) {
                 throw invalidError();
             }
-            return scene_->blocks.contactAreaAlong(index_.direction());
+            return scene_->contactAreaAlong(index_.direction());
         }
 
         [[nodiscard]]
@@ -200,11 +200,11 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         PressureStress maxPressureStress() const {
-            BlockDatas blocks = blockDatas();
+            auto blocks = blockDatas();
             if (!blocks.isValid()) {
                 throw invalidError();
             }
-            return PressureStress::minStress(blocks.local.maxPressureStress(), blocks.other.maxPressureStress());
+            return PressureStress::minStress(blocks.local->maxPressureStress(), blocks.other->maxPressureStress());
         }
 
         [[nodiscard]]
@@ -247,17 +247,17 @@ namespace gustave::core::scenes::cuboidGridScene {
             }
             switch (index_.direction().id()) {
             case Direction::Id::plusX:
-                return SolverContactIndex{ datas.local.linkIndices().plusX, true};
+                return SolverContactIndex{ datas.local->linkIndices().plusX, true};
             case Direction::Id::minusX:
-                return SolverContactIndex{ datas.other.linkIndices().plusX, false};
+                return SolverContactIndex{ datas.other->linkIndices().plusX, false};
             case Direction::Id::plusY:
-                return SolverContactIndex{ datas.local.linkIndices().plusY, true};
+                return SolverContactIndex{ datas.local->linkIndices().plusY, true};
             case Direction::Id::minusY:
-                return SolverContactIndex{ datas.other.linkIndices().plusY, false};
+                return SolverContactIndex{ datas.other->linkIndices().plusY, false};
             case Direction::Id::plusZ:
-                return SolverContactIndex{ datas.local.linkIndices().plusZ, true};
+                return SolverContactIndex{ datas.local->linkIndices().plusZ, true};
             case Direction::Id::minusZ:
-                return SolverContactIndex{ datas.other.linkIndices().plusZ, false};
+                return SolverContactIndex{ datas.other->linkIndices().plusZ, false};
             }
             throw std::invalid_argument(index_.direction().invalidValueMsg());
         }
@@ -276,7 +276,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         Real<u.length> thickness() const {
-            return scene_->blocks.thicknessAlong(index_.direction());
+            return scene_->thicknessAlong(index_.direction());
         }
 
         template<bool mut>
@@ -287,12 +287,12 @@ namespace gustave::core::scenes::cuboidGridScene {
     private:
         [[nodiscard]]
         BlockDatas blockDatas() const {
-            BlockDataReference local = scene_->blocks.find(index_.localBlockIndex());
-            BlockDataReference other{ nullptr };
+            auto localPtr = scene_->blocks.find(index_.localBlockIndex());
+            BlockData const* otherPtr =  nullptr ;
             if (auto optOtherIndex = index_.otherBlockIndex()) {
-                other = scene_->blocks.find(*optOtherIndex);
+                otherPtr = scene_->blocks.find(*optOtherIndex);
             }
-            return BlockDatas{ local, other };
+            return BlockDatas{ localPtr, otherPtr };
         }
 
         [[nodiscard]]
@@ -312,7 +312,7 @@ namespace gustave::core::scenes::cuboidGridScene {
             if (!blocks.isValid()) {
                 throw self.invalidError();
             }
-            return Result{ *self.scene_, { blocks.other.index(), self.index_.direction().opposite()} };
+            return Result{ *self.scene_, { blocks.other->index(), self.index_.direction().opposite()} };
         }
 
         [[nodiscard]]

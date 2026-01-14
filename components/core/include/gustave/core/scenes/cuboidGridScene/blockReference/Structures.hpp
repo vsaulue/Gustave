@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <array>
+#include <algorithm>
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
@@ -38,7 +38,7 @@
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/core/scenes/cuboidGridScene/StructureReference.hpp>
 #include <gustave/utils/ForwardIterator.hpp>
-#include <gustave/utils/NoInit.hpp>
+#include <gustave/utils/InplaceVector.hpp>
 #include <gustave/utils/Prop.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::blockReference {
@@ -56,11 +56,12 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         template<typename T>
         using PropPtr = utils::PropPtr<isMut_, T>;
 
-        using BlockDataRef = cuboidGridScene::detail::BlockDataReference<libCfg_, UD_, false>;
         using DataNeighbours = cuboidGridScene::detail::DataNeighbours<libCfg_, UD_, false>;
         using SceneData = cuboidGridScene::detail::SceneData<libCfg_, UD_>;
 
-        using Values = std::array<StructureIndex, 6>;
+        using BlockData = SceneData::BlockData;
+
+        using Values = utils::InplaceVector<StructureIndex, 6>;
 
         template<bool mut>
         class Enumerator {
@@ -70,7 +71,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
             template<typename T>
             using Prop = utils::Prop<mut, T>;
 
-            using ArrayIterator = Values::const_iterator;
+            using IdsIterator = Values::ConstIterator;
         public:
             [[nodiscard]]
             Enumerator()
@@ -86,7 +87,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
 
             [[nodiscard]]
             bool isEnd() const {
-                return not (indexIt_ < structs_->structIds_.begin() + structs_->size());
+                return indexIt_ == structs_->structIds_.end();
             }
 
             void operator++() {
@@ -105,28 +106,20 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
             }
         private:
             Prop<Structures>* structs_;
-            ArrayIterator indexIt_;
+            IdsIterator indexIt_;
         };
     public:
         using ConstIterator = utils::ForwardIterator<Enumerator<false>>;
         using Iterator = utils::ForwardIterator<Enumerator<isMut_>>;
 
         [[nodiscard]]
-        explicit Structures(Prop<SceneData>& scene, BlockDataRef blockData)
+        explicit Structures(Prop<SceneData>& scene, BlockData const& blockData)
             : scene_{ &scene }
-            , structIds_{ invId(), invId(), invId(), invId(), invId(), invId() }
-            , size_{ 0 }
-            , block_{ blockData }
+            , block_{ &blockData }
         {
-            auto addValue = [&](StructureIndex structId) {
-                if (!contains(structId)) {
-                    structIds_[size_] = structId;
-                    ++size_;
-                }
-            };
             if (blockData.isFoundation()) {
-                for (auto const& neighbour : DataNeighbours{ scene.blocks, blockData.index() }) {
-                    auto const nBlockData = neighbour.block;
+                for (auto const& neighbour : DataNeighbours{ scene, blockData.index() }) {
+                    auto const& nBlockData = neighbour.otherBlock();
                     if (!nBlockData.isFoundation()) {
                         addValue(nBlockData.structureId());
                     }
@@ -167,7 +160,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
 
         [[nodiscard]]
         std::size_t size() const {
-            return size_;
+            return structIds_.size();
         }
 
         [[nodiscard]]
@@ -185,7 +178,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         [[nodiscard]]
         static auto doUnique(meta::cCvRefOf<Structures> auto&& self) {
             using Result = decltype(self.unique());
-            if (self.size_ != 1) {
+            if (self.structIds_.size() != 1) {
                 throw self.noUniqueError();
             }
             return Result{ self.scene_->structures.atShared(self.structIds_[0]) };
@@ -194,28 +187,18 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         [[nodiscard]]
         std::logic_error noUniqueError() const {
             std::stringstream msg;
-            msg << "Block " << block_.index() << " does not have a unique structure (count = " << size_ << ").";
+            msg << "Block " << block_->index() << " does not have a unique structure (count = " << structIds_.size() << ").";
             return std::logic_error{ msg.str() };
         }
 
-        [[nodiscard]]
-        static constexpr StructureIndex invId() {
-            return SceneData::StructureIdGenerator::invalidIndex();
-        }
-
-        [[nodiscard]]
-        bool contains(StructureIndex structId) const {
-            for (std::size_t id = 0; id < size_; ++id) {
-                if (structId == structIds_[id]) {
-                    return true;
-                }
+        void addValue(StructureIndex newId) {
+            if (std::ranges::find(structIds_, newId) == structIds_.end()) {
+                structIds_.pushBack(newId);
             }
-            return false;
         }
 
         PropPtr<SceneData> scene_;
         Values structIds_;
-        std::size_t size_;
-        BlockDataRef block_;
+        BlockData const* block_;
     };
 }
