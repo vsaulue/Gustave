@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <bit>
 #include <functional>
 
 struct Coord {
@@ -33,6 +34,7 @@ struct Coord {
     [[nodiscard]]
     Coord(int v) : value{v} {}
 
+    [[nodiscard]]
     bool operator==(Coord const&) const = default;
 };
 
@@ -44,6 +46,9 @@ struct Point {
         , z(z)
     {}
 
+    [[nodiscard]]
+    bool operator==(Point const&) const = default;
+
     Coord x;
     Coord y;
     Coord z;
@@ -53,5 +58,13 @@ template<>
 struct std::hash<Coord> {
     std::size_t operator()(Coord coord) const {
         return static_cast<std::size_t>(coord.value);
+    }
+};
+
+template<>
+struct std::hash<Point> {
+    std::size_t operator()(Point point) const {
+        constexpr auto cHash = std::hash<Coord>{};
+        return cHash(point.x) ^ std::rotr(cHash(point.y), 20) ^ std::rotr(cHash(point.z), 41);
     }
 };
