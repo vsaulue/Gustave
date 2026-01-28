@@ -38,6 +38,7 @@ add_unit_test(TARGET Comp-Utils-unit-test
         "tests/utils/InplaceVector.cpp"
         "tests/utils/NumberHyperscript.cpp"
         "tests/utils/PointerHash.cpp"
+        "tests/utils/SharedIndexedSet.cpp"
         "tests/utils/prop/Ptr.cpp"
         "tests/utils/prop/SharedPtr.cpp"
         "tests/utils/SizedString.cpp"
