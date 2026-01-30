@@ -1,6 +1,6 @@
 /* This file is part of Gustave, a structural integrity library for video games.
  *
- * Copyright (c) 2022-2025 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
+ * Copyright (c) 2022-2026 Vincent Saulue-Laborde <vincent_saulue@hotmail.fr>
  *
  * MIT License
  *
@@ -59,6 +59,11 @@ namespace gustave::math3d {
         [[nodiscard]]
         constexpr Id id() const {
             return id_;
+        }
+
+        [[nodiscard]]
+        std::invalid_argument invalidError() const {
+            return std::invalid_argument{ invalidValueMsg() };
         }
 
         [[nodiscard]]
