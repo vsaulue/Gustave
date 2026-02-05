@@ -161,6 +161,9 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
 
         void resetSceneDataPtr() {
+            for (auto& block : blocks) {
+                block->setSceneData(*this);
+            }
             for (auto& structure : structures) {
                 structure->setSceneData(*this);
             }

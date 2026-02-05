@@ -24,6 +24,7 @@
  */
 
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/utils/IndexGenerator.hpp>
 
 #include <SceneUserData.hpp>
@@ -34,16 +35,19 @@ using BlockData = gustave::core::scenes::cuboidGridScene::detail::BlockData<libC
 using BlockConstructionInfo = BlockData::BlockConstructionInfo;
 using BlockIndex = BlockData::BlockIndex;
 using LinkIndex = BlockData::LinkIndex;
+using SceneData = BlockData::SceneData;
 using StructureIdGenerator = gustave::utils::IndexGenerator<BlockData::StructureIndex>;
 
 TEST_CASE("core::scenes::cuboidGridScene::detail::BlockData") {
-    auto b111 = BlockData{ BlockConstructionInfo{ {1,1,1}, concrete_20m, 5.f * u.mass, false } };
+    auto scene = SceneData{ vector3(1.f, 2.f, 3.f, u.length) };
+    auto b111 = BlockData{ BlockConstructionInfo{ {1,1,1}, concrete_20m, 5.f * u.mass, false }, scene };
     auto const& cb111 = b111;
 
     SECTION("// constructor && const getters") {
         CHECK(cb111.index() == BlockIndex{ 1,1,1 });
         CHECK(cb111.mass() == 5.f * u.mass);
         CHECK(cb111.isFoundation() == false);
+        CHECK(&cb111.sceneData() == &scene);
     }
 
     SECTION(".linkIndices()") {
@@ -62,6 +66,12 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::BlockData") {
             CHECK(cLinkIds.plusY == maxLinkId);
             CHECK(cLinkIds.plusZ == maxLinkId);
         }
+    }
+
+    SECTION(".setSceneData()") {
+        auto scene2 = SceneData{ vector3(2.f, 3.f, 4.f, u.length) };
+        b111.setSceneData(scene2);
+        CHECK(&cb111.sceneData() == &scene2);
     }
 
     SECTION(".structureId()") {

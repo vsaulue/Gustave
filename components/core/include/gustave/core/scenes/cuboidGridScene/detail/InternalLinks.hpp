@@ -28,7 +28,6 @@
 #include <optional>
 
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
@@ -39,9 +38,10 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_>
     class InternalLinks {
     public:
-        using BlockData = detail::BlockData<cfg, UD_>;
-        using Direction = math3d::BasicDirection;
         using SceneData = detail::SceneData<cfg, UD_>;
+
+        using BlockData = SceneData::BlockData;
+        using Direction = math3d::BasicDirection;
         using Value = DataNeighbour<cfg, UD_, false>;
 
         using Values = utils::InplaceVector<Value, 3>;

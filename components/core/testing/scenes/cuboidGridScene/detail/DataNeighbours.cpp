@@ -56,7 +56,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::DataNeighbours") {
     auto scene = SceneData{ vector3(2.f, 3.f, 1.f, u.length) };
 
     auto addBlock = [&](BlockIndex const& index) -> BlockData& {
-        return scene.blocks.emplace(BlockConstructionInfo{ index, concrete_20m, 20.f * u.mass, false });
+        return scene.blocks.emplace(BlockConstructionInfo{ index, concrete_20m, 20.f * u.mass, false }, scene);
     };
 
     auto& source = addBlock({ min, 1, 2 });

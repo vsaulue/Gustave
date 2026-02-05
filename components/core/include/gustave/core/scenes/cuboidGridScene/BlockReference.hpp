@@ -59,6 +59,9 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<typename T>
         using PropPtr = utils::PropPtr<isMut_, T>;
 
+        template<typename T>
+        using PropSharedPtr = utils::PropSharedPtr<isMut_, T>;
+
         using DataNeighbours = detail::DataNeighbours<libCfg, UD_, false>;
         using SceneData = detail::SceneData<libCfg, UD_>;
 

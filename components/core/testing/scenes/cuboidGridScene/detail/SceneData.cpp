@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <array>
+
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 
 #include <TestHelpers.hpp>
@@ -40,18 +42,19 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
     auto scene1 = SceneData{ blockSize };
 
-    auto block1 = scene1.blocks.emplace(BlockConstructionInfo{ {1,1,1}, concrete_20m, 1000.f * u.mass, false });
+    auto& block1 = scene1.blocks.emplace(BlockConstructionInfo{ {1,1,1}, concrete_20m, 1000.f * u.mass, false }, scene1);
     auto struct1 = std::make_shared<StructureData>(scene1.structureIdGenerator(), scene1, block1);
     scene1.structures.insert(struct1);
 
     SECTION("// move semantics") {
-        auto const expectedStructs = std::vector<std::shared_ptr<StructureData>>{
+        auto const expectedStructs = std::array{
             struct1,
         };
         auto const expectedNextStructId = scene1.structureIdGenerator.readNextIndex();
 
         auto checkMovedScene = [&](SceneData const& movedScene) {
             CHECK_THAT(movedScene.structures, matchers::c2::UnorderedRangeEquals(expectedStructs));
+            CHECK(&block1.sceneData() == &movedScene);
             CHECK(&struct1->sceneData() == &movedScene);
             CHECK(movedScene.blockSize() == blockSize);
             CHECK(movedScene.structureIdGenerator.readNextIndex() == expectedNextStructId);

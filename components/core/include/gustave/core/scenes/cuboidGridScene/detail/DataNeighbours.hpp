@@ -41,6 +41,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto cfg, common::cSceneUserData UD_, bool isMut_>
     class DataNeighbours {
     public:
+        using SceneData = detail::SceneData<cfg, UD_>;
+
         using Neighbour = DataNeighbour<cfg, UD_, isMut_>;
     private:
         template<typename T>
@@ -52,7 +54,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using EndIterator = Values::ConstIterator;
 
         [[nodiscard]]
-        explicit DataNeighbours(Prop<SceneData<cfg, UD_>>& scene, BlockIndex const& source) {
+        explicit DataNeighbours(Prop<SceneData>& scene, BlockIndex const& source) {
             for (auto const& indexNeighbour : IndexNeighbours{ source }) {
                 if (auto neighbour = scene.blocks.find(indexNeighbour.index)) {
                     values_.emplaceBack(indexNeighbour.direction, *neighbour);

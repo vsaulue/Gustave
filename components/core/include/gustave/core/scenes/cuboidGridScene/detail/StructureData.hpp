@@ -48,6 +48,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
     class StructureData {
     public:
+        using SceneData = detail::SceneData<libCfg, UD_>;
         using SolverStructure = solvers::Structure<libCfg>;
     private:
         static constexpr auto u = cfg::units(libCfg);
@@ -67,10 +68,9 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     public:
         using UDTraits = common::UserDataTraits<UD_>;
 
-        using BlockData = detail::BlockData<libCfg, UD_>;
+        using BlockData = SceneData::BlockData;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using NodeIndex = cfg::NodeIndex<libCfg>;
-        using SceneData = detail::SceneData<libCfg, UD_>;
         using SolverIndices = std::unordered_map<BlockIndex, NodeIndex>;
         using StructureIndex = cfg::StructureIndex<libCfg>;
         using UserDataMember = UDTraits::StructureMember;
