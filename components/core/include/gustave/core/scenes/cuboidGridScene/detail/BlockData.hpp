@@ -36,7 +36,9 @@
 #include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockConstructionInfo.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockIndex.hpp>
+#include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/utils/IndexGenerator.hpp>
+#include <gustave/utils/prop/Ptr.hpp>
 
 namespace gustave::core::scenes::cuboidGridScene::detail {
     template<cfg::cLibConfig auto libCfg, common::cSceneUserData UD_>
@@ -48,13 +50,13 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
 
-        using Data = BlockData<libCfg, UD_>;
         using UDTraits = common::UserDataTraits<UD_>;
     public:
         using BlockConstructionInfo = cuboidGridScene::BlockConstructionInfo<libCfg>;
         using BlockIndex = cuboidGridScene::BlockIndex;
         using LinkIndex = cfg::LinkIndex<libCfg>;
         using PressureStress = model::PressureStress<libCfg>;
+        using SceneData = detail::SceneData<libCfg, UD_>;
         using StructureIndex = cfg::StructureIndex<libCfg>;
         using UserDataMember = UDTraits::BlockMember;
 
@@ -65,13 +67,14 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         };
 
         [[nodiscard]]
-        explicit BlockData(BlockConstructionInfo const& info)
+        explicit BlockData(BlockConstructionInfo const& info, SceneData& scene)
             : index_{ info.index() }
             , maxPressureStress_{ info.maxPressureStress() }
             , linkIndices_{ maxLinkId(), maxLinkId(), maxLinkId() }
             , mass_{ info.mass() }
             , isFoundation_{ info.isFoundation() }
             , structureId_{ utils::IndexGenerator<StructureIndex>::invalidIndex() }
+            , scene_{ &scene }
         {
             assert(mass_ > 0.f * u.mass);
         }
@@ -104,6 +107,20 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         [[nodiscard]]
         PressureStress const& maxPressureStress() const {
             return maxPressureStress_;
+        }
+
+        [[nodiscard]]
+        SceneData& sceneData() {
+            return *scene_;
+        }
+
+        [[nodiscard]]
+        SceneData const& sceneData() const {
+            return *scene_;
+        }
+
+        void setSceneData(SceneData& value) {
+            scene_ = &value;
         }
 
         [[nodiscard]]
@@ -145,5 +162,6 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         UserDataMember userData_;
 
         StructureIndex structureId_;
+        utils::prop::Ptr<SceneData> scene_;
     };
 }

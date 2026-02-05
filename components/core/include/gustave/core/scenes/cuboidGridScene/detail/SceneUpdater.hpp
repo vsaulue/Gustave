@@ -101,7 +101,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         }
     private:
         void addBlock(TransactionContext& ctx, BlockConstructionInfo const& newInfo) {
-            auto& newBlock = data_->blocks.emplace(newInfo);
+            auto& newBlock = data_->blocks.emplace(newInfo, *data_);
             if (newBlock.isFoundation()) {
                 for (auto const& neighbour : neighbours(newBlock)) {
                     declareRoot(ctx, neighbour.otherBlock());

@@ -89,6 +89,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
         // check structures.
         for (auto const& structure : data.structures) {
             CHECK(structure->isValid());
+            CHECK(&structure->sceneData() == &data);
             bool hasNonFoundation = false;
             for (auto const& [index,solverIndex] : structure->solverIndices()) {
                 auto& blockData = data.blocks.at(index);
@@ -102,6 +103,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
         // Check blocks.
         for (auto const& blockPtr : data.blocks) {
             auto const blockStructId = blockPtr->structureId();
+            CHECK(&blockPtr->sceneData() == &data);
             // structure
             if (blockPtr->isFoundation()) {
                 REQUIRE(blockStructId == data.structureIdGenerator.invalidIndex());
