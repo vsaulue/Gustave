@@ -61,31 +61,33 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
     Real<u.mass> const blockMass = blockSize.x() * blockSize.y() * blockSize.z() * concreteDensity;
     SceneData data{ blockSize };
 
-    auto copyStructures = [&]() {
-        auto result = std::unordered_map<StructureIndex, SharedPtr<StructureData>>{};
-        for (auto& structPtr : data.structures) {
-            result[structPtr->index()] = structPtr;
+    auto copyMap = [&](auto& sharedMap) {
+        using Result = std::remove_cvref_t<decltype(sharedMap)>;
+        auto result = Result{};
+        for (auto& structPtr : sharedMap) {
+            result.insert(structPtr);
         }
         return result;
     };
 
     auto runTransaction = [&](Transaction const& transaction) {
-        auto oldStructures = copyStructures();
+        auto oldStructures = copyMap(data.structures);
+        auto oldBlocks = copyMap(data.blocks);
         auto const result = SceneUpdater{ data }.runTransaction(transaction);
         // Check structure diff of the result.
         for (auto const& deletedStructureId : result.deletedStructures()) {
             auto extractedStruct = oldStructures.extract(deletedStructureId);
             REQUIRE(extractedStruct);
-            CHECK_FALSE(extractedStruct.mapped()->isValid());
+            CHECK_FALSE(extractedStruct->isValid());
             REQUIRE_FALSE(data.structures.contains(deletedStructureId));
         }
         for (auto const& newStructureId : result.newStructures()) {
             REQUIRE_FALSE(oldStructures.contains(newStructureId));
             auto newStructure = data.structures.atShared(newStructureId);
             CHECK(newStructure->isValid());
-            oldStructures[newStructureId] = std::move(newStructure);
+            oldStructures.insert(std::move(newStructure));
         }
-        REQUIRE_THAT(copyStructures(), matchers::c2::UnorderedRangeEquals(oldStructures));
+        REQUIRE_THAT(data.structures, matchers::c2::UnorderedRangeEquals(oldStructures));
         // check structures.
         for (auto const& structure : data.structures) {
             CHECK(structure->isValid());
@@ -100,8 +102,13 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneUpdater") {
             }
             REQUIRE(hasNonFoundation);
         }
-        // Check blocks.
+        // Check deleted blocks.
+        for (auto const& blockId : transaction.deletedBlocks()) {
+            CHECK_FALSE(oldBlocks.at(blockId).isValid());
+        }
+        // Check valid blocks.
         for (auto const& blockPtr : data.blocks) {
+            CHECK(blockPtr->isValid());
             auto const blockStructId = blockPtr->structureId();
             CHECK(&blockPtr->sceneData() == &data);
             // structure
