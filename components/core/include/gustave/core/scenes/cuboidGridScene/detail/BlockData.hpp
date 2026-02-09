@@ -73,6 +73,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             , linkIndices_{ maxLinkId(), maxLinkId(), maxLinkId() }
             , mass_{ info.mass() }
             , isFoundation_{ info.isFoundation() }
+            , isValid_{ true }
             , structureId_{ utils::IndexGenerator<StructureIndex>::invalidIndex() }
             , scene_{ &scene }
         {
@@ -94,9 +95,19 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             return index_;
         }
 
+        void invalidate() {
+            assert(isValid_);
+            isValid_ = false;
+        }
+
         [[nodiscard]]
         bool isFoundation() const {
             return isFoundation_;
+        }
+
+        [[nodiscard]]
+        bool isValid() const {
+            return isValid_;
         }
 
         [[nodiscard]]
@@ -157,6 +168,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         LinkIndices linkIndices_;
         Real<u.mass> mass_;
         bool isFoundation_;
+        bool isValid_;
 
         [[no_unique_address]]
         UserDataMember userData_;

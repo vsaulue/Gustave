@@ -47,7 +47,13 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::BlockData") {
         CHECK(cb111.index() == BlockIndex{ 1,1,1 });
         CHECK(cb111.mass() == 5.f * u.mass);
         CHECK(cb111.isFoundation() == false);
+        CHECK(cb111.isValid() == true);
         CHECK(&cb111.sceneData() == &scene);
+    }
+
+    SECTION(".invalidate()") {
+        b111.invalidate();
+        CHECK_FALSE(cb111.isValid());
     }
 
     SECTION(".linkIndices()") {
