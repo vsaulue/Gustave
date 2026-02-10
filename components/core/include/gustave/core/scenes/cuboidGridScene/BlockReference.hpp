@@ -95,7 +95,13 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         explicit BlockReference(Prop<SceneData>& sceneData, BlockIndex const& index)
-            : sceneData_{ &sceneData }
+            : data_{ sceneData.blocks.findShared(index) }
+            , index_{ index }
+        {}
+
+        [[nodiscard]]
+        explicit BlockReference(PropSharedPtr<BlockData> blockData, BlockIndex const& index)
+            : data_{ std::move(blockData) }
             , index_{ index }
         {}
 
@@ -142,24 +148,24 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         BlockReference<libCfg, UD_, false> asImmutable() const {
-            return BlockReference<libCfg, UD_, false>{ *sceneData_, index_ };
+            return BlockReference<libCfg, UD_, false>{ data_, index_ };
         }
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
-            return sceneData_->blockSize();
+            return data().sceneData().blockSize();
         }
 
         [[nodiscard]]
         Contacts<true> contacts()
             requires (isMut_)
         {
-            return doContacts(*this);
+            return Contacts<true>{ data() };
         }
 
         [[nodiscard]]
         Contacts<false> contacts() const {
-            return doContacts(*this);
+            return Contacts<false>{ data() };
         }
 
         [[nodiscard]]
@@ -181,7 +187,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         bool isValid() const {
-            return sceneData_->blocks.contains(index_);
+            return (data_ != nullptr) && (data_->isValid());
         }
 
         [[nodiscard]]
@@ -211,12 +217,12 @@ namespace gustave::core::scenes::cuboidGridScene {
         Structures<true> structures()
             requires (isMut_)
         {
-            return Structures<true>{ *sceneData_, data() };
+            return Structures<true>{ data() };
         }
 
         [[nodiscard]]
         Structures<false> structures() const {
-            return Structures<false>{ *sceneData_, data() };
+            return Structures<false>{ data() };
         }
 
         [[nodiscard]]
@@ -236,7 +242,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         [[nodiscard]]
         bool operator==(BlockReference const&) const = default;
     private:
-        PropPtr<SceneData> sceneData_;
+        PropSharedPtr<BlockData> data_;
         BlockIndex index_;
 
         [[nodiscard]]
@@ -250,21 +256,11 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
-        static auto doContacts(meta::cCvRefOf<BlockReference> auto&& self) {
-            using Result = decltype(self.contacts());
-            if (not self.isValid()) {
-                throw self.invalidError();
-            }
-            return Result{ *self.sceneData_, self.index_ };
-        }
-
-        [[nodiscard]]
         static auto doData(meta::cCvRefOf<BlockReference> auto&& self) -> decltype(self.data()) {
-            auto result = self.sceneData_->blocks.find(self.index_);
-            if (!result) {
+            if (!self.isValid()) {
                 throw self.invalidError();
             }
-            return *result;
+            return *self.data_;
         }
     };
 }

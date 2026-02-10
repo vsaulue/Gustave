@@ -30,8 +30,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/DataNeighbours.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
+#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
 #include <gustave/math3d/BasicDirection.hpp>
@@ -47,22 +46,19 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
 
             using Direction = math3d::BasicDirection;
 
-            using SceneData = cuboidGridScene::detail::SceneData<libCfg_, UD_>;
+            using BlockData = cuboidGridScene::detail::BlockData<libCfg_, UD_>;
         public:
             using Value = cuboidGridScene::ContactReference<libCfg_, UD_, isMut_>;
 
             [[nodiscard]]
             Enumerator()
-                : scene_{ nullptr }
-                , localBlockId_{ utils::NO_INIT }
+                : block_{ nullptr }
                 , direction_{ 6 }
-            {
-            }
+            {}
 
             [[nodiscard]]
-            explicit Enumerator(Prop<SceneData>& scene, BlockIndex const& localBlockId)
-                : scene_{ &scene }
-                , localBlockId_{ localBlockId }
+            explicit Enumerator(Prop<BlockData>& block)
+                : block_{ &block }
                 , direction_{ 0 }
             {
                 next();
@@ -95,11 +91,10 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
 
             [[nodiscard]]
             Value value() const {
-                return Value{ *scene_, { localBlockId_, static_cast<Direction::Id>(direction_) } };
+                return Value{ block_->sceneData(), { block_->index(), static_cast<Direction::Id>(direction_) } };
             }
 
-            Prop<SceneData>* scene_;
-            BlockIndex localBlockId_;
+            Prop<BlockData>* block_;
             int direction_;
         };
     }
@@ -118,7 +113,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         template<typename T>
         using PropPtr = utils::PropPtr<isMut_, T>;
 
-        using SceneData = cuboidGridScene::detail::SceneData<libCfg_, UD_>;
+        using BlockData = cuboidGridScene::detail::BlockData<libCfg_, UD_>;
 
         template<bool mut>
         using Enumerator = detail::Enumerator<libCfg_, UD_, mut>;
@@ -127,9 +122,8 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         using Iterator = utils::ForwardIterator<Enumerator<isMut_>>;
 
         [[nodiscard]]
-        explicit Contacts(Prop<SceneData>& sceneData, BlockIndex const& blockId)
-            : scene_{ &sceneData }
-            , index_{ blockId }
+        explicit Contacts(Prop<BlockData>& block)
+            : block_{ &block }
         {}
 
         [[nodiscard]]
@@ -148,12 +142,12 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         Iterator begin()
             requires (isMut_)
         {
-            return Iterator{ *scene_, index_ };
+            return Iterator{ *block_ };
         }
 
         [[nodiscard]]
         ConstIterator begin() const {
-            return ConstIterator{ *scene_, index_ };
+            return ConstIterator{ *block_ };
         }
 
         [[nodiscard]]
@@ -162,21 +156,15 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         }
     private:
         [[nodiscard]]
-        ContactReference<false> alongUnchecked(Direction direction) const {
-            return ContactReference<false>{ *scene_, { index_, direction } };
-        }
-
-        [[nodiscard]]
         static auto doAlong(meta::cCvRefOf<Contacts> auto&& self, Direction direction) {
             using Result = decltype(self.along(direction));
-            auto result = Result{ *self.scene_, { self.index_, direction } };
+            auto result = Result{ self.block_->sceneData(), {self.block_->index(), direction}};
             if (!result.isValid()) {
                 throw result.invalidError();
             }
             return result;
         }
 
-        PropPtr<SceneData> scene_;
-        BlockIndex index_;
+        PropPtr<BlockData> block_;
     };
 }

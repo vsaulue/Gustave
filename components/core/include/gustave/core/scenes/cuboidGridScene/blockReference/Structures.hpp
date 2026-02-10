@@ -97,7 +97,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
             [[nodiscard]]
             Value operator*() const {
                 assert(not isEnd());
-                return Value{ structs_->scene_->structures.atShared(*indexIt_) };
+                return Value{ structs_->block_->sceneData().structures.atShared(*indexIt_)};
             }
 
             [[nodiscard]]
@@ -113,12 +113,11 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         using Iterator = utils::ForwardIterator<Enumerator<isMut_>>;
 
         [[nodiscard]]
-        explicit Structures(Prop<SceneData>& scene, BlockData const& blockData)
-            : scene_{ &scene }
-            , block_{ &blockData }
+        explicit Structures(Prop<BlockData>& blockData)
+            : block_{ &blockData }
         {
             if (blockData.isFoundation()) {
-                for (auto const& neighbour : DataNeighbours{ scene, blockData.index() }) {
+                for (auto const& neighbour : DataNeighbours{ blockData.sceneData(), blockData.index()}) {
                     auto const& nBlockData = neighbour.otherBlock();
                     if (!nBlockData.isFoundation()) {
                         addValue(nBlockData.structureId());
@@ -133,12 +132,12 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
         StructureReference<true> operator[](std::size_t index)
             requires (isMut_)
         {
-            return StructureReference<true>{ scene_->structures.atShared(structIds_[index]) };
+            return StructureReference<true>{ block_->sceneData().structures.atShared(structIds_[index]) };
         }
 
         [[nodiscard]]
         StructureReference<false> operator[](std::size_t index) const {
-            return StructureReference<false>{ scene_->structures.atShared(structIds_[index]) };
+            return StructureReference<false>{ block_->sceneData().structures.atShared(structIds_[index]) };
         }
 
         [[nodiscard]]
@@ -181,7 +180,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
             if (self.structIds_.size() != 1) {
                 throw self.noUniqueError();
             }
-            return Result{ self.scene_->structures.atShared(self.structIds_[0]) };
+            return Result{ self.block_->sceneData().structures.atShared(self.structIds_[0]) };
         }
 
         [[nodiscard]]
@@ -197,8 +196,7 @@ namespace gustave::core::scenes::cuboidGridScene::blockReference {
             }
         }
 
-        PropPtr<SceneData> scene_;
+        PropPtr<BlockData> block_;
         Values structIds_;
-        BlockData const* block_;
     };
 }

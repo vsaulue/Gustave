@@ -65,6 +65,13 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
         t.removeBlock(blockId);
         SceneUpdater{ sceneData }.runTransaction(t);
     };
+    auto replaceBlock = [&](BlockIndex const& blockId) {
+        auto const& oldBlockData = sceneData.blocks.at(blockId);
+        Transaction t;
+        t.removeBlock(blockId);
+        t.addBlock({ oldBlockData.index(), concrete_20m, oldBlockData.mass() + 3000.f * u.mass, oldBlockData.isFoundation() });
+        SceneUpdater{ sceneData }.runTransaction(t);
+    };
 
     auto mb112 = BlockReference<true>{ sceneData, {1,1,2} };
     auto const& cmb112 = mb112;
@@ -116,9 +123,20 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
     }
 
     SECTION(".isValid()") {
-        REQUIRE(ib112.isValid());
-        deleteBlock(ib112.index());
-        REQUIRE_FALSE(ib112.isValid());
+        SECTION("// delete block") {
+            REQUIRE(ib112.isValid());
+            deleteBlock(ib112.index());
+            REQUIRE_FALSE(ib112.isValid());
+        }
+
+        SECTION("// replace block") {
+            REQUIRE(ib112.isValid());
+            replaceBlock(ib112.index());
+            REQUIRE_FALSE(ib112.isValid());
+            auto const newBlockRef = BlockReference<false>{ sceneData, ib112.index() };
+            REQUIRE(newBlockRef.isValid());
+            CHECK(newBlockRef.mass() == 12000.f * u.mass);
+        }
     }
 
     SECTION(".mass()") {

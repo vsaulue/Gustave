@@ -68,11 +68,11 @@ TEST_CASE("core::scenes::cuboidGridScene::blockReference::Contacts") {
     newBlock({ 0,0,9 }, false);
     SceneUpdater{ scene }.runTransaction(t);
 
-    auto mContacts111 = Contacts<true>{ scene, {1,1,1} };
+    auto mContacts111 = Contacts<true>{ scene.blocks.at({1,1,1}) };
     auto const& cmContacts111 = mContacts111;
-    auto iContacts111 = Contacts<false>{ scene, {1,1,1} };
+    auto iContacts111 = Contacts<false>{ scene.blocks.at({1,1,1}) };
 
-    auto mContacts009 = Contacts<true>{ scene, {0,0,9} };
+    auto mContacts009 = Contacts<true>{ scene.blocks.at({0,0,9}) };
 
     auto contactId = [](BlockIndex const& localBlockId, Direction direction) {
         return ContactIndex{ localBlockId, direction };

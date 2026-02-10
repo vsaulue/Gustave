@@ -66,15 +66,15 @@ TEST_CASE("core::scenes::cuboidGridScene::blockReference::Structures") {
     newBlock({ 0,0,9 }, true);
     SceneUpdater{ scene }.runTransaction(t);
 
-    auto mStructs010 = Structures<true>{ scene, scene.blocks.at({0,1,0}) };
+    auto mStructs010 = Structures<true>{ scene.blocks.at({0,1,0}) };
     auto const& cmStructs010 = mStructs010;
-    auto iStructs010 = Structures<false>{ scene, scene.blocks.at({0,1,0}) };
+    auto iStructs010 = Structures<false>{ scene.blocks.at({0,1,0}) };
 
-    auto mStructs003 = Structures<true>{ scene, scene.blocks.at({0,0,3}) };
+    auto mStructs003 = Structures<true>{ scene.blocks.at({0,0,3}) };
     auto const& cmStructs003 = mStructs003;
-    auto iStructs003 = Structures<false>{ scene, scene.blocks.at({0,0,3}) };
+    auto iStructs003 = Structures<false>{ scene.blocks.at({0,0,3}) };
 
-    auto iStructs009 = Structures<false>{ scene, scene.blocks.at({0,0,9}) };
+    auto iStructs009 = Structures<false>{ scene.blocks.at({0,0,9}) };
 
     auto structIdOf = [&](BlockIndex const& blockId) {
         return scene.blocks.at(blockId).structureId();
