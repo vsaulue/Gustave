@@ -34,9 +34,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
-#include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactIndex.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
@@ -57,37 +55,16 @@ namespace gustave::core::scenes::cuboidGridScene {
         template<typename T>
         using PropPtr = utils::PropPtr<isMut_, T>;
 
+        template<typename T>
+        using PropSharedPtr = utils::PropSharedPtr<isMut_, T>;
+
         static constexpr auto u = cfg::units(libCfg);
 
-        using BlockData = detail::BlockData<libCfg, UD_>;
         using SceneData = detail::SceneData<libCfg, UD_>;
+
+        using BlockData = SceneData::BlockData;
         using StructureData = SceneData::StructureData;
         using StructureIndex = SceneData::StructureIndex;
-
-        struct BlockDatas {
-            BlockData const* local;
-            BlockData const* other;
-
-            [[nodiscard]]
-            bool isValid() const {
-                if (local && other) {
-                    return !local->isFoundation() || !other->isFoundation();
-                }
-                return false;
-            }
-
-            [[nodiscard]]
-            std::optional<StructureIndex> structureId() const {
-                if (!isValid()) {
-                    return {};
-                }
-                if (!local->isFoundation()) {
-                    return local->structureId();
-                } else {
-                    return other->structureId();
-                }
-            }
-        };
 
         template<cfg::cUnitOf<libCfg> auto unit>
         using Real = cfg::Real<libCfg, unit>;
@@ -95,7 +72,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using AsImmutable = ContactReference<libCfg, UD_, false>;
         using BlockIndex = cuboidGridScene::BlockIndex;
         using ContactIndex = cuboidGridScene::ContactIndex;
-        using Direction = math3d::BasicDirection;
+        using Direction = ContactIndex::Direction;
         using PressureStress = model::PressureStress<libCfg>;
         using NormalizedVector3 = cfg::NormalizedVector3<libCfg>;
         using SolverContactIndex = solvers::Structure<libCfg>::ContactIndex;
@@ -108,15 +85,34 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         explicit ContactReference(utils::NoInit NO_INIT)
-            : scene_{ nullptr }
+            : structure_{ nullptr }
+            , localBlock_{ nullptr }
+            , otherBlock_{ nullptr }
             , index_{ NO_INIT }
         {}
 
         [[nodiscard]]
         explicit ContactReference(Prop<SceneData>& scene, ContactIndex const& index)
-            : scene_{ &scene }
+            : structure_{ nullptr }
+            , localBlock_{ scene.blocks.find(index.localBlockIndex()) }
+            , otherBlock_{ nullptr }
             , index_{ index }
-        {}
+        {
+            if (!localBlock_) {
+                return;
+            }
+            if (auto const otherBlockId = index.otherBlockIndex()) {
+                otherBlock_ = scene.blocks.find(*otherBlockId);
+                if (!otherBlock_) {
+                    return;
+                }
+                if (!localBlock_->isFoundation()) {
+                    structure_ = scene.structures.atShared(localBlock_->structureId());
+                } else if (!otherBlock_->isFoundation()) {
+                    structure_ = scene.structures.atShared(otherBlock_->structureId());
+                }
+            }
+        }
 
         [[nodiscard]]
         ContactReference(ContactReference&)
@@ -156,17 +152,17 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         Real<u.area> area() const {
-            if (not isValid()) {
+            if (!isValid()) {
                 throw invalidError();
             }
-            return scene_->contactAreaAlong(index_.direction());
+            return structure_->sceneData().contactAreaAlong(index_.direction());
         }
 
         [[nodiscard]]
         AsImmutable asImmutable() const
             requires (isMut_)
         {
-            return AsImmutable{ *scene_, index_ };
+            return AsImmutable{ structure_->sceneData(), index_ };
         }
 
         [[nodiscard]]
@@ -183,7 +179,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         bool isValid() const {
-            return blockDatas().isValid();
+            return structure_ && structure_->isValid();
         }
 
         [[nodiscard]]
@@ -200,11 +196,10 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         PressureStress maxPressureStress() const {
-            auto blocks = blockDatas();
-            if (!blocks.isValid()) {
+            if (!isValid()) {
                 throw invalidError();
             }
-            return PressureStress::minStress(blocks.local->maxPressureStress(), blocks.other->maxPressureStress());
+            return PressureStress::minStress(localBlock_->maxPressureStress(), otherBlock_->maxPressureStress());
         }
 
         [[nodiscard]]
@@ -241,102 +236,97 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         [[nodiscard]]
         SolverContactIndex solverIndex() const {
-            BlockDatas datas = blockDatas();
-            if (!datas.isValid()) {
+            if (!isValid()) {
                 throw invalidError();
             }
             switch (index_.direction().id()) {
             case Direction::Id::plusX:
-                return SolverContactIndex{ datas.local->linkIndices().plusX, true};
+                return SolverContactIndex{ localBlock_->linkIndices().plusX, true};
             case Direction::Id::minusX:
-                return SolverContactIndex{ datas.other->linkIndices().plusX, false};
+                return SolverContactIndex{ otherBlock_->linkIndices().plusX, false};
             case Direction::Id::plusY:
-                return SolverContactIndex{ datas.local->linkIndices().plusY, true};
+                return SolverContactIndex{ localBlock_->linkIndices().plusY, true};
             case Direction::Id::minusY:
-                return SolverContactIndex{ datas.other->linkIndices().plusY, false};
+                return SolverContactIndex{ otherBlock_->linkIndices().plusY, false};
             case Direction::Id::plusZ:
-                return SolverContactIndex{ datas.local->linkIndices().plusZ, true};
+                return SolverContactIndex{ localBlock_->linkIndices().plusZ, true};
             case Direction::Id::minusZ:
-                return SolverContactIndex{ datas.other->linkIndices().plusZ, false};
+                return SolverContactIndex{ otherBlock_->linkIndices().plusZ, false};
             }
-            throw std::invalid_argument(index_.direction().invalidValueMsg());
+            throw index_.direction().invalidError();
         }
 
         [[nodiscard]]
-        StructureReference<true> structure()
+        StructureReference<true> structure() &
             requires (isMut_)
         {
             return doStructure(*this);
         }
 
         [[nodiscard]]
-        StructureReference<false> structure() const {
+        StructureReference<isMut_> structure() && {
+            return doStructure(std::move(*this));
+        }
+
+        [[nodiscard]]
+        StructureReference<false> structure() const& {
             return doStructure(*this);
         }
 
         [[nodiscard]]
         Real<u.length> thickness() const {
-            return scene_->thicknessAlong(index_.direction());
+            if (!isValid()) {
+                throw invalidError();
+            }
+            return structure_->sceneData().thicknessAlong(index_.direction());
         }
 
         template<bool mut>
         [[nodiscard]]
         bool operator==(ContactReference<libCfg, UD_, mut> const& rhs) const {
-            return (scene_ == rhs.scene_) && (index_ == rhs.index_);
+            return (structure_ == rhs.structure_) && (index_ == rhs.index_);
         }
     private:
         [[nodiscard]]
-        BlockDatas blockDatas() const {
-            auto localPtr = scene_->blocks.find(index_.localBlockIndex());
-            BlockData const* otherPtr =  nullptr ;
-            if (auto optOtherIndex = index_.otherBlockIndex()) {
-                otherPtr = scene_->blocks.find(*optOtherIndex);
-            }
-            return BlockDatas{ localPtr, otherPtr };
-        }
-
-        [[nodiscard]]
         static auto doLocalBlock(meta::cCvRefOf<ContactReference> auto&& self) {
             using Result = decltype(self.localBlock());
-            auto result = Result{ *self.scene_, self.index_.localBlockIndex() };
-            if (!result.isValid()) {
+            if (!self.isValid()) {
                 throw self.invalidError();
             }
-            return result;
+            return Result{ self.structure_->sceneData(), self.index_.localBlockIndex() };
         }
 
         [[nodiscard]]
         static auto doOpposite(meta::cCvRefOf<ContactReference> auto&& self) {
             using Result = decltype(self.opposite());
-            BlockDatas blocks = self.blockDatas();
-            if (!blocks.isValid()) {
+            if (!self.isValid()) {
                 throw self.invalidError();
             }
-            return Result{ *self.scene_, { blocks.other->index(), self.index_.direction().opposite()} };
+            return Result{ self.structure_->sceneData(), *self.index_.opposite() };
         }
 
         [[nodiscard]]
         static auto doOtherBlock(meta::cCvRefOf<ContactReference> auto&& self) {
             using Result = decltype(self.otherBlock());
-            std::optional<BlockIndex> blockId = self.index_.otherBlockIndex();
-            if (!blockId || !self.scene_->blocks.contains(*blockId)) {
+            if (!self.isValid()) {
                 throw self.invalidError();
             }
-            return Result{ *self.scene_, *blockId };
+            return Result{ self.structure_->sceneData(), self.otherBlock_->index() };
         }
 
         [[nodiscard]]
         static auto doStructure(meta::cCvRefOf<ContactReference> auto&& self) {
-            using Result = decltype(self.structure());
-            auto const datas = self.blockDatas();
-            auto const optStructId = datas.structureId();
-            if (!optStructId) {
+            using Self = decltype(self);
+            using Result = decltype(std::forward<Self>(self).structure());
+            if (!self.isValid()) {
                 throw self.invalidError();
             }
-            return Result{ self.scene_->structures.atShared(*optStructId) };
+            return Result{ std::forward<Self>(self).structure_ };
         }
 
-        PropPtr<SceneData> scene_;
+        PropSharedPtr<StructureData> structure_;
+        PropPtr<BlockData> localBlock_;
+        PropPtr<BlockData> otherBlock_;
         ContactIndex index_;
     };
 }
