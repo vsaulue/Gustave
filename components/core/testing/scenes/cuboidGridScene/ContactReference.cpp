@@ -59,23 +59,13 @@ static_assert(gustave::testing::cPropPtr<ContactReference<true>>);
 
 TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
     auto const blockSize = vector3(2.f, 3.f, 1.f, u.length);
-    SceneData scene{ blockSize };
+    auto scene = SceneData{ blockSize };
 
-    PressureStress highTensile{
+    auto const highTensile = PressureStress{
         1'000'000.f * u.pressure,
         15'000'000.f * u.pressure,
         20'000'000.f * u.pressure,
     };
-
-    Transaction t;
-    t.addBlock({ {1,2,2}, highTensile, 1000.f * u.mass, false });
-    t.addBlock({ {2,2,2}, concrete_20m, 1000.f * u.mass, true });
-    t.addBlock({ {2,3,2}, concrete_20m, 1000.f * u.mass, true });
-    t.addBlock({ {7,7,7}, concrete_20m, 1000.f * u.mass, false });
-    t.addBlock({ {6,7,7}, concrete_20m, 1000.f * u.mass, true });
-    t.addBlock({ {7,6,7}, concrete_20m, 1000.f * u.mass, false });
-    t.addBlock({ {7,7,6}, concrete_20m, 1000.f * u.mass, false });
-    SceneUpdater{ scene }.runTransaction(t);
 
     auto blockRef = [&](BlockIndex const& blockId) {
         auto result = BlockReference<false>{ scene, blockId };
@@ -96,6 +86,27 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         return ContactReference<false>{ scene, { localBlockId, direction } };
     };
 
+    {
+        Transaction t;
+        t.addBlock({ {1,2,2}, highTensile, 1000.f * u.mass, false });
+        t.addBlock({ {2,2,2}, concrete_20m, 1000.f * u.mass, true });
+        t.addBlock({ {2,3,2}, concrete_20m, 1000.f * u.mass, true });
+        t.addBlock({ {7,7,7}, concrete_20m, 1000.f * u.mass, false });
+        t.addBlock({ {6,7,7}, concrete_20m, 1000.f * u.mass, true });
+        t.addBlock({ {7,6,7}, concrete_20m, 1000.f * u.mass, false });
+        t.addBlock({ {7,7,6}, concrete_20m, 1000.f * u.mass, false });
+        SceneUpdater{ scene }.runTransaction(t);
+    }
+
+    auto invalidatedContact = immContactRef({ 2,2,2 }, Direction::minusX());
+
+    {
+        Transaction t;
+        t.removeBlock({ 1,2,2 });
+        t.addBlock({ {1,2,2}, highTensile, 1000.f * u.mass, false });
+        SceneUpdater{ scene }.runTransaction(t);
+    }
+
     auto mContact222minusX = mutContactRef({ 2,2,2 }, Direction::minusX());
     auto const& cmContact222minusX = mContact222minusX;
     auto iContact222minusX = immContactRef({ 2,2,2 }, Direction::minusX());
@@ -109,6 +120,10 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
 
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.area(), std::out_of_range);
+        }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.area(), std::out_of_range);
         }
     }
 
@@ -128,13 +143,22 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         }
 
         SECTION("// false: no other block") {
-            auto contact = immContactRef({ 2,2,2 }, Direction::minusY());
+            auto const contact = immContactRef({ 2,2,2 }, Direction::minusY());
             CHECK_FALSE(contact.isValid());
         }
 
         SECTION("// false: both foundations") {
-            auto contact = immContactRef({ 2,2,2 }, Direction::plusY());
+            auto const contact = immContactRef({ 2,2,2 }, Direction::plusY());
             CHECK_FALSE(contact.isValid());
+        }
+
+        SECTION("// false: NO_INIT") {
+            auto const contact = ContactReference<false>{ gustave::utils::NO_INIT };
+            CHECK_FALSE(contact.isValid());
+        }
+
+        SECTION("// false: invalidated") {
+            CHECK_FALSE(invalidatedContact.isValid());
         }
     }
 
@@ -161,6 +185,10 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.localBlock(), std::out_of_range);
         }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.localBlock(), std::out_of_range);
+        }
     }
 
     SECTION(".maxPressureStress()") {
@@ -171,6 +199,10 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.maxPressureStress(), std::out_of_range);
         }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.maxPressureStress(), std::out_of_range);
+        }
     }
 
     SECTION(".normal()") {
@@ -180,6 +212,10 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
 
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.normal(), std::out_of_range);
+        }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.normal(), std::out_of_range);
         }
     }
 
@@ -206,6 +242,10 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.opposite(), std::out_of_range);
         }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.opposite(), std::out_of_range);
+        }
     }
 
     SECTION(".otherBlock()") {
@@ -230,6 +270,10 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
 
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.otherBlock(), std::out_of_range);
+        }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.otherBlock(), std::out_of_range);
         }
     }
 
@@ -278,11 +322,15 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.solverIndex(), std::out_of_range);
         }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.solverIndex(), std::out_of_range);
+        }
     }
 
     SECTION(".structure()") {
         auto runValidTest = [&](auto&& contactRef, bool expectedConst) {
-            auto result = contactRef.structure();
+            auto result = std::forward<decltype(contactRef)>(contactRef).structure();
             auto const s122 = structRef({ 1,2,2 });
             auto const s777 = structRef({ 7,7,7 });
             CHECK(result == s122);
@@ -302,8 +350,24 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
             runValidTest(iContact222minusX, true);
         }
 
+        SECTION("// valid - move mutable") {
+            runValidTest(std::move(mContact222minusX), false);
+            CHECK_FALSE(mContact222minusX.isValid());
+            CHECK(iContact222minusX.isValid());
+        }
+
+        SECTION("// valid - move immutable") {
+            runValidTest(std::move(iContact222minusX), true);
+            CHECK_FALSE(iContact222minusX.isValid());
+            CHECK(mContact222minusX.isValid());
+        }
+
         SECTION("// invalid") {
             CHECK_THROWS_AS(invalidContact.structure(), std::out_of_range);
+        }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.structure(), std::out_of_range);
         }
     }
 
