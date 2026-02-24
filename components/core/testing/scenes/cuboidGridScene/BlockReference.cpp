@@ -24,6 +24,7 @@
  */
 
 #include <ranges>
+#include <string_view>
 
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
@@ -79,6 +80,35 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
 
     SECTION(".blockSize()") {
         CHECK(ib112.blockSize() == blockSize);
+    }
+
+    SECTION(".commonUserData()") {
+        auto const uDataValue = std::string_view{ "TestData" };
+
+        auto runTest = [&](auto&& blockRef, bool expectedConst) {
+            auto&& uData = blockRef.commonUserData();
+            CHECK(expectedConst == uData.isCalledAsConst());
+            CHECK(uData.tag.empty());
+            sceneData.userData().tag = uDataValue;
+            CHECK(uData.tag == uDataValue);
+        };
+
+        SECTION("// mutable") {
+            runTest(mb112, false);
+        }
+
+        SECTION("// const") {
+            runTest(cmb112, true);
+        }
+
+        SECTION("// immutable") {
+            runTest(ib112, true);
+        }
+
+        SECTION("// invalid") {
+            deleteBlock(ib112.index());
+            CHECK_THROWS_AS(ib112.commonUserData(), std::out_of_range);
+        }
     }
 
     SECTION(".contacts()") {
@@ -200,7 +230,7 @@ TEST_CASE("core::scenes::cuboidGridScene::BlockReference") {
             auto&& userData = blockRef.userData();
             CHECK(expectedConst == userData.isCalledAsConst());
             CHECK(userData.tag == 0.75f);
-            };
+        };
 
         SECTION("// mutable") {
             runValidTest(mb112, false);

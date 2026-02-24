@@ -77,6 +77,7 @@ namespace gustave::core::scenes::cuboidGridScene {
         using Vector3 = cfg::Vector3<libCfg, unit>;
     public:
         using BlockIndex = cuboidGridScene::BlockIndex;
+        using CommonUserDataMember = UDTraits::CommonMember;
         using Direction = math3d::BasicDirection;
         using PressureStress = model::PressureStress<libCfg>;
         using UserDataMember = UDTraits::BlockMember;
@@ -154,6 +155,20 @@ namespace gustave::core::scenes::cuboidGridScene {
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const {
             return data().sceneData().blockSize();
+        }
+
+        [[nodiscard]]
+        CommonUserDataMember& commonUserData()
+            requires (isMut_ && UDTraits::hasCommonUserData())
+        {
+            return data().sceneData().userData();
+        }
+
+        [[nodiscard]]
+        CommonUserDataMember const& commonUserData() const
+            requires (UDTraits::hasCommonUserData())
+        {
+            return data().sceneData().userData();
         }
 
         [[nodiscard]]
