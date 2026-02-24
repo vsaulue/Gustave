@@ -25,6 +25,7 @@
 
 #include <array>
 #include <stdexcept>
+#include <string_view>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -124,5 +125,16 @@ TEST_CASE("core::scenes::CuboidGridScene") {
         SECTION("// const") {
             runTest(cScene.structures(), true);
         }
+    }
+
+    SECTION(".userData()") {
+        auto const uDataValue = std::string_view{ "Test string 456" };
+
+        auto& uData = scene.userData();
+        auto& cuData = cScene.userData();
+        CHECK_FALSE(uData.isCalledAsConst());
+        CHECK(cuData.isCalledAsConst());
+        uData.tag = uDataValue;
+        CHECK(cuData.tag == uDataValue);
     }
 }

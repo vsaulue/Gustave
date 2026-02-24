@@ -31,6 +31,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/BlockData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/forwardDecls.hpp>
@@ -52,6 +53,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
     private:
         static constexpr auto u = cfg::units(cfg);
 
+        using UDTraits = common::UserDataTraits<UD_>;
+
         template<cfg::cUnitOf<cfg> auto unit>
         using Vector3 = cfg::Vector3<cfg, unit>;
 
@@ -61,6 +64,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
         using Blocks = utils::SharedIndexedSet<BlockData>;
         using StructureIdGenerator = utils::IndexGenerator<StructureIndex>;
         using Structures = utils::SharedIndexedSet<StructureData>;
+        using UserDataMember = UDTraits::CommonMember;
 
         [[nodiscard]]
         explicit SceneData(Vector3<u.length> const& blockSize)
@@ -85,6 +89,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             : blocks{ std::move(other.blocks) }
             , structures{ std::move(other.structures) }
             , structureIdGenerator{ other.structureIdGenerator }
+            , userData_{ std::move(other.userData_ ) }
             , blockSize_{ std::move(other.blockSize_) }
         {
             resetSceneDataPtr();
@@ -95,6 +100,7 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
                 blocks = std::move(other.blocks);
                 structures = std::move(other.structures);
                 structureIdGenerator = other.structureIdGenerator;
+                userData_ = std::move(other.userData_);
                 blockSize_ = other.blockSize_;
                 resetSceneDataPtr();
             }
@@ -149,6 +155,20 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             throw direction.invalidError();
         }
 
+        [[nodiscard]]
+        UserDataMember& userData()
+            requires (UDTraits::hasCommonUserData())
+        {
+            return userData_;
+        }
+
+        [[nodiscard]]
+        UserDataMember const& userData() const
+            requires (UDTraits::hasCommonUserData())
+        {
+            return userData_;
+        }
+
         Blocks blocks;
         Structures structures;
         StructureIdGenerator structureIdGenerator;
@@ -169,6 +189,8 @@ namespace gustave::core::scenes::cuboidGridScene::detail {
             }
         }
 
+        [[no_unique_address]]
+        UserDataMember userData_;
         Vector3<u.length> blockSize_;
     };
 }

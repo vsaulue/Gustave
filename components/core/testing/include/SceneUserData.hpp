@@ -25,9 +25,12 @@
 
 #pragma once
 
+#include <string>
+
 #include <gustave/testing/ConstDetector.hpp>
 
 struct SceneUserData {
     using Block = gustave::testing::ConstDetector<double>;
+    using Common = gustave::testing::ConstDetector<std::string>;
     using Structure = gustave::testing::ConstDetector<int>;
 };

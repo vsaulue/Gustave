@@ -43,6 +43,7 @@ namespace gustave::core::worlds::syncWorld::detail {
 
         struct SceneUserData {
             using Block = void;
+            using Common = void;
             using Structure = StructureUserData<libCfg>;
         };
     public:

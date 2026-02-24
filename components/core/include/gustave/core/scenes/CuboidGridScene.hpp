@@ -30,6 +30,7 @@
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneUpdater.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/StructureData.hpp>
@@ -49,6 +50,8 @@ namespace gustave::core::scenes {
     class CuboidGridScene {
     private:
         static constexpr auto u = cfg::units(libCfg);
+
+        using UDTraits = common::UserDataTraits<UD_>;
 
         using SceneData = cuboidGridScene::detail::SceneData<libCfg, UD_>;
         using SceneUpdater = cuboidGridScene::detail::SceneUpdater<libCfg, UD_>;
@@ -84,6 +87,7 @@ namespace gustave::core::scenes {
 
         using Transaction = cuboidGridScene::Transaction<libCfg>;
         using TransactionResult = cuboidGridScene::TransactionResult<libCfg>;
+        using UserDataMember = UDTraits::CommonMember;
 
         using BlockIndex = BlockReference<false>::BlockIndex;
         using ContactIndex = ContactReference<false>::ContactIndex;
@@ -161,6 +165,20 @@ namespace gustave::core::scenes {
         [[nodiscard]]
         Real<u.length> thicknessAlong(Direction direction) const {
             return data_.thicknessAlong(direction);
+        }
+
+        [[nodiscard]]
+        UserDataMember& userData()
+            requires (UDTraits::hasCommonUserData())
+        {
+            return data_.userData();
+        }
+
+        [[nodiscard]]
+        UserDataMember const& userData() const
+            requires (UDTraits::hasCommonUserData())
+        {
+            return data_.userData();
         }
     private:
         SceneData data_;

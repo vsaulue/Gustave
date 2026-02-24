@@ -25,17 +25,22 @@
 
 #pragma once
 
+#include <concepts>
 #include <type_traits>
 
 namespace gustave::core::scenes::common {
     namespace detail {
         template<typename T>
         concept cUserData = std::is_void_v<T> || std::is_default_constructible_v<T>;
+
+        template<typename T>
+        concept cMovableUserData = std::is_void_v<T> || (cUserData<T> && std::movable<T>);
     }
 
     template<typename T>
     concept cSceneUserData = std::is_void_v<T> || requires {
         requires detail::cUserData<typename T::Block>;
+        requires detail::cMovableUserData<typename T::Common>;
         requires detail::cUserData<typename T::Structure>;
     };
 }
