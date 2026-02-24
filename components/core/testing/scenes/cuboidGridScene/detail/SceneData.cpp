@@ -24,14 +24,16 @@
  */
 
 #include <array>
+#include <string_view>
 
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 
+#include <SceneUserData.hpp>
 #include <TestHelpers.hpp>
 
 namespace cuboid = gustave::core::scenes::cuboidGridScene;
 
-using SceneData = cuboid::detail::SceneData<libCfg, void>;
+using SceneData = cuboid::detail::SceneData<libCfg, SceneUserData>;
 
 using BlockConstructionInfo = SceneData::BlockData::BlockConstructionInfo;
 using Direction = SceneData::Direction;
@@ -40,11 +42,14 @@ using StructureData = SceneData::StructureData;
 
 TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
     auto const blockSize = vector3(1.f, 2.f, 3.f, u.length);
+    auto const uDataValue = std::string_view{ "Test String 123" };
     auto scene1 = SceneData{ blockSize };
+    auto const& cScene1 = scene1;
 
     auto& block1 = scene1.blocks.emplace(BlockConstructionInfo{ {1,1,1}, concrete_20m, 1000.f * u.mass, false }, scene1);
     auto struct1 = std::make_shared<StructureData>(scene1.structureIdGenerator(), scene1, block1);
     scene1.structures.insert(struct1);
+    scene1.userData().tag = uDataValue;
 
     SECTION("// move semantics") {
         auto const expectedStructs = std::array{
@@ -58,6 +63,7 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
             CHECK(&struct1->sceneData() == &movedScene);
             CHECK(movedScene.blockSize() == blockSize);
             CHECK(movedScene.structureIdGenerator.readNextIndex() == expectedNextStructId);
+            CHECK(movedScene.userData().tag == uDataValue);
         };
 
         SECTION("// assign") {
@@ -90,5 +96,16 @@ TEST_CASE("core::scenes::cuboidGridScene::detail::SceneData") {
         CHECK(scene1.thicknessAlong(Direction::plusY()) == 2.f * u.length);
         CHECK(scene1.thicknessAlong(Direction::minusZ()) == 3.f * u.length);
         CHECK(scene1.thicknessAlong(Direction::plusZ()) == 3.f * u.length);
+    }
+
+    SECTION(".userData()") {
+        auto& uData = scene1.userData();
+        auto& cuData = cScene1.userData();
+        CHECK_FALSE(uData.isCalledAsConst());
+        CHECK(cuData.isCalledAsConst());
+        CHECK(cuData.tag == uDataValue);
+        auto const newDataValue = std::string_view{ "New value" };
+        uData.tag = newDataValue;
+        CHECK(cuData.tag == newDataValue);
     }
 }

@@ -32,41 +32,53 @@
 namespace gustave::core::scenes::common {
     struct EmptyUserData {};
 
+    namespace detail {
+        template<common::cSceneUserData UserDatas_>
+        struct UserDatasOf {
+        public:
+            using Block = UserDatas_::Block;
+            using Common = UserDatas_::Common;
+            using Structure = UserDatas_::Structure;
+        };
+
+        template<>
+        struct UserDatasOf<void> {
+        public:
+            using Block = void;
+            using Common = void;
+            using Structure = void;
+        };
+    }
+
     template<common::cSceneUserData UserDatas_>
     struct UserDataTraits {
     private:
-        [[nodiscard]]
-        static consteval meta::cTypeWrapper auto blockUserDataType() {
-            if constexpr (std::is_void_v<UserDatas_>) {
-                return meta::TypeWrapper<void>{};
-            } else {
-                return meta::TypeWrapper<typename UserDatas_::Block>{};
-            }
-        }
+        using Datas = detail::UserDatasOf<UserDatas_>;
 
-        [[nodiscard]]
-        static consteval meta::cTypeWrapper auto structureUserDataType() {
-            if constexpr (std::is_void_v<UserDatas_>) {
-                return meta::TypeWrapper<void>{};
-            } else {
-                return meta::TypeWrapper<typename UserDatas_::Structure>{};
-            }
-        }
+        template<typename T>
+        using UserDataMember = std::conditional_t<std::is_void_v<T>, EmptyUserData, T>;
     public:
-        using Block = decltype(blockUserDataType())::Type;
-        using Structure = decltype(structureUserDataType())::Type;
+        using Block = Datas::Block;
+        using Common = Datas::Common;
+        using Structure = Datas::Structure;
 
         [[nodiscard]]
         static constexpr bool hasBlockUserData() {
-            return not std::is_void_v<Block>;
+            return !std::is_void_v<Block>;
+        }
+
+        [[nodiscard]]
+        static constexpr bool hasCommonUserData() {
+            return !std::is_void_v<Common>;
         }
 
         [[nodiscard]]
         static constexpr bool hasStructureUserData() {
-            return not std::is_void_v<Structure>;
+            return !std::is_void_v<Structure>;
         }
 
-        using BlockMember = std::conditional_t<hasBlockUserData(), Block, EmptyUserData>;
-        using StructureMember = std::conditional_t<hasStructureUserData(), Structure, EmptyUserData>;
+        using BlockMember = UserDataMember<Block>;
+        using CommonMember = UserDataMember<Common>;
+        using StructureMember = UserDataMember<Structure>;
     };
 }
