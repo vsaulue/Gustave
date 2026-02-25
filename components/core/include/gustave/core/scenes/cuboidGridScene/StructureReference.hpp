@@ -66,6 +66,7 @@ namespace gustave::core::scenes::cuboidGridScene {
 
         using UDTraits = common::UserDataTraits<UD_>;
     public:
+        using CommonUserDataMember = UDTraits::CommonMember;
         using SolverStructure = solvers::Structure<cfg>;
         using NodeIndex = cfg::NodeIndex<cfg>;
         using UserDataMember = UDTraits::StructureMember;
@@ -165,6 +166,20 @@ namespace gustave::core::scenes::cuboidGridScene {
         }
 
         [[nodiscard]]
+        CommonUserDataMember& commonUserData()
+            requires (isMut_&& UDTraits::hasCommonUserData())
+        {
+            return getCommonUserData(*this);
+        }
+
+        [[nodiscard]]
+        CommonUserDataMember const& commonUserData() const
+            requires (UDTraits::hasCommonUserData())
+        {
+            return getCommonUserData(*this);
+        }
+
+        [[nodiscard]]
         Contacts<true> contacts()
             requires (isMut_)
         {
@@ -256,7 +271,15 @@ namespace gustave::core::scenes::cuboidGridScene {
         StructureIndex index_;
 
         [[nodiscard]]
-        static decltype(auto) getUserData(meta::cCvRefOf<StructureReference> auto&& self) {
+        static auto getCommonUserData(meta::cCvRefOf<StructureReference> auto&& self) -> decltype(self.commonUserData()) {
+            if (!self.isValid()) {
+                throw self.invalidError();
+            }
+            return self.data_->sceneData().userData();
+        }
+
+        [[nodiscard]]
+        static auto getUserData(meta::cCvRefOf<StructureReference> auto&& self) -> decltype(self.userData()) {
             if (self.data_ == nullptr) {
                 throw self.invalidError();
             }
