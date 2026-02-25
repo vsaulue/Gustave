@@ -127,6 +127,38 @@ TEST_CASE("core::scenes::cuboidGridScene::ContactReference") {
         }
     }
 
+    SECTION(".commonUserData()") {
+        auto const uDataValue = std::string_view{ "TestData" };
+
+        auto runValidTest = [&](auto&& contactRef, bool expectedConst) {
+            auto&& uData = contactRef.commonUserData();
+            CHECK(expectedConst == uData.isCalledAsConst());
+            CHECK(uData.tag.empty());
+            scene.userData().tag = uDataValue;
+            CHECK(uData.tag == uDataValue);
+        };
+
+        SECTION("// valid - mutable") {
+            runValidTest(mContact222minusX, false);
+        }
+
+        SECTION("// valid - const") {
+            runValidTest(cmContact222minusX, true);
+        }
+
+        SECTION("// valid - immutable") {
+            runValidTest(iContact222minusX, true);
+        }
+
+        SECTION("// invalid") {
+            CHECK_THROWS_AS(invalidContact.commonUserData(), std::out_of_range);
+        }
+
+        SECTION("// invalidated") {
+            CHECK_THROWS_AS(invalidatedContact.commonUserData(), std::out_of_range);
+        }
+    }
+
     SECTION(".index()") {
         auto const expected = ContactIndex{ { 2,2,2 }, Direction::minusX() };
         CHECK(iContact222minusX.index() == expected);

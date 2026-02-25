@@ -34,6 +34,7 @@
 #include <gustave/cfg/LibTraits.hpp>
 #include <gustave/core/model/Stress.hpp>
 #include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/scenes/common/UserDataTraits.hpp>
 #include <gustave/core/scenes/cuboidGridScene/detail/SceneData.hpp>
 #include <gustave/core/scenes/cuboidGridScene/BlockReference.hpp>
 #include <gustave/core/scenes/cuboidGridScene/ContactIndex.hpp>
@@ -48,6 +49,8 @@ namespace gustave::core::scenes::cuboidGridScene {
     private:
         template<cfg::cLibConfig auto, common::cSceneUserData, bool>
         friend class ContactReference;
+
+        using UDTraits = common::UserDataTraits<UD_>;
 
         template<typename T>
         using Prop = utils::Prop<isMut_, T>;
@@ -71,6 +74,7 @@ namespace gustave::core::scenes::cuboidGridScene {
     public:
         using AsImmutable = ContactReference<libCfg, UD_, false>;
         using BlockIndex = cuboidGridScene::BlockIndex;
+        using CommonUserDataMember = UDTraits::CommonMember;
         using ContactIndex = cuboidGridScene::ContactIndex;
         using Direction = ContactIndex::Direction;
         using PressureStress = model::PressureStress<libCfg>;
@@ -163,6 +167,20 @@ namespace gustave::core::scenes::cuboidGridScene {
             requires (isMut_)
         {
             return AsImmutable{ structure_->sceneData(), index_ };
+        }
+
+        [[nodiscard]]
+        CommonUserDataMember& commonUserData()
+            requires (isMut_&& UDTraits::hasCommonUserData())
+        {
+            return doCommonUserData(*this);
+        }
+
+        [[nodiscard]]
+        CommonUserDataMember const& commonUserData() const
+            requires (UDTraits::hasCommonUserData())
+        {
+            return doCommonUserData(*this);
         }
 
         [[nodiscard]]
@@ -287,6 +305,14 @@ namespace gustave::core::scenes::cuboidGridScene {
             return (structure_ == rhs.structure_) && (index_ == rhs.index_);
         }
     private:
+        [[nodiscard]]
+        static auto doCommonUserData(meta::cCvRefOf<ContactReference> auto&& self) -> decltype(self.commonUserData()) {
+            if (!self.isValid()) {
+                throw self.invalidError();
+            }
+            return self.structure_->sceneData().userData();
+        }
+
         [[nodiscard]]
         static auto doLocalBlock(meta::cCvRefOf<ContactReference> auto&& self) {
             using Result = decltype(self.localBlock());
