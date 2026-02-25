@@ -101,6 +101,37 @@ TEST_CASE("core::scenes::cuboidGridScene::StructureReference") {
         }
     }
 
+    SECTION(".commonUserData()") {
+        auto const uDataValue = std::string_view{ "TestData" };
+
+        auto runTest = [&](auto&& structRef, bool expectedConst) {
+            auto&& uData = structRef.commonUserData();
+            CHECK(expectedConst == uData.isCalledAsConst());
+            CHECK(uData.tag.empty());
+            data.userData().tag = uDataValue;
+            CHECK(uData.tag == uDataValue);
+        };
+
+        SECTION("// mutable") {
+            runTest(ms3, false);
+        }
+
+        SECTION("// const") {
+            runTest(cms3, true);
+        }
+
+        SECTION("// immutable") {
+            runTest(is3, true);
+        }
+
+        SECTION("// invalid") {
+            Transaction t;
+            t.removeBlock({ 1,0,0 });
+            SceneUpdater{ data }.runTransaction(t);
+            CHECK_THROWS_AS(is1.commonUserData(), std::out_of_range);
+        }
+    }
+
     SECTION(".contacts()") {
         auto runTest = [&](auto&& structRef, bool expectedConst) {
             auto contact = structRef.contacts().at(ContactIndex{ {2,0,0}, Direction::plusX() });
