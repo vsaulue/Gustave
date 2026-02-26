@@ -317,7 +317,7 @@ namespace gustave::core::worlds::syncWorld {
     private:
         [[nodiscard]]
         WorldData const& world() const {
-            return sceneStructRef_.userData().world();
+            return sceneStructRef_.commonUserData().world();
         }
 
         SceneStructureReference sceneStructRef_;

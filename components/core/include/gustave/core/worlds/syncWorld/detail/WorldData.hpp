@@ -85,9 +85,6 @@ namespace gustave::core::worlds::syncWorld::detail {
     private:
         void resetWorldDataPtr() {
             scene.userData().setWorld(*this);
-            for (auto structure : scene.structures()) {
-                structure.userData().setWorldData(*this);
-            }
         }
     };
 }
