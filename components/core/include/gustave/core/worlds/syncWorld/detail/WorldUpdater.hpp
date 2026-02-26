@@ -48,7 +48,6 @@ namespace gustave::core::worlds::syncWorld::detail {
             TransactionResult const result = data_.scene.modify(transaction);
             for (auto const& structureId : result.newStructures()) {
                 auto structure = data_.scene.structures().at(structureId);
-                structure.userData().init(data_);
                 auto const solverResult = data_.solver.run(structure.solverStructurePtr());
                 structure.userData().solve(solverResult.solutionPtr());
             }

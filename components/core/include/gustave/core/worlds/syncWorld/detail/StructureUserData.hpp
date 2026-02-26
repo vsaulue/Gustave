@@ -39,23 +39,15 @@ namespace gustave::core::worlds::syncWorld::detail {
     public:
         using Solver = solvers::Force1Solver<libCfg_>;
         using State = StructureState;
-        using WorldData = detail::WorldData<libCfg_>;
 
         using Solution = Solver::Solution;
         using SolverStructure = Solver::Structure;
 
         [[nodiscard]]
         StructureUserData()
-            : world_{ nullptr }
-            , solution_{ nullptr }
+            : solution_{ nullptr }
             , state_{ State::New }
         {}
-
-        void init(WorldData& world) {
-            assert(state_ == State::New);
-            assert(world_ == nullptr);
-            world_ = &world;
-        }
 
         [[nodiscard]]
         Solution const& solution() const {
@@ -68,7 +60,6 @@ namespace gustave::core::worlds::syncWorld::detail {
         void solve(std::shared_ptr<Solution const> solution) {
             assert(state_ == State::New);
             if (solution != nullptr) {
-                assert(&solution->basis().config() == &world_->solver.config());
                 solution_ = std::move(solution);
                 state_ = State::Solved;
             } else {
@@ -80,17 +71,7 @@ namespace gustave::core::worlds::syncWorld::detail {
         State state() const {
             return state_;
         }
-
-        void setWorldData(WorldData& value) {
-            world_ = &value;
-        }
-
-        [[nodiscard]]
-        WorldData const& world() const {
-            return *world_;
-        }
     private:
-        utils::prop::Ptr<WorldData> world_;
         std::shared_ptr<Solution const> solution_;
         State state_;
     };
