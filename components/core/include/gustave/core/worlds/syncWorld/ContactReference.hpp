@@ -62,13 +62,16 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         explicit ContactReference(WorldData const& world, ContactIndex const& index)
             : sceneContact_{ world.scene.contacts().find(index) }
-            , world_{ &world }
+        {}
+
+        [[nodiscard]]
+        explicit ContactReference(SceneContact sceneContact)
+            : sceneContact_{ std::move(sceneContact) }
         {}
 
         [[nodiscard]]
         explicit ContactReference(utils::NoInit NO_INIT)
             : sceneContact_{ NO_INIT }
-            , world_{ nullptr }
         {}
 
         [[nodiscard]]
@@ -124,7 +127,7 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         BlockReference localBlock() const {
-            return BlockReference{ *world_, sceneContact_.localBlock().index() };
+            return BlockReference{ sceneContact_.localBlock() };
         }
 
         [[nodiscard]]
@@ -139,18 +142,12 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         ContactReference opposite() const {
-            std::optional<ContactIndex> oppositeId = sceneContact_.index().opposite();
-            if (!oppositeId) {
-                std::stringstream msg;
-                msg << "Invalid contact index: " << sceneContact_.index() << ".";
-                throw std::out_of_range(msg.str());
-            }
-            return ContactReference{ *world_, *oppositeId };
+            return ContactReference{ sceneContact_.opposite() };
         }
 
         [[nodiscard]]
         BlockReference otherBlock() const {
-            return BlockReference{ *world_, sceneContact_.otherBlock().index() };
+            return BlockReference{ sceneContact_.otherBlock() };
         }
 
         [[nodiscard]]
@@ -165,14 +162,12 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         StructureReference structure() const {
-            auto sceneStructure = sceneContact_.structure();
-            return StructureReference{ *world_, sceneStructure.index() };
+            return StructureReference{ sceneContact_.structure() };
         }
 
         [[nodiscard]]
         bool operator==(ContactReference const&) const = default;
     private:
         SceneContact sceneContact_;
-        WorldData const* world_;
     };
 }
