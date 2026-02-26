@@ -33,6 +33,8 @@ namespace gustave::core::worlds::syncWorld {
     class Contacts {
     private:
         using WorldData = detail::WorldData<libCfg>;
+
+        using SceneContacts = WorldData::Scene::template Contacts<false>;
     public:
         using ContactReference = syncWorld::ContactReference<libCfg>;
 
@@ -40,23 +42,19 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         explicit Contacts(WorldData const& world)
-            : world_{ &world }
+            : sceneContacts_{ world.scene.contacts() }
         {}
 
         [[nodiscard]]
         ContactReference at(ContactIndex const& index) const {
-            ContactReference result{ *world_, index };
-            if (!result.isValid()) {
-                throw result.invalidError();
-            }
-            return result;
+            return ContactReference{ sceneContacts_.at(index) };
         }
 
         [[nodiscard]]
         ContactReference find(ContactIndex const& index) const {
-            return ContactReference{ *world_, index };
+            return ContactReference{ sceneContacts_.find(index) };
         }
     private:
-        WorldData const* world_;
+        SceneContacts sceneContacts_;
     };
 }

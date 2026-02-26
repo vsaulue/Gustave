@@ -73,7 +73,14 @@ TEST_CASE("core::worlds::syncWorld::Contacts") {
     }
 
     SECTION(".find()") {
-        auto contact = contacts.find(ContactIndex{ {2,1,2}, Direction::plusY() });
-        CHECK_THAT(contact.forceVector(), matchers::WithinRel(blockMass * g, solverPrecision));
+        SECTION("// valid") {
+            auto contact = contacts.find(ContactIndex{ {2,1,2}, Direction::plusY() });
+            CHECK_THAT(contact.forceVector(), matchers::WithinRel(blockMass * g, solverPrecision));
+        }
+
+        SECTION("// invalid") {
+            auto contact = contacts.find(ContactIndex{ {2,1,2}, Direction::plusX() });
+            CHECK_FALSE(contact.isValid());
+        }
     }
 }
