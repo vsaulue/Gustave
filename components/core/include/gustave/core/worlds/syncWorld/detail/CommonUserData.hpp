@@ -26,26 +26,29 @@
 #pragma once
 
 #include <gustave/cfg/cLibConfig.hpp>
-#include <gustave/core/scenes/common/cSceneUserData.hpp>
+#include <gustave/core/worlds/syncWorld/forwardDecls.hpp>
+#include <gustave/utils/Prop.hpp>
 
-namespace gustave::core::worlds::syncWorld {
-    namespace detail {
-        template<cfg::cLibConfig auto>
-        class CommonUserData;
+namespace gustave::core::worlds::syncWorld::detail {
+    template<cfg::cLibConfig auto libCfg_>
+    class CommonUserData {
+    public:
+        using WorldData = detail::WorldData<libCfg_>;
 
-        template<cfg::cLibConfig auto>
-        class StructureUserData;
+        [[nodiscard]]
+        CommonUserData()
+            : world_{ nullptr }
+        {}
 
-        template<cfg::cLibConfig auto>
-        struct WorldData;
-    }
+        void setWorld(WorldData& value) {
+            world_ = &value;
+        }
 
-    template<cfg::cLibConfig auto>
-    class BlockReference;
-
-    template<cfg::cLibConfig auto>
-    class StructureReference;
-
-    template<cfg::cLibConfig auto>
-    class ContactReference;
+        [[nodiscard]]
+        WorldData const& world() const {
+            return *world_;
+        }
+    private:
+        utils::prop::Ptr<WorldData> world_;
+    };
 }

@@ -29,6 +29,7 @@
 
 #include <gustave/cfg/cLibConfig.hpp>
 #include <gustave/core/scenes/CuboidGridScene.hpp>
+#include <gustave/core/worlds/syncWorld/detail/CommonUserData.hpp>
 #include <gustave/core/worlds/syncWorld/detail/StructureUserData.hpp>
 #include <gustave/core/worlds/syncWorld/StructureState.hpp>
 
@@ -43,7 +44,7 @@ namespace gustave::core::worlds::syncWorld::detail {
 
         struct SceneUserData {
             using Block = void;
-            using Common = void;
+            using Common = CommonUserData<libCfg>;
             using Structure = StructureUserData<libCfg>;
         };
     public:
@@ -55,7 +56,9 @@ namespace gustave::core::worlds::syncWorld::detail {
         explicit WorldData(Vector3<u.length> const& blockSize, Solver solver_)
             : scene{ blockSize }
             , solver{ std::move(solver_) }
-        {}
+        {
+            scene.userData().setWorld(*this);
+        }
 
         WorldData(WorldData const&) = delete;
         WorldData& operator=(WorldData const&) = delete;
@@ -81,6 +84,7 @@ namespace gustave::core::worlds::syncWorld::detail {
         Solver solver;
     private:
         void resetWorldDataPtr() {
+            scene.userData().setWorld(*this);
             for (auto structure : scene.structures()) {
                 structure.userData().setWorldData(*this);
             }
