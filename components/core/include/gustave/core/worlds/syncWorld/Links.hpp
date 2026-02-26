@@ -48,22 +48,16 @@ namespace gustave::core::worlds::syncWorld {
             [[nodiscard]]
             Enumerator()
                 : links_{ nullptr }
-                , sceneIt_{}
-                , value_{ utils::NO_INIT }
             {}
 
             [[nodiscard]]
             explicit Enumerator(Links const& links)
                 : links_{ &links }
                 , sceneIt_{ links.sceneLinks_.begin() }
-                , value_{ utils::NO_INIT }
-            {
-                updateValue();
-            }
+            {}
 
             void operator++() {
                 ++sceneIt_;
-                updateValue();
             }
 
             [[nodiscard]]
@@ -72,8 +66,8 @@ namespace gustave::core::worlds::syncWorld {
             }
 
             [[nodiscard]]
-            ContactReference const& operator*() const {
-                return value_;
+            ContactReference operator*() const {
+                return ContactReference{ *sceneIt_ };
             }
 
             [[nodiscard]]
@@ -81,23 +75,15 @@ namespace gustave::core::worlds::syncWorld {
                 return sceneIt_ == other.sceneIt_;
             }
         private:
-            void updateValue() {
-                if (!isEnd()) {
-                    value_ = ContactReference{ *links_->world_, (*sceneIt_).index() };
-                }
-            }
-
             Links const* links_;
             SceneIterator sceneIt_;
-            ContactReference value_;
         };
     public:
         using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Links(WorldData const& world)
-            : world_{ &world }
-            , sceneLinks_{ world.scene.links() }
+            : sceneLinks_{ world.scene.links() }
         {}
 
         [[nodiscard]]
@@ -110,7 +96,6 @@ namespace gustave::core::worlds::syncWorld {
             return {};
         }
     private:
-        WorldData const* world_;
         SceneLinks sceneLinks_;
     };
 }
