@@ -46,6 +46,10 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldData") {
     auto b1 = world1.scene.blocks().at({ 1,1,1 });
     b1.structures().unique().userData().init(world1);
 
+    SECTION("// constructor") {
+        CHECK(&world1 == &world1.scene.userData().world());
+    }
+
     SECTION("// move") {
         auto checkMovedWorld = [&](WorldData const& movedWorld) {
             CHECK(std::ranges::all_of(movedWorld.scene.structures(), [&](auto&& structRef) {
@@ -53,6 +57,7 @@ TEST_CASE("core::worlds::syncWorld::detail::WorldData") {
             }));
             CHECK(movedWorld.scene.blocks().size() == 1);
             CHECK(movedWorld.solver.config().targetMaxError() == solver.config().targetMaxError());
+            CHECK(&movedWorld == &movedWorld.scene.userData().world());
         };
 
         SECTION("// assign") {
