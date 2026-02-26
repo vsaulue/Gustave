@@ -56,48 +56,41 @@ namespace gustave::core::worlds::syncWorld {
             [[nodiscard]]
             explicit Enumerator(Blocks const& blocks)
                 : blocks_{ &blocks }
-                , sceneIterator_{ blocks_->sceneBlocks_.begin() }
+                , sceneIt_{ blocks_->sceneBlocks_.begin() }
             {}
 
             BlockReference operator*() const {
-                return BlockReference{ *blocks_->world_, (*sceneIterator_).index() };;
+                return BlockReference{ *sceneIt_ };
             }
 
             void operator++() {
-                ++sceneIterator_;
+                ++sceneIt_;
             }
 
             [[nodiscard]]
             bool isEnd() const {
-                return sceneIterator_ == blocks_->sceneBlocks_.end();
+                return sceneIt_ == blocks_->sceneBlocks_.end();
             }
 
             [[nodiscard]]
             bool operator==(Enumerator const& other) const {
-                return sceneIterator_ == other.sceneIterator_;
+                return sceneIt_ == other.sceneIt_;
             }
         private:
             Blocks const* blocks_;
-            SceneIterator sceneIterator_;
+            SceneIterator sceneIt_;
         };
     public:
         using Iterator = utils::ForwardIterator<Enumerator>;
 
         [[nodiscard]]
         explicit Blocks(WorldData const& data)
-            : world_{ &data }
-            , sceneBlocks_{ data.scene.blocks() }
+            : sceneBlocks_{ data.scene.blocks() }
         {}
 
         [[nodiscard]]
         BlockReference at(BlockIndex const& index) const {
-            BlockReference result{ *world_, index };
-            if (!result.isValid()) {
-                std::stringstream msg;
-                msg << "No block at index " << index << ".";
-                throw std::out_of_range(msg.str());
-            }
-            return result;
+            return BlockReference{ sceneBlocks_.at(index) };
         }
 
         [[nodiscard]]
@@ -112,7 +105,7 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         BlockReference find(BlockIndex const& index) const {
-            return BlockReference{ *world_, index };
+            return BlockReference{ sceneBlocks_.find(index) };
         }
 
         [[nodiscard]]
@@ -120,7 +113,6 @@ namespace gustave::core::worlds::syncWorld {
             return sceneBlocks_.size();
         }
     private:
-        WorldData const* world_;
         SceneBlocks sceneBlocks_;
     };
 }
