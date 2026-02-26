@@ -87,16 +87,11 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         explicit Structures(WorldData const& world)
             : sceneStructs_{ world.scene.structures() }
-            , world_{ &world }
         {}
 
         [[nodiscard]]
         StructureReference at(StructureIndex index) const {
-            auto const result = StructureReference{ *world_, index };
-            if (!result.isValid()) {
-                throw result.invalidError();
-            }
-            return result;
+            return StructureReference{ sceneStructs_.at(index) };
         }
 
         [[nodiscard]]
@@ -120,6 +115,5 @@ namespace gustave::core::worlds::syncWorld {
         }
     private:
         SceneStructures sceneStructs_;
-        WorldData const* world_;
     };
 }
