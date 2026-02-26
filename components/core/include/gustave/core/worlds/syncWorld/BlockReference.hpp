@@ -85,7 +85,7 @@ namespace gustave::core::worlds::syncWorld {
 
                 [[nodiscard]]
                 ContactReference operator*() const {
-                    return ContactReference{ *contacts_->world_, (*sceneIt_).index() };
+                    return ContactReference{ *sceneIt_ };
                 }
 
                 void operator++() {
@@ -106,7 +106,6 @@ namespace gustave::core::worlds::syncWorld {
             [[nodiscard]]
             explicit Contacts(BlockReference const& block)
                 : sceneContacts_{ block.sceneBlock_.contacts() }
-                , world_{ block.world_ }
             {}
 
             [[nodiscard]]
@@ -120,7 +119,6 @@ namespace gustave::core::worlds::syncWorld {
             }
         private:
             SceneContacts sceneContacts_;
-            WorldData const* world_;
         };
 
         class Structures {
@@ -203,13 +201,16 @@ namespace gustave::core::worlds::syncWorld {
         [[nodiscard]]
         explicit BlockReference(WorldData const& world, BlockIndex const& index)
             : sceneBlock_{ world.scene.blocks().find(index) }
-            , world_{ &world }
+        {}
+
+        [[nodiscard]]
+        explicit BlockReference(SceneBlock sceneBlock)
+            : sceneBlock_{ std::move(sceneBlock) }
         {}
 
         [[nodiscard]]
         explicit BlockReference(utils::NoInit NO_INIT)
             : sceneBlock_{ NO_INIT }
-            , world_{ nullptr }
         {}
 
         [[nodiscard]]
@@ -273,6 +274,5 @@ namespace gustave::core::worlds::syncWorld {
         bool operator==(BlockReference const&) const = default;
     private:
         SceneBlock sceneBlock_;
-        WorldData const* world_;
     };
 }
