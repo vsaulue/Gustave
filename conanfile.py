@@ -80,7 +80,6 @@ class GustaveRecipe(ConanFile):
             self.test_requires("catch2/3.6.0")
         if self._toolsEnabled():
             self.test_requires("nlohmann_json/3.11.3")
-            self.test_requires("svgwrite/0.2.0")
             self.test_requires("tinyxml2/11.0.0")
         if self._toolsEnabled() or self._tutorialsEnabled():
             self.test_requires("cli11/2.4.2")
