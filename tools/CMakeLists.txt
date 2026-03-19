@@ -25,7 +25,6 @@
 if(GUSTAVE_BUILD_TOOLS)
     find_package(CLI11 CONFIG REQUIRED)
     find_package(nlohmann_json CONFIG REQUIRED)
-    find_package(svgwrite CONFIG REQUIRED)
     find_package(tinyxml2 CONFIG REQUIRED)
 
 
