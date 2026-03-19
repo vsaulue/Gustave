@@ -106,26 +106,26 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         }
 
         void renderBlocks(SvgPhaseCanvas& canvas, Float yStart, Float yStep, std::string const& blockStrokeColor) const {
-            canvas.startGroup({ {"stroke-width",1}, { "stroke", blockStrokeColor }, {"fill-opacity",0.f} });
+            auto svgGroup = canvas.svgGroup({ {"stroke-width",1}, { "stroke", blockStrokeColor }, {"fill-opacity",0.f} });
             canvas.drawLegendBlock(xMin_, yStart, {});
             canvas.drawLegendBlock(xMin_, yStart + yStep, {});
-            canvas.endGroup();
+            svgGroup.close();
         }
 
         void renderContacts(SvgPhaseCanvas& canvas, Float yStart, Float yStep) const {
             std::string const fillColorCode = contactFillColor_.svgCode();
             std::string const strokeColorCode = contactStrokeColor_.svgCode();
-            canvas.startGroup({ {"stroke-width", contactStrokeWidth_}, {"stroke",strokeColorCode}, {"fill",fillColorCode} });
+            auto svgGroup = canvas.svgGroup({ {"stroke-width", contactStrokeWidth_}, {"stroke",strokeColorCode}, {"fill",fillColorCode} });
             canvas.drawLegendContactArrow(xMin_, yStart, 0.f, {});
             canvas.drawLegendContactArrow(xMin_, yStart + yStep, 1.f, {});
-            canvas.endGroup();
+            svgGroup.close();
         }
 
         void renderLabels(SvgPhaseCanvas& canvas, Float xMin, Float yStart, Float yStep, Float labelSize, std::string const& textColor) const {
-            canvas.startGroup({ {"font-size",labelSize},{"fill",textColor} });
+            auto svgGroup = canvas.svgGroup({ {"font-size",labelSize},{"fill",textColor} });
             canvas.drawLegendText(xMin, yStart, minLabel_, {});
             canvas.drawLegendText(xMin, yStart + yStep, maxLabel_, {});
-            canvas.endGroup();
+            svgGroup.close();
         }
 
         void renderTitle(SvgPhaseCanvas& canvas, Float titleSize, std::string const& textColor) const {

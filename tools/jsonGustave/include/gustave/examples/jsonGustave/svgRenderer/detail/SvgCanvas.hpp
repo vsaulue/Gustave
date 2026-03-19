@@ -26,9 +26,9 @@
 #pragma once
 
 #include <concepts>
+#include <cstdio>
 #include <span>
-
-#include <svgwrite/writer.hpp>
+#include <variant>
 
 #include <gustave/core/cGustave.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvasContext.hpp>
@@ -38,6 +38,7 @@
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgWorldBox.hpp>
 #include <gustave/examples/jsonGustave/svgRenderer/Config.hpp>
 #include <gustave/examples/jsonGustave/JsonWorld.hpp>
+#include <gustave/examples/jsonGustave/XmlWriter.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
@@ -59,36 +60,16 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
 
         using SvgWorldBox = detail::SvgWorldBox<G>;
     public:
-        class Attrs {
-        public:
-            using AttrsSpan = std::span<svgw::attr const>;
-
-            [[nodiscard]]
-            Attrs(std::initializer_list<svgw::attr> attrs)
-                : attrs_{ attrs }
-            {}
-
-            [[nodiscard]]
-            Attrs(std::convertible_to<AttrsSpan> auto&& attrs)
-                : attrs_{ std::forward<decltype(attrs)>(attrs) }
-            {}
-
-            [[nodiscard]]
-            operator AttrsSpan() const {
-                return attrs_;
-            }
-        private:
-            AttrsSpan attrs_;
-        };
+        using XmlAttr = XmlWriter::Attr;
+        using XmlAttrs = XmlWriter::Attrs;
+        using XmlElement = XmlWriter::Element;
 
         [[nodiscard]]
-        explicit SvgCanvas(SvgCanvasContext const& ctx, SvgDims const& legendDims, std::ostream& output)
+        explicit SvgCanvas(SvgCanvasContext const& ctx, SvgDims const& legendDims, std::FILE* output)
             : ctx_{ ctx }
-            , output_{ output }
             , worldBox_{ ctx }
-            , writer_{ output }
-            , groupCount_{ 0 }
-            , finalized_{ false }
+            , xmlWriter_{ output, true }
+            , xmlRoot_{ xmlWriter_.newRootElement("svg") }
         {
             for (auto const& block : ctx.world().syncWorld().blocks()) {
                 if (block.index().z != 0) {
@@ -100,7 +81,11 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             SvgRect const worldRect = worldBox_.boxCoordinates();
             Float const svgWidth = std::max(worldRect.width(), legendDims.width());
             Float const svgHeight = worldRect.height() + legendDims.height();
-            writer_.start_svg(svgWidth, svgHeight);
+            xmlRoot_.attr("xmlns", "http://www.w3.org/2000/svg");
+            xmlRoot_.attr("xmlns:xlink", "http://www.w3.org/1999/xlink");
+            xmlRoot_.attr("version", "1.1");
+            xmlRoot_.attr("width", svgWidth);
+            xmlRoot_.attr("height", svgHeight);
         }
 
         SvgCanvas(SvgCanvas const&) = delete;
@@ -108,103 +93,94 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
 
         [[nodiscard]]
         std::string defLinearGradient(SvgLinearGradient const& grad) {
-            writer_.start_defs();
-            std::string defId = std::format("linGrad_{}", nextDefId_);
+            auto defId = std::format("linGrad_{}", nextDefId_);
             ++nextDefId_;
-            std::string rawSvg = std::format(R"(<linearGradient id="{}" x1="{}" x2="{}" y1="{}" y2="{}">)",
-                defId, grad.x1(), grad.x2(), grad.y1(), grad.y2()
-            );
-            writer_.write(rawSvg);
+            auto xmlDefs = xmlElement("defs");
+            auto xmlLinGrad = xmlDefs.newElement("linearGradient");
+            xmlLinGrad.attr("id", defId);
+            xmlLinGrad.attr("x1", grad.x1());
+            xmlLinGrad.attr("x2", grad.x2());
+            xmlLinGrad.attr("y1", grad.y1());
+            xmlLinGrad.attr("y2", grad.y2());
             for (auto const& stop : grad.stops()) {
-                rawSvg = std::format(R"(<stop offset="{}" stop-color="{}" />)", stop.offset, stop.color.svgCode());
-                writer_.write(rawSvg);
+                auto xmlStop = xmlLinGrad.newElement("stop");
+                xmlStop.attr("offset", stop.offset);
+                xmlStop.attr("stop-color", stop.color.svgCode());
+                xmlStop.close();
             }
-            writer_.write("</linearGradient>");
-            writer_.end_defs();
+            xmlLinGrad.close();
+            xmlDefs.close();
             return defId;
         }
 
-        void drawLegendBlock(Float xMin, Float yMin, Attrs attrs) {
-            throwIfFinalized();
+        void drawLegendBlock(Float xMin, Float yMin, XmlAttrs attrs) {
+            throwIfClosed();
             auto const coords = SvgRect{ xMin, yMin, ctx_.svgBlockWidth(), ctx_.svgBlockHeight() };
-            drawBlock(coords, attrs);
+            svgRect(coords, attrs);
         }
 
-        void drawLegendContactArrow(Float xMin, Float yMin, Float lengthRatio, Attrs attrs) {
-            throwIfFinalized();
+        void drawLegendContactArrow(Float xMin, Float yMin, Float lengthRatio, XmlAttrs attrs) {
+            throwIfClosed();
             auto const blockCoords = SvgRect{ xMin, yMin, ctx_.svgBlockWidth(), ctx_.svgBlockHeight() };
             drawContactArrow(blockCoords, Direction::minusX(), lengthRatio, attrs);
         }
 
-        void drawLegendLine(Float x1, Float y1, Float x2, Float y2, Attrs attrs) {
-            throwIfFinalized();
-            writer_.line(x1, y1, x2, y2, attrs);
+        void drawLegendLine(Float x1, Float y1, Float x2, Float y2, XmlAttrs attrs) {
+            throwIfClosed();
+            svgLine(x1, y1, x2, y2, attrs);
         }
 
-        void drawLegendRect(SvgRect const& rect, Attrs attrs) {
-            throwIfFinalized();
-            writer_.rect(rect.xMin(), rect.yMin(), rect.width(), rect.height(), attrs);
+        void drawLegendRect(SvgRect const& rect, XmlAttrs attrs) {
+            throwIfClosed();
+            svgRect(rect, attrs);
         }
 
-        void drawLegendText(Float xMin, Float yMax, std::string_view text, Attrs attrs) {
-            throwIfFinalized();
-            writer_.text(xMin, yMax, text, attrs);
+        void drawLegendText(Float xMin, Float yMax, CStringView text, XmlAttrs attrs) {
+            throwIfClosed();
+            svgText(xMin, yMax, text, attrs);
         }
 
-        void drawWorldBlock(SyncWorld::BlockReference const& block, Attrs attrs) {
-            throwIfFinalized();
+        void drawWorldBlock(SyncWorld::BlockReference const& block, XmlAttrs attrs) {
+            throwIfClosed();
             auto const coords = worldBox_.blockCoordinates(block.index());
-            drawBlock(coords, attrs);
+            svgRect(coords, attrs);
         }
 
-        void drawWorldContactArrow(SyncWorld::ContactReference const& contact, Float lengthRatio, Attrs attrs) {
-            throwIfFinalized();
+        void drawWorldContactArrow(SyncWorld::ContactReference const& contact, Float lengthRatio, XmlAttrs attrs) {
+            throwIfClosed();
             auto const blockCoords = worldBox_.blockCoordinates(contact.localBlock().index());
             auto const direction = contact.index().direction();
             drawContactArrow(blockCoords, direction, lengthRatio, attrs);
         }
 
-        void drawWorldFrame(Attrs attrs) {
-            throwIfFinalized();
-            SvgRect const box = worldBox_.boxCoordinates();
-            writer_.rect(box.xMin(), box.yMin(), box.width(), box.height(), attrs);
-        }
-
-        void endGroup() {
-            throwIfFinalized();
-            if (groupCount_ == 0) {
-                throw std::logic_error("Invalid endGroup(): no group to close.");
-            }
-            --groupCount_;
-            writer_.end_g();
+        void drawWorldFrame(XmlAttrs attrs) {
+            throwIfClosed();
+            svgRect(worldBox_.boxCoordinates(), attrs);
         }
 
         void finalize() {
-            throwIfFinalized();
-            if (groupCount_ > 0) {
-                throw std::logic_error("Invalid finalize(): all groups aren't closed.");
-            }
-            finalized_ = true;
-            writer_.end_svg();
-            output_ << '\n';
+            throwIfClosed();
+            xmlRoot_.close();
         }
 
-        void hatchLegendBlock(Float xMin, Float yMin, Attrs attrs) {
-            throwIfFinalized();
+        void hatchLegendBlock(Float xMin, Float yMin, XmlAttrs attrs) {
+            throwIfClosed();
             auto const coords = SvgRect{ xMin, yMin, ctx_.svgBlockWidth(), ctx_.svgBlockHeight() };
             hatchBlock(coords, attrs);
         }
 
-        void hatchWorldBlock(SyncWorld::BlockReference const& block, Attrs attrs) {
-            throwIfFinalized();
+        void hatchWorldBlock(SyncWorld::BlockReference const& block, XmlAttrs attrs) {
+            throwIfClosed();
             auto const coords = worldBox_.blockCoordinates(block.index());
             hatchBlock(coords, attrs);
         }
 
-        void startGroup(Attrs attrs) {
-            throwIfFinalized();
-            writer_.start_g(attrs);
-            ++groupCount_;
+        [[nodiscard]]
+        XmlElement svgGroup(XmlAttrs attrs) {
+            throwIfClosed();
+            auto result = xmlElement("g");
+            result.attrs(attrs);
+            return result;
         }
 
         [[nodiscard]]
@@ -212,11 +188,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             return worldBox_;
         }
     private:
-        void drawBlock(SvgRect const& coords, Attrs attrs) {
-            writer_.rect(coords.xMin(), coords.yMin(), coords.width(), coords.height(), attrs);
-        }
-
-        void drawContactArrow(SvgRect const& blockCoords, Direction direction, Float lengthRatio, Attrs attrs) {
+        void drawContactArrow(SvgRect const& blockCoords, Direction direction, Float lengthRatio, XmlAttrs attrs) {
             Float const triangleFactor = ctx_.config().arrowTriangleFactor();
             Float const minDim = std::min(blockCoords.height(), blockCoords.width());
             Float const triangleSize = minDim * triangleFactor;
@@ -282,29 +254,64 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             }
             }
             path << " Z";
-            writer_.path(path.str(), attrs);
+            auto xmlPath = xmlElement("path");
+            xmlPath.attr("d", path.str());
+            xmlPath.attrs(attrs);
+            xmlPath.close();
         }
 
-        void hatchBlock(SvgRect const& coords, Attrs attrs) {
-            writer_.start_g(attrs);
-            writer_.line(coords.xMean(), coords.yMin(), coords.xMax(), coords.yMean());
-            writer_.line(coords.xMin(), coords.yMin(), coords.xMax(), coords.yMax());
-            writer_.line(coords.xMin(), coords.yMean(), coords.xMean(), coords.yMax());
-            writer_.end_g();
+        void hatchBlock(SvgRect const& coords, XmlAttrs attrs) {
+            auto xmlGroup = svgGroup(attrs);
+            svgLine(coords.xMean(), coords.yMin(), coords.xMax(), coords.yMean());
+            svgLine(coords.xMin(), coords.yMin(), coords.xMax(), coords.yMax());
+            svgLine(coords.xMin(), coords.yMean(), coords.xMean(), coords.yMax());
+            xmlGroup.close();
         }
 
-        void throwIfFinalized() const {
-            if (finalized_) {
-                throw std::logic_error("SvgCanvas finalized twice.");
+        void svgLine(Float x1, Float y1, Float x2, Float y2, XmlAttrs attrs = {}) {
+            auto xmlLine = xmlElement("line");
+            xmlLine.attr("x1", x1);
+            xmlLine.attr("y1", y1);
+            xmlLine.attr("x2", x2);
+            xmlLine.attr("y2", y2);
+            xmlLine.attrs(attrs);
+            xmlLine.close();
+        }
+
+        void svgRect(SvgRect const& rect, XmlAttrs attrs = {}) {
+            auto xmlRect = xmlElement("rect");
+            xmlRect.attr("x", rect.xMin());
+            xmlRect.attr("y", rect.yMin());
+            xmlRect.attr("width", rect.width());
+            xmlRect.attr("height", rect.height());
+            xmlRect.attrs(attrs);
+            xmlRect.close();
+        }
+
+        void svgText(Float x, Float y, CStringView text, XmlAttrs attrs) {
+            auto xmlText = xmlElement("text");
+            xmlText.attr("x", x);
+            xmlText.attr("y", y);
+            xmlText.attrs(attrs);
+            xmlText.text(text);
+            xmlText.close();
+        }
+
+        void throwIfClosed() const {
+            if (xmlRoot_.isClosed()) {
+                throw std::logic_error("SvgCanvas closed twice.");
             }
         }
 
+        [[nodiscard]]
+        XmlElement xmlElement(CStringView name) {
+            return xmlWriter_.newChildElement(name);
+        }
+
         SvgCanvasContext const& ctx_;
-        std::ostream& output_;
         SvgWorldBox worldBox_;
-        svgw::writer writer_;
+        XmlWriter xmlWriter_;
         std::size_t nextDefId_ = 0;
-        unsigned groupCount_;
-        bool finalized_;
+        XmlElement xmlRoot_;
     };
 }

@@ -82,7 +82,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
 
             void renderWorld(SvgPhaseCanvas& canvas) const override {
                 auto const g = NormalizedVector3{ this->syncWorld().g() };
-                canvas.startGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
+                auto svgGroup = canvas.svgGroup({ {"stroke", phase_.strokeColor_.svgCode() },{"stroke-width", phase_.strokeWidth_} });
                 for (auto const& structure : this->syncWorld().structures()) {
                     if (structure.isSolved()) {
                         for (auto const& contact : structure.links()) {
@@ -98,7 +98,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                         }
                     }
                 }
-                canvas.endGroup();
+                svgGroup.close();
             }
 
         private:
