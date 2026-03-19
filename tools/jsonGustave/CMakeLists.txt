@@ -27,6 +27,5 @@ target_include_directories(Examples-JsonWorld INTERFACE "include")
 target_link_libraries(Examples-JsonWorld
     INTERFACE Comp-Core
     INTERFACE nlohmann_json::nlohmann_json
-    INTERFACE svgwrite::svgwrite
     INTERFACE tinyxml2::tinyxml2
 )
