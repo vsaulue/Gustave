@@ -50,6 +50,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         using SvgPhaseCanvas = detail::SvgPhaseCanvas<G>;
         using SvgRect = detail::SvgRect<Float>;
     private:
+        using XmlAttr = SvgPhaseCanvas::XmlAttr;
         using SvgLinearGradient = detail::SvgLinearGradient<Float>;
 
         using GradientStop = SvgLinearGradient::Stop;
@@ -139,13 +140,13 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             Float const textSize = ctx_.config().legendTextSize();
             Float const xMax = xMin_ + scaleWidth + space;
             Float yOffset = yStart + 0.5f * textSize;
-            canvas.startGroup({ {"stroke", textColor}, {"stroke-width", 1.f} });
+            auto svgGroup = canvas.svgGroup({ {"stroke", textColor}, {"stroke-width", 1.f} });
             canvas.drawLegendLine(xMin_, yOffset, xMax, yOffset, {});
             for (GradientRect const& gRect : rects_) {
                 yOffset += gRect.height;
                 canvas.drawLegendLine(xMin_, yOffset, xMax, yOffset, {});
             }
-            canvas.endGroup();
+            svgGroup.close();
         }
 
         void renderLabels(SvgPhaseCanvas& canvas, Float yStart) const {
@@ -154,22 +155,22 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             auto const textColorCode = ctx_.config().legendTextColor().svgCode();
             Float const xOffset = xMin_ + ctx_.config().legendColorScaleWidth() + 2.f * space;
             Float yOffset = yStart + textSize;
-            canvas.startGroup({ {"font-size", textSize}, {"fill", textColorCode} });
+            auto svgGroup = canvas.svgGroup({ {"font-size", textSize}, {"fill", textColorCode} });
             canvas.drawLegendText(xOffset, yOffset, firstLabel_, {});
             for (GradientRect const& gRect : rects_) {
                 yOffset += gRect.height;
                 canvas.drawLegendText(xOffset, yOffset, gRect.endLabel, {});
             }
-            canvas.endGroup();
+            svgGroup.close();
         }
 
         void renderScale(SvgPhaseCanvas& canvas, Float yStart) const {
             Float const width = ctx_.config().legendColorScaleWidth();
             Float const extremityHeight = 0.5f * ctx_.config().legendTextSize();
             std::string color = firstColor_.svgCode();
-            std::array<svgw::attr, 1> attrs = { {
-                { "fill", color },
-            } };
+            auto attrs = std::array{
+                XmlAttr{ "fill", color },
+            };
             auto rect = SvgRect{ xMin_, yStart, width, extremityHeight };
             canvas.drawLegendRect(rect, attrs);
             std::array<GradientStop, 2> stops{ {

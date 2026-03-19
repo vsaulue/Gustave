@@ -25,19 +25,20 @@
 
 #pragma once
 
-#include <svgwrite/writer.hpp>
-
 #include <gustave/examples/jsonGustave/svgRenderer/detail/SvgCanvas.hpp>
 
 namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class SvgPhaseCanvas {
     public:
+        using CString = char const*;
         using Float = G::RealRep;
         using SvgCanvas = detail::SvgCanvas<G>;
         using SyncWorld = G::Worlds::SyncWorld;
 
-        using Attrs = SvgCanvas::Attrs;
+        using XmlAttr = SvgCanvas::XmlAttr;
+        using XmlAttrs = SvgCanvas::XmlAttrs;
+        using XmlElement = SvgCanvas::XmlElement;
         using BlockReference = SyncWorld::BlockReference;
         using ContactReference = SyncWorld::ContactReference;
         using SvgLinearGradient = SvgCanvas::SvgLinearGradient;
@@ -55,53 +56,54 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
             return canvas_.defLinearGradient(gradient);
         }
 
-        void drawLegendBlock(Float xMin, Float yMin, Attrs attrs) {
+        void drawLegendBlock(Float xMin, Float yMin, XmlAttrs attrs) {
             canvas_.drawLegendBlock(xMin + xLegendOffset_, yMin + yLegendOffset_, attrs);
         }
 
-        void drawLegendContactArrow(Float xMin, Float yMin, Float lengthFactor, Attrs attrs) {
+        void drawLegendContactArrow(Float xMin, Float yMin, Float lengthFactor, XmlAttrs attrs) {
             canvas_.drawLegendContactArrow(xMin + xLegendOffset_, yMin + yLegendOffset_, lengthFactor, attrs);
         }
 
-        void drawLegendLine(Float x1, Float y1, Float x2, Float y2, Attrs attrs) {
+        void drawLegendLine(Float x1, Float y1, Float x2, Float y2, XmlAttrs attrs) {
             canvas_.drawLegendLine(x1 + xLegendOffset_, y1 + yLegendOffset_, x2 + xLegendOffset_, y2 + yLegendOffset_, attrs);
         }
 
-        void drawLegendRect(SvgRect const& rect, Attrs attrs) {
+        void drawLegendRect(SvgRect const& rect, XmlAttrs attrs) {
             auto const absRect = SvgRect{ rect.xMin() + xLegendOffset_, rect.yMin() + yLegendOffset_, rect.width(), rect.height() };
             canvas_.drawLegendRect(absRect, attrs);
         }
 
-        void drawLegendText(Float xMin, Float yMin, std::string_view text, Attrs attrs) {
+        void drawLegendText(Float xMin, Float yMin, CString text, XmlAttrs attrs) {
             canvas_.drawLegendText(xMin + xLegendOffset_, yMin + yLegendOffset_, text, attrs);
         }
 
-        void drawWorldBlock(BlockReference const& block, Attrs attrs) {
+        void drawLegendText(Float xMin, Float yMin, std::string const& text, XmlAttrs attrs) {
+            canvas_.drawLegendText(xMin + xLegendOffset_, yMin + yLegendOffset_, text.c_str(), attrs);
+        }
+
+        void drawWorldBlock(BlockReference const& block, XmlAttrs attrs) {
             canvas_.drawWorldBlock(block, attrs);
         }
 
-        void drawWorldContactArrow(ContactReference const& contact, Float lengthRatio, Attrs attrs) {
+        void drawWorldContactArrow(ContactReference const& contact, Float lengthRatio, XmlAttrs attrs) {
             canvas_.drawWorldContactArrow(contact, lengthRatio, attrs);
         }
 
-        void drawWorldFrame(Attrs attrs) {
+        void drawWorldFrame(XmlAttrs attrs) {
             canvas_.drawWorldFrame(attrs);
         }
 
-        void endGroup() {
-            canvas_.endGroup();
-        }
-
-        void hatchLegendBlock(Float xMin, Float yMax, Attrs attrs) {
+        void hatchLegendBlock(Float xMin, Float yMax, XmlAttrs attrs) {
             canvas_.hatchLegendBlock(xMin + xLegendOffset_, yMax + yLegendOffset_, attrs);
         }
 
-        void hatchWorldBlock(BlockReference const& block, Attrs attrs) {
+        void hatchWorldBlock(BlockReference const& block, XmlAttrs attrs) {
             canvas_.hatchWorldBlock(block, attrs);
         }
 
-        void startGroup(Attrs attrs) {
-            canvas_.startGroup(attrs);
+        [[nodiscard]]
+        XmlElement svgGroup(XmlAttrs attrs) {
+            return canvas_.svgGroup(attrs);
         }
     private:
         SvgCanvas& canvas_;

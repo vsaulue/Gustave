@@ -84,7 +84,7 @@ namespace gustave::examples::jsonGustave {
             phases_.push_back(std::move(phase));
         }
 
-        void run(JsonWorld const& world, std::ostream& output) const {
+        void run(JsonWorld const& world, std::FILE* output) const {
             Float const space = config_.legendSpace();
             std::vector<std::unique_ptr<PhaseContext>> phaseContexts;
             phaseContexts.reserve(phases_.size());

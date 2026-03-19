@@ -75,7 +75,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
             }
 
             void renderWorld(SvgPhaseCanvas& canvas) const override {
-                canvas.startGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
+                auto svgGroup = canvas.svgGroup({ {"stroke", phase_.blockBorderColor_.svgCode()}, {"stroke-width", phase_.blockBorderWidth_} });
                 auto const hatchColorCode = phase_.foundationHatchColor_.svgCode();
                 for (auto const& block : this->syncWorld().blocks()) {
                     auto const stress = phase_.stressCoord_.extract(block.stressRatio()).value();
@@ -85,7 +85,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::phases {
                         canvas.hatchWorldBlock(block, { {"stroke", hatchColorCode },{"stroke-width", phase_.foundationHatchWidth_} });
                     }
                 }
-                canvas.endGroup();
+                svgGroup.close();
             }
         private:
             [[nodiscard]]

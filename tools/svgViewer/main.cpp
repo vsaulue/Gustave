@@ -107,12 +107,14 @@ static JG::SvgRenderer makeRenderer(std::optional<std::string> const& fileName) 
 int main(int argc, char* argv[]) {
     CLI::App argsParser{ "Gustave's SVG viewer." };
     try {
+        std::FILE* output = stdout;
         Arguments args;
         initArgumentsParser(argsParser, args);
         argsParser.parse(argc, argv);
         auto const renderer = makeRenderer(args.rendererFileName);
         auto const world = parseWorldFile(args.inputWorldFileName);
-        renderer.run(world, std::cout);
+        renderer.run(world, output);
+        std::fputc('\n', output);
         return EXIT_SUCCESS;
     } catch (CLI::ParseError const& e) {
         if (e.get_name() == "CallForHelp") {

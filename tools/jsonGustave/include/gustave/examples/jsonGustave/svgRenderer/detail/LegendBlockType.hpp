@@ -39,6 +39,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class LegendBlockType {
     public:
+        using CString = char const*;
         using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
@@ -100,23 +101,23 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     private:
         void renderBlocks(SvgPhaseCanvas& canvas, Float yStart, Float yStep) const {
             std::string const borderColorCode = blockBorderColor_.svgCode();
-            canvas.startGroup({ {"stroke",borderColorCode},{"stroke-width",blockBorderWidth_} });
+            auto svgGroup = canvas.svgGroup({ {"stroke",borderColorCode},{"stroke-width",blockBorderWidth_} });
             Float y = yStart;
             for (auto const& blockType : blockTypes_) {
                 canvas.drawLegendBlock(xMin_, y, { {"fill", blockType->color().svgCode()} });
                 y += yStep;
             }
-            canvas.endGroup();
+            svgGroup.close();
         }
 
         void renderLabels(SvgPhaseCanvas& canvas, Float x, Float yStart, Float yStep, Float textSize, std::string const& color) const {
-            canvas.startGroup({ {"fill",color},{"font-size",textSize} });
+            auto svgGroup = canvas.svgGroup({ {"fill",color},{"font-size",textSize} });
             Float y = yStart;
             for (auto const& blockType : blockTypes_) {
                 canvas.drawLegendText(x, y, blockType->name(), {});
                 y += yStep;
             }
-            canvas.endGroup();
+            svgGroup.close();
         }
 
         void renderTitle(SvgPhaseCanvas& canvas, Float titleSize, std::string const& color) const {
@@ -124,7 +125,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         }
 
         [[nodiscard]]
-        static std::string_view title() {
+        static constexpr CString title() {
             return "Block color (type/material):";
         }
 

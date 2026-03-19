@@ -37,6 +37,7 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
     template<core::cGustave G>
     class LegendBlockHatch {
     public:
+        using CString = char const*;
         using Float = G::RealRep;
 
         using Color = jsonGustave::Color<Float>;
@@ -91,12 +92,12 @@ namespace gustave::examples::jsonGustave::svgRenderer::detail {
         }
 
         [[nodiscard]]
-        static std::string_view label() {
+        static constexpr CString label() {
             return "Foundation";
         }
 
         [[nodiscard]]
-        static std::string_view title() {
+        static constexpr CString title() {
             return "Block hatching:";
         }
 
