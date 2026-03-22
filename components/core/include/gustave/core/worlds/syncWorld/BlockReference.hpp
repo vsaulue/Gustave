@@ -215,7 +215,7 @@ namespace gustave::core::worlds::syncWorld {
 
         [[nodiscard]]
         Vector3<u.length> const& blockSize() const
-            requires requires { this->sceneBlock_.blockSize(); }
+            requires requires (SceneBlock const& sb) { sb.blockSize(); }
         {
             return sceneBlock_.blockSize();
         }
