@@ -44,16 +44,16 @@ class GustaveRecipe(ConanFile):
     test_package_folder = "packaging/test_package"
 
     def _memcheckTestsEnabled(self) -> bool:
-        return self._testsEnabled() or self.conf.get("user.gustave:enable_memcheck_tests", default=True, check_type=bool)
+        return self._testsEnabled() and self.conf.get("user.gustave:enable_memcheck_tests", default=True, check_type=bool)
 
     def _packagingTestsEnabled(self) -> bool:
-        return self._testsEnabled() or self.conf.get("user.gustave:enable_packaging_tests", default=True, check_type=bool)
+        return self._testsEnabled() and self.conf.get("user.gustave:enable_packaging_tests", default=True, check_type=bool)
 
     def _docsEnabled(self) -> bool:
         return self.conf.get("user.gustave:build_docs", default=True, check_type=bool)
 
     def _testsEnabled(self) -> bool:
-        return self.conf.get("tools.build:skip_test", default=False)
+        return not self.conf.get("tools.build:skip_test", default=False)
 
     def _toolsEnabled(self) -> bool:
         return self.conf.get("user.gustave:build_tools", default=True, check_type=bool)
@@ -62,7 +62,7 @@ class GustaveRecipe(ConanFile):
         return self.conf.get("user.gustave:build_tutorials", default=True, check_type=bool)
 
     def _unitTestsEnabled(self) -> bool:
-        return self._testsEnabled() or self.conf.get("user.gustave:enable_unit_tests", default=True, check_type=bool)
+        return self._testsEnabled() and self.conf.get("user.gustave:enable_unit_tests", default=True, check_type=bool)
 
     def set_version(self):
         cmakeFilePath = os.path.join(self.recipe_folder, 'CMakeLists.txt')
