@@ -11,5 +11,5 @@ jobs:
       runner: ubuntu-24.04
       conan_pr_build: ./.github/conanProfiles/ubuntu24.txt
       conan_pr_host: ./.github/conanProfiles/linux-gcc13.txt
-      cmake_profile: conan-x86_64-linux-gcc-13
+      github_cache_key: linux-gcc-13
       compiler_name: gcc

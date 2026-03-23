@@ -88,7 +88,6 @@ class GustaveRecipe(ConanFile):
         check_min_cppstd(self, 20)
 
     def layout(self):
-        self.folders.build_folder_vars = ["settings.arch", "settings.os", "settings.compiler", "settings.compiler.version"]
         cmake_layout(self)
 
     def generate(self):

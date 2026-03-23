@@ -16,9 +16,9 @@ on:
         type: string
         description: "Path to the conan host profile (relative to source dir)"
         required: true
-      cmake_profile:
+      github_cache_key:
         type: string
-        description: "Name of the CMake build profile"
+        description: "String identifying the Github caches to use"
         required: true
       compiler_name:
         type: string
@@ -87,7 +87,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.conan2/p
-          key: ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
+          key: conan-cache-${{ inputs.github_cache_key }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] conan install"
         run: conan install . -pr:b=${{ inputs.conan_pr_build }} -pr:h=${{ inputs.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
@@ -95,7 +95,7 @@ jobs:
       - name: "[build] cmake config (windows)"
         if: ${{ contains(inputs.runner, 'windows') }}
         run: >
-          cmake . --preset ${{ inputs.cmake_profile }}
+          cmake . --preset conan-default
           -D "GUSTAVE_MEMCHECKER_PATH=${{ env.drMemory_base }}/bin64"
           -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ inputs.conan_pr_build }}"
           -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
@@ -104,30 +104,30 @@ jobs:
       - name: "[build] cmake config (ubuntu)"
         if: ${{ contains(inputs.runner, 'ubuntu') }}
         run: >
-          cmake . --preset ${{ inputs.cmake_profile }}
+          cmake . --preset conan-default
           -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ inputs.conan_pr_build }}"
           -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
           -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
 
       - name: "[build/setup] Install Python venvs"
-        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target venvs
+        run: cmake --build --preset conan-${{ steps.build_type.outputs.lowercase }} --target venvs
 
       - name: "[build] Build"
-        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }}
+        run: cmake --build --preset conan-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] Run unit tests"
-        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-unit-tests
+        run: cmake --build --preset conan-${{ steps.build_type.outputs.lowercase }} --target run-unit-tests
 
       - name: "[build] Run tool tests"
-        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tool-tests
+        run: cmake --build --preset conan-${{ steps.build_type.outputs.lowercase }} --target run-tool-tests
 
       - name: "[build] Run memcheck tests"
         # Disabled drMemory test (windows) because of too many false positives
         if: ${{ contains(inputs.runner, 'ubuntu') }}
-        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
+        run: cmake --build --preset conan-${{ steps.build_type.outputs.lowercase }} --target run-memcheck-tests
 
       - name: "[build] Run tutorials"
-        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-tutorials
+        run: cmake --build --preset conan-${{ steps.build_type.outputs.lowercase }} --target run-tutorials
 
       - name: "[build] Run packaging tests"
-        run: cmake --build --preset ${{ inputs.cmake_profile }}-${{ steps.build_type.outputs.lowercase }} --target run-packaging-tests
+        run: cmake --build --preset conan-${{ steps.build_type.outputs.lowercase }} --target run-packaging-tests
