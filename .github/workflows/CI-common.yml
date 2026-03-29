@@ -8,10 +8,6 @@ on:
         type: string
         description: 'The github runner for the workflow'
         required: true
-      conan_pr_build:
-        type: string
-        description: "Path to the conan build profile (relative to source dir)"
-        required: true
       conan_pr_host:
         type: string
         description: "Path to the conan host profile (relative to source dir)"
@@ -82,6 +78,7 @@ jobs:
         run: |
           pipx install conan
           pipx ensurepath
+          conan profile detect
 
       - name: "[setup] Cache conan packages"
         uses: actions/cache@v4
@@ -90,14 +87,13 @@ jobs:
           key: conan-cache-${{ inputs.github_cache_key }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] conan install"
-        run: conan install . -pr:b=${{ inputs.conan_pr_build }} -pr:h=${{ inputs.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
+        run: conan install . -pr:h=${{ inputs.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
 
       - name: "[build] cmake config (windows)"
         if: ${{ contains(inputs.runner, 'windows') }}
         run: >
           cmake . --preset conan-default
           -D "GUSTAVE_MEMCHECKER_PATH=${{ env.drMemory_base }}/bin64"
-          -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ inputs.conan_pr_build }}"
           -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
           -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
 
@@ -105,7 +101,6 @@ jobs:
         if: ${{ contains(inputs.runner, 'ubuntu') }}
         run: >
           cmake . --preset conan-default
-          -D "GUSTAVE_CONAN_BUILD_PROFILE=${{ inputs.conan_pr_build }}"
           -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
           -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
 

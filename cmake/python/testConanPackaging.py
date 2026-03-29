@@ -62,7 +62,6 @@ class TestConanPackaging(gu.GustaveScript):
         shutil.copytree(ctx.cmakeVars.folders.testPackage, tmpTestPackagePath)
 
         createCmd = [ conanExe, 'create', ctx.cmakeVars.folders.source,
-            '-pr:b', ctx.cmakeVars.conanProfiles.build,
             '-pr:h', ctx.cmakeVars.conanProfiles.host,
             '-s:h', f'build_type={ctx.cmakeVars.config}',
             '-c', 'tools.build:skip_test=True',
