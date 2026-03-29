@@ -12,14 +12,9 @@ on:
         type: string
         description: "Path to the conan host profile (relative to source dir)"
         required: true
-      github_cache_key:
+      toolchain_id:
         type: string
-        description: "String identifying the Github caches to use"
-        required: true
-      compiler_name:
-        type: string
-        description: "Name of the compiler (gcc/clang/msvc)"
-        required: true
+        description: "String identifying the toolchain: '${os}-${compiler}-${compilerVersion}' (ex: linux-gcc-13)"
 
 env:
   drMemory_base: '$HOME/drMemory'
@@ -52,20 +47,20 @@ jobs:
           string: ${{ matrix.build_type }}
 
       - name: "[setup] Enable MSVC"
-        if: ${{ contains(inputs.compiler_name, 'msvc') }}
+        if: ${{ contains(inputs.toolchain_id, 'msvc') }}
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: "[setup] Install vcpkg"
         run: python '.github/scripts/installVcpkg.py' --dest "${{ env.vcpkg_base }}"
 
       - name: "[setup] Install apt-get packages (ubuntu/clang)"
-        if: ${{ contains(inputs.runner, 'ubuntu') && inputs.compiler_name == 'clang' }}
+        if: ${{ contains(inputs.runner, 'ubuntu') && contains(inputs.toolchain_id, 'clang') }}
         run: |
           sudo apt update
           sudo apt install -y ninja-build libc++-17-dev valgrind
 
       - name: "[setup] Install apt-get packages (ubuntu/gcc)"
-        if: ${{ contains(inputs.runner, 'ubuntu') && inputs.compiler_name == 'gcc' }}
+        if: ${{ contains(inputs.runner, 'ubuntu') && contains(inputs.toolchain_id, 'gcc') }}
         run: |
           sudo apt update
           sudo apt install -y ninja-build valgrind
@@ -84,7 +79,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.conan2/p
-          key: conan-cache-${{ inputs.github_cache_key }}-${{ steps.build_type.outputs.lowercase }}
+          key: conan-cache-${{ inputs.toolchain_id }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] conan install"
         run: conan install . -pr:h=${{ inputs.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing

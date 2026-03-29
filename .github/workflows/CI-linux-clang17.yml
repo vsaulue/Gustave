@@ -10,5 +10,4 @@ jobs:
     with:
       runner: ubuntu-24.04
       conan_pr_host: ./.github/conanProfiles/linux-clang17.txt
-      github_cache_key: linux-clang-17
-      compiler_name: clang
+      toolchain_id: linux-clang-17

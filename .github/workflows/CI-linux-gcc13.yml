@@ -10,5 +10,4 @@ jobs:
     with:
       runner: ubuntu-24.04
       conan_pr_host: ./.github/conanProfiles/linux-gcc13.txt
-      github_cache_key: linux-gcc-13
-      compiler_name: gcc
+      toolchain_id: linux-gcc-13
