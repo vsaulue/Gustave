@@ -10,5 +10,4 @@ jobs:
     with:
       runner: windows-2022
       conan_pr_host: ./.github/conanProfiles/windows-msvc193.txt
-      github_cache_key: windows-msvc-193
-      compiler_name: msvc
+      toolchain_id: windows-msvc-193
