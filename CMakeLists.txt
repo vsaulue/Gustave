@@ -52,7 +52,6 @@ set(GUSTAVE_MEMCHECKER_PATH CACHE PATH "Path containing the memcheck program (va
 
 # Packaging tests settings
 set(GUSTAVE_CONAN_PATH CACHE PATH "Path to conan program (for packaging tests).")
-set(GUSTAVE_CONAN_BUILD_PROFILE CACHE STRING "Conan build profile (for packaging tests).")
 set(GUSTAVE_CONAN_HOST_PROFILE CACHE STRING "Conan host profile (for packaging tests).")
 set(GUSTAVE_VCPKG_ROOT CACHE STRING "Path to the vcpkg installation (for packaging tests).")
 

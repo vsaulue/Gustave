@@ -5,7 +5,6 @@
     },
     "colorDiagnostics": ${json_color_diagnostics},
     "conanProfiles": {
-        "build": "${GUSTAVE_CONAN_BUILD_PROFILE}",
         "host": "${GUSTAVE_CONAN_HOST_PROFILE}"
     },
     "config": "${json_config}",

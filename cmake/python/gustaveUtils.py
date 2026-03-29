@@ -581,9 +581,6 @@ class CMakeFolders(object):
 class CMakeConanProfiles(object):
     """Class holding the name/path of the conan profiles."""
 
-    _build: str
-    """Value of the `build` property."""
-
     _host: str
     """Value of the `host` property."""
 
@@ -592,16 +589,7 @@ class CMakeConanProfiles(object):
         :param jsonObject: Input JSON sub-object.
         :raises TypeError: if an unexpected type is found in the JSON.
         """
-        self._build = JsonUtils.getStr(jsonObject, 'build')
         self._host = JsonUtils.getStr(jsonObject, 'host')
-
-    @property
-    def build(self) -> str:
-        """Name (or path) of the Conan build profile."""
-        result = self._build
-        if result == '':
-            raise ValueError('"build" property is empty.')
-        return result
 
     @property
     def host(self) -> str:
