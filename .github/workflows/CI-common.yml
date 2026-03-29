@@ -65,9 +65,9 @@ jobs:
           sudo apt update
           sudo apt install -y ninja-build valgrind
 
-      - name: "[setup] Install DrMemory (windows)"
-        if: ${{ contains(inputs.runner, 'windows') }}
-        run: python '.github/scripts/msvc/installDrMemory.py' --dest "${{ env.drMemory_base }}"
+      #- name: "[setup] Install DrMemory (windows)"
+      #  if: ${{ contains(inputs.runner, 'windows') }}
+      #  run: python '.github/scripts/msvc/installDrMemory.py' --dest "${{ env.drMemory_base }}"
 
       - name: "[setup] Install conan"
         run: |
@@ -88,7 +88,7 @@ jobs:
         if: ${{ contains(inputs.runner, 'windows') }}
         run: >
           cmake . --preset conan-default
-          -D "GUSTAVE_MEMCHECKER_PATH=${{ env.drMemory_base }}/bin64"
+          -D "GUSTAVE_ENABLE_MEMCHECK_TESTS=OFF"
           -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
           -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
 

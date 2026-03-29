@@ -1,0 +1,20 @@
+---
+
+name: Windows MSVC
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  windows_msvc194:
+    uses: ./.github/workflows/CI-common.yml
+    with:
+      runner: windows-2022
+      conan_pr_host: ./.github/conanProfiles/windows-msvc194.txt
+      toolchain_id: windows-msvc-194
+
+  windows_msvc195:
+    uses: ./.github/workflows/CI-common.yml
+    with:
+      runner: windows-2025-vs2026
+      conan_pr_host: ./.github/conanProfiles/windows-msvc195.txt
+      toolchain_id: windows-msvc-195
