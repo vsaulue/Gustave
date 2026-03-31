@@ -1,6 +1,6 @@
 ---
 
-name: Linux clang-17
+name: Linux Clang
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -11,3 +11,10 @@ jobs:
       runner: ubuntu-24.04
       conan_pr_host: ./.github/conanProfiles/linux-clang17.txt
       toolchain_id: linux-clang-17
+
+  linux_clang21:
+    uses: ./.github/workflows/CI-common.yml
+    with:
+      runner: ubuntu-24.04
+      conan_pr_host: ./.github/conanProfiles/linux-clang21.txt
+      toolchain_id: linux-clang-21
