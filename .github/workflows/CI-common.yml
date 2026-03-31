@@ -53,17 +53,9 @@ jobs:
       - name: "[setup] Install vcpkg"
         run: python '.github/scripts/installVcpkg.py' --dest "${{ env.vcpkg_base }}"
 
-      - name: "[setup] Install apt-get packages (ubuntu/clang)"
-        if: ${{ contains(inputs.runner, 'ubuntu') && contains(inputs.toolchain_id, 'clang') }}
-        run: |
-          sudo apt update
-          sudo apt install -y ninja-build libc++-17-dev valgrind
-
-      - name: "[setup] Install apt-get packages (ubuntu/gcc)"
-        if: ${{ contains(inputs.runner, 'ubuntu') && contains(inputs.toolchain_id, 'gcc') }}
-        run: |
-          sudo apt update
-          sudo apt install -y ninja-build valgrind
+      - name: "[setup] Install Apt packages & C++ compiler (ubuntu)"
+        if: ${{ contains(inputs.runner, 'ubuntu') }}
+        run: python '.github/scripts/ubuntu/installAptPackages.py' --toolchainId "${{ inputs.toolchain_id }}"
 
       #- name: "[setup] Install DrMemory (windows)"
       #  if: ${{ contains(inputs.runner, 'windows') }}
