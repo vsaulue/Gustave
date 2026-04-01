@@ -26,7 +26,9 @@ import argparse
 import os
 import pathlib
 import re
+import shutil
 import subprocess
+import tempfile
 
 class ToolchainId:
     _osName: str
@@ -61,6 +63,16 @@ def runLlvmScript(version: int) -> None:
     subprocess.run(["chmod", "u+x", scriptPath], check=True)
     subprocess.run(["sudo", scriptPath, str(version)], check=True)
 
+def installXpackGcc(dirName: str, tarUrl: str) -> None:
+    homeDir = pathlib.Path.home()
+    compilerDir = os.path.join(homeDir, dirName)
+    shutil.rmtree(compilerDir, ignore_errors=True)
+    os.makedirs(compilerDir)
+    with tempfile.TemporaryDirectory() as tmpDir:
+        tarFilepath = os.path.join(tmpDir, "gcc-tarball")
+        subprocess.run(["wget", "-O", tarFilepath, tarUrl], check=True)
+        subprocess.run(["tar", "-xvzf", tarFilepath, "-C", compilerDir, "--strip-components=1"], check=True)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="installAptPackages", description="Install Apt packages and the C++ compiler for builds on Ubuntu.")
     parser.add_argument("--toolchainId", required=True, type=ToolchainId, help="Toolchain identifier (os-compilerName-compilerVersion)")
@@ -80,6 +92,8 @@ if __name__ == "__main__":
             pass
         elif compilerVersion == 14:
             pass
+        elif compilerVersion == 15:
+            installXpackGcc("xpack-gcc-15", "https://github.com/xpack-dev-tools/gcc-xpack/releases/download/v15.2.0-1/xpack-gcc-15.2.0-1-linux-x64.tar.gz")
         else:
             raise ValueError(f"Unsupported {compilerName} version: {compilerVersion}")
     elif compilerName == "clang":
