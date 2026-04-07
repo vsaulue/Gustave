@@ -11,6 +11,12 @@ on:
       toolchain_id:
         type: string
         description: "String identifying the toolchain: '${os}-${compiler}-${compilerVersion}' (ex: linux-gcc-13)"
+        required: true
+      build_type:
+        type: string
+        description: "Build type (Debug/Release)"
+        required: true
+
 
 env:
   conan_pr_host: "./.github/conanProfiles/${{ inputs.toolchain_id }}.txt"
@@ -20,16 +26,13 @@ env:
 jobs:
   ci_run:
     runs-on: ${{ inputs.runner }}
-    strategy:
-      matrix:
-        build_type: [Debug, Release]
     steps:
       - uses: actions/checkout@v4
 
       - id: build_type
         uses: ASzc/change-string-case-action@v6
         with:
-          string: ${{ matrix.build_type }}
+          string: ${{ inputs.build_type }}
 
       - name: "[setup] Enable MSVC"
         if: ${{ contains(inputs.toolchain_id, 'msvc') }}
@@ -59,7 +62,7 @@ jobs:
           key: conan-cache-${{ inputs.toolchain_id }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] conan install"
-        run: conan install . -pr:h=${{ env.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
+        run: conan install . -pr:h=${{ env.conan_pr_host }} -s:h build_type=${{ inputs.build_type }} --build=missing
 
       - name: "[build] cmake config (windows)"
         if: ${{ contains(inputs.runner, 'windows') }}
