@@ -1,0 +1,46 @@
+---
+name: CI workflow
+
+on:
+  workflow_call:
+    inputs:
+      min_runner:
+        type: string
+        description: 'The github runner for the minimum compiler version'
+        required: true
+      min_toolchain_id:
+        type: string
+        description: "${os}-${compiler}-${compilerVersion} for the minimum compiler version"
+      latest_runner:
+        type: string
+        description: 'The github runner for the latest compiler version'
+      latest_toolchain_id:
+        type: string
+        description: "${os}-${compiler}-${compilerVersion} for the latest compiler version"
+
+jobs:
+  skip_duplicate:
+    runs-on: ubuntu-24.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          skip_after_successful_duplicate: true
+
+  ci_min_compiler:
+    needs: skip_duplicate
+    if: ${{ !fromJSON(needs.skip_duplicate.outputs.should_skip) }}
+    uses: ./.github/workflows/CI-run.yml
+    with:
+      runner: ${{ inputs.min_runner }}
+      toolchain_id: ${{ inputs.min_toolchain_id }}
+
+  ci_latest_compiler:
+    needs: skip_duplicate
+    if: ${{ !fromJSON(needs.skip_duplicate.outputs.should_skip) }}
+    uses: ./.github/workflows/CI-run.yml
+    with:
+      runner: ${{ inputs.latest_runner }}
+      toolchain_id: ${{ inputs.latest_toolchain_id }}

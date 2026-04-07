@@ -18,20 +18,8 @@ env:
   vcpkg_base: '$HOME/vcpkg'
 
 jobs:
-  skip_duplicate:
-    runs-on: ubuntu-24.04
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@v5
-        with:
-          skip_after_successful_duplicate: true
-
-  ci_common:
+  ci_run:
     runs-on: ${{ inputs.runner }}
-    needs: skip_duplicate
-    if: ${{ !fromJSON(needs.skip_duplicate.outputs.should_skip) }}
     strategy:
       matrix:
         build_type: [Debug, Release]
