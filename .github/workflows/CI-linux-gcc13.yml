@@ -9,12 +9,10 @@ jobs:
     uses: ./.github/workflows/CI-common.yml
     with:
       runner: ubuntu-24.04
-      conan_pr_host: ./.github/conanProfiles/linux-gcc13.txt
       toolchain_id: linux-gcc-13
 
   linux_gcc15:
     uses: ./.github/workflows/CI-common.yml
     with:
       runner: ubuntu-24.04
-      conan_pr_host: ./.github/conanProfiles/linux-gcc15.txt
       toolchain_id: linux-gcc-15

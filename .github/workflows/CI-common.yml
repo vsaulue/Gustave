@@ -8,15 +8,12 @@ on:
         type: string
         description: 'The github runner for the workflow'
         required: true
-      conan_pr_host:
-        type: string
-        description: "Path to the conan host profile (relative to source dir)"
-        required: true
       toolchain_id:
         type: string
         description: "String identifying the toolchain: '${os}-${compiler}-${compilerVersion}' (ex: linux-gcc-13)"
 
 env:
+  conan_pr_host: "./.github/conanProfiles/${{ inputs.toolchain_id }}.txt"
   drMemory_base: '$HOME/drMemory'
   vcpkg_base: '$HOME/vcpkg'
 
@@ -74,21 +71,21 @@ jobs:
           key: conan-cache-${{ inputs.toolchain_id }}-${{ steps.build_type.outputs.lowercase }}
 
       - name: "[build] conan install"
-        run: conan install . -pr:h=${{ inputs.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
+        run: conan install . -pr:h=${{ env.conan_pr_host }} -s:h build_type=${{ matrix.build_type }} --build=missing
 
       - name: "[build] cmake config (windows)"
         if: ${{ contains(inputs.runner, 'windows') }}
         run: >
           cmake . --preset conan-default
           -D "GUSTAVE_ENABLE_MEMCHECK_TESTS=OFF"
-          -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
+          -D "GUSTAVE_CONAN_HOST_PROFILE=${{ env.conan_pr_host }}"
           -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
 
       - name: "[build] cmake config (ubuntu)"
         if: ${{ contains(inputs.runner, 'ubuntu') }}
         run: >
           cmake . --preset conan-default
-          -D "GUSTAVE_CONAN_HOST_PROFILE=${{ inputs.conan_pr_host }}"
+          -D "GUSTAVE_CONAN_HOST_PROFILE=${{ env.conan_pr_host }}"
           -D "GUSTAVE_VCPKG_ROOT=${{ env.vcpkg_base }}"
 
       - name: "[build/setup] Install Python venvs"
