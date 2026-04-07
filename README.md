@@ -43,9 +43,9 @@ To do so, Gustave uses a more realistic model than commonly used in the gaming i
 
 Gustave is a **header-only** library that just requires a **C++20** compiler and standard library. The currently tested platforms are:
 
-- **gcc 13.1** (Linux, libstdc++)
+- **gcc 13.3** (Linux, libstdc++)
 - **clang 17.0** (Linux, libc++)
-- **MSVC 19.44.35207** (Windows, Microsoft STL) (Visual Studio 2022)
+- **MSVC 19.44** (Windows, Microsoft STL) (Visual Studio 2022)
 
 <!-- -8<- [end:body] -->
 
