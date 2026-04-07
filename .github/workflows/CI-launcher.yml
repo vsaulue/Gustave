@@ -36,11 +36,16 @@ jobs:
     with:
       runner: ${{ inputs.min_runner }}
       toolchain_id: ${{ inputs.min_toolchain_id }}
+      build_type: Debug
 
   ci_latest_compiler:
     needs: skip_duplicate
     if: ${{ !fromJSON(needs.skip_duplicate.outputs.should_skip) }}
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
     uses: ./.github/workflows/CI-run.yml
     with:
       runner: ${{ inputs.latest_runner }}
       toolchain_id: ${{ inputs.latest_toolchain_id }}
+      build_type: ${{ matrix.build_type }}
