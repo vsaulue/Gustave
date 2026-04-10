@@ -1,6 +1,6 @@
 {
   "name": "gustave",
-  "version": "0.1.900",
+  "version": "0.2.0",
   "homepage": "https://github.com/vsaulue/Gustave",
   "description": "A structural integrity library for video games.",
   "license": "MIT",
